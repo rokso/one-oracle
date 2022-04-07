@@ -1,0 +1,6 @@
+{
+  "solidity.defaultCompiler": "localNodeModule",
+  "files.associations": {
+    ".env.*": "dotenv"
+  }
+}
