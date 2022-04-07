@@ -10,9 +10,7 @@ This repository contains set of smart contracts and test cases of One-Oracle.
    npm i
    ```
 
-2. set NODE_URL in env
-
-   Creating a `.env` file (use `.env.template` as reference)
+2. Set env vars in `.env` file (use `.env.template` as reference)
 
 3. Test
 
