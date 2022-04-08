@@ -5,11 +5,11 @@ const {hexlify, solidityKeccak256, zeroPad, getAddress, hexStripZeros} = ethers.
 
 // Slot number mapping for a token. Prepared using utility https://github.com/kendricktan/slot20
 const slots = {
-  [Address.DAI_ADDRESS]: 2,
-  [Address.WETH_ADDRESS]: 3,
-  [Address.USDC_ADDRESS]: 9,
-  [Address.WBTC_ADDRESS]: 0,
-  [Address.VSP_ADDRESS]: 0,
+  [Address.mainnet.DAI_ADDRESS]: 2,
+  [Address.mainnet.WETH_ADDRESS]: 3,
+  [Address.mainnet.USDC_ADDRESS]: 9,
+  [Address.mainnet.WBTC_ADDRESS]: 0,
+  [Address.mainnet.VSP_ADDRESS]: 0,
 }
 
 const getSlot = (

@@ -7,6 +7,12 @@
         "semi": false,
         "singleQuote": true
       }
+    },
+    {
+      "files": ["contracts/core/ChainlinkAvalanchePriceProvider.sol"],
+      "options": {
+        "printWidth": 140
+      }
     }
   ],
   "bracketSpacing": false

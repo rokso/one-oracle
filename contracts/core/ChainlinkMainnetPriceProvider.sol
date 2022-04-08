@@ -6,7 +6,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/FeedRegistryInterface.sol";
 import "./ChainlinkPriceProvider.sol";
 
 /**
- * @title ChainLink's price provider for Ethereum mainnet
+ * @title ChainLink's price provider for Mainnet mainnet
  * @dev This contract uses price feed
  */
 contract ChainlinkMainnetPriceProvider is ChainlinkPriceProvider {

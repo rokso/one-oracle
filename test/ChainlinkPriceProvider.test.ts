@@ -13,7 +13,7 @@ const {
   CHAINLINK_MAINNET_DAI_USD_AGGREGATOR,
   CHAINLINK_MAINNET_ETH_USD_AGGREGATOR,
   CHAINLINK_MAINNET_BTC_USD_AGGREGATOR,
-} = Address
+} = Address.mainnet
 
 describe('ChainlinkPriceProvider @mainnet', function () {
   let snapshotId: string
@@ -113,17 +113,17 @@ describe('ChainlinkPriceProvider @mainnet', function () {
       await expect(tx).revertedWith('token-without-aggregator')
     })
 
-    it('should quote WETH to USD', async function () {
+    it('should quote USD to WETH', async function () {
       const {_amountOut} = await priceProvider.quoteUsdToToken(weth.address, parseEther('3,236'))
       expect(_amountOut).closeTo(parseEther('1'), parseEther('1'))
     })
 
-    it('should quote WBTC to USD', async function () {
+    it('should quote USD to WBTC', async function () {
       const {_amountOut} = await priceProvider.quoteUsdToToken(wbtc.address, parseEther('436,753'))
       expect(_amountOut).closeTo(parseUnits('10', 8), parseEther('1'))
     })
 
-    it('should quote DAI to USD', async function () {
+    it('should quote USD to DAI', async function () {
       const {_amountOut} = await priceProvider.quoteUsdToToken(dai.address, parseEther('100'))
       expect(_amountOut).closeTo(parseEther('100'), parseEther('1'))
     })

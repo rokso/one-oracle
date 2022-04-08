@@ -63,7 +63,7 @@ contract ChainlinkPriceProvider is IPriceProvider, IChainlinkPriceProvider, Gove
      * @param token_ The token to get aggregator from
      * @return _aggregator The aggregator
      */
-    function _aggregatorOf(address token_) internal view virtual returns (AggregatorV3Interface _aggregator) {
+    function _aggregatorOf(address token_) private view returns (AggregatorV3Interface _aggregator) {
         _aggregator = aggregators[token_];
         require(address(_aggregator) != address(0), "token-without-aggregator");
     }
@@ -75,7 +75,8 @@ contract ChainlinkPriceProvider is IPriceProvider, IChainlinkPriceProvider, Gove
      */
     function _getUsdPriceOfAsset(address token_) internal view virtual returns (uint256, uint256) {
         (, int256 _price, , uint256 _lastUpdatedAt, ) = _aggregatorOf(token_).latestRoundData();
-        return (SafeCast.toUint256(_price) * 1e10, _lastUpdatedAt);
+        uint256 _priceInWei = SafeCast.toUint256(_price) * 1e10; // chainlink returns 8-decimals price
+        return (_priceInWei, _lastUpdatedAt);
     }
 
     /**

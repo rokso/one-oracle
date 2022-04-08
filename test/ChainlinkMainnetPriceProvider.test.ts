@@ -3,20 +3,20 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {
-  ChainlinkEthereumPriceProvider,
-  ChainlinkEthereumPriceProvider__factory,
+  ChainlinkMainnetPriceProvider,
+  ChainlinkMainnetPriceProvider__factory,
   IERC20,
   IERC20__factory,
 } from '../typechain-types'
 import Address from '../helpers/address'
 import {parseEther, parseUnits} from './helpers'
 
-const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address
+const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.mainnet
 
-describe('ChainlinkEthereumPriceProvider @mainnet', function () {
+describe('ChainlinkMainnetPriceProvider @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
-  let priceProvider: ChainlinkEthereumPriceProvider
+  let priceProvider: ChainlinkMainnetPriceProvider
   let dai: IERC20
   let weth: IERC20
   let wbtc: IERC20
@@ -29,7 +29,7 @@ describe('ChainlinkEthereumPriceProvider @mainnet', function () {
     weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
     wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
 
-    const priceProviderFactory = new ChainlinkEthereumPriceProvider__factory(deployer)
+    const priceProviderFactory = new ChainlinkMainnetPriceProvider__factory(deployer)
     priceProvider = await priceProviderFactory.deploy()
     await priceProvider.deployed()
   })
@@ -104,17 +104,17 @@ describe('ChainlinkEthereumPriceProvider @mainnet', function () {
       await expect(tx).revertedWith('token-without-aggregator')
     })
 
-    it('should quote WETH to USD', async function () {
+    it('should quote USD to WETH', async function () {
       const {_amountOut} = await priceProvider.quoteUsdToToken(weth.address, parseEther('3,236'))
       expect(_amountOut).closeTo(parseEther('1'), parseEther('1'))
     })
 
-    it('should quote WBTC to USD', async function () {
+    it('should quote USD to WBTC', async function () {
       const {_amountOut} = await priceProvider.quoteUsdToToken(wbtc.address, parseEther('436,753'))
       expect(_amountOut).closeTo(parseUnits('10', 8), parseEther('1'))
     })
 
-    it('should quote DAI to USD', async function () {
+    it('should quote USD to DAI', async function () {
       const {_amountOut} = await priceProvider.quoteUsdToToken(dai.address, parseEther('100'))
       expect(_amountOut).closeTo(parseEther('100'), parseEther('1'))
     })

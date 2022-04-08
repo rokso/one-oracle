@@ -14,11 +14,10 @@
     "hardhat": "hardhat",
     "clean": "hardhat clean",
     "compile": "hardhat compile",
-    "build": "npm run clean && npm run compile",
     "coverage": "hardhat coverage",
     "deploy": "hardhat deploy",
-    "fork": "hardhat node --no-deploy",
-    "test": "hardhat typechain && hardhat test",
+    "pretest": "hardhat typechain",
+    "test": "hardhat test --parallel --grep mainnet",
     "verify": "hardhat etherscan-verify",
     "size-contract": "hardhat size-contracts",
     "prepare": "husky install"
