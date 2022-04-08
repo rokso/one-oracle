@@ -73,7 +73,7 @@ contract ChainlinkPriceProvider is IPriceProvider, IChainlinkPriceProvider, Gove
      * @param token_ The token
      * @return The price (18 decimals) and its timestamp
      */
-    function _getUsdPriceOfAsset(address token_) private view returns (uint256, uint256) {
+    function _getUsdPriceOfAsset(address token_) internal view virtual returns (uint256, uint256) {
         (, int256 _price, , uint256 _lastUpdatedAt, ) = _aggregatorOf(token_).latestRoundData();
         return (SafeCast.toUint256(_price) * 1e10, _lastUpdatedAt);
     }
