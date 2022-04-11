@@ -16,6 +16,11 @@ import "../access/Governable.sol";
  */
 contract ChainlinkPriceProvider is IPriceProvider, IChainlinkPriceProvider, Governable {
     /**
+     * @notice Used to convert 8-decimals from Chainlink to 18-decimals values
+     */
+    uint256 public constant TEN_DECIMALS = 1e10;
+
+    /**
      * @notice Aggregators map (token => aggregator)
      */
     mapping(address => AggregatorV3Interface) public aggregators;
@@ -75,7 +80,7 @@ contract ChainlinkPriceProvider is IPriceProvider, IChainlinkPriceProvider, Gove
      */
     function _getUsdPriceOfAsset(address token_) internal view virtual returns (uint256, uint256) {
         (, int256 _price, , uint256 _lastUpdatedAt, ) = _aggregatorOf(token_).latestRoundData();
-        uint256 _priceInWei = SafeCast.toUint256(_price) * 1e10; // chainlink returns 8-decimals price
+        uint256 _priceInWei = SafeCast.toUint256(_price) * TEN_DECIMALS;
         return (_priceInWei, _lastUpdatedAt);
     }
 

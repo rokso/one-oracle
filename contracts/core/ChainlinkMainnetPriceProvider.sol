@@ -27,6 +27,6 @@ contract ChainlinkMainnetPriceProvider is ChainlinkPriceProvider {
             token_ = BTC;
         }
         (, int256 _price, , uint256 _lastUpdatedAt, ) = PRICE_FEED.latestRoundData(token_, USD);
-        return (SafeCast.toUint256(_price) * 1e10, _lastUpdatedAt);
+        return (SafeCast.toUint256(_price) * TEN_DECIMALS, _lastUpdatedAt);
     }
 }
