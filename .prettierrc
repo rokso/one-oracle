@@ -9,7 +9,10 @@
       }
     },
     {
-      "files": ["contracts/core/ChainlinkAvalanchePriceProvider.sol"],
+      "files": [
+        "contracts/core/ChainlinkAvalanchePriceProvider.sol",
+        "contracts/core/ChainlinkArbitrumPriceProvider.sol"
+      ],
       "options": {
         "printWidth": 140
       }

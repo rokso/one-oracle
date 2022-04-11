@@ -3,20 +3,20 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {
-  ChainlinkAvalanchePriceProvider,
-  ChainlinkAvalanchePriceProvider__factory,
+  ChainlinkArbitrumPriceProvider,
+  ChainlinkArbitrumPriceProvider__factory,
   IERC20,
   IERC20__factory,
 } from '../typechain-types'
 import Address from '../helpers/address'
 import {parseEther, parseUnits} from './helpers'
 
-const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.avalanche
+const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.arbitrum
 
-describe('ChainlinkAvalanchePriceProvider @avalanche', function () {
+describe('ChainlinkArbitrumPriceProvider @arbitrum', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
-  let priceProvider: ChainlinkAvalanchePriceProvider
+  let priceProvider: ChainlinkArbitrumPriceProvider
   let dai: IERC20
   let weth: IERC20
   let wbtc: IERC20
@@ -29,7 +29,7 @@ describe('ChainlinkAvalanchePriceProvider @avalanche', function () {
     weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
     wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
 
-    const priceProviderFactory = new ChainlinkAvalanchePriceProvider__factory(deployer)
+    const priceProviderFactory = new ChainlinkArbitrumPriceProvider__factory(deployer)
     priceProvider = await priceProviderFactory.deploy()
     await priceProvider.deployed()
   })
@@ -41,21 +41,21 @@ describe('ChainlinkAvalanchePriceProvider @avalanche', function () {
   describe('quote', function () {
     it('should quote WETH to DAI', async function () {
       const {_amountOut} = await priceProvider.quote(weth.address, dai.address, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('3,251'), parseEther('1'))
+      expect(_amountOut).closeTo(parseEther('3,020'), parseEther('1'))
     })
   })
 
   describe('quoteTokenToUsd', function () {
     it('should quote WETH to USD', async function () {
       const {_amountOut} = await priceProvider.quoteTokenToUsd(weth.address, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('3,251'), parseEther('1'))
+      expect(_amountOut).closeTo(parseEther('3,023'), parseEther('1'))
     })
   })
 
   describe('quoteUsdToToken', function () {
     it('should quote USD to WBTC', async function () {
       const {_amountOut} = await priceProvider.quoteUsdToToken(wbtc.address, parseEther('43,675'))
-      expect(_amountOut).closeTo(parseUnits('1', 8), parseEther('1'))
+      expect(_amountOut).closeTo(parseUnits('1', 8), parseEther('0.1'))
     })
   })
 })

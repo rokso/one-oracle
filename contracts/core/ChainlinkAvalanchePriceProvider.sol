@@ -6,7 +6,6 @@ import "./ChainlinkPriceProvider.sol";
 
 /**
  * @title ChainLink's price provider for Avalanche network
- * @dev Based on https://etherscan.deth.net/address/0xe102421A85D9C0e71C0Ef1870DaC658EB43E1493
  */
 contract ChainlinkAvalanchePriceProvider is ChainlinkPriceProvider {
     constructor() {
