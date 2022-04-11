@@ -17,7 +17,7 @@
     "coverage": "hardhat coverage",
     "deploy": "hardhat deploy",
     "pretest": "hardhat typechain",
-    "test": "hardhat test --parallel --grep mainnet",
+    "test": "hardhat test --parallel",
     "test:all": "./scripts/test-all-chains.sh",
     "verify": "hardhat etherscan-verify",
     "size-contract": "hardhat size-contracts",
