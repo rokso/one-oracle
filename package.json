@@ -18,6 +18,7 @@
     "deploy": "hardhat deploy",
     "pretest": "hardhat typechain",
     "test": "hardhat test --parallel --grep mainnet",
+    "test:all": "./scripts/test-all-chains.sh",
     "verify": "hardhat etherscan-verify",
     "size-contract": "hardhat size-contracts",
     "prepare": "husky install"
