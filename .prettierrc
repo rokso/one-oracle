@@ -7,6 +7,16 @@
         "semi": false,
         "singleQuote": true
       }
+    },
+    {
+      "files": [
+        "contracts/core/ChainlinkAvalanchePriceProvider.sol",
+        "contracts/core/ChainlinkArbitrumPriceProvider.sol",
+        "contracts/core/ChainlinkPolygonPriceProvider.sol"
+      ],
+      "options": {
+        "printWidth": 140
+      }
     }
   ],
   "bracketSpacing": false

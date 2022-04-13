@@ -1,6 +1,5 @@
 import {BigNumber} from '@ethersproject/bignumber'
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
-import {parseEther} from 'ethers/lib/utils'
 import {ethers, network} from 'hardhat'
 
 export const VSP_HOLDER = '0xba4cfe5741b357fa371b506e5db0774abfecf8fc'
@@ -13,6 +12,10 @@ export const DAY = HOUR.mul(24)
 export const WEEK = DAY.mul(7)
 export const MONTH = DAY.mul(30)
 export const YEAR = DAY.mul(365)
+
+export const parseUnits = (n: string, d: number) => ethers.utils.parseUnits(n.replace(new RegExp(/,/g), ''), d)
+
+export const parseEther = (n: string) => parseUnits(n, 18)
 
 export const increaseTime = async (timeToIncrease: BigNumber): Promise<void> => {
   await ethers.provider.send('evm_increaseTime', [timeToIncrease.toNumber()])
@@ -28,7 +31,7 @@ export const setEtherBalance = async (address: string, value: BigNumber): Promis
 
 export const impersonateAccount = async (address: string): Promise<SignerWithAddress> => {
   await network.provider.request({method: 'hardhat_impersonateAccount', params: [address]})
-  await setEtherBalance(address, parseEther('1000000'))
+  await setEtherBalance(address, parseEther('1,000,000'))
   return await ethers.getSigner(address)
 }
 
