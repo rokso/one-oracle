@@ -5,14 +5,15 @@ pragma solidity 0.8.9;
 interface IPriceProvider {
     /**
      * @notice Get quote
-     * @param _tokenIn The address of assetIn
-     * @param _tokenOut The address of assetOut
-     * @param _amountIn Amount of input token
-     * @return _amountOut , _lastUpdatedAt. Amount out and last updated timestamp
+     * @param tokenIn_ The address of assetIn
+     * @param tokenOut_ The address of assetOut
+     * @param amountIn_ Amount of input token
+     * @return _amountOut Amount out
+     * @return _lastUpdatedAt Last updated timestamp
      */
     function quote(
-        address _tokenIn,
-        address _tokenOut,
-        uint256 _amountIn
+        address tokenIn_,
+        address tokenOut_,
+        uint256 amountIn_
     ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
 }

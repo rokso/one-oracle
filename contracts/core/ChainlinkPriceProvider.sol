@@ -6,7 +6,6 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import "../interfaces/core/IPriceProvider.sol";
 import "../interfaces/core/IChainlinkPriceProvider.sol";
 import "../access/Governable.sol";
 
@@ -14,7 +13,7 @@ import "../access/Governable.sol";
  * @title ChainLink's price provider
  * @dev This contract wrapps chainlink agreggators
  */
-contract ChainlinkPriceProvider is IPriceProvider, IChainlinkPriceProvider, Governable {
+contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
     /**
      * @notice Used to convert 8-decimals from Chainlink to 18-decimals values
      */
