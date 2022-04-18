@@ -2,7 +2,9 @@
 
 pragma solidity 0.8.9;
 
-interface IChainlinkPriceProvider {
+import "./IPriceProvider.sol";
+
+interface IChainlinkPriceProvider is IPriceProvider {
     /**
      * @notice Get quote in USD amount
      * @param token_ The address of assetIn
