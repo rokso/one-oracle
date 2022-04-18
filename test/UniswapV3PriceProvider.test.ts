@@ -127,7 +127,7 @@ describe('UniswapV3PriceProvider', function () {
           poolFee,
           parseUnits('1', 8)
         )
-        expect(_amountOut).closeTo(parseUnits('43,711', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(parseUnits('43,676', 6), parseUnits('1', 6))
       })
     })
   })
