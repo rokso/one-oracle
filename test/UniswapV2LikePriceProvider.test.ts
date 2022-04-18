@@ -18,6 +18,7 @@ describe('UniswapV2LikePriceProvider', function () {
   let deployer: SignerWithAddress
   let governor: SignerWithAddress
   let dai: IERC20
+  let usdc: IERC20
   let nativeToken: IERC20
   let wbtc: IERC20
 
@@ -31,13 +32,20 @@ describe('UniswapV2LikePriceProvider', function () {
   })
 
   describe('UniswapV2LikePriceProvider @mainnet', function () {
-    const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS, UNISWAP_V2_FACTORY_ADDRESS, SUSHISWAP_FACTORY_ADDRESS} =
-      Address.mainnet
+    const {
+      DAI_ADDRESS,
+      WETH_ADDRESS,
+      WBTC_ADDRESS,
+      USDC_ADDRESS,
+      UNISWAP_V2_FACTORY_ADDRESS,
+      SUSHISWAP_FACTORY_ADDRESS,
+    } = Address.mainnet
 
     beforeEach(async function () {
       dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
       nativeToken = IERC20__factory.connect(WETH_ADDRESS, deployer)
       wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
+      usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
     })
 
     describe('quote', function () {
@@ -57,11 +65,13 @@ describe('UniswapV2LikePriceProvider', function () {
 
           await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WETH_ADDRESS))
           await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WETH_ADDRESS))
+          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(USDC_ADDRESS, WETH_ADDRESS))
 
           await increaseTime(DEFAULT_TWAP_PERIOD)
 
           await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WETH_ADDRESS))
           await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WETH_ADDRESS))
+          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(USDC_ADDRESS, WETH_ADDRESS))
         })
 
         describe('updateDefaultTwapPeriod', function () {
@@ -140,22 +150,22 @@ describe('UniswapV2LikePriceProvider', function () {
           expect(_amountOut).eq(amountIn)
         })
 
-        it('should quote using NATIVE-DAI path', async function () {
+        it('should quote using NATIVE-USDC path', async function () {
           const {_amountOut} = await priceProvider['quote(address,address,uint256)'](
             nativeToken.address,
-            dai.address,
+            usdc.address,
             parseEther('1')
           )
-          expect(_amountOut).closeTo(parseEther('3,233'), parseEther('1'))
+          expect(_amountOut).closeTo(parseUnits('3,236', 6), parseUnits('1', 6))
         })
 
-        it('should quote using WBTC-NATIVE-DAI', async function () {
+        it('should quote using WBTC-NATIVE-USDC', async function () {
           const {_amountOut} = await priceProvider['quote(address,address,uint256)'](
             wbtc.address,
-            dai.address,
+            usdc.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(parseEther('43,733'), parseEther('1'))
+          expect(_amountOut).closeTo(parseUnits('43,784', 6), parseUnits('1', 6))
         })
       })
 
