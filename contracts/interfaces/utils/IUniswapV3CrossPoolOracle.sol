@@ -5,9 +5,8 @@ pragma solidity 0.8.9;
 /**
  * @title UniswapV3 oracle with ability to query across an intermediate liquidity pool
  */
-// TODO: Comment
 interface IUniswapV3CrossPoolOracle {
-    function weth() external view returns (address);
+    function nativeToken() external view returns (address);
 
     function assetToEth(
         address _tokenIn,

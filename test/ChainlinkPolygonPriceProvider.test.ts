@@ -41,14 +41,14 @@ describe('ChainlinkPolygonPriceProvider @polygon', function () {
   describe('quote', function () {
     it('should quote WETH to DAI', async function () {
       const {_amountOut} = await priceProvider.quote(weth.address, dai.address, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('3,023'), parseEther('1'))
+      expect(_amountOut).closeTo(parseEther('3,013'), parseEther('1'))
     })
   })
 
   describe('quoteTokenToUsd', function () {
     it('should quote WETH to USD', async function () {
       const {_amountOut} = await priceProvider.quoteTokenToUsd(weth.address, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('3,023'), parseEther('1'))
+      expect(_amountOut).closeTo(parseEther('3,014'), parseEther('1'))
     })
   })
 

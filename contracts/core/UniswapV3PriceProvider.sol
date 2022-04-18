@@ -67,12 +67,26 @@ contract UniswapV3PriceProvider is IUniswapV3PriceProvider, Governable {
         address tokenIn_,
         address tokenOut_,
         uint24 poolFee_,
+        uint256 amountIn_
+    ) external view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+        return quote(tokenIn_, tokenOut_, poolFee_, defaultTwapPeriod, amountIn_);
+    }
+
+    /// @inheritdoc IUniswapV3PriceProvider
+    function quote(
+        address tokenIn_,
+        address tokenOut_,
+        uint24 poolFee_,
         uint32 twapPeriod_,
         uint256 amountIn_
     ) public view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
-        if (tokenIn_ == crossPoolOracle.weth()) {
+        if (tokenIn_ == tokenOut_) {
+            return (amountIn_, block.timestamp);
+        }
+
+        if (tokenIn_ == crossPoolOracle.nativeToken()) {
             _amountOut = crossPoolOracle.ethToAsset(amountIn_, tokenOut_, poolFee_, twapPeriod_);
-        } else if (tokenOut_ == crossPoolOracle.weth()) {
+        } else if (tokenOut_ == crossPoolOracle.nativeToken()) {
             _amountOut = crossPoolOracle.assetToEth(tokenIn_, amountIn_, poolFee_, twapPeriod_);
         } else {
             _amountOut = crossPoolOracle.assetToAsset(tokenIn_, amountIn_, tokenOut_, poolFee_, twapPeriod_);

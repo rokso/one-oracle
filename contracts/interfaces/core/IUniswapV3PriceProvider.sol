@@ -33,6 +33,22 @@ interface IUniswapV3PriceProvider is IPriceProvider {
      * @param tokenIn_ The address of assetIn
      * @param tokenOut_ The address of assetOut
      * @param poolFee_ The pools' fees
+     * @param amountIn_ Amount of input token
+     * @return _amountOut Amount out
+     * @return _lastUpdatedAt Last updated timestamp
+     */
+    function quote(
+        address tokenIn_,
+        address tokenOut_,
+        uint24 poolFee_,
+        uint256 amountIn_
+    ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
+
+    /**
+     * @notice Get quote
+     * @param tokenIn_ The address of assetIn
+     * @param tokenOut_ The address of assetOut
+     * @param poolFee_ The pools' fees
      * @param twapPeriod_ The TWAP period
      * @param amountIn_ Amount of input token
      * @return _amountOut Amount out

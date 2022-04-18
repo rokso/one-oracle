@@ -9,99 +9,98 @@ import "../libraries/SafeUint128.sol";
 /// @title UniswapV3 oracle with ability to query across an intermediate liquidity pool
 /// @dev Based on https://etherscan.io/address/0x0f1f5a87f99f0918e6c81f16e59f3518698221ff#code
 /// @dev Having this as a separated contract to due to solc version conflicts with uniswap contracts
-// TODO: Rename function params to use _ as suffix
 contract UniswapV3CrossPoolOracle {
     // UniswapV3 has its factopry deployed with the same address in all chains
     // See: https://docs.uniswap.org/protocol/reference/deployments
     address public constant UNISWAP_V3_FACTORY = 0x1F98431c8aD98523631AE4a59f267346ea31F984;
     address public immutable nativeToken;
 
-    constructor(address _nativeToken) {
-        nativeToken = _nativeToken;
+    constructor(address nativeToken_) {
+        nativeToken = nativeToken_;
     }
 
     function assetToEth(
-        address _tokenIn,
-        uint256 _amountIn,
-        uint24 _fee,
-        uint32 _twapPeriod
+        address tokenIn_,
+        uint256 amountIn_,
+        uint24 fee_,
+        uint32 twapPeriod_
     ) public view returns (uint256 ethAmountOut) {
-        return _fetchTwap(_tokenIn, nativeToken, _fee, _twapPeriod, _amountIn);
+        return _fetchTwap(tokenIn_, nativeToken, fee_, twapPeriod_, amountIn_);
     }
 
     function ethToAsset(
         uint256 _ethAmountIn,
-        address _tokenOut,
-        uint24 _fee,
-        uint32 _twapPeriod
+        address tokenOut_,
+        uint24 fee_,
+        uint32 twapPeriod_
     ) public view returns (uint256 amountOut) {
-        return _fetchTwap(nativeToken, _tokenOut, _fee, _twapPeriod, _ethAmountIn);
+        return _fetchTwap(nativeToken, tokenOut_, fee_, twapPeriod_, _ethAmountIn);
     }
 
     function assetToAsset(
-        address _tokenIn,
-        uint256 _amountIn,
-        address _tokenOut,
-        uint24 _fee,
-        uint32 _twapPeriod
+        address tokenIn_,
+        uint256 amountIn_,
+        address tokenOut_,
+        uint24 fee_,
+        uint32 twapPeriod_
     ) public view returns (uint256 amountOut) {
-        if (_tokenIn == nativeToken) {
-            return ethToAsset(_amountIn, _tokenOut, _fee, _twapPeriod);
-        } else if (_tokenOut == nativeToken) {
-            return assetToEth(_tokenIn, _amountIn, _fee, _twapPeriod);
+        if (tokenIn_ == nativeToken) {
+            return ethToAsset(amountIn_, tokenOut_, fee_, twapPeriod_);
+        } else if (tokenOut_ == nativeToken) {
+            return assetToEth(tokenIn_, amountIn_, fee_, twapPeriod_);
         } else {
-            uint256 ethAmount = assetToEth(_tokenIn, _amountIn, _fee, _twapPeriod);
-            return ethToAsset(ethAmount, _tokenOut, _fee, _twapPeriod);
+            uint256 ethAmount = assetToEth(tokenIn_, amountIn_, fee_, twapPeriod_);
+            return ethToAsset(ethAmount, tokenOut_, fee_, twapPeriod_);
         }
     }
 
     function assetToAssetThruRoute(
-        address _tokenIn,
-        uint256 _amountIn,
-        address _tokenOut,
-        uint32 _twapPeriod,
-        address _routeThruToken,
-        uint24[2] memory _poolFees
+        address tokenIn_,
+        uint256 amountIn_,
+        address tokenOut_,
+        uint32 twapPeriod_,
+        address routeThruToken_,
+        uint24[2] memory poolFees_
     ) public view returns (uint256 amountOut) {
-        require(_poolFees.length <= 2, "uniV3CPOracle: bad fees length");
-        uint24 pool0Fee = _poolFees[0];
-        uint24 pool1Fee = _poolFees[1];
-        address routeThruToken = _routeThruToken == address(0) ? nativeToken : _routeThruToken;
+        require(poolFees_.length <= 2, "uniV3CPOracle: bad fees length");
+        uint24 _pool0Fee = poolFees_[0];
+        uint24 _pool1Fee = poolFees_[1];
+        address _routeThruToken = routeThruToken_ == address(0) ? nativeToken : routeThruToken_;
 
-        if (routeThruToken == nativeToken && pool0Fee == pool1Fee) {
+        if (_routeThruToken == nativeToken && _pool0Fee == _pool1Fee) {
             // Same as basic assetToAsset()
-            return assetToAsset(_tokenIn, _amountIn, _tokenOut, pool0Fee, _twapPeriod);
+            return assetToAsset(tokenIn_, amountIn_, tokenOut_, _pool0Fee, twapPeriod_);
         }
 
-        if (_tokenIn == routeThruToken || _tokenOut == routeThruToken) {
+        if (tokenIn_ == _routeThruToken || tokenOut_ == _routeThruToken) {
             // Can skip routeThru token
-            return _fetchTwap(_tokenIn, _tokenOut, pool0Fee, _twapPeriod, _amountIn);
+            return _fetchTwap(tokenIn_, tokenOut_, _pool0Fee, twapPeriod_, amountIn_);
         }
 
         // Cross pools through routeThru
-        uint256 routeThruAmount = _fetchTwap(_tokenIn, routeThruToken, pool0Fee, _twapPeriod, _amountIn);
-        return _fetchTwap(routeThruToken, _tokenOut, pool1Fee, _twapPeriod, routeThruAmount);
+        uint256 _routeThruAmount = _fetchTwap(tokenIn_, _routeThruToken, _pool0Fee, twapPeriod_, amountIn_);
+        return _fetchTwap(_routeThruToken, tokenOut_, _pool1Fee, twapPeriod_, _routeThruAmount);
     }
 
     function _fetchTwap(
-        address _tokenIn,
-        address _tokenOut,
-        uint24 _poolFee,
-        uint32 _twapPeriod,
-        uint256 _amountIn
+        address tokenIn_,
+        address tokenOut_,
+        uint24 poolFee_,
+        uint32 twapPeriod_,
+        uint256 amountIn_
     ) internal view returns (uint256 amountOut) {
-        address pool = PoolAddress.computeAddress(
+        address _pool = PoolAddress.computeAddress(
             UNISWAP_V3_FACTORY,
-            PoolAddress.getPoolKey(_tokenIn, _tokenOut, _poolFee)
+            PoolAddress.getPoolKey(tokenIn_, tokenOut_, poolFee_)
         );
         // Leave twapTick as a int256 to avoid solidity casting
-        (int256 twapTick, ) = OracleLibrary.consult(pool, _twapPeriod);
+        (int256 _twapTick, ) = OracleLibrary.consult(_pool, twapPeriod_);
         return
             OracleLibrary.getQuoteAtTick(
-                int24(twapTick), // can assume safe being result from consult()
-                SafeUint128.toUint128(_amountIn),
-                _tokenIn,
-                _tokenOut
+                int24(_twapTick), // can assume safe being result from consult()
+                SafeUint128.toUint128(amountIn_),
+                tokenIn_,
+                tokenOut_
             );
     }
 }
