@@ -7,9 +7,9 @@ import {
   UniswapV2LikePriceProvider__factory,
   IERC20,
   IERC20__factory,
-} from '../typechain-types'
-import Address from '../helpers/address'
-import {parseEther, parseUnits, HOUR, increaseTime} from './helpers'
+} from '../../typechain-types'
+import Address from '../../helpers/address'
+import {parseEther, parseUnits, HOUR, increaseTime} from '../helpers'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 

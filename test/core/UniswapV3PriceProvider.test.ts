@@ -8,9 +8,9 @@ import {
   UniswapV3PriceProvider__factory,
   IERC20,
   IERC20__factory,
-} from '../typechain-types'
-import Address from '../helpers/address'
-import {parseEther, parseUnits, HOUR} from './helpers'
+} from '../../typechain-types'
+import Address from '../../helpers/address'
+import {parseEther, parseUnits, HOUR} from '../helpers'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%

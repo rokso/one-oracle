@@ -7,9 +7,9 @@ import {
   ChainlinkArbitrumPriceProvider__factory,
   IERC20,
   IERC20__factory,
-} from '../typechain-types'
-import Address from '../helpers/address'
-import {parseEther, parseUnits} from './helpers'
+} from '../../typechain-types'
+import Address from '../../helpers/address'
+import {parseEther, parseUnits} from '../helpers'
 
 const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.arbitrum
 
