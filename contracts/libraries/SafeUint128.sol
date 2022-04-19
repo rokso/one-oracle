@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.5.0;
+pragma solidity >=0.7.6;
 
 /// @title Safe uint128 casting methods
 /// @notice Contains methods for safely casting between types
@@ -9,6 +9,6 @@ library SafeUint128 {
     /// @param y The uint256 to be downcasted
     /// @return z The downcasted integer, now type uint128
     function toUint128(uint256 y) internal pure returns (uint128 z) {
-        require((z = uint128(y)) == y);
+        require((z = uint128(y)) == y, "error-when-casting");
     }
 }
