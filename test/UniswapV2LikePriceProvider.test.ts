@@ -463,7 +463,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(parseEther('40,696'), parseEther('1'))
+          expect(_amountOut).closeTo(parseEther('40,832'), parseEther('1'))
         })
       })
 
@@ -515,7 +515,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(parseEther('40,880'), parseEther('1'))
+          expect(_amountOut).closeTo(parseEther('40,739'), parseEther('1'))
         })
       })
     })

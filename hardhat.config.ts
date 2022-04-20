@@ -45,16 +45,45 @@ const config: HardhatUserConfig = {
     excludeContracts: ['mock/'],
   },
   solidity: {
-    version: '0.8.9',
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 100,
-      },
-      outputSelection: {
-        '*': {
-          '*': ['storageLayout'],
+    compilers: [
+      {
+        version: '0.8.9',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 100,
+          },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
         },
+      },
+      {
+        version: '0.7.6',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 100,
+          },
+          outputSelection: {
+            '*': {
+              '*': ['storageLayout'],
+            },
+          },
+        },
+      },
+    ],
+    overrides: {
+      '@uniswap/v3-core/contracts/libraries/FullMath.sol': {
+        version: '0.7.6',
+      },
+      '@uniswap/v3-core/contracts/libraries/TickMath.sol': {
+        version: '0.7.6',
+      },
+      '@uniswap/v3-periphery/contracts/libraries/PoolAddress.sol': {
+        version: '0.7.6',
       },
     },
   },

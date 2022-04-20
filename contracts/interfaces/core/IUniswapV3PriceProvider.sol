@@ -1,0 +1,78 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity 0.8.9;
+
+import "./IPriceProvider.sol";
+
+interface IUniswapV3PriceProvider is IPriceProvider {
+    /**
+     * @notice The default time-weighted average price (TWAP) period
+     * Used when a period isn't specified
+     * @dev See more: https://docs.uniswap.org/protocol/concepts/V3-overview/oracle
+     */
+    function defaultTwapPeriod() external view returns (uint32);
+
+    /**
+     * @notice Get quote
+     * @param tokenIn_ The address of assetIn
+     * @param tokenOut_ The address of assetOut
+     * @param twapPeriod_ The TWAP period
+     * @param amountIn_ Amount of input token
+     * @return _amountOut Amount out
+     * @return _lastUpdatedAt Last updated timestamp
+     */
+    function quote(
+        address tokenIn_,
+        address tokenOut_,
+        uint32 twapPeriod_,
+        uint256 amountIn_
+    ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
+
+    /**
+     * @notice Get quote
+     * @param tokenIn_ The address of assetIn
+     * @param tokenOut_ The address of assetOut
+     * @param poolFee_ The pools' fees
+     * @param amountIn_ Amount of input token
+     * @return _amountOut Amount out
+     * @return _lastUpdatedAt Last updated timestamp
+     */
+    function quote(
+        address tokenIn_,
+        address tokenOut_,
+        uint24 poolFee_,
+        uint256 amountIn_
+    ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
+
+    /**
+     * @notice Get quote
+     * @param tokenIn_ The address of assetIn
+     * @param tokenOut_ The address of assetOut
+     * @param poolFee_ The pools' fees
+     * @param twapPeriod_ The TWAP period
+     * @param amountIn_ Amount of input token
+     * @return _amountOut Amount out
+     * @return _lastUpdatedAt Last updated timestamp
+     */
+    function quote(
+        address tokenIn_,
+        address tokenOut_,
+        uint24 poolFee_,
+        uint32 twapPeriod_,
+        uint256 amountIn_
+    ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
+
+    /**
+     * @notice Update the default TWAP period
+     * @dev Administrative function
+     * @param newDefaultTwapPeriod_ The new default period
+     */
+    function updateDefaultTwapPeriod(uint32 newDefaultTwapPeriod_) external;
+
+    /**
+     * @notice Update the default pool fee
+     * @dev Administrative function
+     * @param newDefaultPoolFee_ The new default period
+     */
+    function updateDefaultPoolFee(uint24 newDefaultPoolFee_) external;
+}
