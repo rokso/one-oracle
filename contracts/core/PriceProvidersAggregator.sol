@@ -36,7 +36,9 @@ contract PriceProvidersAggregator is IPriceProvidersAggregator, Governable {
         address tokenOut_,
         uint256 amountIn_
     ) external view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
-        return quote(provider_, tokenIn_, provider_, tokenOut_, amountIn_);
+        IPriceProvider _provider = priceProviders[provider_];
+        require(address(_provider) != address(0), "provider-not-set");
+        return _provider.quote(tokenIn_, tokenOut_, amountIn_);
     }
 
     /// @inheritdoc IPriceProvidersAggregator
