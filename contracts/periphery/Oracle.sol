@@ -20,6 +20,7 @@ contract Oracle is IOracle, PriceProvidersAggregator {
      * @dev Stable coin may lose pegging on-chain and may not be equal to $1.
      */
     address public usdEquivalentToken;
+    uint8 private usdEquivalentTokenDecimals;
 
     /**
      * @notice The default provider (optional)
@@ -35,7 +36,6 @@ contract Oracle is IOracle, PriceProvidersAggregator {
         view
         returns (uint256 _amountOut, uint256 _lastUpdatedAt)
     {
-        require(defaultProvider != Provider.NONE, "not-supported");
         return quoteTokenToUsd(defaultProvider, token_, amountIn_);
     }
 
@@ -45,12 +45,11 @@ contract Oracle is IOracle, PriceProvidersAggregator {
         address token_,
         uint256 amountIn_
     ) public view returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+        require(token_ != address(0), "token-is-null");
+        require(provider_ != Provider.NONE, "not-supported");
+
         if (usdEquivalentToken == token_) {
-            _amountOut = OracleHelpers.scaleDecimal(
-                amountIn_,
-                IERC20Metadata(usdEquivalentToken).decimals(),
-                USD_DECIMALS
-            );
+            _amountOut = OracleHelpers.scaleDecimal(amountIn_, usdEquivalentTokenDecimals, USD_DECIMALS);
             return (_amountOut, block.timestamp);
         }
 
@@ -65,11 +64,7 @@ contract Oracle is IOracle, PriceProvidersAggregator {
 
         (_amountOut, _lastUpdatedAt) = _priceProvider.quote(token_, usdEquivalentToken, amountIn_);
 
-        _amountOut = OracleHelpers.scaleDecimal(
-            _amountOut,
-            IERC20Metadata(usdEquivalentToken).decimals(),
-            USD_DECIMALS
-        );
+        _amountOut = OracleHelpers.scaleDecimal(_amountOut, usdEquivalentTokenDecimals, USD_DECIMALS);
     }
 
     /// @inheritdoc IOracle
@@ -78,7 +73,6 @@ contract Oracle is IOracle, PriceProvidersAggregator {
         view
         returns (uint256 _amountOut, uint256 _lastUpdatedAt)
     {
-        require(defaultProvider != Provider.NONE, "not-supported");
         return quoteUsdToToken(defaultProvider, token_, amountIn_);
     }
 
@@ -88,12 +82,11 @@ contract Oracle is IOracle, PriceProvidersAggregator {
         address token_,
         uint256 amountIn_
     ) public view returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+        require(token_ != address(0), "token-is-null");
+        require(provider_ != Provider.NONE, "not-supported");
+
         if (usdEquivalentToken == token_) {
-            _amountOut = OracleHelpers.scaleDecimal(
-                amountIn_,
-                USD_DECIMALS,
-                IERC20Metadata(usdEquivalentToken).decimals()
-            );
+            _amountOut = OracleHelpers.scaleDecimal(amountIn_, USD_DECIMALS, usdEquivalentTokenDecimals);
 
             return (_amountOut, block.timestamp);
         }
@@ -107,11 +100,7 @@ contract Oracle is IOracle, PriceProvidersAggregator {
 
         require(usdEquivalentToken != address(0), "not-supported");
 
-        uint256 _amountIn = OracleHelpers.scaleDecimal(
-            amountIn_,
-            USD_DECIMALS,
-            IERC20Metadata(usdEquivalentToken).decimals()
-        );
+        uint256 _amountIn = OracleHelpers.scaleDecimal(amountIn_, USD_DECIMALS, usdEquivalentTokenDecimals);
 
         (_amountOut, _lastUpdatedAt) = _priceProvider.quote(usdEquivalentToken, token_, _amountIn);
     }
@@ -119,6 +108,11 @@ contract Oracle is IOracle, PriceProvidersAggregator {
     /// @inheritdoc IOracle
     function setUSDEquivalentToken(address usdEquivalentToken_) external onlyGovernor {
         usdEquivalentToken = usdEquivalentToken_;
+        if (usdEquivalentToken_ == address(0)) {
+            usdEquivalentTokenDecimals = 0;
+        } else {
+            usdEquivalentTokenDecimals = IERC20Metadata(usdEquivalentToken).decimals();
+        }
     }
 
     /// @inheritdoc IOracle
