@@ -19,10 +19,14 @@ contract PriceProvidersAggregator is IPriceProvidersAggregator, Governable {
     /**
      * @notice Price providers map
      */
-    mapping(Provider => IPriceProvider) public priceProviders;
+    mapping(DataTypes.Provider => IPriceProvider) public override priceProviders;
 
     /// Emitted when an price provider is updated
-    event PriceProviderUpdated(Provider provider, IPriceProvider oldPriceProvider, IPriceProvider newPriceProvider);
+    event PriceProviderUpdated(
+        DataTypes.Provider provider,
+        IPriceProvider oldPriceProvider,
+        IPriceProvider newPriceProvider
+    );
 
     constructor(address nativeToken_) {
         require(nativeToken_ != address(0), "native-token-is-null");
@@ -31,7 +35,7 @@ contract PriceProvidersAggregator is IPriceProvidersAggregator, Governable {
 
     /// @inheritdoc IPriceProvidersAggregator
     function quote(
-        Provider provider_,
+        DataTypes.Provider provider_,
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
@@ -43,9 +47,9 @@ contract PriceProvidersAggregator is IPriceProvidersAggregator, Governable {
 
     /// @inheritdoc IPriceProvidersAggregator
     function quote(
-        Provider providerIn_,
+        DataTypes.Provider providerIn_,
         address tokenIn_,
-        Provider providerOut_,
+        DataTypes.Provider providerOut_,
         address tokenOut_,
         uint256 amountIn_
     ) public view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
@@ -66,8 +70,8 @@ contract PriceProvidersAggregator is IPriceProvidersAggregator, Governable {
     }
 
     /// @inheritdoc IPriceProvidersAggregator
-    function setPriceProvider(Provider provider_, IPriceProvider priceProvider_) external onlyGovernor {
-        require(provider_ != Provider.NONE, "invalid-provider");
+    function setPriceProvider(DataTypes.Provider provider_, IPriceProvider priceProvider_) external onlyGovernor {
+        require(provider_ != DataTypes.Provider.NONE, "invalid-provider");
         IPriceProvider _current = priceProviders[provider_];
         require(priceProvider_ != _current, "same-as-current");
 

@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity 0.8.9;
+
+library DataTypes {
+    /**
+     * @notice Price providers enumeration
+     */
+    enum Provider {
+        NONE,
+        CHAINLINK,
+        UNISWAP_V3,
+        UNISWAP_V2,
+        SUSHISWAP,
+        TRADERJOE,
+        PANGOLIN,
+        QUICKSWAP
+    }
+}

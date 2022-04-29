@@ -12,6 +12,8 @@ import {
   ChainlinkMainnetPriceProvider,
   Oracle,
   Oracle__factory,
+  PriceProvidersAggregator__factory,
+  PriceProvidersAggregator,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, parseUnits, HOUR} from '../helpers'
@@ -44,6 +46,7 @@ describe('Oracle @mainnet', function () {
   let wbtc: IERC20
   let uniswapV3Provider: UniswapV3PriceProvider
   let chainlinkProvider: ChainlinkMainnetPriceProvider
+  let providersAggregator: PriceProvidersAggregator
   let oracle: Oracle
 
   beforeEach(async function () {
@@ -71,13 +74,16 @@ describe('Oracle @mainnet', function () {
     chainlinkProvider = await chainlinkProviderFactory.deploy()
     await chainlinkProvider.deployed()
 
+    const providersAggregatorFactory = new PriceProvidersAggregator__factory(deployer)
+    providersAggregator = await providersAggregatorFactory.deploy(WETH_ADDRESS)
+    await providersAggregator.deployed()
+
+    await providersAggregator.setPriceProvider(Provider.UNISWAP_V3, uniswapV3Provider.address)
+    await providersAggregator.setPriceProvider(Provider.CHAINLINK, chainlinkProvider.address)
+
     const oracleFactory = new Oracle__factory(deployer)
-    oracle = await oracleFactory.deploy(WETH_ADDRESS)
+    oracle = await oracleFactory.deploy(providersAggregator.address)
     await oracle.deployed()
-
-    await oracle.setPriceProvider(Provider.UNISWAP_V3, uniswapV3Provider.address)
-    await oracle.setPriceProvider(Provider.CHAINLINK, chainlinkProvider.address)
-
     await oracle.setDefaultProvider(Provider.CHAINLINK)
     await oracle.setUSDEquivalentToken(usdc.address)
 

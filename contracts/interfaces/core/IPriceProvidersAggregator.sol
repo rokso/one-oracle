@@ -2,22 +2,14 @@
 
 pragma solidity 0.8.9;
 
+import "../../libraries/DataTypes.sol";
 import "./IPriceProvider.sol";
 
 interface IPriceProvidersAggregator {
     /**
-     * @notice Price providers enumeration
+     * @notice Provider Providers' mapping
      */
-    enum Provider {
-        NONE,
-        CHAINLINK,
-        UNISWAP_V3,
-        UNISWAP_V2,
-        SUSHISWAP,
-        TRADERJOE,
-        PANGOLIN,
-        QUICKSWAP
-    }
+    function priceProviders(DataTypes.Provider provider_) external view returns (IPriceProvider _priceProvider);
 
     /**
      * @notice Get quote
@@ -29,7 +21,7 @@ interface IPriceProvidersAggregator {
      * @return _lastUpdatedAt Last updated timestamp
      */
     function quote(
-        Provider provider_,
+        DataTypes.Provider provider_,
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
@@ -47,9 +39,9 @@ interface IPriceProvidersAggregator {
      * @return _lastUpdatedAt Last updated timestamp
      */
     function quote(
-        Provider providerIn_,
+        DataTypes.Provider providerIn_,
         address tokenIn_,
-        Provider providerOut_,
+        DataTypes.Provider providerOut_,
         address tokenOut_,
         uint256 amountIn_
     ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
@@ -60,5 +52,5 @@ interface IPriceProvidersAggregator {
      * @param provider_ The provider (from enum)
      * @param priceProvider_ The price provider contract
      */
-    function setPriceProvider(Provider provider_, IPriceProvider priceProvider_) external;
+    function setPriceProvider(DataTypes.Provider provider_, IPriceProvider priceProvider_) external;
 }
