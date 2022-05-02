@@ -24,6 +24,8 @@ export const parseUnits = (n: string, d: number) => ethers.utils.parseUnits(n.re
 
 export const parseEther = (n: string) => parseUnits(n, 18)
 
+export const toUSD = (n: string) => parseUnits(n, 18)
+
 export const increaseTime = async (timeToIncrease: BigNumber): Promise<void> => {
   await ethers.provider.send('evm_increaseTime', [timeToIncrease.toNumber()])
   await ethers.provider.send('evm_mine', [])

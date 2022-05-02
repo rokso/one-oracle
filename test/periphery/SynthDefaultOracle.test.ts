@@ -11,14 +11,12 @@ import {
   ERC20Mock__factory,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
-import {parseUnits, HOUR} from '../helpers'
+import {toUSD, HOUR} from '../helpers'
 import {BigNumber} from 'ethers'
 
 const STALE_PERIOD = HOUR
 
 const {WETH_ADDRESS, WBTC_ADDRESS, DAI_ADDRESS} = Address.avalanche
-
-const toUSD = (n: string) => parseUnits(n, 18)
 
 describe('SynthDefaultOracle @avalanche', function () {
   let snapshotId: string
