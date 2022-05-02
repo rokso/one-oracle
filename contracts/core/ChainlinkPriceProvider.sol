@@ -79,8 +79,7 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
      */
     function _getUsdPriceOfAsset(address token_) internal view virtual returns (uint256, uint256) {
         (, int256 _price, , uint256 _lastUpdatedAt, ) = _aggregatorOf(token_).latestRoundData();
-        uint256 _priceInWei = SafeCast.toUint256(_price) * TEN_DECIMALS;
-        return (_priceInWei, _lastUpdatedAt);
+        return (SafeCast.toUint256(_price) * TEN_DECIMALS, _lastUpdatedAt);
     }
 
     /**

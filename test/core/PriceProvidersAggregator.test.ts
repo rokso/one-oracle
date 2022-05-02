@@ -12,9 +12,9 @@ import {
   UniswapV3CrossPoolOracle__factory,
   ChainlinkMainnetPriceProvider__factory,
   ChainlinkMainnetPriceProvider,
-} from '../typechain-types'
-import Address from '../helpers/address'
-import {parseEther, parseUnits, HOUR} from './helpers'
+} from '../../typechain-types'
+import Address from '../../helpers/address'
+import {parseEther, parseUnits, HOUR} from '../helpers'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
@@ -32,7 +32,7 @@ enum Provider {
   QUICKSWAP = 7,
 }
 
-// Note: No need to cover all chains with this test
+// Note: No need to cover all chains on this test
 describe('PriceProvidersAggregator @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
