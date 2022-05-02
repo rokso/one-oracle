@@ -14,10 +14,8 @@ import "../access/Governable.sol";
  * @dev This contract wrapps chainlink agreggators
  */
 contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
-    /**
-     * @notice Used to convert 8-decimals from Chainlink to 18-decimals values
-     */
-    uint256 public constant TEN_DECIMALS = 1e10;
+    uint256 internal constant CHAINLINK_DECIMALS = 8;
+    uint256 public constant USD_DECIMALS = 18;
 
     /**
      * @notice Aggregators map (token => aggregator)
@@ -26,6 +24,11 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
 
     /// Emitted when an agreggator is updated
     event AggregatorUpdated(AggregatorV3Interface oldAggregator, AggregatorV3Interface newAggregator);
+
+    /// @inheritdoc IChainlinkPriceProvider
+    function getPriceInUsd(address token_) public view override returns (uint256 _priceInUsd, uint256 _lastUpdatedAt) {
+        return _getUsdPriceOfAsset(token_);
+    }
 
     /// @inheritdoc IPriceProvider
     function quote(
@@ -79,7 +82,10 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
      */
     function _getUsdPriceOfAsset(address token_) internal view virtual returns (uint256, uint256) {
         (, int256 _price, , uint256 _lastUpdatedAt, ) = _aggregatorOf(token_).latestRoundData();
-        return (SafeCast.toUint256(_price) * TEN_DECIMALS, _lastUpdatedAt);
+        return (
+            OracleHelpers.scaleDecimal(SafeCast.toUint256(_price), CHAINLINK_DECIMALS, USD_DECIMALS),
+            _lastUpdatedAt
+        );
     }
 
     /**
