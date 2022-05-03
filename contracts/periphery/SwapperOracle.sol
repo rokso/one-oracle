@@ -39,6 +39,12 @@ contract SwapperOracle is ISwapperOracle, Governable {
     /// @notice Emitted when stale period is updated
     event StalePeriodUpdated(uint256 oldStalePeriod, uint256 newStalePeriod);
 
+    /// @notice Emitted when providers aggregator is updated
+    event ProvidersAggregatorUpdated(
+        IPriceProvidersAggregator oldProvidersAggregator,
+        IPriceProvidersAggregator newProvidersAggregator
+    );
+
     constructor(
         IPriceProvidersAggregator providersAggregator_,
         uint256 stalePeriod_,
@@ -72,10 +78,10 @@ contract SwapperOracle is ISwapperOracle, Governable {
 
         // 4. If price from fallback A is OK and there isn't a fallback B, return price from fallback A
         bool _aPriceOK = _amountOutA > 0 && !_priceIsStale(_lastUpdatedAtA);
-        if (_aPriceOK && fallbackProviderB == DataTypes.Provider.NONE) {
+        if (fallbackProviderB == DataTypes.Provider.NONE) {
+            require(_aPriceOK, "fallback-a-failed");
             return _amountOutA;
         }
-        require(_aPriceOK || fallbackProviderB != DataTypes.Provider.NONE, "fallback-a-failed");
 
         // 5. Get price from fallback B
         (uint256 _amountOutB, uint256 _lastUpdatedAtB) = _quote(fallbackProviderB, tokenIn_, tokenOut_, amountIn_);
@@ -137,6 +143,7 @@ contract SwapperOracle is ISwapperOracle, Governable {
      */
     function updateProvidersAggregator(IPriceProvidersAggregator providersAggregator_) public onlyGovernor {
         require(address(providersAggregator_) != address(0), "address-is-null");
+        emit ProvidersAggregatorUpdated(providersAggregator, providersAggregator_);
         providersAggregator = providersAggregator_;
     }
 

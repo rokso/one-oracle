@@ -66,13 +66,11 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         // 3. Get best route between paths A and B
         require(_amountInA > 0 || _amountInB > 0, "invalid-swap");
 
-        if (_amountInA > 0 && _amountInB > 0) {
-            if (_amountInA < _amountInB) return (_amountInA, _pathA);
-            return (_amountInB, _pathB);
+        // Returns A if it's valid and better than B or if B isn't valid
+        if ((_amountInA > 0 && _amountInA < _amountInB) || _amountInB == 0) {
+            return (_amountInA, _pathA);
         }
-
-        if (_amountInA == 0) return (_amountInB, _pathB);
-        return (_amountInA, _pathA);
+        return (_amountInB, _pathB);
     }
 
     /// @inheritdoc IExchange
