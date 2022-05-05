@@ -51,7 +51,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 100,
+            runs: 5000,
           },
           outputSelection: {
             '*': {
@@ -65,7 +65,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 100,
+            runs: 5000,
           },
           outputSelection: {
             '*': {
