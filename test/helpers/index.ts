@@ -2,16 +2,23 @@ import {BigNumber} from '@ethersproject/bignumber'
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {ethers, network} from 'hardhat'
 
-export const VSP_HOLDER = '0xba4cfe5741b357fa371b506e5db0774abfecf8fc'
-export const WETH_HOLDER = '0x2f0b23f53734252bda2277357e97e1517d6b042a'
-export const USDC_HOLDER = '0x0a59649758aa4d66e25f08dd01271e891fe52199'
-
 export const MINUTE = BigNumber.from(60)
 export const HOUR = MINUTE.mul(60)
 export const DAY = HOUR.mul(24)
 export const WEEK = DAY.mul(7)
 export const MONTH = DAY.mul(30)
 export const YEAR = DAY.mul(365)
+
+export enum Provider {
+  NONE = 0,
+  CHAINLINK = 1,
+  UNISWAP_V3 = 2,
+  UNISWAP_V2 = 3,
+  SUSHISWAP = 4,
+  TRADERJOE = 5,
+  PANGOLIN = 6,
+  QUICKSWAP = 7,
+}
 
 export const parseUnits = (n: string, d: number) => ethers.utils.parseUnits(n.replace(new RegExp(/,/g), ''), d)
 
@@ -37,3 +44,9 @@ export const impersonateAccount = async (address: string): Promise<SignerWithAdd
 
 export const timestampFromLatestBlock = async (): Promise<number> =>
   (await ethers.provider.getBlock('latest')).timestamp
+
+export const min = (a: BigNumber, b: BigNumber) => (a.lt(b) ? a : b)
+
+export const max = (a: BigNumber, b: BigNumber) => (a.gte(b) ? a : b)
+
+export const toUSD = (n: string) => parseUnits(n, 18)

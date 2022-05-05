@@ -9,7 +9,11 @@ const slots = {
   [Address.mainnet.WETH_ADDRESS]: 3,
   [Address.mainnet.USDC_ADDRESS]: 9,
   [Address.mainnet.WBTC_ADDRESS]: 0,
-  [Address.mainnet.VSP_ADDRESS]: 0,
+  [Address.avalanche.WAVAX_ADDRESS]: 3,
+  [Address.avalanche.DAI_ADDRESS]: 0,
+  [Address.avalanche.WETH_ADDRESS]: 0,
+  [Address.avalanche.USDC_ADDRESS]: 0,
+  [Address.avalanche.WBTC_ADDRESS]: 0,
 }
 
 const getSlot = (
