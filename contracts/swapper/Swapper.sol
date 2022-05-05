@@ -214,6 +214,14 @@ contract Swapper is ISwapper, Governable {
     }
 
     /**
+     * @notice Update max slippage
+     */
+    function updateMaxSlippage(uint256 maxSlippage_) external onlyGovernor {
+        emit MaxSlippageUpdated(maxSlippage, maxSlippage_);
+        maxSlippage = maxSlippage_;
+    }
+
+    /**
      * @notice Update oracle contract
      */
     function updateOracle(ISwapperOracle oracle_) external onlyGovernor {
