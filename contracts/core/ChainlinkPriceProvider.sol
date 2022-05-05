@@ -6,7 +6,6 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import "../libraries/OracleHelpers.sol";
 import "../interfaces/core/IChainlinkPriceProvider.sol";
 import "../access/Governable.sol";
 
@@ -15,8 +14,10 @@ import "../access/Governable.sol";
  * @dev This contract wrapps chainlink agreggators
  */
 contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
-    uint256 internal constant CHAINLINK_DECIMALS = 8;
-    uint256 public constant USD_DECIMALS = 18;
+    /**
+     * @notice Used to convert 8-decimals from Chainlink to 18-decimals values
+     */
+    uint256 public constant TEN_DECIMALS = 1e10;
 
     /**
      * @notice Aggregators map (token => aggregator)
@@ -83,10 +84,7 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
      */
     function _getUsdPriceOfAsset(address token_) internal view virtual returns (uint256, uint256) {
         (, int256 _price, , uint256 _lastUpdatedAt, ) = _aggregatorOf(token_).latestRoundData();
-        return (
-            OracleHelpers.scaleDecimal(SafeCast.toUint256(_price), CHAINLINK_DECIMALS, USD_DECIMALS),
-            _lastUpdatedAt
-        );
+        return (SafeCast.toUint256(_price) * TEN_DECIMALS, _lastUpdatedAt);
     }
 
     /**

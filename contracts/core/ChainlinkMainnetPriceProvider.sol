@@ -29,9 +29,6 @@ contract ChainlinkMainnetPriceProvider is ChainlinkPriceProvider {
 
         (, int256 _price, , uint256 _lastUpdatedAt, ) = PRICE_FEED.latestRoundData(token_, USD);
 
-        return (
-            OracleHelpers.scaleDecimal(SafeCast.toUint256(_price), CHAINLINK_DECIMALS, USD_DECIMALS),
-            _lastUpdatedAt
-        );
+        return (SafeCast.toUint256(_price) * TEN_DECIMALS, _lastUpdatedAt);
     }
 }

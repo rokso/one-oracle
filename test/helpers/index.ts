@@ -50,5 +50,3 @@ export const timestampFromLatestBlock = async (): Promise<number> =>
 export const min = (a: BigNumber, b: BigNumber) => (a.lt(b) ? a : b)
 
 export const max = (a: BigNumber, b: BigNumber) => (a.gte(b) ? a : b)
-
-export const toUSD = (n: string) => parseUnits(n, 18)
