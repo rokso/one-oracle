@@ -24,6 +24,8 @@ export const parseUnits = (n: string, d: number) => ethers.utils.parseUnits(n.re
 
 export const parseEther = (n: string) => parseUnits(n, 18)
 
+export const toUSD = (n: string) => parseUnits(n, 18)
+
 export const increaseTime = async (timeToIncrease: BigNumber): Promise<void> => {
   await ethers.provider.send('evm_increaseTime', [timeToIncrease.toNumber()])
   await ethers.provider.send('evm_mine', [])
@@ -48,5 +50,3 @@ export const timestampFromLatestBlock = async (): Promise<number> =>
 export const min = (a: BigNumber, b: BigNumber) => (a.lt(b) ? a : b)
 
 export const max = (a: BigNumber, b: BigNumber) => (a.gte(b) ? a : b)
-
-export const toUSD = (n: string) => parseUnits(n, 18)

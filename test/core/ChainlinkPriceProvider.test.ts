@@ -47,6 +47,23 @@ describe('ChainlinkPriceProvider @mainnet', function () {
     await ethers.provider.send('evm_revert', [snapshotId])
   })
 
+  describe('getPriceInUsd', function () {
+    it('should WETH price', async function () {
+      const {_priceInUsd} = await priceProvider.getPriceInUsd(weth.address)
+      expect(_priceInUsd).closeTo(parseEther('3,236'), parseEther('1'))
+    })
+
+    it('should WBTC price', async function () {
+      const {_priceInUsd} = await priceProvider.getPriceInUsd(wbtc.address)
+      expect(_priceInUsd).closeTo(parseEther('43,675'), parseEther('1'))
+    })
+
+    it('should DAI price', async function () {
+      const {_priceInUsd} = await priceProvider.getPriceInUsd(dai.address)
+      expect(_priceInUsd).closeTo(parseEther('1'), parseEther('0.1'))
+    })
+  })
+
   describe('quote', function () {
     it('should revert if aggregator does not exist', async function () {
       const tx = priceProvider.quote(weth.address, ethers.constants.AddressZero, parseEther('1'))

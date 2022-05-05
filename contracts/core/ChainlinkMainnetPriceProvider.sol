@@ -26,7 +26,9 @@ contract ChainlinkMainnetPriceProvider is ChainlinkPriceProvider {
         } else if (token_ == WBTC) {
             token_ = BTC;
         }
+
         (, int256 _price, , uint256 _lastUpdatedAt, ) = PRICE_FEED.latestRoundData(token_, USD);
+
         return (SafeCast.toUint256(_price) * TEN_DECIMALS, _lastUpdatedAt);
     }
 }
