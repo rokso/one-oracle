@@ -4,4 +4,4 @@ pragma solidity 0.8.9;
 
 import "./IUSDPriceProvider.sol";
 
-interface IChainlinkPriceProvider is IUSDPriceProvider {}
+interface IUmbrellaPriceProvider is IUSDPriceProvider {}
