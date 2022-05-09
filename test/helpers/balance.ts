@@ -15,6 +15,7 @@ const slots = {
   [Address.avalanche.WETH_ADDRESS]: 0,
   [Address.avalanche.USDC_ADDRESS]: 0,
   [Address.avalanche.WBTC_ADDRESS]: 0,
+  [Address.bsc.UMB_ADDRESS]: 1,
 }
 
 const getSlot = (

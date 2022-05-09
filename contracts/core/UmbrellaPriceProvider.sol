@@ -9,6 +9,9 @@ import "@umb-network/toolbox/dist/contracts/IRegistry.sol";
 import "../access/Governable.sol";
 import "../interfaces/core/IUmbrellaPriceProvider.sol";
 
+/**
+ * @notice Umbrella's price provider
+ */
 contract UmbrellaPriceProvider is IUmbrellaPriceProvider, Governable {
     IRegistry public immutable registry;
 
