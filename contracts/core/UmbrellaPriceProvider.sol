@@ -13,29 +13,18 @@ import "../interfaces/core/IUmbrellaPriceProvider.sol";
  * @notice Umbrella's price provider
  */
 contract UmbrellaPriceProvider is IUmbrellaPriceProvider, Governable {
+    bytes32 private constant CHAIN = bytes32("Chain");
+
+    /**
+     * @notice Umbrella's Registry
+     * @dev Has other contracts' addresses
+     */
+
     IRegistry public immutable registry;
 
     constructor(IRegistry registry_) {
         require(address(registry_) != address(0), "registry-is-null");
         registry = registry_;
-    }
-
-    /**
-     * @notice Get token's price
-     * @param token_ The token
-     * @return _priceInUsd The USD price
-     * @return _lastUpdatedAt Last updated timestamp
-     */
-    function _getUsdPriceOfAsset(address token_)
-        internal
-        view
-        virtual
-        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
-    {
-        bytes32 _key = _toKey(token_);
-
-        (_priceInUsd, _lastUpdatedAt) = _chain().getCurrentValue(_key);
-        require(_lastUpdatedAt > 0, "invalid-quote");
     }
 
     /// @inheritdoc IUSDPriceProvider
@@ -79,13 +68,41 @@ contract UmbrellaPriceProvider is IUmbrellaPriceProvider, Governable {
     }
 
     /**
+     * @notice Get Umbrella's main contract
+     */
+    function _chain() internal view returns (IChain umbChain) {
+        umbChain = IChain(registry.getAddress(CHAIN));
+    }
+
+    /**
+     * @notice Get token's price
+     * @param token_ The token
+     * @return _priceInUsd The USD price
+     * @return _lastUpdatedAt Last updated timestamp
+     */
+    function _getUsdPriceOfAsset(address token_)
+        internal
+        view
+        virtual
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
+    {
+        bytes32 _key = _toKey(token_);
+
+        (_priceInUsd, _lastUpdatedAt) = _chain().getCurrentValue(_key);
+        require(_lastUpdatedAt > 0, "invalid-quote");
+    }
+
+    /**
      * @notice Build key from quote/base string in bytes format
      * @dev The standard parser `bytes32(bytes)` will right pad with zeros
-     * but Umbrella expects left padded byte as key
+     * but Umbrella expects left padded bytes as key
      * @dev See if there is a simpler way to do the same as this function
      */
-    function _toKey(address token_) private view returns (bytes32) {
+    function _toKey(address token_) internal view returns (bytes32) {
         require(token_ != address(0), "invalid-token");
+        // Note: Assuming that the symbol is a upper case string
+        // If need to handle tokens where it isn't true, we can use a function like this
+        // https://gist.github.com/kepler-296e/f9196a8d4cb94e833302c464479e5b65
         string memory _base = IERC20Metadata(token_).symbol();
         bytes32 _baseHash = keccak256(abi.encodePacked(_base));
         if (_baseHash == keccak256("WBTC")) _base = "BTC";
@@ -100,10 +117,5 @@ contract UmbrellaPriceProvider is IUmbrellaPriceProvider, Governable {
             _aux[_idx] = bytes_[i];
         }
         return bytes32(_aux);
-    }
-
-    // TODO: Comment
-    function _chain() private view returns (IChain umbChain) {
-        umbChain = IChain(registry.getAddress("Chain"));
     }
 }
