@@ -10,9 +10,9 @@ const {
   DAI_ADDRESS,
   WETH_ADDRESS,
   WBTC_ADDRESS,
-  CHAINLINK_MAINNET_DAI_USD_AGGREGATOR,
-  CHAINLINK_MAINNET_ETH_USD_AGGREGATOR,
-  CHAINLINK_MAINNET_BTC_USD_AGGREGATOR,
+  CHAINLINK_DAI_USD_AGGREGATOR,
+  CHAINLINK_ETH_USD_AGGREGATOR,
+  CHAINLINK_BTC_USD_AGGREGATOR,
 } = Address.mainnet
 
 describe('ChainlinkPriceProvider @mainnet', function () {
@@ -38,9 +38,9 @@ describe('ChainlinkPriceProvider @mainnet', function () {
     await priceProvider.transferGovernorship(governor.address)
     await priceProvider.connect(governor).acceptGovernorship()
 
-    await priceProvider.connect(governor).updateAggregator(dai.address, CHAINLINK_MAINNET_DAI_USD_AGGREGATOR)
-    await priceProvider.connect(governor).updateAggregator(weth.address, CHAINLINK_MAINNET_ETH_USD_AGGREGATOR)
-    await priceProvider.connect(governor).updateAggregator(wbtc.address, CHAINLINK_MAINNET_BTC_USD_AGGREGATOR)
+    await priceProvider.connect(governor).updateAggregator(dai.address, CHAINLINK_DAI_USD_AGGREGATOR)
+    await priceProvider.connect(governor).updateAggregator(weth.address, CHAINLINK_ETH_USD_AGGREGATOR)
+    await priceProvider.connect(governor).updateAggregator(wbtc.address, CHAINLINK_BTC_USD_AGGREGATOR)
   })
 
   afterEach(async function () {
@@ -148,28 +148,28 @@ describe('ChainlinkPriceProvider @mainnet', function () {
 
   describe('updateAggregator', function () {
     it('should revert if not governor', async function () {
-      const tx = priceProvider.updateAggregator(weth.address, CHAINLINK_MAINNET_ETH_USD_AGGREGATOR)
+      const tx = priceProvider.updateAggregator(weth.address, CHAINLINK_ETH_USD_AGGREGATOR)
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should revert if token is null', async function () {
       const tx = priceProvider
         .connect(governor)
-        .updateAggregator(ethers.constants.AddressZero, CHAINLINK_MAINNET_ETH_USD_AGGREGATOR)
+        .updateAggregator(ethers.constants.AddressZero, CHAINLINK_ETH_USD_AGGREGATOR)
       await expect(tx).revertedWith('token-is-null')
     })
 
     it('should revert if using same aggregator as current', async function () {
-      const tx = priceProvider.connect(governor).updateAggregator(weth.address, CHAINLINK_MAINNET_ETH_USD_AGGREGATOR)
+      const tx = priceProvider.connect(governor).updateAggregator(weth.address, CHAINLINK_ETH_USD_AGGREGATOR)
       await expect(tx).revertedWith('same-as-current')
     })
 
     it('should update aggregator', async function () {
       const before = await priceProvider.aggregators(weth.address)
       expect(before).not.eq(ethers.constants.AddressZero)
-      await priceProvider.connect(governor).updateAggregator(weth.address, CHAINLINK_MAINNET_BTC_USD_AGGREGATOR)
+      await priceProvider.connect(governor).updateAggregator(weth.address, CHAINLINK_BTC_USD_AGGREGATOR)
       const after = await priceProvider.aggregators(weth.address)
-      expect(after).eq(CHAINLINK_MAINNET_BTC_USD_AGGREGATOR).not.eq(before)
+      expect(after).eq(CHAINLINK_BTC_USD_AGGREGATOR).not.eq(before)
     })
 
     it('should set aggregator to null', async function () {
