@@ -27,7 +27,7 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
     /// Emitted when an agreggator is updated
     event AggregatorUpdated(AggregatorV3Interface oldAggregator, AggregatorV3Interface newAggregator);
 
-    /// @inheritdoc IChainlinkPriceProvider
+    /// @inheritdoc IUSDPriceProvider
     function getPriceInUsd(address token_) public view override returns (uint256 _priceInUsd, uint256 _lastUpdatedAt) {
         return _getUsdPriceOfAsset(token_);
     }
@@ -43,7 +43,7 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
         _lastUpdatedAt = Math.min(_lastUpdatedAt0, _lastUpdatedAt);
     }
 
-    /// @inheritdoc IChainlinkPriceProvider
+    /// @inheritdoc IUSDPriceProvider
     function quoteTokenToUsd(address token_, uint256 amountIn_)
         public
         view
@@ -55,7 +55,7 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
         _amountOut = (amountIn_ * _price) / 10**IERC20Metadata(token_).decimals();
     }
 
-    /// @inheritdoc IChainlinkPriceProvider
+    /// @inheritdoc IUSDPriceProvider
     function quoteUsdToToken(address token_, uint256 amountIn_)
         public
         view
