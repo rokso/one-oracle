@@ -4,15 +4,18 @@ pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../../interfaces/core/IChainlinkPriceProvider.sol";
+import "../../interfaces/core/IUSDPriceProvider.sol";
 import "../../interfaces/periphery/synth/ISynthOracle.sol";
 import "../../access/Governable.sol";
+import "../ChainlinkAndFallbacksOracle.sol";
 
 /**
- * @title The default/fallback oracle used by Vesper Synth (i.e. Synth calls this when a specific oracle for the given asset isn't set)
- * @dev This can change later, but for now we only want to use the Chainlink as the main provider for Synth
+ * @title The Synth Oracle
+ * @dev Extends `ChainlinkAndFallbacksOracle` contract
  * @dev This contract maps synth assets (i.e. vsAssets and vsdAssets) with their underlyings
+ * @dev The fallback providers MUST implement the `IUSDPriceProvider` interface
  */
-contract SynthDefaultOracle is ISynthOracle, Governable {
+contract SynthDefaultOracle is ISynthOracle, Governable, ChainlinkAndFallbacksOracle {
     uint256 public constant ONE_USD = 1e18;
 
     /**
@@ -26,11 +29,6 @@ contract SynthDefaultOracle is ISynthOracle, Governable {
     }
 
     /**
-     * @notice The Chainlink provider
-     */
-    IChainlinkPriceProvider public chainlinkProvider;
-
-    /**
      * @notice Avaliable assets
      */
     mapping(IERC20 => Asset) public assets;
@@ -38,9 +36,21 @@ contract SynthDefaultOracle is ISynthOracle, Governable {
     /// @notice Emitted when asset setup is updated
     event AssetUpdated(IERC20 indexed asset, address underlyingAsset, bool isUsd, uint256 stalePeriod);
 
-    constructor(IChainlinkPriceProvider _chainlinkProvider) {
-        chainlinkProvider = _chainlinkProvider;
-    }
+    constructor(
+        IPriceProvidersAggregator providersAggregator_,
+        uint256 maxDeviation_,
+        uint256 stalePeriod_,
+        DataTypes.Provider fallbackProviderA_,
+        DataTypes.Provider fallbackProviderB_
+    )
+        ChainlinkAndFallbacksOracle(
+            providersAggregator_,
+            maxDeviation_,
+            stalePeriod_,
+            fallbackProviderA_,
+            fallbackProviderB_
+        )
+    {}
 
     /**
      * @notice Store an asset
@@ -73,7 +83,7 @@ contract SynthDefaultOracle is ISynthOracle, Governable {
      * @param _underlyingAsset The asset's chainlink aggregator contract
      * @param _stalePeriod The stale period
      */
-    function addOrUpdateAssetThatUsesChainlink(
+    function addOrUpdateAsset(
         IERC20 _asset,
         address _underlyingAsset,
         uint256 _stalePeriod
@@ -87,9 +97,60 @@ contract SynthDefaultOracle is ISynthOracle, Governable {
 
         if (_assetData.isUsd) return ONE_USD;
 
+        // 1. Get price from chainlink
         uint256 _lastUpdatedAt;
-        (_priceInUsd, _lastUpdatedAt) = chainlinkProvider.getPriceInUsd(_assetData.underlyingAsset);
+        (_priceInUsd, _lastUpdatedAt) = _getPriceInUsd(DataTypes.Provider.CHAINLINK, _assetData.underlyingAsset);
 
-        require(_assetData.stalePeriod > block.timestamp - _lastUpdatedAt, "price-is-stale");
+        // 2. If price from chainlink is OK return it
+        if (_priceInUsd > 0 && !_priceIsStale(_lastUpdatedAt, _assetData.stalePeriod)) {
+            return _priceInUsd;
+        }
+
+        // 3. Get price from fallback A
+        (uint256 _amountOutA, uint256 _lastUpdatedAtA) = _getPriceInUsd(fallbackProviderA, _assetData.underlyingAsset);
+
+        // 4. If price from fallback A is OK and there isn't a fallback B, return price from fallback A
+        bool _aPriceOK = _amountOutA > 0 && !_priceIsStale(_lastUpdatedAtA, _assetData.stalePeriod);
+        if (fallbackProviderB == DataTypes.Provider.NONE) {
+            require(_aPriceOK, "fallback-a-failed");
+            return _amountOutA;
+        }
+
+        // 5. Get price from fallback B
+        (uint256 _amountOutB, uint256 _lastUpdatedAtB) = _getPriceInUsd(fallbackProviderB, _assetData.underlyingAsset);
+
+        // 6. If only one price from fallbacks is valid, return it
+        bool _bPriceOK = _amountOutB > 0 && !_priceIsStale(_lastUpdatedAtB, _assetData.stalePeriod);
+        if (!_bPriceOK && _aPriceOK) {
+            return _amountOutA;
+        } else if (_bPriceOK && !_aPriceOK) {
+            return _amountOutB;
+        }
+
+        // 7. Check fallback prices deviation
+        require(_aPriceOK && _bPriceOK, "fallbacks-failed");
+        require(OracleHelpers.isDeviationOK(_amountOutA, _amountOutB, maxDeviation), "prices-deviation-too-high");
+
+        // 8. If deviation is OK, return price from fallback A
+        return _amountOutA;
+    }
+
+    /**
+     * @notice Wrapped `getPriceInUsd` function
+     * @dev Assumes that the `provider_` implements the `IUSDPriceProvider` interface
+     * @dev Return [0,0] (i.e. invalid quote) if the call reverts
+     */
+    function _getPriceInUsd(DataTypes.Provider provider_, address token_)
+        private
+        view
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
+    {
+        try IUSDPriceProvider(address(providersAggregator.priceProviders(provider_))).getPriceInUsd(token_) returns (
+            uint256 __priceInUsd,
+            uint256 __lastUpdatedAt
+        ) {
+            _priceInUsd = __priceInUsd;
+            _lastUpdatedAt = __lastUpdatedAt;
+        } catch {}
     }
 }

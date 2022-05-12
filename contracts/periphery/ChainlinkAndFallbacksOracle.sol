@@ -169,10 +169,21 @@ contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, Governable
 
     /**
      * @notice Check if a price timestamp is outdated
-     * @param _timeOfLastUpdate The price timestamp
+     * @dev Uses default stale period
+     * @param timeOfLastUpdate_ The price timestamp
      * @return true if price is stale (outdated)
      */
-    function _priceIsStale(uint256 _timeOfLastUpdate) private view returns (bool) {
-        return block.timestamp - _timeOfLastUpdate > stalePeriod;
+    function _priceIsStale(uint256 timeOfLastUpdate_) internal view returns (bool) {
+        return _priceIsStale(timeOfLastUpdate_, stalePeriod);
+    }
+
+    /**
+     * @notice Check if a price timestamp is outdated
+     * @param timeOfLastUpdate_ The price timestamp
+     * @param stalePeriod_ The maximum acceptable outdated period
+     * @return true if price is stale (outdated)
+     */
+    function _priceIsStale(uint256 timeOfLastUpdate_, uint256 stalePeriod_) internal view returns (bool) {
+        return block.timestamp - timeOfLastUpdate_ > stalePeriod_;
     }
 }
