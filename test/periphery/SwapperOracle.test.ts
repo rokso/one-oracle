@@ -9,6 +9,7 @@ import {parseEther, timestampFromLatestBlock, Provider} from '../helpers'
 import {BigNumber} from 'ethers'
 
 const STALE_PERIOD = ethers.constants.MaxUint256
+const MAX_DEVIATION = parseEther('0.1') // 10%
 
 const {WETH_ADDRESS, DAI_ADDRESS} = Address.mainnet
 
@@ -29,6 +30,7 @@ describe('SwapperOracle @mainnet', function () {
     const swapperOracleFactory = new SwapperOracle__factory(deployer)
     swapperOracle = await swapperOracleFactory.deploy(
       aggregator.address,
+      MAX_DEVIATION,
       STALE_PERIOD,
       Provider.UNISWAP_V3,
       Provider.UNISWAP_V2
@@ -114,6 +116,26 @@ describe('SwapperOracle @mainnet', function () {
       // then
       const after = await swapperOracle.providersAggregator()
       expect(after).eq(deployer.address)
+    })
+  })
+
+  describe('updateMaxDeviation', function () {
+    it('should revert if not governor', async function () {
+      const tx = swapperOracle.updateMaxDeviation(MAX_DEVIATION)
+      await expect(tx).revertedWith('not-governor')
+    })
+
+    it('should update max deviation', async function () {
+      // given
+      const before = await swapperOracle.maxDeviation()
+      expect(before).eq(MAX_DEVIATION)
+
+      // when
+      await swapperOracle.connect(governor).updateMaxDeviation(1)
+
+      // then
+      const after = await swapperOracle.maxDeviation()
+      expect(after).eq(1)
     })
   })
 
