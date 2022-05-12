@@ -6,14 +6,14 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../access/Governable.sol";
 import "../interfaces/core/IChainlinkPriceProvider.sol";
 import "../interfaces/core/IPriceProvidersAggregator.sol";
-import "../interfaces/periphery/ISwapperOracle.sol";
+import "../interfaces/periphery/IChainlinkAndFallbacksOracle.sol";
 import "../libraries/OracleHelpers.sol";
 
 /**
- * @title Swapper oracle
+ * @title Chainlink and Fallbacks oracle
  * @dev Uses chainlink as primary oracle, if it doesn't support the asset(s), get price from fallback providers
  */
-contract SwapperOracle is ISwapperOracle, Governable {
+contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, Governable {
     /// @notice The max acceptable deviation from fallbacks' prices
     uint256 public maxDeviation;
 
@@ -65,7 +65,7 @@ contract SwapperOracle is ISwapperOracle, Governable {
         fallbackProviderB = fallbackProviderB_;
     }
 
-    /// @inheritdoc ISwapperOracle
+    /// @inheritdoc IChainlinkAndFallbacksOracle
     function quote(
         address tokenIn_,
         address tokenOut_,

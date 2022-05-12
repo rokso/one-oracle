@@ -9,7 +9,7 @@ import {
   Swapper__factory,
   IERC20,
   IERC20__factory,
-  SwapperOracle__factory,
+  ChainlinkAndFallbacksOracle__factory,
   ChainlinkMainnetPriceProvider,
   ChainlinkMainnetPriceProvider__factory,
   PriceProvidersAggregator,
@@ -17,7 +17,7 @@ import {
   UniswapV3CrossPoolOracle__factory,
   UniswapV3PriceProvider,
   UniswapV3PriceProvider__factory,
-  SwapperOracle,
+  ChainlinkAndFallbacksOracle,
   UniswapV2LikePriceProvider,
   UniswapV2LikePriceProvider__factory,
 } from '../../typechain-types'
@@ -44,7 +44,7 @@ describe('Swapper @mainnet', function () {
   let invalidToken: SignerWithAddress
   let uniswapV2Exchange: UniswapV2LikeExchange
   let sushiswapExchange: UniswapV2LikeExchange
-  let swapperOracleFake: FakeContract
+  let chainlinkAndFallbacksOracleFake: FakeContract
   let swapper: Swapper
   let weth: IERC20
   let dai: IERC20
@@ -64,10 +64,10 @@ describe('Swapper @mainnet', function () {
     sushiswapExchange = await uniswapV2LikeExchangeFactory.deploy(SUSHISWAP_ROUTER_ADDRESS, WETH_ADDRESS)
     await sushiswapExchange.deployed()
 
-    swapperOracleFake = await smock.fake('SwapperOracle')
+    chainlinkAndFallbacksOracleFake = await smock.fake('ChainlinkAndFallbacksOracle')
 
     const swapperFactory = new Swapper__factory(deployer)
-    swapper = await swapperFactory.deploy(swapperOracleFake.address, MAX_SLIPPAGE)
+    swapper = await swapperFactory.deploy(chainlinkAndFallbacksOracleFake.address, MAX_SLIPPAGE)
     await swapper.deployed()
 
     await swapper.addExchange(uniswapV2Exchange.address)
@@ -92,6 +92,7 @@ describe('Swapper @mainnet', function () {
   })
 
   describe('gas usage', function () {
+    const MAX_DEVIATION = parseEther('0.1') // 10%
     const STALE_PERIOD = ethers.constants.MaxUint256
     const DEFAULT_TWAP_PERIOD = HOUR
     const DEFAULT_POOLS_FEE = 3000 // 0.3%
@@ -99,7 +100,7 @@ describe('Swapper @mainnet', function () {
     let uniswapV3Provider: UniswapV3PriceProvider
     let chainlinkProvider: ChainlinkMainnetPriceProvider
     let aggregator: PriceProvidersAggregator
-    let swapperOracle: SwapperOracle
+    let chainlinkAndFallbacksOracle: ChainlinkAndFallbacksOracle
 
     beforeEach(async function () {
       const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
@@ -143,14 +144,15 @@ describe('Swapper @mainnet', function () {
       await aggregator.setPriceProvider(Provider.UNISWAP_V3, uniswapV3Provider.address)
       await aggregator.setPriceProvider(Provider.CHAINLINK, chainlinkProvider.address)
 
-      const swapperOracleFactory = new SwapperOracle__factory(deployer)
-      swapperOracle = await swapperOracleFactory.deploy(
+      const chainlinkAndFallbacksOracleFactory = new ChainlinkAndFallbacksOracle__factory(deployer)
+      chainlinkAndFallbacksOracle = await chainlinkAndFallbacksOracleFactory.deploy(
         aggregator.address,
+        MAX_DEVIATION,
         STALE_PERIOD,
         Provider.UNISWAP_V3,
         Provider.UNISWAP_V2
       )
-      await swapper.updateOracle(swapperOracle.address)
+      await swapper.updateOracle(chainlinkAndFallbacksOracle.address)
     })
 
     describe('worst case - non-chainlink token + 3 length path', function () {
@@ -162,7 +164,7 @@ describe('Swapper @mainnet', function () {
         await wbtc.approve(swapper.address, amountIn)
         const tx = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq(352183)
+        expect(receipt.gasUsed).eq(350191)
       })
 
       it('swapExactOutput', async function () {
@@ -173,7 +175,7 @@ describe('Swapper @mainnet', function () {
         await btt.approve(swapper.address, _amountIn.mul('10'))
         const tx = await swapper.swapExactOutput(BTT_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq(386708)
+        expect(receipt.gasUsed).eq(384716)
       })
     })
 
@@ -186,7 +188,7 @@ describe('Swapper @mainnet', function () {
         await wbtc.approve(swapper.address, amountIn)
         const tx = await swapper.swapExactInput(WBTC_ADDRESS, WETH_ADDRESS, amountIn, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq(231336)
+        expect(receipt.gasUsed).eq(231285)
       })
 
       it('swapExactOutput', async function () {
@@ -197,7 +199,7 @@ describe('Swapper @mainnet', function () {
         await weth.approve(swapper.address, _amountIn.mul('10'))
         const tx = await swapper.swapExactOutput(WETH_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq(260921)
+        expect(receipt.gasUsed).eq(260870)
       })
     })
   })
@@ -349,7 +351,7 @@ describe('Swapper @mainnet', function () {
       const {_amountOut} = await swapper.getBestAmountOut(WBTC_ADDRESS, USDC_ADDRESS, amountIn)
 
       // when
-      swapperOracleFake.quote.returns(() => _amountOut.mul('10'))
+      chainlinkAndFallbacksOracleFake.quote.returns(() => _amountOut.mul('10'))
       await wbtc.approve(swapper.address, amountIn)
       const tx = swapper.swapExactInput(WBTC_ADDRESS, USDC_ADDRESS, amountIn, deployer.address)
 
@@ -365,7 +367,7 @@ describe('Swapper @mainnet', function () {
       const usdcBefore = await usdc.balanceOf(deployer.address)
 
       // when
-      swapperOracleFake.quote.returns(() => _amountOut)
+      chainlinkAndFallbacksOracleFake.quote.returns(() => _amountOut)
       await wbtc.approve(swapper.address, amountIn)
       await swapper.swapExactInput(WBTC_ADDRESS, USDC_ADDRESS, amountIn, deployer.address)
 
@@ -382,7 +384,7 @@ describe('Swapper @mainnet', function () {
       // given
       const amountOut = parseUnits('1', 8)
       const {_amountIn, _amountInMax} = await swapper.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
-      swapperOracleFake.quote.returns(() => _amountIn.div('10'))
+      chainlinkAndFallbacksOracleFake.quote.returns(() => _amountIn.div('10'))
 
       // when
       await usdc.approve(swapper.address, _amountInMax)
@@ -400,7 +402,7 @@ describe('Swapper @mainnet', function () {
       const wbtcBefore = await wbtc.balanceOf(deployer.address)
 
       // when
-      swapperOracleFake.quote.returns(() => _amountIn)
+      chainlinkAndFallbacksOracleFake.quote.returns(() => _amountIn)
       const amountInMax = _amountIn.mul(parseEther('1').mul(MAX_SLIPPAGE)).div(parseEther('1'))
       await usdc.approve(swapper.address, amountInMax)
       await swapper.swapExactOutput(USDC_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
@@ -420,7 +422,7 @@ describe('Swapper @mainnet', function () {
       const wbtcBefore = await wbtc.balanceOf(deployer.address)
 
       // when
-      swapperOracleFake.quote.returns(() => _amountIn)
+      chainlinkAndFallbacksOracleFake.quote.returns(() => _amountIn)
       await usdc.approve(swapper.address, _amountIn.mul('10'))
       await swapper.swapExactOutput(USDC_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
       expect(await usdc.balanceOf(swapper.address)).eq(0)

@@ -2,7 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {SwapperOracle, SwapperOracle__factory} from '../../typechain-types'
+import {ChainlinkAndFallbacksOracle, ChainlinkAndFallbacksOracle__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {parseEther, timestampFromLatestBlock, Provider} from '../helpers'
@@ -14,12 +14,12 @@ const MAX_DEVIATION = parseEther('0.1') // 10%
 const {WETH_ADDRESS, DAI_ADDRESS} = Address.mainnet
 
 // Note: No need to cover all chains on this test
-describe('SwapperOracle @mainnet', function () {
+describe('ChainlinkAndFallbacksOracle @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
   let governor: SignerWithAddress
   let aggregator: FakeContract
-  let swapperOracle: SwapperOracle
+  let chainlinkAndFallbacksOracle: ChainlinkAndFallbacksOracle
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
@@ -27,17 +27,17 @@ describe('SwapperOracle @mainnet', function () {
 
     aggregator = await smock.fake('PriceProvidersAggregator')
 
-    const swapperOracleFactory = new SwapperOracle__factory(deployer)
-    swapperOracle = await swapperOracleFactory.deploy(
+    const chainlinkAndFallbacksOracleFactory = new ChainlinkAndFallbacksOracle__factory(deployer)
+    chainlinkAndFallbacksOracle = await chainlinkAndFallbacksOracleFactory.deploy(
       aggregator.address,
       MAX_DEVIATION,
       STALE_PERIOD,
       Provider.UNISWAP_V3,
       Provider.UNISWAP_V2
     )
-    await swapperOracle.deployed()
-    await swapperOracle.transferGovernorship(governor.address)
-    await swapperOracle.connect(governor).acceptGovernorship()
+    await chainlinkAndFallbacksOracle.deployed()
+    await chainlinkAndFallbacksOracle.transferGovernorship(governor.address)
+    await chainlinkAndFallbacksOracle.connect(governor).acceptGovernorship()
   })
 
   afterEach(async function () {
@@ -46,30 +46,34 @@ describe('SwapperOracle @mainnet', function () {
 
   describe('updateFallbackProviders', function () {
     it('should revert if not governor', async function () {
-      const tx = swapperOracle.updateFallbackProviders(Provider.UNISWAP_V3, Provider.UNISWAP_V2)
+      const tx = chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V3, Provider.UNISWAP_V2)
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should revert if setting fallback provider A as null', async function () {
-      const tx = swapperOracle.connect(governor).updateFallbackProviders(Provider.NONE, Provider.UNISWAP_V2)
+      const tx = chainlinkAndFallbacksOracle
+        .connect(governor)
+        .updateFallbackProviders(Provider.NONE, Provider.UNISWAP_V2)
       await expect(tx).revertedWith('fallback-a-is-null')
     })
 
     it('should update both fallback providers', async function () {
       // given
       const before = await Promise.all([
-        await swapperOracle.fallbackProviderA(),
-        await swapperOracle.fallbackProviderB(),
+        await chainlinkAndFallbacksOracle.fallbackProviderA(),
+        await chainlinkAndFallbacksOracle.fallbackProviderB(),
       ])
       expect(before).deep.eq([Provider.UNISWAP_V3, Provider.UNISWAP_V2])
 
       // when
-      await swapperOracle.connect(governor).updateFallbackProviders(Provider.UNISWAP_V2, Provider.UNISWAP_V3)
+      await chainlinkAndFallbacksOracle
+        .connect(governor)
+        .updateFallbackProviders(Provider.UNISWAP_V2, Provider.UNISWAP_V3)
 
       // then
       const after = await Promise.all([
-        await swapperOracle.fallbackProviderA(),
-        await swapperOracle.fallbackProviderB(),
+        await chainlinkAndFallbacksOracle.fallbackProviderA(),
+        await chainlinkAndFallbacksOracle.fallbackProviderB(),
       ])
       expect(after).deep.eq([Provider.UNISWAP_V2, Provider.UNISWAP_V3])
     })
@@ -77,18 +81,18 @@ describe('SwapperOracle @mainnet', function () {
     it('should set fallback provider B as null', async function () {
       // given
       const before = await Promise.all([
-        await swapperOracle.fallbackProviderA(),
-        await swapperOracle.fallbackProviderB(),
+        await chainlinkAndFallbacksOracle.fallbackProviderA(),
+        await chainlinkAndFallbacksOracle.fallbackProviderB(),
       ])
       expect(before).deep.eq([Provider.UNISWAP_V3, Provider.UNISWAP_V2])
 
       // when
-      await swapperOracle.connect(governor).updateFallbackProviders(Provider.UNISWAP_V2, Provider.NONE)
+      await chainlinkAndFallbacksOracle.connect(governor).updateFallbackProviders(Provider.UNISWAP_V2, Provider.NONE)
 
       // then
       const after = await Promise.all([
-        await swapperOracle.fallbackProviderA(),
-        await swapperOracle.fallbackProviderB(),
+        await chainlinkAndFallbacksOracle.fallbackProviderA(),
+        await chainlinkAndFallbacksOracle.fallbackProviderB(),
       ])
       expect(after).deep.eq([Provider.UNISWAP_V2, Provider.NONE])
     })
@@ -96,65 +100,65 @@ describe('SwapperOracle @mainnet', function () {
 
   describe('updateProvidersAggregator', function () {
     it('should revert if not governor', async function () {
-      const tx = swapperOracle.updateProvidersAggregator(aggregator.address)
+      const tx = chainlinkAndFallbacksOracle.updateProvidersAggregator(aggregator.address)
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should revert if setting null', async function () {
-      const tx = swapperOracle.connect(governor).updateProvidersAggregator(ethers.constants.AddressZero)
+      const tx = chainlinkAndFallbacksOracle.connect(governor).updateProvidersAggregator(ethers.constants.AddressZero)
       await expect(tx).revertedWith('address-is-null')
     })
 
     it('should update providers aggregator', async function () {
       // given
-      const before = await swapperOracle.providersAggregator()
+      const before = await chainlinkAndFallbacksOracle.providersAggregator()
       expect(before).eq(aggregator.address)
 
       // when
-      await swapperOracle.connect(governor).updateProvidersAggregator(deployer.address)
+      await chainlinkAndFallbacksOracle.connect(governor).updateProvidersAggregator(deployer.address)
 
       // then
-      const after = await swapperOracle.providersAggregator()
+      const after = await chainlinkAndFallbacksOracle.providersAggregator()
       expect(after).eq(deployer.address)
     })
   })
 
   describe('updateMaxDeviation', function () {
     it('should revert if not governor', async function () {
-      const tx = swapperOracle.updateMaxDeviation(MAX_DEVIATION)
+      const tx = chainlinkAndFallbacksOracle.updateMaxDeviation(MAX_DEVIATION)
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should update max deviation', async function () {
       // given
-      const before = await swapperOracle.maxDeviation()
+      const before = await chainlinkAndFallbacksOracle.maxDeviation()
       expect(before).eq(MAX_DEVIATION)
 
       // when
-      await swapperOracle.connect(governor).updateMaxDeviation(1)
+      await chainlinkAndFallbacksOracle.connect(governor).updateMaxDeviation(1)
 
       // then
-      const after = await swapperOracle.maxDeviation()
+      const after = await chainlinkAndFallbacksOracle.maxDeviation()
       expect(after).eq(1)
     })
   })
 
   describe('updateStalePeriod', function () {
     it('should revert if not governor', async function () {
-      const tx = swapperOracle.updateStalePeriod(Provider.UNISWAP_V3)
+      const tx = chainlinkAndFallbacksOracle.updateStalePeriod(Provider.UNISWAP_V3)
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should update default provider (allows none)', async function () {
       // given
-      const before = await swapperOracle.stalePeriod()
+      const before = await chainlinkAndFallbacksOracle.stalePeriod()
       expect(before).eq(STALE_PERIOD)
 
       // when
-      await swapperOracle.connect(governor).updateStalePeriod(1)
+      await chainlinkAndFallbacksOracle.connect(governor).updateStalePeriod(1)
 
       // then
-      const after = await swapperOracle.stalePeriod()
+      const after = await chainlinkAndFallbacksOracle.stalePeriod()
       expect(after).eq(1)
     })
   })
@@ -176,7 +180,7 @@ describe('SwapperOracle @mainnet', function () {
         })
 
         // when
-        const amountOut = await swapperOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+        const amountOut = await chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
 
         // then
         expect(amountOut).eq(chainlinkAmounOut)
@@ -188,7 +192,9 @@ describe('SwapperOracle @mainnet', function () {
         describe('when fallback B is not set', function () {
           it('should get price from fallback A', async function () {
             // given
-            await swapperOracle.connect(governor).updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            await chainlinkAndFallbacksOracle
+              .connect(governor)
+              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
             const v3AmountOut = parseEther('3,000')
             aggregator['quote(uint8,address,address,uint256)'].returns((args: [number, string, string, BigNumber]) => {
               const [provider] = args
@@ -197,7 +203,7 @@ describe('SwapperOracle @mainnet', function () {
             })
 
             // when
-            const amountOut = await swapperOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+            const amountOut = await chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
 
             // then
             expect(amountOut).eq(v3AmountOut)
@@ -220,7 +226,7 @@ describe('SwapperOracle @mainnet', function () {
               )
 
               // when
-              const amountOut = await swapperOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+              const amountOut = await chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
 
               // then
               expect(amountOut).eq(v3AmountOut)
@@ -241,7 +247,7 @@ describe('SwapperOracle @mainnet', function () {
               )
 
               // when
-              const call = swapperOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+              const call = chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
 
               // then
               await expect(call).revertedWith('prices-deviation-too-high')
@@ -261,7 +267,7 @@ describe('SwapperOracle @mainnet', function () {
             })
 
             // when
-            const amountOut = await swapperOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+            const amountOut = await chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
 
             // then
             expect(amountOut).eq(v3AmountOut)
@@ -273,7 +279,9 @@ describe('SwapperOracle @mainnet', function () {
         describe('when fallback B is not set', function () {
           it('should revert', async function () {
             // given
-            await swapperOracle.connect(governor).updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            await chainlinkAndFallbacksOracle
+              .connect(governor)
+              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
             aggregator['quote(uint8,address,address,uint256)'].returns((args: [number, string, string, BigNumber]) => {
               const [provider] = args
               if (provider === Provider.CHAINLINK) return [0, 0]
@@ -281,7 +289,7 @@ describe('SwapperOracle @mainnet', function () {
             })
 
             // when
-            const call = swapperOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+            const call = chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
 
             // then
             await expect(call).revertedWith('fallback-a-failed')
@@ -300,7 +308,7 @@ describe('SwapperOracle @mainnet', function () {
             })
 
             // when
-            const amountOut = await swapperOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+            const amountOut = await chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
 
             // then
             expect(amountOut).eq(v2AmountOut)
@@ -318,7 +326,7 @@ describe('SwapperOracle @mainnet', function () {
             })
 
             // when
-            const call = swapperOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+            const call = chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
 
             // then
             await expect(call).revertedWith('fallbacks-failed')

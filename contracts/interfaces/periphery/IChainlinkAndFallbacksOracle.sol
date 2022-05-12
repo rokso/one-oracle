@@ -5,7 +5,7 @@ pragma solidity 0.8.9;
 /**
  * @notice Swapper's Oracle interface
  */
-interface ISwapperOracle {
+interface IChainlinkAndFallbacksOracle {
     /**
      * @notice Get quote
      * @param tokenIn_ The address of assetIn
