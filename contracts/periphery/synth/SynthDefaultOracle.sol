@@ -23,7 +23,7 @@ contract SynthDefaultOracle is ISynthOracle, Governable, ChainlinkAndFallbacksOr
      * @dev I.e. maps the oracle used by each asset
      */
     struct Asset {
-        address underlyingAsset; // the address of the unlderying asset to get prices from
+        address underlyingAsset; // the address of the underlying asset to get prices from
         bool isUsd; // i.e. when true no oracle query is needed (amountOut = amountIn)
         uint256 stalePeriod; // it's used to determine if a price is invalid (i.e. outdated)
     }

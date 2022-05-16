@@ -32,10 +32,10 @@ contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, Governable
 
     /// @notice Emitted when fallback providers are updated
     event FallbackProvidersUpdated(
-        DataTypes.Provider oldfallbackProviderA,
-        DataTypes.Provider newfallbackProviderA,
-        DataTypes.Provider oldfallbackProviderB,
-        DataTypes.Provider newfallbackProviderB
+        DataTypes.Provider oldFallbackProviderA,
+        DataTypes.Provider newFallbackProviderA,
+        DataTypes.Provider oldFallbackProviderB,
+        DataTypes.Provider newFallbackProviderB
     );
 
     /// @notice Emitted when max deviation is updated

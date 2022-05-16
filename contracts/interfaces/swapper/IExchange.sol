@@ -42,7 +42,7 @@ interface IExchange {
     /**
      * @notice Perform an exact output swap
      * @dev Should transfer `amountInMax_` before performing swap
-     * @dev Sends swap remanings - if any - to the `inSender_`
+     * @dev Sends swap remains - if any - to the `inSender_`
      */
     function swapExactOutput(
         address[] calldata path_,

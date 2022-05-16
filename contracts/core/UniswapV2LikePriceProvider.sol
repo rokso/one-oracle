@@ -144,8 +144,6 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable {
      * @param twapPeriod_ The TWAP period
      */
     function _addOracleFor(IUniswapV2Pair pair_, uint256 twapPeriod_) private {
-        if (hasOracle(pair_, twapPeriod_)) return;
-
         (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast) = pair_.getReserves();
 
         require(_reserve0 != 0 && _reserve1 != 0, "no-reserves");

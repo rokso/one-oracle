@@ -11,7 +11,7 @@ import "../access/Governable.sol";
 
 /**
  * @title ChainLink's price provider
- * @dev This contract wrapps chainlink agreggators
+ * @dev This contract wraps chainlink aggregators
  */
 contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
     /**
@@ -24,7 +24,7 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
      */
     mapping(address => AggregatorV3Interface) public aggregators;
 
-    /// Emitted when an agreggator is updated
+    /// Emitted when an aggregator is updated
     event AggregatorUpdated(AggregatorV3Interface oldAggregator, AggregatorV3Interface newAggregator);
 
     /// @inheritdoc IUSDPriceProvider
