@@ -111,15 +111,15 @@ describe('Swapper @mainnet', function () {
       )
       await uniswapV2Provider.deployed()
 
-      await uniswapV2Provider['updateOrAdd(address)'](await uniswapV2Provider.pairFor(DAI_ADDRESS, WETH_ADDRESS))
-      await uniswapV2Provider['updateOrAdd(address)'](await uniswapV2Provider.pairFor(WBTC_ADDRESS, WETH_ADDRESS))
-      await uniswapV2Provider['updateOrAdd(address)'](await uniswapV2Provider.pairFor(USDC_ADDRESS, WETH_ADDRESS))
+      await uniswapV2Provider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
+      await uniswapV2Provider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
+      await uniswapV2Provider['updateOrAdd(address,address)'](USDC_ADDRESS, WETH_ADDRESS)
 
       await increaseTime(DEFAULT_TWAP_PERIOD)
 
-      await uniswapV2Provider['updateOrAdd(address)'](await uniswapV2Provider.pairFor(DAI_ADDRESS, WETH_ADDRESS))
-      await uniswapV2Provider['updateOrAdd(address)'](await uniswapV2Provider.pairFor(WBTC_ADDRESS, WETH_ADDRESS))
-      await uniswapV2Provider['updateOrAdd(address)'](await uniswapV2Provider.pairFor(USDC_ADDRESS, WETH_ADDRESS))
+      await uniswapV2Provider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
+      await uniswapV2Provider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
+      await uniswapV2Provider['updateOrAdd(address,address)'](USDC_ADDRESS, WETH_ADDRESS)
 
       const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
       const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)

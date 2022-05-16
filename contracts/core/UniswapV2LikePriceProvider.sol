@@ -121,21 +121,26 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable {
         uint256 twapPeriod_,
         uint256 amountIn_
     ) public override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
-        updateOrAdd(pairFor(tokenIn_, tokenOut_), twapPeriod_);
+        updateOrAdd(tokenIn_, tokenOut_, twapPeriod_);
         return quote(tokenIn_, tokenOut_, twapPeriod_, amountIn_);
     }
 
     /// @inheritdoc IUniswapV2LikePriceProvider
-    function updateOrAdd(IUniswapV2Pair pair_) external override {
-        updateOrAdd(pair_, defaultTwapPeriod);
+    function updateOrAdd(address tokenIn_, address tokenOut_) external override {
+        updateOrAdd(tokenIn_, tokenOut_, defaultTwapPeriod);
     }
 
     /// @inheritdoc IUniswapV2LikePriceProvider
-    function updateOrAdd(IUniswapV2Pair pair_, uint256 twapPeriod_) public override {
-        if (oracles[pair_][twapPeriod_].blockTimestampLast == 0) {
-            _addOracleFor(pair_, twapPeriod_);
+    function updateOrAdd(
+        address tokenIn_,
+        address tokenOut_,
+        uint256 twapPeriod_
+    ) public override {
+        IUniswapV2Pair _pair = pairFor(tokenIn_, tokenOut_);
+        if (!hasOracle(_pair, twapPeriod_)) {
+            _addOracleFor(_pair, twapPeriod_);
         }
-        _updateIfNeeded(pair_, twapPeriod_);
+        _updateIfNeeded(_pair, twapPeriod_);
     }
 
     /**
@@ -144,6 +149,8 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable {
      * @param twapPeriod_ The TWAP period
      */
     function _addOracleFor(IUniswapV2Pair pair_, uint256 twapPeriod_) private {
+        require(address(pair_) != address(0), "invalid-pair");
+
         (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast) = pair_.getReserves();
 
         require(_reserve0 != 0 && _reserve1 != 0, "no-reserves");

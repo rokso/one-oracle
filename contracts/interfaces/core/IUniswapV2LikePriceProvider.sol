@@ -94,15 +94,21 @@ interface IUniswapV2LikePriceProvider is IPriceProvider {
      * @notice Update cumulative and average price of pair
      * @dev Will create the pair if it doesn't exist
      * @dev Uses `defaultTwapPeriod`
-     * @param pair_ The pair to update
+     * @param tokenIn_ The address of assetIn
+     * @param tokenOut_ The address of assetOut
      */
-    function updateOrAdd(IUniswapV2Pair pair_) external;
+    function updateOrAdd(address tokenIn_, address tokenOut_) external;
 
     /**
      * @notice Update cumulative and average price of pair
      * @dev Will create the pair if it doesn't exist
-     * @param pair_ The pair to update
+     * @param tokenIn_ The address of assetIn
+     * @param tokenOut_ The address of assetOut
      * @param twapPeriod_ The TWAP period
      */
-    function updateOrAdd(IUniswapV2Pair pair_, uint256 twapPeriod_) external;
+    function updateOrAdd(
+        address tokenIn_,
+        address tokenOut_,
+        uint256 twapPeriod_
+    ) external;
 }
