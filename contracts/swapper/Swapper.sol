@@ -234,7 +234,7 @@ contract Swapper is ISwapper, Governable {
      * @notice Remove exchange
      */
     function removeExchange(address exchange_) external onlyGovernor {
-        require(exchanges.remove(exchange_), "exchange-does-nOt-exist");
+        require(exchanges.remove(exchange_), "exchange-does-not-exist");
         emit ExchangeRemoved(exchange_);
     }
 }
