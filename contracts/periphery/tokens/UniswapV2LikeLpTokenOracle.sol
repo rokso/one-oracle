@@ -5,7 +5,7 @@ pragma solidity 0.8.9;
 import "@prb/math/contracts/PRBMath.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
-import "../../interfaces/periphery/synth/ISynthOracle.sol";
+import "../../interfaces/periphery/IUSDOracle.sol";
 import "../../libraries/OracleHelpers.sol";
 
 import "hardhat/console.sol";
@@ -14,24 +14,20 @@ import "hardhat/console.sol";
  * @title Oracle for UniswapV2-Like liquidity pair tokens
  * @dev See more: https://blog.alphaventuredao.io/fair-lp-token-pricing/
  */
-contract UniswapV2LikePairTokenOracle is ISynthOracle {
+contract UniswapV2LikeLpTokenOracle is IUSDOracle {
     using OracleHelpers for uint256;
     using PRBMath for uint256;
 
     /**
      * @notice The oracle that resolves the price of underlying token
      */
-    ISynthOracle public underlyingOracle;
+    IUSDOracle public underlyingOracle;
 
-    constructor(ISynthOracle _underlyingOracle) {
+    constructor(IUSDOracle _underlyingOracle) {
         underlyingOracle = _underlyingOracle;
     }
 
-    /**
-     * @notice Get cToken's USD price
-     * @param _asset The asset's to get price from
-     * @return _priceInUsd The amount in USD (18 decimals)
-     */
+    /// @inheritdoc IUSDOracle
     function getPriceInUsd(IERC20 _asset) external view returns (uint256 _priceInUsd) {
         IUniswapV2Pair _pair = IUniswapV2Pair(address(_asset));
         uint256 _totalSupply = _pair.totalSupply();

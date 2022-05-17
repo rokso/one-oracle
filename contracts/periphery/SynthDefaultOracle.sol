@@ -3,11 +3,11 @@
 pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import "../../interfaces/core/IChainlinkPriceProvider.sol";
-import "../../interfaces/core/IUSDPriceProvider.sol";
-import "../../interfaces/periphery/synth/ISynthOracle.sol";
-import "../../access/Governable.sol";
-import "../ChainlinkAndFallbacksOracle.sol";
+import "../interfaces/core/IChainlinkPriceProvider.sol";
+import "../interfaces/core/IUSDPriceProvider.sol";
+import "../interfaces/periphery/IUSDOracle.sol";
+import "../access/Governable.sol";
+import "./ChainlinkAndFallbacksOracle.sol";
 
 /**
  * @title The Synth Oracle
@@ -15,7 +15,7 @@ import "../ChainlinkAndFallbacksOracle.sol";
  * @dev This contract maps synth assets (i.e. vsAssets and vsdAssets) with their underlyings
  * @dev The fallback providers MUST implement the `IUSDPriceProvider` interface
  */
-contract SynthDefaultOracle is ISynthOracle, Governable, ChainlinkAndFallbacksOracle {
+contract SynthDefaultOracle is IUSDOracle, Governable, ChainlinkAndFallbacksOracle {
     uint256 public constant ONE_USD = 1e18;
 
     /**
@@ -91,7 +91,7 @@ contract SynthDefaultOracle is ISynthOracle, Governable, ChainlinkAndFallbacksOr
         _addOrUpdateAsset(_asset, _underlyingAsset, false, _stalePeriod);
     }
 
-    /// @inheritdoc ISynthOracle
+    /// @inheritdoc IUSDOracle
     function getPriceInUsd(IERC20 _asset) external view returns (uint256 _priceInUsd) {
         Asset memory _assetData = assets[_asset];
 

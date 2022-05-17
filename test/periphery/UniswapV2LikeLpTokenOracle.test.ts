@@ -3,8 +3,8 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {
-  UniswapV2LikePairTokenOracle,
-  UniswapV2LikePairTokenOracle__factory,
+  UniswapV2LikeLpTokenOracle,
+  UniswapV2LikeLpTokenOracle__factory,
   ChainlinkMainnetPriceProvider__factory,
   ChainlinkMainnetPriceProvider,
   IUniswapV2Pair,
@@ -25,11 +25,11 @@ const DAI_HOLDER = '0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8'
 
 const {UNISWAP_V2_ROUTER_ADDRESS, WETH_ADDRESS, DAI_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS} = Address.mainnet
 
-describe('UniswapV2LikePairTokenOracle @mainnet', function () {
+describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
   let underlyingOracle: ChainlinkMainnetPriceProvider
-  let lpOracle: UniswapV2LikePairTokenOracle
+  let lpOracle: UniswapV2LikeLpTokenOracle
   let router: IUniswapV2Router02
   let ethDaiPair: IUniswapV2Pair
   let ethWbtcPair: IUniswapV2Pair
@@ -47,7 +47,7 @@ describe('UniswapV2LikePairTokenOracle @mainnet', function () {
     underlyingOracle = await chainlinkProviderFactory.deploy()
     await underlyingOracle.deployed()
 
-    const lpOracleFactory = new UniswapV2LikePairTokenOracle__factory(deployer)
+    const lpOracleFactory = new UniswapV2LikeLpTokenOracle__factory(deployer)
     lpOracle = await lpOracleFactory.deploy(underlyingOracle.address)
     await lpOracle.deployed()
 
