@@ -103,7 +103,6 @@ contract FluxPriceProvider is IFluxPriceProvider, Governable {
      * @return _aggregator The aggregator
      */
     function _aggregatorOf(address token_, uint256 i_) private view returns (AggregatorV3Interface _aggregator) {
-        require(aggregatorsOf[token_].length() > i_, "aggregator-not-found");
         _aggregator = AggregatorV3Interface(aggregatorsOf[token_].at(i_));
     }
 
@@ -114,6 +113,7 @@ contract FluxPriceProvider is IFluxPriceProvider, Governable {
      * @dev Sweep all aggregators and get the most recent price, revert if deviation among prices are too high.
      */
     function _getUsdPriceOfAsset(address token_) internal view virtual returns (uint256, uint256) {
+        require(aggregatorsOf[token_].length() > 0, "aggregator-not-found");
         (, int256 _price, , uint256 _lastUpdatedAt, ) = _aggregatorOf(token_, 0).latestRoundData();
 
         uint256 _len = aggregatorsOf[token_].length();
