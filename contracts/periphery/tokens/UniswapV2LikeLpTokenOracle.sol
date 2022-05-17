@@ -8,8 +8,6 @@ import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 import "../../interfaces/periphery/IUSDOracle.sol";
 import "../../libraries/OracleHelpers.sol";
 
-import "hardhat/console.sol";
-
 /**
  * @title Oracle for UniswapV2-Like liquidity pair tokens
  * @dev See more: https://blog.alphaventuredao.io/fair-lp-token-pricing/
@@ -39,10 +37,8 @@ contract UniswapV2LikeLpTokenOracle is IUSDOracle {
         _reserve0 = OracleHelpers.scaleDecimal(_reserve0, _token0.decimals(), 18);
         _reserve1 = OracleHelpers.scaleDecimal(_reserve1, _token1.decimals(), 18);
 
-        uint256 _token0Price = underlyingOracle.getPriceInUsd(_token0); // BTC
-        // console.log("_reserve0", _reserve0); // 38661229454
-        uint256 _token1Price = underlyingOracle.getPriceInUsd(_token1); // ETH
-        // console.log("_reserve1", _reserve1); // 5229469835109795287187
+        uint256 _token0Price = underlyingOracle.getPriceInUsd(_token0);
+        uint256 _token1Price = underlyingOracle.getPriceInUsd(_token1);
 
         uint256 _sqrtK = (_reserve0 * _reserve1).sqrt();
         uint256 _sqrtP0xP1 = (_token0Price * _token1Price).sqrt();
