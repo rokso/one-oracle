@@ -14,23 +14,12 @@ import {
   ChainlinkMainnetPriceProvider,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
-import {parseEther, parseUnits, HOUR} from '../helpers'
+import {parseEther, parseUnits, HOUR, Provider} from '../helpers'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
 
 const {WETH_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS} = Address.mainnet
-
-enum Provider {
-  NONE = 0,
-  CHAINLINK = 1,
-  UNISWAP_V3 = 2,
-  UNISWAP_V2 = 3,
-  SUSHISWAP = 4,
-  TRADERJOE = 5,
-  PANGOLIN = 6,
-  QUICKSWAP = 7,
-}
 
 // Note: No need to cover all chains on this test
 describe('PriceProvidersAggregator @mainnet', function () {

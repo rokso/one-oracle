@@ -6,20 +6,22 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../access/Governable.sol";
 import "../interfaces/core/IChainlinkPriceProvider.sol";
 import "../interfaces/core/IPriceProvidersAggregator.sol";
-import "../interfaces/periphery/ISwapperOracle.sol";
+import "../interfaces/periphery/IChainlinkAndFallbacksOracle.sol";
+import "../libraries/OracleHelpers.sol";
 
 /**
- * @title Swapper oracle
+ * @title Chainlink and Fallbacks oracle
  * @dev Uses chainlink as primary oracle, if it doesn't support the asset(s), get price from fallback providers
  */
-contract SwapperOracle is ISwapperOracle, Governable {
-    uint256 internal constant MAX_DEVIATION = 0.1e18; // 10%
-
-    /// @notice The PriceProvidersAggregator contract
-    IPriceProvidersAggregator public providersAggregator;
+contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, Governable {
+    /// @notice The max acceptable deviation from fallbacks' prices
+    uint256 public maxDeviation;
 
     /// @notice The stale period. It's used to determine if a price is invalid (i.e. outdated)
     uint256 public stalePeriod;
+
+    /// @notice The PriceProvidersAggregator contract
+    IPriceProvidersAggregator public providersAggregator;
 
     /// @notice The fallback provider A. It's used when Chainlink isn't available
     DataTypes.Provider public fallbackProviderA;
@@ -36,6 +38,9 @@ contract SwapperOracle is ISwapperOracle, Governable {
         DataTypes.Provider newfallbackProviderB
     );
 
+    /// @notice Emitted when max deviation is updated
+    event MaxDeviationUpdated(uint256 oldMaxDeviation, uint256 newMaxDeviation);
+
     /// @notice Emitted when stale period is updated
     event StalePeriodUpdated(uint256 oldStalePeriod, uint256 newStalePeriod);
 
@@ -47,6 +52,7 @@ contract SwapperOracle is ISwapperOracle, Governable {
 
     constructor(
         IPriceProvidersAggregator providersAggregator_,
+        uint256 maxDeviation_,
         uint256 stalePeriod_,
         DataTypes.Provider fallbackProviderA_,
         DataTypes.Provider fallbackProviderB_
@@ -54,11 +60,12 @@ contract SwapperOracle is ISwapperOracle, Governable {
         require(fallbackProviderA_ != DataTypes.Provider.NONE, "fallback-provider-not-set");
         providersAggregator = providersAggregator_;
         stalePeriod = stalePeriod_;
+        maxDeviation = maxDeviation_;
         fallbackProviderA = fallbackProviderA_;
         fallbackProviderB = fallbackProviderB_;
     }
 
-    /// @inheritdoc ISwapperOracle
+    /// @inheritdoc IChainlinkAndFallbacksOracle
     function quote(
         address tokenIn_,
         address tokenOut_,
@@ -96,10 +103,7 @@ contract SwapperOracle is ISwapperOracle, Governable {
 
         // 7. Check fallback prices deviation
         require(_aPriceOK && _bPriceOK, "fallbacks-failed");
-        uint256 _deviation = _amountOutA > _amountOutB
-            ? ((_amountOutA - _amountOutB) * 1e18) / _amountOutA
-            : ((_amountOutB - _amountOutA) * 1e18) / _amountOutB;
-        require(_deviation <= MAX_DEVIATION, "prices-deviation-too-high");
+        require(OracleHelpers.isDeviationOK(_amountOutA, _amountOutB, maxDeviation), "prices-deviation-too-high");
 
         // 8. If deviation is OK, return price from fallback A
         return _amountOutA;
@@ -139,6 +143,14 @@ contract SwapperOracle is ISwapperOracle, Governable {
     }
 
     /**
+     * @notice Update max deviation
+     */
+    function updateMaxDeviation(uint256 maxDeviation_) public onlyGovernor {
+        emit MaxDeviationUpdated(maxDeviation, maxDeviation_);
+        maxDeviation = maxDeviation_;
+    }
+
+    /**
      * @notice Update PriceProvidersAggregator contract
      */
     function updateProvidersAggregator(IPriceProvidersAggregator providersAggregator_) public onlyGovernor {
@@ -157,10 +169,21 @@ contract SwapperOracle is ISwapperOracle, Governable {
 
     /**
      * @notice Check if a price timestamp is outdated
-     * @param _timeOfLastUpdate The price timestamp
+     * @dev Uses default stale period
+     * @param timeOfLastUpdate_ The price timestamp
      * @return true if price is stale (outdated)
      */
-    function _priceIsStale(uint256 _timeOfLastUpdate) private view returns (bool) {
-        return block.timestamp - _timeOfLastUpdate > stalePeriod;
+    function _priceIsStale(uint256 timeOfLastUpdate_) internal view returns (bool) {
+        return _priceIsStale(timeOfLastUpdate_, stalePeriod);
+    }
+
+    /**
+     * @notice Check if a price timestamp is outdated
+     * @param timeOfLastUpdate_ The price timestamp
+     * @param stalePeriod_ The maximum acceptable outdated period
+     * @return true if price is stale (outdated)
+     */
+    function _priceIsStale(uint256 timeOfLastUpdate_, uint256 stalePeriod_) internal view returns (bool) {
+        return block.timestamp - timeOfLastUpdate_ > stalePeriod_;
     }
 }

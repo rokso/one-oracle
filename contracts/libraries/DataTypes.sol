@@ -14,6 +14,8 @@ library DataTypes {
         SUSHISWAP,
         TRADERJOE,
         PANGOLIN,
-        QUICKSWAP
+        QUICKSWAP,
+        UMBRELLA,
+        FLUX
     }
 }
