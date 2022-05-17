@@ -63,15 +63,15 @@ describe('UniswapV2LikePriceProvider', function () {
           await priceProvider.transferGovernorship(governor.address)
           await priceProvider.connect(governor).acceptGovernorship()
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WETH_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WETH_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(USDC_ADDRESS, WETH_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](USDC_ADDRESS, WETH_ADDRESS)
 
           await increaseTime(DEFAULT_TWAP_PERIOD)
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WETH_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WETH_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(USDC_ADDRESS, WETH_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](USDC_ADDRESS, WETH_ADDRESS)
         })
 
         describe('updateDefaultTwapPeriod', function () {
@@ -102,7 +102,7 @@ describe('UniswapV2LikePriceProvider', function () {
             expect(await priceProvider['hasOracle(address)'](pair)).false
 
             // when
-            await priceProvider['updateOrAdd(address)'](pair)
+            await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WBTC_ADDRESS)
 
             // then
             expect(await priceProvider['hasOracle(address)'](pair)).true
@@ -117,8 +117,8 @@ describe('UniswapV2LikePriceProvider', function () {
             expect(await priceProvider['hasOracle(address,uint256)'](pair, twapPeriod1)).false
 
             // when
-            await priceProvider['updateOrAdd(address,uint256)'](pair, twapPeriod0)
-            await priceProvider['updateOrAdd(address,uint256)'](pair, twapPeriod1)
+            await priceProvider['updateOrAdd(address,address,uint256)'](DAI_ADDRESS, WBTC_ADDRESS, twapPeriod0)
+            await priceProvider['updateOrAdd(address,address,uint256)'](DAI_ADDRESS, WBTC_ADDRESS, twapPeriod1)
 
             // then
             expect(await priceProvider['hasOracle(address,uint256)'](pair, twapPeriod0)).true
@@ -132,7 +132,7 @@ describe('UniswapV2LikePriceProvider', function () {
 
             // when
             await increaseTime(HOUR.mul('10'))
-            await priceProvider['updateOrAdd(address,uint256)'](pair, DEFAULT_TWAP_PERIOD)
+            await priceProvider['updateOrAdd(address,address,uint256)'](DAI_ADDRESS, WETH_ADDRESS, DEFAULT_TWAP_PERIOD)
 
             // then
             const {blockTimestampLast: after} = await priceProvider.oracles(pair, DEFAULT_TWAP_PERIOD)
@@ -183,13 +183,13 @@ describe('UniswapV2LikePriceProvider', function () {
           await priceProvider.transferGovernorship(governor.address)
           await priceProvider.connect(governor).acceptGovernorship()
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WETH_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WETH_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
 
           await increaseTime(DEFAULT_TWAP_PERIOD)
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WETH_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WETH_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
         })
 
         it('should quote same token to same token', async function () {
@@ -248,13 +248,13 @@ describe('UniswapV2LikePriceProvider', function () {
           await priceProvider.transferGovernorship(governor.address)
           await priceProvider.connect(governor).acceptGovernorship()
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WAVAX_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WAVAX_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WAVAX_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WAVAX_ADDRESS)
 
           await increaseTime(DEFAULT_TWAP_PERIOD)
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WAVAX_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WAVAX_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WAVAX_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WAVAX_ADDRESS)
         })
 
         it('should quote same token to same token', async function () {
@@ -300,13 +300,13 @@ describe('UniswapV2LikePriceProvider', function () {
           await priceProvider.transferGovernorship(governor.address)
           await priceProvider.connect(governor).acceptGovernorship()
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WAVAX_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WAVAX_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WAVAX_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WAVAX_ADDRESS)
 
           await increaseTime(DEFAULT_TWAP_PERIOD)
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WAVAX_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WAVAX_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WAVAX_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WAVAX_ADDRESS)
         })
 
         it('should quote same token to same token', async function () {
@@ -364,13 +364,13 @@ describe('UniswapV2LikePriceProvider', function () {
           await priceProvider.transferGovernorship(governor.address)
           await priceProvider.connect(governor).acceptGovernorship()
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WETH_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WETH_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
 
           await increaseTime(DEFAULT_TWAP_PERIOD)
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WETH_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WETH_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
         })
 
         it('should quote same token to same token', async function () {
@@ -429,13 +429,13 @@ describe('UniswapV2LikePriceProvider', function () {
           await priceProvider.transferGovernorship(governor.address)
           await priceProvider.connect(governor).acceptGovernorship()
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WMATIC_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WMATIC_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WMATIC_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WMATIC_ADDRESS)
 
           await increaseTime(DEFAULT_TWAP_PERIOD)
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WMATIC_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WMATIC_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WMATIC_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WMATIC_ADDRESS)
         })
 
         it('should quote same token to same token', async function () {
@@ -481,13 +481,13 @@ describe('UniswapV2LikePriceProvider', function () {
           await priceProvider.transferGovernorship(governor.address)
           await priceProvider.connect(governor).acceptGovernorship()
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WMATIC_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WMATIC_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WMATIC_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WMATIC_ADDRESS)
 
           await increaseTime(DEFAULT_TWAP_PERIOD)
 
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(DAI_ADDRESS, WMATIC_ADDRESS))
-          await priceProvider['updateOrAdd(address)'](await priceProvider.pairFor(WBTC_ADDRESS, WMATIC_ADDRESS))
+          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WMATIC_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WMATIC_ADDRESS)
         })
 
         it('should quote same token to same token', async function () {

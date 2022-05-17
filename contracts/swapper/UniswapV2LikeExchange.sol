@@ -16,7 +16,7 @@ contract UniswapV2LikeExchange is IExchange, Governable {
 
     /**
      * @notice The WETH-Like token (a.k.a. Native Token)
-     * @dev I.e. should be the most liquidatid token that offer best routers among trade pairs
+     * @dev I.e. should be the most liquid token that offer best routers among trade pairs
      * @dev It's usually the wrapper token of the chain's native coin but it isn't always true
      * For instance: On Polygon, the `WETH` is more liquid than `WMATIC` on UniV3 protocol.
      */

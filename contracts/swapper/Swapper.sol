@@ -167,7 +167,7 @@ contract Swapper is ISwapper, Governable {
     }
 
     /**
-     * @notice Wrapps `exchange.getBestAmountIn()` function
+     * @notice Wraps `exchange.getBestAmountIn()` function
      * @dev Returns `(0,[])` if reverts
      */
     function _getBestAmountIn(
@@ -186,7 +186,7 @@ contract Swapper is ISwapper, Governable {
     }
 
     /**
-     * @notice Wrapps `exchange.getBestAmountOut()` function
+     * @notice Wraps `exchange.getBestAmountOut()` function
      * @dev Returns `(0,[])` if reverts
      */
     function _getBestAmountOut(
@@ -234,7 +234,7 @@ contract Swapper is ISwapper, Governable {
      * @notice Remove exchange
      */
     function removeExchange(address exchange_) external onlyGovernor {
-        require(exchanges.remove(exchange_), "exchange-doesnt-exist");
+        require(exchanges.remove(exchange_), "exchange-does-not-exist");
         emit ExchangeRemoved(exchange_);
     }
 }

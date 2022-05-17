@@ -5,12 +5,11 @@ pragma solidity 0.8.9;
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../../interfaces/external/ICToken.sol";
 import "../../interfaces/periphery/synth/ISynthOracle.sol";
-import "../../access/Governable.sol";
 
 /**
  * @title Oracle for `CTokens`
  */
-contract CTokenOracle is ISynthOracle, Governable {
+contract CTokenOracle is ISynthOracle {
     uint256 public constant ONE_CTOKEN = 1e8;
     /**
      * @notice The oracle that resolves the price of underlying token

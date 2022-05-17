@@ -2,14 +2,13 @@
 
 pragma solidity 0.8.9;
 
-import "../../access/Governable.sol";
 import "../../interfaces/periphery/synth/ISynthOracle.sol";
 import "../../interfaces/external/ICurveAddressProvider.sol";
 
 /**
  * @title Oracle for Curve LP tokens
  */
-contract CurveLpTokenOracle is ISynthOracle, Governable {
+contract CurveLpTokenOracle is ISynthOracle {
     ICurveAddressProvider public addressProvider;
 
     constructor(ICurveAddressProvider _addressProvider) {

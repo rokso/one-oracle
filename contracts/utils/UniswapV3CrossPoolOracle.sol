@@ -10,7 +10,7 @@ import "../libraries/SafeUint128.sol";
 /// @dev Based on https://etherscan.io/address/0x0f1f5a87f99f0918e6c81f16e59f3518698221ff#code
 /// @dev Having this as a separated contract to due to solc version conflicts with uniswap contracts
 contract UniswapV3CrossPoolOracle {
-    // UniswapV3 has its factopry deployed with the same address in all chains
+    // UniswapV3 has its factory deployed with the same address in all chains
     // See: https://docs.uniswap.org/protocol/reference/deployments
     address public constant UNISWAP_V3_FACTORY = 0x1F98431c8aD98523631AE4a59f267346ea31F984;
     address public immutable nativeToken;
