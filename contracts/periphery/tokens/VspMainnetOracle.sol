@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "../../access/Governable.sol";
 import "../../features/UsingMaxDeviation.sol";
+import "../../features/UsingStalePeriod.sol";
 import "../../interfaces/core/IChainlinkPriceProvider.sol";
 import "../../interfaces/core/IPriceProvidersAggregator.sol";
 import "../../interfaces/periphery/IVSPOracle.sol";
@@ -14,15 +15,10 @@ import "../../interfaces/periphery/IVSPOracle.sol";
  * @title Main oracle
  * @dev Reuses `PriceProvidersAggregator` and add support to USD quotes
  */
-contract VspMainnetOracle is IVSPOracle, UsingMaxDeviation {
+contract VspMainnetOracle is IVSPOracle, UsingMaxDeviation, UsingStalePeriod {
     uint256 public constant USD_DECIMALS = 18;
     uint256 public constant ONE_VSP = 1e18;
     address public constant VSP_ADDRESS = 0x1b40183EFB4Dd766f11bDa7A7c3AD8982e998421;
-
-    /**
-     * @notice The stale period. It's used to determine if a price is invalid (i.e. outdated)
-     */
-    uint256 public stalePeriod;
 
     /**
      * @notice A stable coin to use as USD price reference if provider is UniV2 or UniV3
@@ -45,18 +41,14 @@ contract VspMainnetOracle is IVSPOracle, UsingMaxDeviation {
     /// @notice Emitted when USD-Equivalent token is updated
     event UsdEquivalentTokenUpdated(address oldUsdToken, address newUsdToken);
 
-    /// @notice Emitted when stale period is updated
-    event StalePeriodUpdated(uint256 oldStalePeriod, uint256 newStalePeriod);
-
     constructor(
         IPriceProvidersAggregator providersAggregator_,
         address usdEquivalentToken_,
         uint256 maxDeviation_,
         uint256 stalePeriod_
-    ) UsingMaxDeviation(maxDeviation_) {
+    ) UsingMaxDeviation(maxDeviation_) UsingStalePeriod(stalePeriod_) {
         require(address(providersAggregator_) != address(0), "aggregator-is-null");
         providersAggregator = providersAggregator_;
-        stalePeriod = stalePeriod_;
         setUSDEquivalentToken(usdEquivalentToken_);
     }
 
@@ -101,23 +93,5 @@ contract VspMainnetOracle is IVSPOracle, UsingMaxDeviation {
         require(address(providersAggregator_) != address(0), "address-is-null");
         emit ProvidersAggregatorUpdated(providersAggregator, providersAggregator_);
         providersAggregator = providersAggregator_;
-    }
-
-    /**
-     * @notice Update stale period
-     */
-    function updateStalePeriod(uint256 stalePeriod_) public onlyGovernor {
-        emit StalePeriodUpdated(stalePeriod, stalePeriod_);
-        stalePeriod = stalePeriod_;
-    }
-
-    /**
-     * @notice Check if a price timestamp is outdated
-     * @dev Uses default stale period
-     * @param timeOfLastUpdate_ The price timestamp
-     * @return true if price is stale (outdated)
-     */
-    function _priceIsStale(uint256 timeOfLastUpdate_) internal view returns (bool) {
-        return block.timestamp - timeOfLastUpdate_ > stalePeriod;
     }
 }

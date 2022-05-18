@@ -8,15 +8,13 @@ import "../interfaces/core/IChainlinkPriceProvider.sol";
 import "../interfaces/core/IPriceProvidersAggregator.sol";
 import "../interfaces/periphery/IChainlinkAndFallbacksOracle.sol";
 import "../features/UsingMaxDeviation.sol";
+import "../features/UsingStalePeriod.sol";
 
 /**
  * @title Chainlink and Fallbacks oracle
  * @dev Uses chainlink as primary oracle, if it doesn't support the asset(s), get price from fallback providers
  */
-contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, UsingMaxDeviation {
-    /// @notice The stale period. It's used to determine if a price is invalid (i.e. outdated)
-    uint256 public stalePeriod;
-
+contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, UsingMaxDeviation, UsingStalePeriod {
     /// @notice The PriceProvidersAggregator contract
     IPriceProvidersAggregator public providersAggregator;
 
@@ -35,9 +33,6 @@ contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, UsingMaxDe
         DataTypes.Provider newFallbackProviderB
     );
 
-    /// @notice Emitted when stale period is updated
-    event StalePeriodUpdated(uint256 oldStalePeriod, uint256 newStalePeriod);
-
     /// @notice Emitted when providers aggregator is updated
     event ProvidersAggregatorUpdated(
         IPriceProvidersAggregator oldProvidersAggregator,
@@ -50,10 +45,9 @@ contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, UsingMaxDe
         uint256 stalePeriod_,
         DataTypes.Provider fallbackProviderA_,
         DataTypes.Provider fallbackProviderB_
-    ) UsingMaxDeviation(maxDeviation_) {
+    ) UsingMaxDeviation(maxDeviation_) UsingStalePeriod(stalePeriod_) {
         require(fallbackProviderA_ != DataTypes.Provider.NONE, "fallback-provider-not-set");
         providersAggregator = providersAggregator_;
-        stalePeriod = stalePeriod_;
         fallbackProviderA = fallbackProviderA_;
         fallbackProviderB = fallbackProviderB_;
     }
@@ -142,33 +136,5 @@ contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, UsingMaxDe
         require(address(providersAggregator_) != address(0), "address-is-null");
         emit ProvidersAggregatorUpdated(providersAggregator, providersAggregator_);
         providersAggregator = providersAggregator_;
-    }
-
-    /**
-     * @notice Update stale period
-     */
-    function updateStalePeriod(uint256 stalePeriod_) public onlyGovernor {
-        emit StalePeriodUpdated(stalePeriod, stalePeriod_);
-        stalePeriod = stalePeriod_;
-    }
-
-    /**
-     * @notice Check if a price timestamp is outdated
-     * @dev Uses default stale period
-     * @param timeOfLastUpdate_ The price timestamp
-     * @return true if price is stale (outdated)
-     */
-    function _priceIsStale(uint256 timeOfLastUpdate_) internal view returns (bool) {
-        return _priceIsStale(timeOfLastUpdate_, stalePeriod);
-    }
-
-    /**
-     * @notice Check if a price timestamp is outdated
-     * @param timeOfLastUpdate_ The price timestamp
-     * @param stalePeriod_ The maximum acceptable outdated period
-     * @return true if price is stale (outdated)
-     */
-    function _priceIsStale(uint256 timeOfLastUpdate_, uint256 stalePeriod_) internal view returns (bool) {
-        return block.timestamp - timeOfLastUpdate_ > stalePeriod_;
     }
 }
