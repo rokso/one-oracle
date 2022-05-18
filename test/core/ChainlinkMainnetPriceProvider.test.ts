@@ -41,7 +41,7 @@ describe('ChainlinkMainnetPriceProvider @mainnet', function () {
   describe('quote', function () {
     it('should revert if aggregator does not exist', async function () {
       const tx = priceProvider.quote(weth.address, ethers.constants.AddressZero, parseEther('1'))
-      await expect(tx).revertedWith('token-without-aggregator')
+      await expect(tx).revertedWith('Feed not found')
     })
 
     it('should quote same token to same token', async function () {
@@ -79,7 +79,7 @@ describe('ChainlinkMainnetPriceProvider @mainnet', function () {
   describe('quoteTokenToUsd', function () {
     it('should revert if aggregator does not exist', async function () {
       const tx = priceProvider.quoteTokenToUsd(ethers.constants.AddressZero, parseEther('1'))
-      await expect(tx).revertedWith('token-without-aggregator')
+      await expect(tx).revertedWith('Feed not found')
     })
 
     it('should quote WETH to USD', async function () {
@@ -101,7 +101,7 @@ describe('ChainlinkMainnetPriceProvider @mainnet', function () {
   describe('quoteUsdToToken', function () {
     it('should revert if aggregator does not exist', async function () {
       const tx = priceProvider.quoteUsdToToken(ethers.constants.AddressZero, parseEther('1'))
-      await expect(tx).revertedWith('token-without-aggregator')
+      await expect(tx).revertedWith('Feed not found')
     })
 
     it('should quote USD to WETH', async function () {
