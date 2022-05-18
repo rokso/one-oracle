@@ -2,11 +2,9 @@
 
 pragma solidity 0.8.9;
 
-import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import "../access/Governable.sol";
-import "../interfaces/core/IChainlinkPriceProvider.sol";
 import "../interfaces/core/IPriceProvidersAggregator.sol";
 import "../interfaces/periphery/IChainlinkAndFallbacksOracle.sol";
+import "../features/UsingProvidersAggregator.sol";
 import "../features/UsingMaxDeviation.sol";
 import "../features/UsingStalePeriod.sol";
 
@@ -14,10 +12,12 @@ import "../features/UsingStalePeriod.sol";
  * @title Chainlink and Fallbacks oracle
  * @dev Uses chainlink as primary oracle, if it doesn't support the asset(s), get price from fallback providers
  */
-contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, UsingMaxDeviation, UsingStalePeriod {
-    /// @notice The PriceProvidersAggregator contract
-    IPriceProvidersAggregator public providersAggregator;
-
+contract ChainlinkAndFallbacksOracle is
+    IChainlinkAndFallbacksOracle,
+    UsingProvidersAggregator,
+    UsingMaxDeviation,
+    UsingStalePeriod
+{
     /// @notice The fallback provider A. It's used when Chainlink isn't available
     DataTypes.Provider public fallbackProviderA;
 
@@ -33,21 +33,14 @@ contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, UsingMaxDe
         DataTypes.Provider newFallbackProviderB
     );
 
-    /// @notice Emitted when providers aggregator is updated
-    event ProvidersAggregatorUpdated(
-        IPriceProvidersAggregator oldProvidersAggregator,
-        IPriceProvidersAggregator newProvidersAggregator
-    );
-
     constructor(
         IPriceProvidersAggregator providersAggregator_,
         uint256 maxDeviation_,
         uint256 stalePeriod_,
         DataTypes.Provider fallbackProviderA_,
         DataTypes.Provider fallbackProviderB_
-    ) UsingMaxDeviation(maxDeviation_) UsingStalePeriod(stalePeriod_) {
+    ) UsingProvidersAggregator(providersAggregator_) UsingMaxDeviation(maxDeviation_) UsingStalePeriod(stalePeriod_) {
         require(fallbackProviderA_ != DataTypes.Provider.NONE, "fallback-provider-not-set");
-        providersAggregator = providersAggregator_;
         fallbackProviderA = fallbackProviderA_;
         fallbackProviderB = fallbackProviderB_;
     }
@@ -127,14 +120,5 @@ contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, UsingMaxDe
         emit FallbackProvidersUpdated(fallbackProviderA, fallbackProviderA_, fallbackProviderB, fallbackProviderB_);
         fallbackProviderA = fallbackProviderA_;
         fallbackProviderB = fallbackProviderB_;
-    }
-
-    /**
-     * @notice Update PriceProvidersAggregator contract
-     */
-    function updateProvidersAggregator(IPriceProvidersAggregator providersAggregator_) public onlyGovernor {
-        require(address(providersAggregator_) != address(0), "address-is-null");
-        emit ProvidersAggregatorUpdated(providersAggregator, providersAggregator_);
-        providersAggregator = providersAggregator_;
     }
 }
