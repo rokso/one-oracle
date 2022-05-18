@@ -29,7 +29,7 @@ contract SynthDefaultOracle is IUSDOracle, Governable, ChainlinkAndFallbacksOrac
     }
 
     /**
-     * @notice Avaliable assets
+     * @notice Available assets
      */
     mapping(IERC20 => Asset) public assets;
 
@@ -129,7 +129,7 @@ contract SynthDefaultOracle is IUSDOracle, Governable, ChainlinkAndFallbacksOrac
 
         // 7. Check fallback prices deviation
         require(_aPriceOK && _bPriceOK, "fallbacks-failed");
-        require(OracleHelpers.isDeviationOK(_amountOutA, _amountOutB, maxDeviation), "prices-deviation-too-high");
+        require(_isDeviationOK(_amountOutA, _amountOutB), "prices-deviation-too-high");
 
         // 8. If deviation is OK, return price from fallback A
         return _amountOutA;

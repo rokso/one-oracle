@@ -7,16 +7,13 @@ import "../access/Governable.sol";
 import "../interfaces/core/IChainlinkPriceProvider.sol";
 import "../interfaces/core/IPriceProvidersAggregator.sol";
 import "../interfaces/periphery/IChainlinkAndFallbacksOracle.sol";
-import "../libraries/OracleHelpers.sol";
+import "../features/UsingMaxDeviation.sol";
 
 /**
  * @title Chainlink and Fallbacks oracle
  * @dev Uses chainlink as primary oracle, if it doesn't support the asset(s), get price from fallback providers
  */
-contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, Governable {
-    /// @notice The max acceptable deviation from fallbacks' prices
-    uint256 public maxDeviation;
-
+contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, UsingMaxDeviation {
     /// @notice The stale period. It's used to determine if a price is invalid (i.e. outdated)
     uint256 public stalePeriod;
 
@@ -38,9 +35,6 @@ contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, Governable
         DataTypes.Provider newFallbackProviderB
     );
 
-    /// @notice Emitted when max deviation is updated
-    event MaxDeviationUpdated(uint256 oldMaxDeviation, uint256 newMaxDeviation);
-
     /// @notice Emitted when stale period is updated
     event StalePeriodUpdated(uint256 oldStalePeriod, uint256 newStalePeriod);
 
@@ -56,11 +50,10 @@ contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, Governable
         uint256 stalePeriod_,
         DataTypes.Provider fallbackProviderA_,
         DataTypes.Provider fallbackProviderB_
-    ) {
+    ) UsingMaxDeviation(maxDeviation_) {
         require(fallbackProviderA_ != DataTypes.Provider.NONE, "fallback-provider-not-set");
         providersAggregator = providersAggregator_;
         stalePeriod = stalePeriod_;
-        maxDeviation = maxDeviation_;
         fallbackProviderA = fallbackProviderA_;
         fallbackProviderB = fallbackProviderB_;
     }
@@ -103,7 +96,7 @@ contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, Governable
 
         // 7. Check fallback prices deviation
         require(_aPriceOK && _bPriceOK, "fallbacks-failed");
-        require(OracleHelpers.isDeviationOK(_amountOutA, _amountOutB, maxDeviation), "prices-deviation-too-high");
+        require(_isDeviationOK(_amountOutA, _amountOutB), "prices-deviation-too-high");
 
         // 8. If deviation is OK, return price from fallback A
         return _amountOutA;
@@ -140,14 +133,6 @@ contract ChainlinkAndFallbacksOracle is IChainlinkAndFallbacksOracle, Governable
         emit FallbackProvidersUpdated(fallbackProviderA, fallbackProviderA_, fallbackProviderB, fallbackProviderB_);
         fallbackProviderA = fallbackProviderA_;
         fallbackProviderB = fallbackProviderB_;
-    }
-
-    /**
-     * @notice Update max deviation
-     */
-    function updateMaxDeviation(uint256 maxDeviation_) public onlyGovernor {
-        emit MaxDeviationUpdated(maxDeviation, maxDeviation_);
-        maxDeviation = maxDeviation_;
     }
 
     /**

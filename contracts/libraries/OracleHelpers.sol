@@ -15,13 +15,4 @@ library OracleHelpers {
         }
         return amount;
     }
-
-    function isDeviationOK(
-        uint256 a,
-        uint256 b,
-        uint256 maxDeviation
-    ) internal pure returns (bool) {
-        uint256 _deviation = a > b ? ((a - b) * 1e18) / a : ((b - a) * 1e18) / b;
-        return _deviation <= maxDeviation;
-    }
 }

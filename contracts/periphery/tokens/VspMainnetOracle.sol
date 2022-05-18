@@ -5,7 +5,7 @@ pragma solidity 0.8.9;
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "../../access/Governable.sol";
-import "../../libraries/OracleHelpers.sol";
+import "../../features/UsingMaxDeviation.sol";
 import "../../interfaces/core/IChainlinkPriceProvider.sol";
 import "../../interfaces/core/IPriceProvidersAggregator.sol";
 import "../../interfaces/periphery/IVSPOracle.sol";
@@ -14,7 +14,7 @@ import "../../interfaces/periphery/IVSPOracle.sol";
  * @title Main oracle
  * @dev Reuses `PriceProvidersAggregator` and add support to USD quotes
  */
-contract VspMainnetOracle is IVSPOracle, Governable {
+contract VspMainnetOracle is IVSPOracle, UsingMaxDeviation {
     uint256 public constant USD_DECIMALS = 18;
     uint256 public constant ONE_VSP = 1e18;
     address public constant VSP_ADDRESS = 0x1b40183EFB4Dd766f11bDa7A7c3AD8982e998421;
@@ -23,11 +23,6 @@ contract VspMainnetOracle is IVSPOracle, Governable {
      * @notice The stale period. It's used to determine if a price is invalid (i.e. outdated)
      */
     uint256 public stalePeriod;
-
-    /**
-     * @notice The max acceptable deviation from fallbacks' prices
-     */
-    uint256 public maxDeviation;
 
     /**
      * @notice A stable coin to use as USD price reference if provider is UniV2 or UniV3
@@ -50,9 +45,6 @@ contract VspMainnetOracle is IVSPOracle, Governable {
     /// @notice Emitted when USD-Equivalent token is updated
     event UsdEquivalentTokenUpdated(address oldUsdToken, address newUsdToken);
 
-    /// @notice Emitted when max deviation is updated
-    event MaxDeviationUpdated(uint256 oldMaxDeviation, uint256 newMaxDeviation);
-
     /// @notice Emitted when stale period is updated
     event StalePeriodUpdated(uint256 oldStalePeriod, uint256 newStalePeriod);
 
@@ -61,11 +53,10 @@ contract VspMainnetOracle is IVSPOracle, Governable {
         address usdEquivalentToken_,
         uint256 maxDeviation_,
         uint256 stalePeriod_
-    ) {
+    ) UsingMaxDeviation(maxDeviation_) {
         require(address(providersAggregator_) != address(0), "aggregator-is-null");
         providersAggregator = providersAggregator_;
         stalePeriod = stalePeriod_;
-        maxDeviation = maxDeviation_;
         setUSDEquivalentToken(usdEquivalentToken_);
     }
 
@@ -90,7 +81,7 @@ contract VspMainnetOracle is IVSPOracle, Governable {
             _priceInUsd > 0 && _priceInUsd1 > 0 && !_priceIsStale(Math.min(_lastUpdatedAt, _lastUpdatedAt1)),
             "one-or-both-prices-invalid"
         );
-        require(OracleHelpers.isDeviationOK(_priceInUsd, _priceInUsd1, maxDeviation), "prices-deviation-too-high");
+        require(_isDeviationOK(_priceInUsd, _priceInUsd1), "prices-deviation-too-high");
     }
 
     /// @inheritdoc IVSPOracle
@@ -110,14 +101,6 @@ contract VspMainnetOracle is IVSPOracle, Governable {
         require(address(providersAggregator_) != address(0), "address-is-null");
         emit ProvidersAggregatorUpdated(providersAggregator, providersAggregator_);
         providersAggregator = providersAggregator_;
-    }
-
-    /**
-     * @notice Update max deviation
-     */
-    function updateMaxDeviation(uint256 maxDeviation_) public onlyGovernor {
-        emit MaxDeviationUpdated(maxDeviation, maxDeviation_);
-        maxDeviation = maxDeviation_;
     }
 
     /**
