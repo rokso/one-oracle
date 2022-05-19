@@ -28,7 +28,6 @@ contract UniswapV2LikeLpTokenOracle is IUSDOracle {
     /// @inheritdoc IUSDOracle
     function getPriceInUsd(IERC20 _asset) external view returns (uint256 _priceInUsd) {
         IUniswapV2Pair _pair = IUniswapV2Pair(address(_asset));
-        uint256 _totalSupply = _pair.totalSupply();
         (uint256 _reserve0, uint256 _reserve1, ) = _pair.getReserves();
 
         IERC20Metadata _token0 = IERC20Metadata(_pair.token0());
@@ -43,6 +42,6 @@ contract UniswapV2LikeLpTokenOracle is IUSDOracle {
         uint256 _sqrtK = (_reserve0 * _reserve1).sqrt();
         uint256 _sqrtP0xP1 = (_token0Price * _token1Price).sqrt();
 
-        _priceInUsd = (2 * (_sqrtK * _sqrtP0xP1)) / _totalSupply;
+        _priceInUsd = (2 * (_sqrtK * _sqrtP0xP1)) / _pair.totalSupply();
     }
 }
