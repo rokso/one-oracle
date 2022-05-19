@@ -162,7 +162,7 @@ describe('UniswapV2LikeExchange', function () {
 
         // when
         await usdc.transfer(dex.address, _amountIn)
-        await dex.swapExactOutput(_path, amountOut, ethers.constants.MaxUint256, deployer.address, deployer.address)
+        await dex.swapExactOutput(_path, amountOut, _amountIn, deployer.address, deployer.address)
 
         // then
         const usdcAfter = await usdc.balanceOf(deployer.address)
@@ -331,7 +331,7 @@ describe('UniswapV2LikeExchange', function () {
 
         // when
         await dai.transfer(dex.address, _amountIn)
-        await dex.swapExactOutput(_path, amountOut, ethers.constants.MaxUint256, deployer.address, deployer.address)
+        await dex.swapExactOutput(_path, amountOut, _amountIn, deployer.address, deployer.address)
 
         // then
         const daiAfter = await dai.balanceOf(deployer.address)
@@ -350,7 +350,7 @@ describe('UniswapV2LikeExchange', function () {
 
         // when
         await usdc.transfer(dex.address, _amountIn)
-        await dex.swapExactOutput(_path, amountOut, ethers.constants.MaxUint256, deployer.address, deployer.address)
+        await dex.swapExactOutput(_path, amountOut, _amountIn, deployer.address, deployer.address)
 
         // then
         const usdcAfter = await usdc.balanceOf(deployer.address)
