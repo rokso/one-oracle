@@ -4,33 +4,29 @@ pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../../interfaces/external/ICToken.sol";
-import "../../interfaces/periphery/synth/ISynthOracle.sol";
+import "../../interfaces/periphery/IUSDOracle.sol";
 
 /**
  * @title Oracle for `CTokens`
  */
-contract CTokenOracle is ISynthOracle {
+contract CTokenOracle is IUSDOracle {
     uint256 public constant ONE_CTOKEN = 1e8;
     /**
      * @notice The oracle that resolves the price of underlying token
      */
-    ISynthOracle public underlyingOracle;
+    IUSDOracle public underlyingOracle;
 
     /**
      * @notice The address of the `CEther` underlying (Usually WETH)
      */
     address public wethLike;
 
-    constructor(ISynthOracle _underlyingOracle, address _wethLike) {
+    constructor(IUSDOracle _underlyingOracle, address _wethLike) {
         underlyingOracle = _underlyingOracle;
         wethLike = _wethLike;
     }
 
-    /**
-     * @notice Get cToken's USD price
-     * @param _asset The asset's to get price from
-     * @return _priceInUsd The amount in USD (18 decimals)
-     */
+    /// @inheritdoc IUSDOracle
     function getPriceInUsd(IERC20 _asset) external view returns (uint256 _priceInUsd) {
         address _underlyingAddress;
         // Note: Compound's `CEther` hasn't the `underlying()` function, forks may return `address(0)` (e.g. RariFuse)
