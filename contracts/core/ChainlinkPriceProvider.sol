@@ -14,10 +14,11 @@ import "../access/Governable.sol";
  * @dev This contract wraps chainlink aggregators
  */
 contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
-    /**
-     * @notice Used to convert 8-decimals from Chainlink to 18-decimals values
-     */
-    uint256 public constant TEN_DECIMALS = 1e10;
+    using SafeCast for int256;
+
+    uint256 public constant CHAINLINK_DECIMALS = 8;
+    uint256 public constant USD_DECIMALS = 18;
+    uint256 public constant TO_SCALE = 10**(USD_DECIMALS - CHAINLINK_DECIMALS);
 
     /**
      * @notice Aggregators map (token => aggregator)
@@ -68,23 +69,15 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
     }
 
     /**
-     * @notice Get token's aggregator
-     * @param token_ The token to get aggregator from
-     * @return _aggregator The aggregator
-     */
-    function _aggregatorOf(address token_) private view returns (AggregatorV3Interface _aggregator) {
-        _aggregator = aggregators[token_];
-        require(address(_aggregator) != address(0), "token-without-aggregator");
-    }
-
-    /**
      * @notice Get token's price
      * @param token_ The token
      * @return The price (18 decimals) and its timestamp
      */
     function _getUsdPriceOfAsset(address token_) internal view virtual returns (uint256, uint256) {
-        (, int256 _price, , uint256 _lastUpdatedAt, ) = _aggregatorOf(token_).latestRoundData();
-        return (SafeCast.toUint256(_price) * TEN_DECIMALS, _lastUpdatedAt);
+        AggregatorV3Interface _aggregator = aggregators[token_];
+        require(address(_aggregator) != address(0), "token-without-aggregator");
+        (, int256 _price, , uint256 _lastUpdatedAt, ) = _aggregator.latestRoundData();
+        return (_price.toUint256() * TO_SCALE, _lastUpdatedAt);
     }
 
     /**
@@ -94,9 +87,12 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
         require(token_ != address(0), "token-is-null");
         AggregatorV3Interface _current = aggregators[token_];
         require(aggregator_ != _current, "same-as-current");
-
+        _setAggregator(token_, aggregator_);
         emit AggregatorUpdated(_current, aggregator_);
+    }
 
+    function _setAggregator(address token_, AggregatorV3Interface aggregator_) internal {
+        require(address(aggregator_) == address(0) || aggregator_.decimals() == CHAINLINK_DECIMALS, "invalid-decimals");
         aggregators[token_] = aggregator_;
     }
 }

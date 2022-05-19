@@ -164,7 +164,7 @@ describe('Swapper @mainnet', function () {
         await wbtc.approve(swapper.address, amountIn)
         const tx = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('350000', 1000)
+        expect(receipt.gasUsed).closeTo('345000', 1000)
       })
 
       it('swapExactOutput', async function () {
@@ -175,7 +175,7 @@ describe('Swapper @mainnet', function () {
         await btt.approve(swapper.address, _amountIn.mul('10'))
         const tx = await swapper.swapExactOutput(BTT_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('385000', 500)
+        expect(receipt.gasUsed).closeTo('380000', 1000)
       })
     })
 
@@ -188,7 +188,7 @@ describe('Swapper @mainnet', function () {
         await wbtc.approve(swapper.address, amountIn)
         const tx = await swapper.swapExactInput(WBTC_ADDRESS, WETH_ADDRESS, amountIn, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('231000', 500)
+        expect(receipt.gasUsed).closeTo('234000', 1000)
       })
 
       it('swapExactOutput', async function () {
@@ -199,7 +199,7 @@ describe('Swapper @mainnet', function () {
         await weth.approve(swapper.address, _amountIn.mul('10'))
         const tx = await swapper.swapExactOutput(WETH_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('261000', 500)
+        expect(receipt.gasUsed).closeTo('264000', 1000)
       })
     })
   })
