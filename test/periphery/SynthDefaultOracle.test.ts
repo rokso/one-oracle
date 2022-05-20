@@ -60,7 +60,7 @@ describe('SynthDefaultOracle @avalanche', function () {
       aggregator.address,
       MAX_DEVIATION,
       STALE_PERIOD,
-      Provider.UMBRELLA,
+      Provider.UMBRELLA_PASSPORT,
       Provider.FLUX
     )
     await oracle.deployed()

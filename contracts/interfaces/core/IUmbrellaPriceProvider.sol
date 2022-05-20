@@ -2,6 +2,6 @@
 
 pragma solidity 0.8.9;
 
-import "./IUSDPriceProvider.sol";
+import "./IPriceProvider.sol";
 
-interface IUmbrellaPriceProvider is IUSDPriceProvider {}
+interface IUmbrellaPriceProvider is IPriceProvider {}

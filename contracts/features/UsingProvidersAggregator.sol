@@ -8,7 +8,7 @@ import "../interfaces/core/IPriceProvidersAggregator.sol";
 /**
  * @title Providers Aggregators usage feature, useful for periphery oracles that need get prices from many providers
  */
-contract UsingProvidersAggregator is Governable {
+abstract contract UsingProvidersAggregator is Governable {
     /// @notice The PriceProvidersAggregator contract
     IPriceProvidersAggregator public providersAggregator;
 

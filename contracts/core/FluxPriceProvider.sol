@@ -6,16 +6,15 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../interfaces/core/IFluxPriceProvider.sol";
-import "../access/Governable.sol";
 import "../features/UsingMaxDeviation.sol";
+import "./PriceProvider.sol";
 
 /**
  * @title Flux's price provider
  * @dev The Flux uses the same aggregator's interface as Chainlink
  */
-contract FluxPriceProvider is IFluxPriceProvider, UsingMaxDeviation {
+contract FluxPriceProvider is IFluxPriceProvider, PriceProvider, UsingMaxDeviation {
     using SafeCast for int256;
     using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -28,10 +27,10 @@ contract FluxPriceProvider is IFluxPriceProvider, UsingMaxDeviation {
      */
     mapping(address => EnumerableSet.AddressSet) internal aggregatorsOf;
 
-    /// Emitted when an agreggator is added
+    /// Emitted when an aggregator is added
     event AggregatorAdded(address token, address aggregator);
 
-    /// Emitted when an agreggator is removed
+    /// Emitted when an aggregator is removed
     event AggregatorRemoved(address token, address aggregator);
 
     constructor(uint256 maxDeviation_) UsingMaxDeviation(maxDeviation_) {}
@@ -45,65 +44,19 @@ contract FluxPriceProvider is IFluxPriceProvider, UsingMaxDeviation {
         return aggregatorsOf[token_].values();
     }
 
-    /// @inheritdoc IPriceProvider
-    function getPriceInUsd(address token_) public view override returns (uint256 _priceInUsd, uint256 _lastUpdatedAt) {
-        return _getUsdPriceOfAsset(token_);
-    }
-
-    /// @inheritdoc IPriceProvider
-    function quote(
-        address tokenIn_,
-        address tokenOut_,
-        uint256 amountIn_
-    ) external view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
-        (uint256 _amountInUsd, uint256 _lastUpdatedAt0) = quoteTokenToUsd(tokenIn_, amountIn_);
-        (_amountOut, _lastUpdatedAt) = quoteUsdToToken(tokenOut_, _amountInUsd);
-        _lastUpdatedAt = Math.min(_lastUpdatedAt0, _lastUpdatedAt);
-    }
-
-    /// @inheritdoc IUSDPriceProvider
-    function quoteTokenToUsd(address token_, uint256 amountIn_)
-        public
-        view
-        override
-        returns (uint256 _amountOut, uint256 _lastUpdatedAt)
-    {
-        uint256 _price;
-        (_price, _lastUpdatedAt) = _getUsdPriceOfAsset(token_);
-        _amountOut = (amountIn_ * _price) / 10**IERC20Metadata(token_).decimals();
-    }
-
-    /// @inheritdoc IUSDPriceProvider
-    function quoteUsdToToken(address token_, uint256 amountIn_)
-        public
-        view
-        override
-        returns (uint256 _amountOut, uint256 _lastUpdatedAt)
-    {
-        uint256 _price;
-        (_price, _lastUpdatedAt) = _getUsdPriceOfAsset(token_);
-        _amountOut = (amountIn_ * 10**IERC20Metadata(token_).decimals()) / _price;
-    }
-
     /**
-     * @notice Get a token's aggregator
-     * @param token_ The token to get aggregator from
-     * @param i_ The aggregator's index
-     * @return _aggregator The aggregator
-     */
-    function _aggregatorOf(address token_, uint256 i_) private view returns (AggregatorV3Interface _aggregator) {
-        _aggregator = AggregatorV3Interface(aggregatorsOf[token_].at(i_));
-    }
-
-    /**
-     * @notice Get token's price
-     * @param token_ The token
-     * @return The price (18 decimals) and its timestamp
+     * @inheritdoc IPriceProvider
      * @dev Sweep all aggregators and get the most recent price, revert if deviation among prices are too high.
      */
-    function _getUsdPriceOfAsset(address token_) internal view virtual returns (uint256, uint256) {
+    function getPriceInUsd(address token_)
+        public
+        view
+        override(IPriceProvider, PriceProvider)
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
+    {
         require(aggregatorsOf[token_].length() > 0, "aggregator-not-found");
-        (, int256 _price, , uint256 _lastUpdatedAt, ) = _aggregatorOf(token_, 0).latestRoundData();
+        int256 _price;
+        (, _price, , _lastUpdatedAt, ) = _aggregatorOf(token_, 0).latestRoundData();
 
         uint256 _len = aggregatorsOf[token_].length();
         for (uint256 i = 1; i < _len; ++i) {
@@ -120,10 +73,29 @@ contract FluxPriceProvider is IFluxPriceProvider, UsingMaxDeviation {
         return (_price.toUint256() * TO_SCALE, _lastUpdatedAt);
     }
 
+    /// @inheritdoc IPriceProvider
+    function quote(
+        address tokenIn_,
+        address tokenOut_,
+        uint256 amountIn_
+    ) external view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+        (uint256 _amountInUsd, uint256 _lastUpdatedAt0) = quoteTokenToUsd(tokenIn_, amountIn_);
+        (_amountOut, _lastUpdatedAt) = quoteUsdToToken(tokenOut_, _amountInUsd);
+        _lastUpdatedAt = Math.min(_lastUpdatedAt0, _lastUpdatedAt);
+    }
+
     /**
-     * @notice Add an aggregator to the token
+     * @notice Get a token's aggregator
+     * @param token_ The token to get aggregator from
+     * @param i_ The aggregator's index
+     * @return _aggregator The aggregator
      */
-    function addAggregator(address token_, address aggregator_) external onlyGovernor {
+    function _aggregatorOf(address token_, uint256 i_) private view returns (AggregatorV3Interface _aggregator) {
+        _aggregator = AggregatorV3Interface(aggregatorsOf[token_].at(i_));
+    }
+
+    /// @inheritdoc IFluxPriceProvider
+    function addAggregator(address token_, address aggregator_) external override onlyGovernor {
         require(token_ != address(0), "token-is-null");
         require(aggregator_ != address(0), "aggregator-is-null");
         require(AggregatorV3Interface(aggregator_).decimals() == FLUX_DECIMALS, "invalid-decimals");
@@ -132,10 +104,8 @@ contract FluxPriceProvider is IFluxPriceProvider, UsingMaxDeviation {
         emit AggregatorAdded(token_, aggregator_);
     }
 
-    /**
-     * @notice Remove an aggregator from the token
-     */
-    function removeAggregator(address token_, address aggregator_) external onlyGovernor {
+    /// @inheritdoc IFluxPriceProvider
+    function removeAggregator(address token_, address aggregator_) external override onlyGovernor {
         require(token_ != address(0), "token-is-null");
         require(aggregator_ != address(0), "aggregator-is-null");
 

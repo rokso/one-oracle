@@ -9,12 +9,13 @@ import "@uniswap/v2-periphery/contracts/libraries/UniswapV2OracleLibrary.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import "../features/UsingStableAsUsd.sol";
 import "../interfaces/core/IUniswapV2LikePriceProvider.sol";
+import "./PriceProvider.sol";
 
 /**
  * @title UniswapV2 (and forks) TWAP Oracle implementation
  * Based on https://github.com/Uniswap/v2-periphery/blob/master/contracts/examples/ExampleOracleSimple.sol
  */
-contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, UsingStableAsUsd {
+contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, PriceProvider, UsingStableAsUsd {
     using FixedPoint for *;
 
     /**
@@ -79,9 +80,9 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, UsingStableA
 
     /// @inheritdoc IPriceProvider
     function getPriceInUsd(address token_)
-        external
+        public
         view
-        override
+        override(IPriceProvider, PriceProvider)
         returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
     {
         return getPriceInUsd(token_, defaultTwapPeriod);
@@ -132,6 +133,28 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, UsingStableA
             (_amountOut, __lastUpdatedAt) = _getAmountOut(nativeToken, tokenOut_, twapPeriod_, _amountOut);
             _lastUpdatedAt = Math.min(__lastUpdatedAt, _lastUpdatedAt);
         }
+    }
+
+    /// @inheritdoc IUniswapV2LikePriceProvider
+    function quoteTokenToUsd(
+        address token_,
+        uint256 amountIn_,
+        uint256 twapPeriod_
+    ) public view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+        uint256 _price;
+        (_price, _lastUpdatedAt) = getPriceInUsd(token_, twapPeriod_);
+        _amountOut = (amountIn_ * _price) / 10**IERC20Metadata(token_).decimals();
+    }
+
+    /// @inheritdoc IUniswapV2LikePriceProvider
+    function quoteUsdToToken(
+        address token_,
+        uint256 amountIn_,
+        uint256 twapPeriod_
+    ) public view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+        uint256 _price;
+        (_price, _lastUpdatedAt) = getPriceInUsd(token_, twapPeriod_);
+        _amountOut = (amountIn_ * 10**IERC20Metadata(token_).decimals()) / _price;
     }
 
     /// @inheritdoc IUniswapV2LikePriceProvider

@@ -18,8 +18,9 @@ export enum Provider {
   TRADERJOE = 5,
   PANGOLIN = 6,
   QUICKSWAP = 7,
-  UMBRELLA = 8,
-  FLUX = 9,
+  UMBRELLA_FIRST_CLASS = 8,
+  UMBRELLA_PASSPORT = 9,
+  FLUX = 10,
 }
 
 export const parseUnits = (n: string, d: number) => ethers.utils.parseUnits(n.replace(new RegExp(/,/g), ''), d)

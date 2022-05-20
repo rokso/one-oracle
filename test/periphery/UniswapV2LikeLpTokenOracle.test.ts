@@ -71,8 +71,8 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         // given
         const ethReserves = await weth.balanceOf(ethDaiPair.address)
         const daiReserves = await dai.balanceOf(ethDaiPair.address)
-        const {_priceInUsd: ethPriceInUsd} = await underlyingOracle.getPriceInUsd(weth.address)
-        const {_priceInUsd: daiPriceInUsd} = await underlyingOracle.getPriceInUsd(dai.address)
+        const [ethPriceInUsd] = await underlyingOracle.getPriceInUsd(weth.address)
+        const [daiPriceInUsd] = await underlyingOracle.getPriceInUsd(dai.address)
         const ethReservesInUsd = ethReserves.mul(ethPriceInUsd).div(parseEther('1'))
         const daiReservesInUsd = daiReserves.mul(daiPriceInUsd).div(parseEther('1'))
         const allReservesInUsd = ethReservesInUsd.add(daiReservesInUsd)
@@ -90,8 +90,8 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         // given
         const ethReserves = await weth.balanceOf(ethWbtcPair.address)
         const wbtcReserves = await wbtc.balanceOf(ethWbtcPair.address)
-        const {_priceInUsd: ethPriceInUsd} = await underlyingOracle.getPriceInUsd(weth.address)
-        const {_priceInUsd: btcPriceInUsd} = await underlyingOracle.getPriceInUsd(wbtc.address)
+        const [ethPriceInUsd] = await underlyingOracle.getPriceInUsd(weth.address)
+        const [btcPriceInUsd] = await underlyingOracle.getPriceInUsd(wbtc.address)
         const ethReservesInUsd = ethReserves.mul(ethPriceInUsd).div(parseEther('1'))
         const wbtcReservesInUsd = wbtcReserves.mul(btcPriceInUsd).div(parseUnits('1', 8))
         const allReservesInUsd = ethReservesInUsd.add(wbtcReservesInUsd)
@@ -109,8 +109,8 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         // given
         const wbtcReserves = await wbtc.balanceOf(wbtcUsdcPair.address)
         const usdcReserves = await usdc.balanceOf(wbtcUsdcPair.address)
-        const {_priceInUsd: btcPriceInUsd} = await underlyingOracle.getPriceInUsd(wbtc.address)
-        const {_priceInUsd: usdcPriceInUsd} = await underlyingOracle.getPriceInUsd(usdc.address)
+        const [btcPriceInUsd] = await underlyingOracle.getPriceInUsd(wbtc.address)
+        const [usdcPriceInUsd] = await underlyingOracle.getPriceInUsd(usdc.address)
         const wbtcReservesInUsd = wbtcReserves.mul(btcPriceInUsd).div(parseUnits('1', 8))
         const usdcReservesInUsd = usdcReserves.mul(usdcPriceInUsd).div(parseUnits('1', 6))
         const allReservesInUsd = wbtcReservesInUsd.add(usdcReservesInUsd)
@@ -182,7 +182,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         const daiBalanceOfPair = await dai.balanceOf(ethDaiPair.address)
         expect(daiBalanceOfProvider).gt(daiBalanceOfPair)
         expect(daiBalanceOfPair).closeTo(parseEther('13,483,054.61'), parseEther('0.01'))
-        const {_priceInUsd: ethPriceInUsd} = await underlyingOracle.getPriceInUsd(weth.address)
+        const [ethPriceInUsd] = await underlyingOracle.getPriceInUsd(weth.address)
         expect(ethPriceInUsd).closeTo(parseEther('3,236.41'), parseEther('0.01'))
 
         // when

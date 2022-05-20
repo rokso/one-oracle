@@ -4,7 +4,7 @@ pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../interfaces/core/IChainlinkPriceProvider.sol";
-import "../interfaces/core/IUSDPriceProvider.sol";
+import "../interfaces/core/IPriceProvider.sol";
 import "../interfaces/periphery/IUSDOracle.sol";
 import "./ChainlinkAndFallbacksOracle.sol";
 
@@ -12,7 +12,6 @@ import "./ChainlinkAndFallbacksOracle.sol";
  * @title The Synth Oracle
  * @dev Extends `ChainlinkAndFallbacksOracle` contract
  * @dev This contract maps synth assets (i.e. vsAssets and vsdAssets) with their underlying
- * @dev The fallback providers MUST implement the `IUSDPriceProvider` interface
  */
 contract SynthDefaultOracle is IUSDOracle, ChainlinkAndFallbacksOracle {
     uint256 public constant ONE_USD = 1e18;
@@ -136,7 +135,6 @@ contract SynthDefaultOracle is IUSDOracle, ChainlinkAndFallbacksOracle {
 
     /**
      * @notice Wrapped `getPriceInUsd` function
-     * @dev Assumes that the `provider_` implements the `IUSDPriceProvider` interface
      * @dev Return [0,0] (i.e. invalid quote) if the call reverts
      */
     function _getPriceInUsd(DataTypes.Provider provider_, address token_)
@@ -144,7 +142,7 @@ contract SynthDefaultOracle is IUSDOracle, ChainlinkAndFallbacksOracle {
         view
         returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
     {
-        try IUSDPriceProvider(address(providersAggregator.priceProviders(provider_))).getPriceInUsd(token_) returns (
+        try providersAggregator.priceProviders(provider_).getPriceInUsd(token_) returns (
             uint256 __priceInUsd,
             uint256 __lastUpdatedAt
         ) {

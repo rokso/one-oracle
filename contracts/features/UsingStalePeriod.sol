@@ -7,7 +7,7 @@ import "../access/Governable.sol";
 /**
  * @title Stale price check feature, useful when checking if prices are fresh enough
  */
-contract UsingStalePeriod is Governable {
+abstract contract UsingStalePeriod is Governable {
     /// @notice The stale period. It's used to determine if a price is invalid (i.e. outdated)
     uint256 public stalePeriod;
 
