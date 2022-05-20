@@ -63,7 +63,7 @@ interface IUniswapV2LikePriceProvider is IPriceProvider {
     ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
 
     /**
-     * @notice Get quote in USD amount
+     * @notice Get quote in USD (or equivalent) amount
      * @param token_ The address of assetIn
      * @param amountIn_ Amount of input token.
      * @return amountOut_ Amount in USD
@@ -77,7 +77,7 @@ interface IUniswapV2LikePriceProvider is IPriceProvider {
     ) external view returns (uint256 amountOut_, uint256 _lastUpdatedAt);
 
     /**
-     * @notice Get quote from USD amount to amount of token
+     * @notice Get quote from USD (or equivalent) amount to amount of token
      * @param token_ The address of assetIn
      * @param amountIn_ Input amount in USD
      * @param twapPeriod_ The TWAP period
