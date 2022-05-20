@@ -5,7 +5,7 @@ pragma solidity 0.8.9;
 interface IPriceProvider {
     /**
      * @notice Get USD (or equivalent) price of an asset
-     * @param token_ The address of assetIn
+     * @param token_ The address of asset
      * @return _priceInUsd The USD price
      * @return _lastUpdatedAt Last updated timestamp
      */
@@ -39,7 +39,7 @@ interface IPriceProvider {
 
     /**
      * @notice Get quote from USD (or equivalent) amount to amount of token
-     * @param token_ The address of assetIn
+     * @param token_ The address of assetOut
      * @param amountIn_ Input amount in USD
      * @return _amountOut Output amount of token
      * @return _lastUpdatedAt Last updated timestamp

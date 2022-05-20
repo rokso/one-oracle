@@ -7,6 +7,18 @@ import "./IPriceProvider.sol";
 
 interface IPriceProvidersAggregator {
     /**
+     * @notice Get USD (or equivalent) price of an asset
+     * @param provider_ The price provider to get quote from
+     * @param token_ The address of asset
+     * @return _priceInUsd The USD price
+     * @return _lastUpdatedAt Last updated timestamp
+     */
+    function getPriceInUsd(DataTypes.Provider provider_, address token_)
+        external
+        view
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);
+
+    /**
      * @notice Provider Providers' mapping
      */
     function priceProviders(DataTypes.Provider provider_) external view returns (IPriceProvider _priceProvider);
@@ -43,6 +55,34 @@ interface IPriceProvidersAggregator {
         address tokenIn_,
         DataTypes.Provider providerOut_,
         address tokenOut_,
+        uint256 amountIn_
+    ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
+
+    /**
+     * @notice Get quote in USD (or equivalent) amount
+     * @param provider_ The price provider to get quote from
+     * @param token_ The address of assetIn
+     * @param amountIn_ Amount of input token.
+     * @return amountOut_ Amount in USD
+     * @return _lastUpdatedAt Last updated timestamp
+     */
+    function quoteTokenToUsd(
+        DataTypes.Provider provider_,
+        address token_,
+        uint256 amountIn_
+    ) external view returns (uint256 amountOut_, uint256 _lastUpdatedAt);
+
+    /**
+     * @notice Get quote from USD (or equivalent) amount to amount of token
+     * @param provider_ The price provider to get quote from
+     * @param token_ The address of assetOut
+     * @param amountIn_ Input amount in USD
+     * @return _amountOut Output amount of token
+     * @return _lastUpdatedAt Last updated timestamp
+     */
+    function quoteUsdToToken(
+        DataTypes.Provider provider_,
+        address token_,
         uint256 amountIn_
     ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
 
