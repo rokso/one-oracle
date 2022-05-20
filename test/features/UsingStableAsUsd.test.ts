@@ -8,6 +8,7 @@ import {parseEther, parseUnits, timestampFromLatestBlock, toUSD} from '../helper
 import {FakeContract, smock} from '@defi-wonderland/smock'
 
 const {DAI_ADDRESS, USDC_ADDRESS, USDT_ADDRESS} = Address.mainnet
+const {AddressZero} = ethers.constants
 
 describe('UsingStableAsUsd @mainnet', function () {
   let snapshotId: string
@@ -51,6 +52,19 @@ describe('UsingStableAsUsd @mainnet', function () {
       expect(await usingStableAsUsd.primaryStableCoin()).eq(USDT_ADDRESS)
       expect(await usingStableAsUsd.secondaryStableCoin()).eq(DAI_ADDRESS)
     })
+
+    it('should update stable coins to null', async function () {
+      // given
+      expect(await usingStableAsUsd.primaryStableCoin()).eq(DAI_ADDRESS)
+      expect(await usingStableAsUsd.secondaryStableCoin()).eq(USDC_ADDRESS)
+
+      // when
+      await usingStableAsUsd.connect(governor).updateStableCoins(AddressZero, AddressZero)
+
+      // then
+      expect(await usingStableAsUsd.primaryStableCoin()).eq(AddressZero)
+      expect(await usingStableAsUsd.secondaryStableCoin()).eq(AddressZero)
+    })
   })
 
   describe('getStableCoinIfPegged', function () {
@@ -62,9 +76,7 @@ describe('UsingStableAsUsd @mainnet', function () {
 
     it('should revert if stables are null', async function () {
       // given
-      await usingStableAsUsd
-        .connect(governor)
-        .updateStableCoins(ethers.constants.AddressZero, ethers.constants.AddressZero)
+      await usingStableAsUsd.connect(governor).updateStableCoins(AddressZero, AddressZero)
 
       // when
       const tx = usingStableAsUsd.getStableCoinIfPegged(priceProvider.address)

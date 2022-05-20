@@ -3,11 +3,11 @@
 pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import "../access/Governable.sol";
+import "../features/UsingStableAsUsd.sol";
 import "../interfaces/utils/IUniswapV3CrossPoolOracle.sol";
 import "../interfaces/core/IUniswapV3PriceProvider.sol";
 
-contract UniswapV3PriceProvider is IUniswapV3PriceProvider, Governable {
+contract UniswapV3PriceProvider is IUniswapV3PriceProvider, UsingStableAsUsd {
     /**
      * @notice The UniswapV3CrossPoolOracle contract
      * @dev This contract encapsulates UniswapV3 oracle logic
@@ -35,12 +35,63 @@ contract UniswapV3PriceProvider is IUniswapV3PriceProvider, Governable {
     constructor(
         IUniswapV3CrossPoolOracle crossPoolOracle_,
         uint32 defaultTwapPeriod_,
-        uint24 defaultFee_
-    ) {
+        uint24 defaultFee_,
+        address primaryStableCoin_,
+        address secondaryStableCoin_
+    ) UsingStableAsUsd(primaryStableCoin_, secondaryStableCoin_) {
         require(address(crossPoolOracle_) != address(0), "cross-pool-is-null");
         crossPoolOracle = crossPoolOracle_;
         defaultTwapPeriod = defaultTwapPeriod_;
         defaultPoolFee = defaultFee_;
+    }
+
+    /// @inheritdoc IPriceProvider
+    function getPriceInUsd(address token_)
+        external
+        view
+        override
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
+    {
+        return getPriceInUsd(token_, defaultTwapPeriod, defaultPoolFee);
+    }
+
+    /// @inheritdoc IUniswapV3PriceProvider
+    function getPriceInUsd(address token_, uint32 twapPeriod_)
+        public
+        view
+        override
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
+    {
+        return getPriceInUsd(token_, twapPeriod_, defaultPoolFee);
+    }
+
+    /// @inheritdoc IUniswapV3PriceProvider
+    function getPriceInUsd(address token_, uint24 poolFee_)
+        public
+        view
+        override
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
+    {
+        return getPriceInUsd(token_, defaultTwapPeriod, poolFee_);
+    }
+
+    /// @inheritdoc IUniswapV3PriceProvider
+    function getPriceInUsd(
+        address token_,
+        uint32 twapPeriod_,
+        uint24 poolFee_
+    ) public view override returns (uint256 _priceInUsd, uint256 _lastUpdatedAt) {
+        uint256 _stableCoinAmount;
+
+        (_stableCoinAmount, _lastUpdatedAt) = quote(
+            token_,
+            _getStableCoinIfPegged(this),
+            poolFee_,
+            twapPeriod_,
+            10**IERC20Metadata(token_).decimals() // ONE
+        );
+
+        _priceInUsd = _toUsdRepresentation(_stableCoinAmount);
     }
 
     /// @inheritdoc IPriceProvider

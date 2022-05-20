@@ -13,6 +13,44 @@ interface IUniswapV3PriceProvider is IPriceProvider {
     function defaultTwapPeriod() external view returns (uint32);
 
     /**
+     * @notice Get USD (or equivalent) price of an asset
+     * @param token_ The address of assetIn
+     * @param poolFee_ The pools' fees
+     * @return _priceInUsd The USD price
+     * @return _lastUpdatedAt Last updated timestamp
+     */
+    function getPriceInUsd(address token_, uint24 poolFee_)
+        external
+        view
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);
+
+    /**
+     * @notice Get USD (or equivalent) price of an asset
+     * @param token_ The address of assetIn
+     * @param twapPeriod_ The TWAP period
+     * @return _priceInUsd The USD price
+     * @return _lastUpdatedAt Last updated timestamp
+     */
+    function getPriceInUsd(address token_, uint32 twapPeriod_)
+        external
+        view
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);
+
+    /**
+     * @notice Get USD (or equivalent) price of an asset
+     * @param token_ The address of assetIn
+     * @param poolFee_ The pools' fees
+     * @param twapPeriod_ The TWAP period
+     * @return _priceInUsd The USD price
+     * @return _lastUpdatedAt Last updated timestamp
+     */
+    function getPriceInUsd(
+        address token_,
+        uint32 twapPeriod_,
+        uint24 poolFee_
+    ) external view returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);
+
+    /**
      * @notice Get quote
      * @param tokenIn_ The address of assetIn
      * @param tokenOut_ The address of assetOut

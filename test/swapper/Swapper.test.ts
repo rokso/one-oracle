@@ -107,7 +107,10 @@ describe('Swapper @mainnet', function () {
       uniswapV2Provider = await priceProviderFactory.deploy(
         UNISWAP_V2_FACTORY_ADDRESS,
         DEFAULT_TWAP_PERIOD,
-        WETH_ADDRESS
+        WETH_ADDRESS,
+        // null stable coins
+        ethers.constants.AddressZero,
+        ethers.constants.AddressZero
       )
       await uniswapV2Provider.deployed()
 
@@ -129,7 +132,10 @@ describe('Swapper @mainnet', function () {
       uniswapV3Provider = await uniswapV3ProviderFactory.deploy(
         crossPoolOracle.address,
         DEFAULT_TWAP_PERIOD,
-        DEFAULT_POOLS_FEE
+        DEFAULT_POOLS_FEE,
+        // null stable coins
+        ethers.constants.AddressZero,
+        ethers.constants.AddressZero
       )
       await uniswapV3Provider.deployed()
 

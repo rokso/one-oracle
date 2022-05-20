@@ -40,11 +40,9 @@ contract VspMainnetOracle is
     function getPriceInUsd(IERC20 _asset) external view returns (uint256 _priceInUsd) {
         require(address(_asset) == VSP_ADDRESS, "invalid-token");
         uint256 _lastUpdatedAt;
-
         IPriceProvidersAggregator _aggregator = providersAggregator;
 
         address _stableCoin = _getStableCoinIfPegged(_aggregator.priceProviders(DataTypes.Provider.UNISWAP_V2));
-
         (_priceInUsd, _lastUpdatedAt) = _aggregator.quote(
             DataTypes.Provider.UNISWAP_V2,
             VSP_ADDRESS,

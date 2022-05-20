@@ -35,6 +35,18 @@ interface IUniswapV2LikePriceProvider is IPriceProvider {
     function pairFor(address token0_, address token1_) external view returns (IUniswapV2Pair _pair);
 
     /**
+     * @notice Get USD (or equivalent) price of an asset
+     * @param token_ The address of assetIn
+     * @param twapPeriod_ The TWAP period
+     * @return _priceInUsd The USD price
+     * @return _lastUpdatedAt Last updated timestamp
+     */
+    function getPriceInUsd(address token_, uint256 twapPeriod_)
+        external
+        view
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);
+
+    /**
      * @notice Get quote
      * @param tokenIn_ The address of assetIn
      * @param tokenOut_ The address of assetOut

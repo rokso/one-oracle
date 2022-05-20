@@ -28,13 +28,4 @@ interface IUSDPriceProvider is IPriceProvider {
         external
         view
         returns (uint256 _amountOut, uint256 _lastUpdatedAt);
-
-    /**
-     * @notice Get USD price of an asset
-     * @dev It's the same as calling `quoteTokenToUsd(token, 10**token.decimals())` but less costly
-     * @param token_ The address of assetIn
-     * @return _priceInUsd The USD price
-     * @return _lastUpdatedAt Last updated timestamp
-     */
-    function getPriceInUsd(address token_) external view returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);
 }

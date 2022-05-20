@@ -28,7 +28,7 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, Governable {
     /// Emitted when an aggregator is updated
     event AggregatorUpdated(AggregatorV3Interface oldAggregator, AggregatorV3Interface newAggregator);
 
-    /// @inheritdoc IUSDPriceProvider
+    /// @inheritdoc IPriceProvider
     function getPriceInUsd(address token_) public view override returns (uint256 _priceInUsd, uint256 _lastUpdatedAt) {
         return _getUsdPriceOfAsset(token_);
     }

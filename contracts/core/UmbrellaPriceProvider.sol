@@ -27,7 +27,7 @@ contract UmbrellaPriceProvider is IUmbrellaPriceProvider, Governable {
         registry = registry_;
     }
 
-    /// @inheritdoc IUSDPriceProvider
+    /// @inheritdoc IPriceProvider
     function getPriceInUsd(address token_) public view override returns (uint256 _priceInUsd, uint256 _lastUpdatedAt) {
         return _getUsdPriceOfAsset(token_);
     }
