@@ -5,7 +5,7 @@ import {ethers} from 'hardhat'
 import {VspMainnetOracle, VspMainnetOracle__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
 import {FakeContract, smock} from '@defi-wonderland/smock'
-import {parseEther, timestampFromLatestBlock, Provider, HOUR} from '../helpers'
+import {parseEther, timestampFromLatestBlock, Provider, HOUR, parseUnits} from '../helpers'
 import {BigNumber} from 'ethers'
 
 const STALE_PERIOD = HOUR
@@ -13,23 +13,39 @@ const MAX_DEVIATION = parseEther('0.1') // 10%
 
 const VSP_ADDRESS = '0x1b40183EFB4Dd766f11bDa7A7c3AD8982e998421'
 
-const {DAI_ADDRESS} = Address.mainnet
+const {DAI_ADDRESS, USDC_ADDRESS} = Address.mainnet
 
 describe('VspMainnetOracle @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
   let governor: SignerWithAddress
   let aggregator: FakeContract
+  let uniswapV2PriceProvider: FakeContract
   let vspOracle: VspMainnetOracle
+  let lastUpdatedAt: number
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, governor] = await ethers.getSigners()
+    lastUpdatedAt = await timestampFromLatestBlock()
 
     aggregator = await smock.fake('PriceProvidersAggregator')
+    uniswapV2PriceProvider = await smock.fake('UniswapV2LikePriceProvider')
+
+    uniswapV2PriceProvider['quote(address,address,uint256)'].returns(() => {
+      // 1 DAI = 1 USDC
+      return [parseUnits('1', 6), lastUpdatedAt]
+    })
+    aggregator['priceProviders(uint8)'].returns(() => uniswapV2PriceProvider.address)
 
     const vspMainnetOracleFactory = new VspMainnetOracle__factory(deployer)
-    vspOracle = await vspMainnetOracleFactory.deploy(aggregator.address, DAI_ADDRESS, MAX_DEVIATION, STALE_PERIOD)
+    vspOracle = await vspMainnetOracleFactory.deploy(
+      aggregator.address,
+      DAI_ADDRESS,
+      USDC_ADDRESS,
+      MAX_DEVIATION,
+      STALE_PERIOD
+    )
     await vspOracle.deployed()
     await vspOracle.transferGovernorship(governor.address)
     await vspOracle.connect(governor).acceptGovernorship()
@@ -40,12 +56,6 @@ describe('VspMainnetOracle @mainnet', function () {
   })
 
   describe('getPriceInUsd', function () {
-    let lastUpdatedAt: number
-
-    beforeEach(async function () {
-      lastUpdatedAt = await timestampFromLatestBlock()
-    })
-
     it('should return UniV2 price when both DEXes prices are OK', async function () {
       // given
       const uniswapV2AmountOut = parseEther('0.83')
