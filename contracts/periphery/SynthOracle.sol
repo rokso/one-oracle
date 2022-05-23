@@ -13,7 +13,7 @@ import "./ChainlinkAndFallbacksOracle.sol";
  * @dev Extends `ChainlinkAndFallbacksOracle` contract
  * @dev This contract maps synth assets (i.e. vsAssets and vsdAssets) with their underlying
  */
-contract SynthDefaultOracle is ChainlinkAndFallbacksOracle {
+contract SynthOracle is ChainlinkAndFallbacksOracle {
     uint256 public constant ONE_USD = 1e18;
 
     /**

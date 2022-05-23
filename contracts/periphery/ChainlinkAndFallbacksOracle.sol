@@ -213,7 +213,7 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingProvidersAggregator, Using
         view
         returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
     {
-        try providersAggregator.priceProviders(provider_).getPriceInUsd(token_) returns (
+        try providersAggregator.getPriceInUsd(provider_, token_) returns (
             uint256 __priceInUsd,
             uint256 __lastUpdatedAt
         ) {

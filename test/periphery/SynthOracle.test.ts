@@ -5,23 +5,22 @@ import {ethers} from 'hardhat'
 import {
   ChainlinkAvalanchePriceProvider__factory,
   ChainlinkAvalanchePriceProvider,
-  SynthDefaultOracle__factory,
-  SynthDefaultOracle,
+  SynthOracle__factory,
+  SynthOracle,
   ERC20Mock,
   ERC20Mock__factory,
   PriceProvidersAggregator,
   PriceProvidersAggregator__factory,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
-import {toUSD, HOUR, Provider, parseEther} from '../helpers'
-import {BigNumber} from 'ethers'
+import {toUSD, HOUR, Provider, parseEther, parseUnits} from '../helpers'
 
 const STALE_PERIOD = HOUR
 const MAX_DEVIATION = parseEther('0.1') // 10%
 
 const {WETH_ADDRESS, WBTC_ADDRESS, DAI_ADDRESS} = Address.avalanche
 
-describe('SynthDefaultOracle @avalanche', function () {
+describe('SynthOracle @avalanche', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
   let governor: SignerWithAddress
@@ -30,7 +29,7 @@ describe('SynthDefaultOracle @avalanche', function () {
   let vsETH: ERC20Mock
   let chainlinkProvider: ChainlinkAvalanchePriceProvider
   let aggregator: PriceProvidersAggregator
-  let oracle: SynthDefaultOracle
+  let oracle: SynthOracle
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
@@ -55,7 +54,7 @@ describe('SynthDefaultOracle @avalanche', function () {
 
     await aggregator.setPriceProvider(Provider.CHAINLINK, chainlinkProvider.address)
 
-    const synthDefaultOracleFactory = new SynthDefaultOracle__factory(deployer)
+    const synthDefaultOracleFactory = new SynthOracle__factory(deployer)
     oracle = await synthDefaultOracleFactory.deploy(
       aggregator.address,
       MAX_DEVIATION,
@@ -113,31 +112,99 @@ describe('SynthDefaultOracle @avalanche', function () {
     })
   })
 
-  describe('getPriceInUsd', function () {
+  describe('when have assets setup', function () {
     beforeEach(async function () {
       await oracle.connect(governor).addOrUpdateAsset(vsBTC.address, WBTC_ADDRESS)
       await oracle.connect(governor).addOrUpdateAsset(vsETH.address, WETH_ADDRESS)
       await oracle.connect(governor).addOrUpdateUsdAsset(vsUSD.address)
     })
 
-    it('should revert when asset is not set', async function () {
-      const call = oracle.getPriceInUsd(DAI_ADDRESS)
-      await expect(call).reverted
+    describe('getPriceInUsd', function () {
+      it('should revert when asset is not set', async function () {
+        const call = oracle.getPriceInUsd(DAI_ADDRESS)
+        await expect(call).reverted
+      })
+
+      it('should get vsETH price', async function () {
+        const priceInUsd = await oracle.getPriceInUsd(vsETH.address)
+        expect(priceInUsd).closeTo(toUSD('3,251'), toUSD('1'))
+      })
+
+      it('should get vsBTC price', async function () {
+        const priceInUsd = await oracle.getPriceInUsd(vsBTC.address)
+        expect(priceInUsd).closeTo(toUSD('42,794'), toUSD('1'))
+      })
+
+      it('should get vsUSD price (always 1)', async function () {
+        const priceInUsd = await oracle.getPriceInUsd(vsUSD.address)
+        expect(priceInUsd).eq(toUSD('1'))
+      })
     })
 
-    it('should get vsETH price', async function () {
-      const priceInUsd = await oracle.getPriceInUsd(vsETH.address)
-      expect(priceInUsd).closeTo(toUSD('3,251'), toUSD('1'))
+    describe('quote', function () {
+      it('should revert when asset is not set', async function () {
+        const call = oracle.quote(vsBTC.address, DAI_ADDRESS, parseUnits('1', 8))
+        await expect(call).reverted
+      })
+
+      it('should get vsETH-vsUSD price', async function () {
+        const amountOut = await oracle.quote(vsETH.address, vsUSD.address, parseEther('1'))
+        expect(amountOut).closeTo(toUSD('3,251'), toUSD('1'))
+      })
+
+      it('should get vsBTC-vsETH price', async function () {
+        const amountOut = await oracle.quote(vsBTC.address, vsETH.address, parseUnits('1', 8))
+        expect(amountOut).closeTo(parseEther('13.1'), parseEther('0.1'))
+      })
+
+      it('should get vsUSD-vsETH price', async function () {
+        const amountOut = await oracle.quote(vsUSD.address, vsETH.address, toUSD('3,251'))
+        expect(amountOut).closeTo(parseEther('1'), parseEther('0.01'))
+      })
     })
 
-    it('should get vsBTC price', async function () {
-      const priceInUsd = await oracle.getPriceInUsd(vsBTC.address)
-      expect(priceInUsd).closeTo(toUSD('42,794'), toUSD('1'))
+    describe('quoteTokenToUsd', function () {
+      it('should revert when asset is not set', async function () {
+        const call = oracle.quoteTokenToUsd(DAI_ADDRESS, parseEther('1'))
+        await expect(call).reverted
+      })
+
+      it('should get vsETH price', async function () {
+        const amountOut = await oracle.quoteTokenToUsd(vsETH.address, parseEther('1'))
+        expect(amountOut).closeTo(toUSD('3,251'), toUSD('1'))
+      })
+
+      it('should get vsBTC price', async function () {
+        const amountOut = await oracle.quoteTokenToUsd(vsBTC.address, parseUnits('1', 8))
+        expect(amountOut).closeTo(toUSD('42,794'), toUSD('1'))
+      })
+
+      it('should get vsUSD price (always 1)', async function () {
+        const amountOut = await oracle.quoteTokenToUsd(vsUSD.address, parseEther('1'))
+        expect(amountOut).eq(toUSD('1'))
+      })
     })
 
-    it('should get vsUSD price (always 1)', async function () {
-      const priceInUsd = await oracle.getPriceInUsd(vsUSD.address)
-      expect(priceInUsd).eq(toUSD('1'))
+    describe('quoteUsdToToken', function () {
+      it('should revert when asset is not set', async function () {
+        const call = oracle.quoteUsdToToken(DAI_ADDRESS, parseEther('1'))
+        await expect(call).reverted
+      })
+
+      it('should get vsETH price', async function () {
+        const amountOut = await oracle.quoteUsdToToken(vsETH.address, toUSD('3,251'))
+        expect(amountOut).closeTo(parseEther('1'), parseEther('0.1'))
+      })
+
+      it('should get vsBTC price', async function () {
+        const amountOut = await oracle.quoteUsdToToken(vsBTC.address, toUSD('42,794'))
+        expect(amountOut).closeTo(parseUnits('1', 8), parseUnits('0.1', 8))
+      })
+
+      it('should get vsUSD price (always 1)', async function () {
+        const amountOut = await oracle.quoteUsdToToken(vsUSD.address, parseEther('1'))
+        expect(amountOut).eq(toUSD('1'))
+      })
     })
   })
 })
