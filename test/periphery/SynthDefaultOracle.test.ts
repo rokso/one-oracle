@@ -74,23 +74,22 @@ describe('SynthDefaultOracle @avalanche', function () {
 
   describe('addOrUpdateAsset', function () {
     it('should revert if not governor', async function () {
-      const tx = oracle.addOrUpdateAsset(vsBTC.address, WBTC_ADDRESS, STALE_PERIOD)
+      const tx = oracle.addOrUpdateAsset(vsBTC.address, WBTC_ADDRESS)
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should add asset that uses Chainlink', async function () {
       // given
       const before = await oracle.assets(vsBTC.address)
-      expect(before).deep.eq([ethers.constants.AddressZero, false, BigNumber.from(0)])
+      expect(before).deep.eq([ethers.constants.AddressZero, false])
 
       // when
       const underlyingAsset = WBTC_ADDRESS
-      const stalePeriod = STALE_PERIOD
-      await oracle.connect(governor).addOrUpdateAsset(vsBTC.address, underlyingAsset, stalePeriod)
+      await oracle.connect(governor).addOrUpdateAsset(vsBTC.address, underlyingAsset)
 
       // then
       const after = await oracle.assets(vsBTC.address)
-      expect(after).deep.eq([underlyingAsset, false, BigNumber.from(stalePeriod)])
+      expect(after).deep.eq([underlyingAsset, false])
     })
   })
 
@@ -103,21 +102,21 @@ describe('SynthDefaultOracle @avalanche', function () {
     it('should update default provider (allows none)', async function () {
       // given
       const before = await oracle.assets(vsUSD.address)
-      expect(before).deep.eq([ethers.constants.AddressZero, false, BigNumber.from(0)])
+      expect(before).deep.eq([ethers.constants.AddressZero, false])
 
       // when
       await oracle.connect(governor).addOrUpdateUsdAsset(vsUSD.address)
 
       // then
       const after = await oracle.assets(vsUSD.address)
-      expect(after).deep.eq([ethers.constants.AddressZero, true, ethers.constants.MaxUint256])
+      expect(after).deep.eq([ethers.constants.AddressZero, true])
     })
   })
 
   describe('getPriceInUsd', function () {
     beforeEach(async function () {
-      await oracle.connect(governor).addOrUpdateAsset(vsBTC.address, WBTC_ADDRESS, STALE_PERIOD)
-      await oracle.connect(governor).addOrUpdateAsset(vsETH.address, WETH_ADDRESS, STALE_PERIOD)
+      await oracle.connect(governor).addOrUpdateAsset(vsBTC.address, WBTC_ADDRESS)
+      await oracle.connect(governor).addOrUpdateAsset(vsETH.address, WETH_ADDRESS)
       await oracle.connect(governor).addOrUpdateUsdAsset(vsUSD.address)
     })
 

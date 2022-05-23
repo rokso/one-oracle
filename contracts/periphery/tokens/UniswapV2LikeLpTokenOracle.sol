@@ -3,38 +3,40 @@
 pragma solidity 0.8.9;
 
 import "@prb/math/contracts/PRBMath.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
-import "../../interfaces/periphery/IUSDOracle.sol";
+import "../../interfaces/periphery/IOracle.sol";
+import "../../interfaces/periphery/ITokenOracle.sol";
 import "../../libraries/OracleHelpers.sol";
 
 /**
  * @title Oracle for UniswapV2-Like liquidity pair tokens
  * @dev See more: https://blog.alphaventuredao.io/fair-lp-token-pricing/
  */
-contract UniswapV2LikeLpTokenOracle is IUSDOracle {
+contract UniswapV2LikeLpTokenOracle is ITokenOracle {
     using OracleHelpers for uint256;
     using PRBMath for uint256;
 
     /**
      * @notice The oracle that resolves the price of underlying token
      */
-    IUSDOracle public underlyingOracle;
+    IOracle public underlyingOracle;
 
-    constructor(IUSDOracle _underlyingOracle) {
+    constructor(IOracle _underlyingOracle) {
         underlyingOracle = _underlyingOracle;
     }
 
-    /// @inheritdoc IUSDOracle
-    function getPriceInUsd(IERC20 _asset) external view returns (uint256 _priceInUsd) {
+    /// @inheritdoc ITokenOracle
+    function getPriceInUsd(address _asset) external view returns (uint256 _priceInUsd) {
         IUniswapV2Pair _pair = IUniswapV2Pair(address(_asset));
         (uint256 _reserve0, uint256 _reserve1, ) = _pair.getReserves();
 
-        IERC20Metadata _token0 = IERC20Metadata(_pair.token0());
-        IERC20Metadata _token1 = IERC20Metadata(_pair.token1());
+        address _token0 = _pair.token0();
+        address _token1 = _pair.token1();
 
-        _reserve0 = OracleHelpers.scaleDecimal(_reserve0, _token0.decimals(), 18);
-        _reserve1 = OracleHelpers.scaleDecimal(_reserve1, _token1.decimals(), 18);
+        _reserve0 = OracleHelpers.scaleDecimal(_reserve0, IERC20Metadata(_token0).decimals(), 18);
+        _reserve1 = OracleHelpers.scaleDecimal(_reserve1, IERC20Metadata(_token1).decimals(), 18);
 
         uint256 _token0Price = underlyingOracle.getPriceInUsd(_token0);
         uint256 _token1Price = underlyingOracle.getPriceInUsd(_token1);

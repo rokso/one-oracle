@@ -7,14 +7,14 @@ import "../../features/UsingProvidersAggregator.sol";
 import "../../features/UsingMaxDeviation.sol";
 import "../../features/UsingStableAsUsd.sol";
 import "../../features/UsingStalePeriod.sol";
-import "../../interfaces/periphery/IUSDOracle.sol";
+import "../../interfaces/periphery/ITokenOracle.sol";
 
 /**
  * @title Main oracle
  * @dev Reuses `PriceProvidersAggregator` and add support to USD quotes
  */
 contract VspMainnetOracle is
-    IUSDOracle,
+    ITokenOracle,
     UsingProvidersAggregator,
     UsingMaxDeviation,
     UsingStableAsUsd,
@@ -36,8 +36,8 @@ contract VspMainnetOracle is
         UsingStalePeriod(stalePeriod_)
     {}
 
-    /// @inheritdoc IUSDOracle
-    function getPriceInUsd(IERC20 _asset) external view returns (uint256 _priceInUsd) {
+    /// @inheritdoc ITokenOracle
+    function getPriceInUsd(address _asset) external view returns (uint256 _priceInUsd) {
         require(address(_asset) == VSP_ADDRESS, "invalid-token");
         uint256 _lastUpdatedAt;
         IPriceProvidersAggregator _aggregator = providersAggregator;
@@ -61,5 +61,6 @@ contract VspMainnetOracle is
             "one-or-both-prices-invalid"
         );
         require(_isDeviationOK(_priceInUsd, _priceInUsd1), "prices-deviation-too-high");
+        _lastUpdatedAt = Math.min(_lastUpdatedAt, _lastUpdatedAt1);
     }
 }
