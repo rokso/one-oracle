@@ -5,16 +5,18 @@ pragma solidity 0.8.9;
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../libraries/OracleHelpers.sol";
 import "../interfaces/core/IPriceProvider.sol";
-import "./UsingMaxDeviation.sol";
+import "../access/Governable.sol";
 import "./UsingStalePeriod.sol";
 
 /**
  * @title Stable coin as USD feature - useful for getting USD prices reference from DEXes
  * @dev Stable coin may lose pegging on-chain and may not be equal to $1
  */
-abstract contract UsingStableAsUsd is UsingMaxDeviation, UsingStalePeriod {
+abstract contract UsingStableAsUsd is Governable {
     using OracleHelpers for uint256;
 
+    uint256 public constant MAX_STABLECOINS_DEVIATION = 0.05e18; // 5%
+    uint256 public constant STABLECOINS_STALE_PERIOD = 2 hours;
     uint256 public constant USD_DECIMALS = 18;
 
     /**
@@ -37,12 +39,7 @@ abstract contract UsingStableAsUsd is UsingMaxDeviation, UsingStalePeriod {
         address newSecondaryStableCoin
     );
 
-    constructor(
-        address primaryStableCoin_,
-        address secondaryStableCoin_,
-        uint256 maxDeviation_,
-        uint256 stalePeriod_
-    ) UsingMaxDeviation(maxDeviation_) UsingStalePeriod(stalePeriod_) {
+    constructor(address primaryStableCoin_, address secondaryStableCoin_) {
         _updateStableCoins(primaryStableCoin_, secondaryStableCoin_);
     }
 
@@ -65,6 +62,8 @@ abstract contract UsingStableAsUsd is UsingMaxDeviation, UsingStalePeriod {
     /**
      * @notice Return the stable coin if pegged
      * @dev Check price relation between both stable coins and revert if peg is too loose
+     * @param priceProvider_ The price provider to quote prices from (Chainlink provider is encouraged)
+     * @return The primary stable coin if pass all checks
      */
     function _getStableCoinIfPegged(IPriceProvider priceProvider_) internal view returns (address) {
         require(__primaryStableCoin != address(0), "stable-coin-not-supported");
@@ -74,12 +73,12 @@ abstract contract UsingStableAsUsd is UsingMaxDeviation, UsingStalePeriod {
             __secondaryStableCoin,
             _amountIn
         );
-        require(_amountOut > 0 && !_priceIsStale(_lastUpdatedAt), "stable-prices-invalid");
+        require(_amountOut > 0 && !_checkPriceStale(_lastUpdatedAt), "stable-prices-invalid");
         if (__primaryStableCoinDecimals == __secondaryStableCoinDecimals) {
-            require(_isDeviationOK(_amountIn, _amountOut), "stable-coins-deviation-too-high");
+            require(_checkDeviation(_amountIn, _amountOut), "stable-coins-deviation-too-high");
         } else {
             require(
-                _isDeviationOK(
+                _checkDeviation(
                     _amountIn,
                     _amountOut.scaleDecimal(__secondaryStableCoinDecimals, __primaryStableCoinDecimals)
                 ),
@@ -87,6 +86,23 @@ abstract contract UsingStableAsUsd is UsingMaxDeviation, UsingStalePeriod {
             );
         }
         return __primaryStableCoin;
+    }
+
+    /**
+     * @notice Check if two numbers deviation is acceptable
+     */
+    function _checkDeviation(uint256 a_, uint256 b_) internal pure returns (bool) {
+        uint256 _deviation = a_ > b_ ? ((a_ - b_) * 1e18) / a_ : ((b_ - a_) * 1e18) / b_;
+        return _deviation <= MAX_STABLECOINS_DEVIATION;
+    }
+
+    /**
+     * @notice Check if a price timestamp is outdated
+     * @param timeOfLastUpdate_ The price timestamp
+     * @return true if price is stale (outdated)
+     */
+    function _checkPriceStale(uint256 timeOfLastUpdate_) internal view returns (bool) {
+        return block.timestamp - timeOfLastUpdate_ > STABLECOINS_STALE_PERIOD;
     }
 
     /**

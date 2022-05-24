@@ -4,11 +4,9 @@ import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {UsingStableAsUsdMock, UsingStableAsUsdMock__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
-import {HOUR, parseEther, parseUnits, timestampFromLatestBlock, toUSD} from '../helpers'
+import {parseEther, parseUnits, timestampFromLatestBlock, toUSD} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 
-const STALE_PERIOD = HOUR
-const MAX_DEVIATION = parseEther('0.1') // 10%
 const {DAI_ADDRESS, USDC_ADDRESS, USDT_ADDRESS} = Address.mainnet
 
 describe('UsingStableAsUsd @mainnet', function () {
@@ -23,7 +21,7 @@ describe('UsingStableAsUsd @mainnet', function () {
     ;[deployer, governor] = await ethers.getSigners()
 
     const usingStableAsUsdFactory = new UsingStableAsUsdMock__factory(deployer)
-    usingStableAsUsd = await usingStableAsUsdFactory.deploy(DAI_ADDRESS, USDC_ADDRESS, MAX_DEVIATION, STALE_PERIOD)
+    usingStableAsUsd = await usingStableAsUsdFactory.deploy(DAI_ADDRESS, USDC_ADDRESS)
     await usingStableAsUsd.deployed()
     await usingStableAsUsd.transferGovernorship(governor.address)
     await usingStableAsUsd.connect(governor).acceptGovernorship()

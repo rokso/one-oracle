@@ -4,14 +4,22 @@ pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "../../features/UsingProvidersAggregator.sol";
+import "../../features/UsingMaxDeviation.sol";
 import "../../features/UsingStableAsUsd.sol";
+import "../../features/UsingStalePeriod.sol";
 import "../../interfaces/periphery/IUSDOracle.sol";
 
 /**
  * @title Main oracle
  * @dev Reuses `PriceProvidersAggregator` and add support to USD quotes
  */
-contract VspMainnetOracle is IUSDOracle, UsingProvidersAggregator, UsingStableAsUsd {
+contract VspMainnetOracle is
+    IUSDOracle,
+    UsingProvidersAggregator,
+    UsingMaxDeviation,
+    UsingStableAsUsd,
+    UsingStalePeriod
+{
     uint256 public constant ONE_VSP = 1e18;
     address public constant VSP_ADDRESS = 0x1b40183EFB4Dd766f11bDa7A7c3AD8982e998421;
 
@@ -23,7 +31,9 @@ contract VspMainnetOracle is IUSDOracle, UsingProvidersAggregator, UsingStableAs
         uint256 stalePeriod_
     )
         UsingProvidersAggregator(providersAggregator_)
-        UsingStableAsUsd(stableCoinA_, stableCoinB_, maxDeviation_, stalePeriod_)
+        UsingStableAsUsd(stableCoinA_, stableCoinB_)
+        UsingMaxDeviation(maxDeviation_)
+        UsingStalePeriod(stalePeriod_)
     {}
 
     /// @inheritdoc IUSDOracle
