@@ -5,19 +5,19 @@ pragma solidity 0.8.9;
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "../../features/UsingProvidersAggregator.sol";
 import "../../features/UsingMaxDeviation.sol";
-import "../../features/UsingStableAsUsd.sol";
+import "../../features/UsingStableCoinProvider.sol";
 import "../../features/UsingStalePeriod.sol";
-import "../../interfaces/periphery/IUSDOracle.sol";
+import "../../interfaces/periphery/ITokenOracle.sol";
 
 /**
  * @title Main oracle
  * @dev Reuses `PriceProvidersAggregator` and add support to USD quotes
  */
 contract VspMainnetOracle is
-    IUSDOracle,
+    ITokenOracle,
     UsingProvidersAggregator,
     UsingMaxDeviation,
-    UsingStableAsUsd,
+    UsingStableCoinProvider,
     UsingStalePeriod
 {
     uint256 public constant ONE_VSP = 1e18;
@@ -25,25 +25,25 @@ contract VspMainnetOracle is
 
     constructor(
         IPriceProvidersAggregator providersAggregator_,
-        address stableCoinA_,
-        address stableCoinB_,
+        IStableCoinProvider stableCoinProvider_,
         uint256 maxDeviation_,
         uint256 stalePeriod_
     )
         UsingProvidersAggregator(providersAggregator_)
-        UsingStableAsUsd(stableCoinA_, stableCoinB_)
+        UsingStableCoinProvider(stableCoinProvider_)
         UsingMaxDeviation(maxDeviation_)
         UsingStalePeriod(stalePeriod_)
-    {}
+    {
+        require(address(stableCoinProvider_) != address(0), "stable-coin-provider-is-null");
+    }
 
-    /// @inheritdoc IUSDOracle
-    function getPriceInUsd(IERC20 _asset) external view returns (uint256 _priceInUsd) {
+    /// @inheritdoc ITokenOracle
+    function getPriceInUsd(address _asset) external view returns (uint256 _priceInUsd) {
         require(address(_asset) == VSP_ADDRESS, "invalid-token");
         uint256 _lastUpdatedAt;
-
         IPriceProvidersAggregator _aggregator = providersAggregator;
 
-        address _stableCoin = _getStableCoinIfPegged(_aggregator.priceProviders(DataTypes.Provider.UNISWAP_V2));
+        address _stableCoin = stableCoinProvider.getStableCoinIfPegged();
 
         (_priceInUsd, _lastUpdatedAt) = _aggregator.quote(
             DataTypes.Provider.UNISWAP_V2,
@@ -63,5 +63,6 @@ contract VspMainnetOracle is
             "one-or-both-prices-invalid"
         );
         require(_isDeviationOK(_priceInUsd, _priceInUsd1), "prices-deviation-too-high");
+        _lastUpdatedAt = Math.min(_lastUpdatedAt, _lastUpdatedAt1);
     }
 }

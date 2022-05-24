@@ -2,31 +2,45 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {UsingStableAsUsdMock, UsingStableAsUsdMock__factory} from '../../typechain-types'
+import {StableCoinProvider, StableCoinProvider__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
-import {parseEther, parseUnits, timestampFromLatestBlock, toUSD} from '../helpers'
+import {HOUR, parseEther, parseUnits, timestampFromLatestBlock, toUSD} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 
 const {DAI_ADDRESS, USDC_ADDRESS, USDT_ADDRESS} = Address.mainnet
+const {AddressZero} = ethers.constants
 
-describe('UsingStableAsUsd @mainnet', function () {
+const STALE_PERIOD = HOUR
+const MAX_DEVIATION = parseEther('0.05') // 5%
+
+describe('StableCoinProvider @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
   let governor: SignerWithAddress
-  let usingStableAsUsd: UsingStableAsUsdMock
+  let stableCoinProvider: StableCoinProvider
+  let providersAggregator: FakeContract
   let priceProvider: FakeContract
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, governor] = await ethers.getSigners()
 
-    const usingStableAsUsdFactory = new UsingStableAsUsdMock__factory(deployer)
-    usingStableAsUsd = await usingStableAsUsdFactory.deploy(DAI_ADDRESS, USDC_ADDRESS)
-    await usingStableAsUsd.deployed()
-    await usingStableAsUsd.transferGovernorship(governor.address)
-    await usingStableAsUsd.connect(governor).acceptGovernorship()
+    providersAggregator = await smock.fake('PriceProvidersAggregator')
+    priceProvider = await smock.fake('ChainlinkPriceProvider')
 
-    priceProvider = await smock.fake('UniswapV2LikePriceProvider')
+    providersAggregator.priceProviders.returns(() => priceProvider.address)
+
+    const stableCoinProviderFactory = new StableCoinProvider__factory(deployer)
+    stableCoinProvider = await stableCoinProviderFactory.deploy(
+      DAI_ADDRESS,
+      USDC_ADDRESS,
+      providersAggregator.address,
+      STALE_PERIOD,
+      MAX_DEVIATION
+    )
+    await stableCoinProvider.deployed()
+    await stableCoinProvider.transferGovernorship(governor.address)
+    await stableCoinProvider.connect(governor).acceptGovernorship()
   })
 
   afterEach(async function () {
@@ -35,21 +49,33 @@ describe('UsingStableAsUsd @mainnet', function () {
 
   describe('updateStableCoin', function () {
     it('should revert if not governor', async function () {
-      const tx = usingStableAsUsd.updateStableCoins(USDC_ADDRESS, DAI_ADDRESS)
+      const tx = stableCoinProvider.updateStableCoins(USDC_ADDRESS, DAI_ADDRESS)
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should update stable coins token', async function () {
       // given
-      expect(await usingStableAsUsd.primaryStableCoin()).eq(DAI_ADDRESS)
-      expect(await usingStableAsUsd.secondaryStableCoin()).eq(USDC_ADDRESS)
+      expect(await stableCoinProvider.primaryStableCoin()).eq(DAI_ADDRESS)
+      expect(await stableCoinProvider.secondaryStableCoin()).eq(USDC_ADDRESS)
 
       // when
-      await usingStableAsUsd.connect(governor).updateStableCoins(USDT_ADDRESS, DAI_ADDRESS)
+      await stableCoinProvider.connect(governor).updateStableCoins(USDT_ADDRESS, DAI_ADDRESS)
 
       // then
-      expect(await usingStableAsUsd.primaryStableCoin()).eq(USDT_ADDRESS)
-      expect(await usingStableAsUsd.secondaryStableCoin()).eq(DAI_ADDRESS)
+      expect(await stableCoinProvider.primaryStableCoin()).eq(USDT_ADDRESS)
+      expect(await stableCoinProvider.secondaryStableCoin()).eq(DAI_ADDRESS)
+    })
+
+    it('should revert if setting stable coins to null', async function () {
+      // given
+      expect(await stableCoinProvider.primaryStableCoin()).eq(DAI_ADDRESS)
+      expect(await stableCoinProvider.secondaryStableCoin()).eq(USDC_ADDRESS)
+
+      // when
+      const tx = stableCoinProvider.connect(governor).updateStableCoins(AddressZero, AddressZero)
+
+      // then
+      await expect(tx).revertedWith('stable-coins-are-null')
     })
   })
 
@@ -60,19 +86,6 @@ describe('UsingStableAsUsd @mainnet', function () {
       lastUpdatedAt = await timestampFromLatestBlock()
     })
 
-    it('should revert if stables are null', async function () {
-      // given
-      await usingStableAsUsd
-        .connect(governor)
-        .updateStableCoins(ethers.constants.AddressZero, ethers.constants.AddressZero)
-
-      // when
-      const tx = usingStableAsUsd.getStableCoinIfPegged(priceProvider.address)
-
-      // then
-      await expect(tx).revertedWith('stable-coin-not-supported')
-    })
-
     it('should revert if stables price is invalid', async function () {
       // given
       priceProvider['quote(address,address,uint256)'].returns(() => {
@@ -80,7 +93,7 @@ describe('UsingStableAsUsd @mainnet', function () {
       })
 
       // when
-      const tx = usingStableAsUsd.getStableCoinIfPegged(priceProvider.address)
+      const tx = stableCoinProvider.getStableCoinIfPegged()
 
       // then
       await expect(tx).revertedWith('stable-prices-invalid')
@@ -88,14 +101,14 @@ describe('UsingStableAsUsd @mainnet', function () {
 
     it('should revert if stables price deviation is too high (different decimals)', async function () {
       // given
-      await usingStableAsUsd.connect(governor).updateStableCoins(USDC_ADDRESS, DAI_ADDRESS)
+      await stableCoinProvider.connect(governor).updateStableCoins(USDC_ADDRESS, DAI_ADDRESS)
 
       priceProvider['quote(address,address,uint256)'].returns(() => {
         return [parseEther('0.85'), lastUpdatedAt] // 1 USDC = 0.85 DAI
       })
 
       // when
-      const tx = usingStableAsUsd.getStableCoinIfPegged(priceProvider.address)
+      const tx = stableCoinProvider.getStableCoinIfPegged()
 
       // then
       await expect(tx).revertedWith('stable-coins-deviation-too-high')
@@ -103,14 +116,14 @@ describe('UsingStableAsUsd @mainnet', function () {
 
     it('should revert if stables price deviation is too high (same decimals)', async function () {
       // given
-      await usingStableAsUsd.connect(governor).updateStableCoins(USDC_ADDRESS, USDT_ADDRESS)
+      await stableCoinProvider.connect(governor).updateStableCoins(USDC_ADDRESS, USDT_ADDRESS)
 
       priceProvider['quote(address,address,uint256)'].returns(() => {
         return [parseUnits('0.85', 6), lastUpdatedAt] // 1 USDC = 0.85 USDT
       })
 
       // when
-      const tx = usingStableAsUsd.getStableCoinIfPegged(priceProvider.address)
+      const tx = stableCoinProvider.getStableCoinIfPegged()
 
       // then
       await expect(tx).revertedWith('stable-coins-deviation-too-high')
@@ -118,14 +131,14 @@ describe('UsingStableAsUsd @mainnet', function () {
 
     it('should get primary stable coin if peg is OK (different decimals)', async function () {
       // given
-      await usingStableAsUsd.connect(governor).updateStableCoins(DAI_ADDRESS, USDT_ADDRESS)
+      await stableCoinProvider.connect(governor).updateStableCoins(DAI_ADDRESS, USDT_ADDRESS)
 
       priceProvider['quote(address,address,uint256)'].returns(() => {
         return [parseUnits('0.99', 6), lastUpdatedAt] // 1 DAI = 0.99 USDT
       })
 
       // when
-      const stableCoinAddress = await usingStableAsUsd.getStableCoinIfPegged(priceProvider.address)
+      const stableCoinAddress = await stableCoinProvider.getStableCoinIfPegged()
 
       // then
       expect(stableCoinAddress).eq(DAI_ADDRESS)
@@ -133,14 +146,14 @@ describe('UsingStableAsUsd @mainnet', function () {
 
     it('should get primary stable coin if peg is OK (same decimals)', async function () {
       // given
-      await usingStableAsUsd.connect(governor).updateStableCoins(USDC_ADDRESS, USDT_ADDRESS)
+      await stableCoinProvider.connect(governor).updateStableCoins(USDC_ADDRESS, USDT_ADDRESS)
 
       priceProvider['quote(address,address,uint256)'].returns(() => {
         return [parseUnits('0.99', 6), lastUpdatedAt] // 1 USDC = 0.99 USDT
       })
 
       // when
-      const stableCoinAddress = await usingStableAsUsd.getStableCoinIfPegged(priceProvider.address)
+      const stableCoinAddress = await stableCoinProvider.getStableCoinIfPegged()
 
       // then
       expect(stableCoinAddress).eq(USDC_ADDRESS)
@@ -150,11 +163,11 @@ describe('UsingStableAsUsd @mainnet', function () {
   describe('toUsdRepresentation', function () {
     it('should get correct USD representation (from 6-decimals)', async function () {
       // given
-      await usingStableAsUsd.connect(governor).updateStableCoins(USDC_ADDRESS, USDT_ADDRESS)
+      await stableCoinProvider.connect(governor).updateStableCoins(USDC_ADDRESS, USDT_ADDRESS)
 
       // when
       const usdcAmount = parseUnits('1', 6)
-      const usdRepresentation = await usingStableAsUsd.toUsdRepresentation(usdcAmount)
+      const usdRepresentation = await stableCoinProvider.toUsdRepresentation(usdcAmount)
 
       // then
       expect(usdRepresentation).eq(toUSD('1'))
@@ -162,11 +175,11 @@ describe('UsingStableAsUsd @mainnet', function () {
 
     it('should get correct USD representation (from 18-decimals)', async function () {
       // given
-      await usingStableAsUsd.connect(governor).updateStableCoins(DAI_ADDRESS, USDT_ADDRESS)
+      await stableCoinProvider.connect(governor).updateStableCoins(DAI_ADDRESS, USDT_ADDRESS)
 
       // when
       const daiAmount = parseEther('1')
-      const usdRepresentation = await usingStableAsUsd.toUsdRepresentation(daiAmount)
+      const usdRepresentation = await stableCoinProvider.toUsdRepresentation(daiAmount)
 
       // then
       expect(usdRepresentation).eq(toUSD('1'))

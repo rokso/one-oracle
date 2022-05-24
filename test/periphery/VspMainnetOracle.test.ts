@@ -23,6 +23,7 @@ describe('VspMainnetOracle @mainnet', function () {
   let uniswapV2PriceProvider: FakeContract
   let vspOracle: VspMainnetOracle
   let lastUpdatedAt: number
+  let stableCoinProvider: FakeContract
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
@@ -38,11 +39,13 @@ describe('VspMainnetOracle @mainnet', function () {
     })
     aggregator['priceProviders(uint8)'].returns(() => uniswapV2PriceProvider.address)
 
+    stableCoinProvider = await smock.fake('StableCoinProvider')
+    stableCoinProvider.getStableCoinIfPegged.returns(DAI_ADDRESS)
+
     const vspMainnetOracleFactory = new VspMainnetOracle__factory(deployer)
     vspOracle = await vspMainnetOracleFactory.deploy(
       aggregator.address,
-      DAI_ADDRESS,
-      USDC_ADDRESS,
+      stableCoinProvider.address,
       MAX_DEVIATION,
       STALE_PERIOD
     )

@@ -2,18 +2,20 @@
 
 pragma solidity 0.8.9;
 
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@uniswap/lib/contracts/libraries/FixedPoint.sol";
 import "@uniswap/v2-periphery/contracts/libraries/UniswapV2OracleLibrary.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
-import "../access/Governable.sol";
+import "../features/UsingStableCoinProvider.sol";
 import "../interfaces/core/IUniswapV2LikePriceProvider.sol";
+import "./PriceProvider.sol";
 
 /**
  * @title UniswapV2 (and forks) TWAP Oracle implementation
  * Based on https://github.com/Uniswap/v2-periphery/blob/master/contracts/examples/ExampleOracleSimple.sol
  */
-contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable {
+contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, PriceProvider, UsingStableCoinProvider {
     using FixedPoint for *;
 
     /**
@@ -51,8 +53,9 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable {
     constructor(
         address factory_,
         uint256 defaultTwapPeriod_,
-        address nativeToken_
-    ) {
+        address nativeToken_,
+        IStableCoinProvider stableCoinProvider_
+    ) UsingStableCoinProvider(stableCoinProvider_) {
         require(factory_ != address(0), "factory-is-null");
         defaultTwapPeriod = defaultTwapPeriod_;
         factory = factory_;
@@ -72,6 +75,35 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable {
     /// @inheritdoc IUniswapV2LikePriceProvider
     function pairFor(address token0_, address token1_) public view override returns (IUniswapV2Pair _pair) {
         _pair = IUniswapV2Pair(IUniswapV2Factory(factory).getPair(token0_, token1_));
+    }
+
+    /// @inheritdoc IPriceProvider
+    function getPriceInUsd(address token_)
+        public
+        view
+        override(IPriceProvider, PriceProvider)
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
+    {
+        return getPriceInUsd(token_, defaultTwapPeriod);
+    }
+
+    /// @inheritdoc IUniswapV2LikePriceProvider
+    function getPriceInUsd(address token_, uint256 twapPeriod_)
+        public
+        view
+        override
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
+    {
+        require(address(stableCoinProvider) != address(0), "stable-coin-not-supported");
+
+        uint256 _stableCoinAmount;
+        (_stableCoinAmount, _lastUpdatedAt) = quote(
+            token_,
+            stableCoinProvider.getStableCoinIfPegged(),
+            twapPeriod_,
+            10**IERC20Metadata(token_).decimals() // ONE
+        );
+        _priceInUsd = stableCoinProvider.toUsdRepresentation(_stableCoinAmount);
     }
 
     /// @inheritdoc IPriceProvider
@@ -102,6 +134,28 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable {
             (_amountOut, __lastUpdatedAt) = _getAmountOut(nativeToken, tokenOut_, twapPeriod_, _amountOut);
             _lastUpdatedAt = Math.min(__lastUpdatedAt, _lastUpdatedAt);
         }
+    }
+
+    /// @inheritdoc IUniswapV2LikePriceProvider
+    function quoteTokenToUsd(
+        address token_,
+        uint256 amountIn_,
+        uint256 twapPeriod_
+    ) public view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+        uint256 _price;
+        (_price, _lastUpdatedAt) = getPriceInUsd(token_, twapPeriod_);
+        _amountOut = (amountIn_ * _price) / 10**IERC20Metadata(token_).decimals();
+    }
+
+    /// @inheritdoc IUniswapV2LikePriceProvider
+    function quoteUsdToToken(
+        address token_,
+        uint256 amountIn_,
+        uint256 twapPeriod_
+    ) public view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+        uint256 _price;
+        (_price, _lastUpdatedAt) = getPriceInUsd(token_, twapPeriod_);
+        _amountOut = (amountIn_ * 10**IERC20Metadata(token_).decimals()) / _price;
     }
 
     /// @inheritdoc IUniswapV2LikePriceProvider

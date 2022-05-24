@@ -98,6 +98,175 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
     })
   })
 
+  describe('getPriceInUsd', function () {
+    let lastUpdatedAt: number
+
+    beforeEach(async function () {
+      lastUpdatedAt = await timestampFromLatestBlock()
+    })
+
+    describe('when price from chainlink is OK', function () {
+      it('should get price from chainlink', async function () {
+        // given
+        const chainlinkPriceInUsd = parseEther('3,000')
+        aggregator['getPriceInUsd(uint8,address)'].returns((args: [number, string]) => {
+          const [provider] = args
+          if (provider === Provider.CHAINLINK) return [chainlinkPriceInUsd, lastUpdatedAt]
+        })
+
+        // when
+        const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+
+        // then
+        expect(priceInUsd).eq(chainlinkPriceInUsd)
+      })
+    })
+
+    describe('when price from chainlink is NOT OK', function () {
+      describe('when price from fallback A is OK', function () {
+        describe('when fallback B is not set', function () {
+          it('should get price from fallback A', async function () {
+            // given
+            await chainlinkAndFallbacksOracle
+              .connect(governor)
+              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            const v3PriceInUsd = parseEther('3,000')
+            aggregator['getPriceInUsd(uint8,address)'].returns((args: [number, string]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [v3PriceInUsd, lastUpdatedAt]
+            })
+
+            // when
+            const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+
+            // then
+            expect(priceInUsd).eq(v3PriceInUsd)
+          })
+        })
+
+        describe('when price from fallback B is OK', function () {
+          describe('when deviation is OK', function () {
+            it('should get price from fallback A', async function () {
+              // given
+              const v3PriceInUsd = parseEther('3,000')
+              const v2PriceInUsd = parseEther('2,990')
+              aggregator['getPriceInUsd(uint8,address)'].returns((args: [number, string]) => {
+                const [provider] = args
+                if (provider === Provider.CHAINLINK) return [0, 0]
+                if (provider === Provider.UNISWAP_V3) return [v3PriceInUsd, lastUpdatedAt]
+                if (provider === Provider.UNISWAP_V2) return [v2PriceInUsd, lastUpdatedAt]
+              })
+
+              // when
+              const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+
+              // then
+              expect(priceInUsd).eq(v3PriceInUsd)
+            })
+          })
+          describe('when deviation is NOT OK', function () {
+            it('should revert', async function () {
+              // given
+              const v3PriceInUsd = parseEther('3,000')
+              const v2PriceInUsd = parseEther('2,000')
+              aggregator['getPriceInUsd(uint8,address)'].returns((args: [number, string]) => {
+                const [provider] = args
+                if (provider === Provider.CHAINLINK) return [0, 0]
+                if (provider === Provider.UNISWAP_V3) return [v3PriceInUsd, lastUpdatedAt]
+                if (provider === Provider.UNISWAP_V2) return [v2PriceInUsd, lastUpdatedAt]
+              })
+
+              // when
+              const call = chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+
+              // then
+              await expect(call).revertedWith('prices-deviation-too-high')
+            })
+          })
+        })
+
+        describe('when price from fallback B is NOT OK', function () {
+          it('should get price from fallback A', async function () {
+            // given
+            const v3PriceInUsd = parseEther('3,000')
+            aggregator['getPriceInUsd(uint8,address)'].returns((args: [number, string]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [v3PriceInUsd, lastUpdatedAt]
+              if (provider === Provider.UNISWAP_V2) return [0, 0]
+            })
+
+            // when
+            const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+
+            // then
+            expect(priceInUsd).eq(v3PriceInUsd)
+          })
+        })
+      })
+
+      describe('when price from fallback A is NOT OK', function () {
+        describe('when fallback B is not set', function () {
+          it('should revert', async function () {
+            // given
+            await chainlinkAndFallbacksOracle
+              .connect(governor)
+              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            aggregator['getPriceInUsd(uint8,address)'].returns((args: [number, string]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [0, 0]
+            })
+
+            // when
+            const call = chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+
+            // then
+            await expect(call).revertedWith('fallback-a-failed')
+          })
+        })
+
+        describe('when price from fallback B is OK', function () {
+          it('should get price from fallback B', async function () {
+            // given
+            const v2PriceInUsd = parseEther('3,000')
+            aggregator['getPriceInUsd(uint8,address)'].returns((args: [number, string]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [0, 0]
+              if (provider === Provider.UNISWAP_V2) return [v2PriceInUsd, lastUpdatedAt]
+            })
+
+            // when
+            const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+
+            // then
+            expect(priceInUsd).eq(v2PriceInUsd)
+          })
+        })
+
+        describe('when price from fallback B is NOT OK', function () {
+          it('should revert', async function () {
+            // given
+            aggregator['getPriceInUsd(uint8,address)'].returns((args: [number, string, string, BigNumber]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [0, 0]
+              if (provider === Provider.UNISWAP_V2) return [0, 0]
+            })
+
+            // when
+            const call = chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+
+            // then
+            await expect(call).revertedWith('fallbacks-failed')
+          })
+        })
+      })
+    })
+  })
+
   describe('quote', function () {
     let lastUpdatedAt: number
 
@@ -262,6 +431,344 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
 
             // when
             const call = chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+
+            // then
+            await expect(call).revertedWith('fallbacks-failed')
+          })
+        })
+      })
+    })
+  })
+
+  describe('quoteTokenToUsd', function () {
+    let lastUpdatedAt: number
+
+    beforeEach(async function () {
+      lastUpdatedAt = await timestampFromLatestBlock()
+    })
+
+    describe('when price from chainlink is OK', function () {
+      it('should get price from chainlink', async function () {
+        // given
+        const chainlinkAmounOut = parseEther('3,000')
+        aggregator['quoteTokenToUsd(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+          const [provider] = args
+          if (provider === Provider.CHAINLINK) return [chainlinkAmounOut, lastUpdatedAt]
+        })
+
+        // when
+        const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+
+        // then
+        expect(amountOut).eq(chainlinkAmounOut)
+      })
+    })
+
+    describe('when price from chainlink is NOT OK', function () {
+      describe('when price from fallback A is OK', function () {
+        describe('when fallback B is not set', function () {
+          it('should get price from fallback A', async function () {
+            // given
+            await chainlinkAndFallbacksOracle
+              .connect(governor)
+              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            const v3AmountOut = parseEther('3,000')
+            aggregator['quoteTokenToUsd(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt]
+            })
+
+            // when
+            const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+
+            // then
+            expect(amountOut).eq(v3AmountOut)
+          })
+        })
+
+        describe('when price from fallback B is OK', function () {
+          describe('when deviation is OK', function () {
+            it('should get price from fallback A', async function () {
+              // given
+              const v3AmountOut = parseEther('3,000')
+              const v2AmountOut = parseEther('2,990')
+              aggregator['quoteTokenToUsd(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+                const [provider] = args
+                if (provider === Provider.CHAINLINK) return [0, 0]
+                if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt]
+                if (provider === Provider.UNISWAP_V2) return [v2AmountOut, lastUpdatedAt]
+              })
+
+              // when
+              const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+
+              // then
+              expect(amountOut).eq(v3AmountOut)
+            })
+          })
+          describe('when deviation is NOT OK', function () {
+            it('should revert', async function () {
+              // given
+              const v3AmountOut = parseEther('3,000')
+              const v2AmountOut = parseEther('2,000')
+              aggregator['quoteTokenToUsd(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+                const [provider] = args
+                if (provider === Provider.CHAINLINK) return [0, 0]
+                if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt]
+                if (provider === Provider.UNISWAP_V2) return [v2AmountOut, lastUpdatedAt]
+              })
+
+              // when
+              const call = chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+
+              // then
+              await expect(call).revertedWith('prices-deviation-too-high')
+            })
+          })
+        })
+
+        describe('when price from fallback B is NOT OK', function () {
+          it('should get price from fallback A', async function () {
+            // given
+            const v3AmountOut = parseEther('3,000')
+            aggregator['quoteTokenToUsd(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt]
+              if (provider === Provider.UNISWAP_V2) return [0, 0]
+            })
+
+            // when
+            const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+
+            // then
+            expect(amountOut).eq(v3AmountOut)
+          })
+        })
+      })
+
+      describe('when price from fallback A is NOT OK', function () {
+        describe('when fallback B is not set', function () {
+          it('should revert', async function () {
+            // given
+            await chainlinkAndFallbacksOracle
+              .connect(governor)
+              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            aggregator['quoteTokenToUsd(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [0, 0]
+            })
+
+            // when
+            const call = chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+
+            // then
+            await expect(call).revertedWith('fallback-a-failed')
+          })
+        })
+
+        describe('when price from fallback B is OK', function () {
+          it('should get price from fallback B', async function () {
+            // given
+            const v2AmountOut = parseEther('3,000')
+            aggregator['quoteTokenToUsd(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [0, 0]
+              if (provider === Provider.UNISWAP_V2) return [v2AmountOut, lastUpdatedAt]
+            })
+
+            // when
+            const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+
+            // then
+            expect(amountOut).eq(v2AmountOut)
+          })
+        })
+
+        describe('when price from fallback B is NOT OK', function () {
+          it('should revert', async function () {
+            // given
+            aggregator['quoteTokenToUsd(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [0, 0]
+              if (provider === Provider.UNISWAP_V2) return [0, 0]
+            })
+
+            // when
+            const call = chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+
+            // then
+            await expect(call).revertedWith('fallbacks-failed')
+          })
+        })
+      })
+    })
+  })
+
+  describe('quoteUsdToToken', function () {
+    let lastUpdatedAt: number
+
+    beforeEach(async function () {
+      lastUpdatedAt = await timestampFromLatestBlock()
+    })
+
+    describe('when price from chainlink is OK', function () {
+      it('should get price from chainlink', async function () {
+        // given
+        const chainlinkAmounOut = parseEther('1')
+        aggregator['quoteUsdToToken(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+          const [provider] = args
+          if (provider === Provider.CHAINLINK) return [chainlinkAmounOut, lastUpdatedAt]
+        })
+
+        // when
+        const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+
+        // then
+        expect(amountOut).eq(chainlinkAmounOut)
+      })
+    })
+
+    describe('when price from chainlink is NOT OK', function () {
+      describe('when price from fallback A is OK', function () {
+        describe('when fallback B is not set', function () {
+          it('should get price from fallback A', async function () {
+            // given
+            await chainlinkAndFallbacksOracle
+              .connect(governor)
+              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            const v3AmountOut = parseEther('1')
+            aggregator['quoteUsdToToken(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt]
+            })
+
+            // when
+            const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+
+            // then
+            expect(amountOut).eq(v3AmountOut)
+          })
+        })
+
+        describe('when price from fallback B is OK', function () {
+          describe('when deviation is OK', function () {
+            it('should get price from fallback A', async function () {
+              // given
+              const v3AmountOut = parseEther('1')
+              const v2AmountOut = parseEther('1.05')
+              aggregator['quoteUsdToToken(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+                const [provider] = args
+                if (provider === Provider.CHAINLINK) return [0, 0]
+                if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt]
+                if (provider === Provider.UNISWAP_V2) return [v2AmountOut, lastUpdatedAt]
+              })
+
+              // when
+              const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+
+              // then
+              expect(amountOut).eq(v3AmountOut)
+            })
+          })
+          describe('when deviation is NOT OK', function () {
+            it('should revert', async function () {
+              // given
+              const v3AmountOut = parseEther('1')
+              const v2AmountOut = parseEther('0.66')
+              aggregator['quoteUsdToToken(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+                const [provider] = args
+                if (provider === Provider.CHAINLINK) return [0, 0]
+                if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt]
+                if (provider === Provider.UNISWAP_V2) return [v2AmountOut, lastUpdatedAt]
+              })
+
+              // when
+              const call = chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+
+              // then
+              await expect(call).revertedWith('prices-deviation-too-high')
+            })
+          })
+        })
+
+        describe('when price from fallback B is NOT OK', function () {
+          it('should get price from fallback A', async function () {
+            // given
+            const v3AmountOut = parseEther('1')
+            aggregator['quoteUsdToToken(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt]
+              if (provider === Provider.UNISWAP_V2) return [0, 0]
+            })
+
+            // when
+            const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+
+            // then
+            expect(amountOut).eq(v3AmountOut)
+          })
+        })
+      })
+
+      describe('when price from fallback A is NOT OK', function () {
+        describe('when fallback B is not set', function () {
+          it('should revert', async function () {
+            // given
+            await chainlinkAndFallbacksOracle
+              .connect(governor)
+              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            aggregator['quoteUsdToToken(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [0, 0]
+            })
+
+            // when
+            const call = chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+
+            // then
+            await expect(call).revertedWith('fallback-a-failed')
+          })
+        })
+
+        describe('when price from fallback B is OK', function () {
+          it('should get price from fallback B', async function () {
+            // given
+            const v2AmountOut = parseEther('1')
+            aggregator['quoteUsdToToken(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [0, 0]
+              if (provider === Provider.UNISWAP_V2) return [v2AmountOut, lastUpdatedAt]
+            })
+
+            // when
+            const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+
+            // then
+            expect(amountOut).eq(v2AmountOut)
+          })
+        })
+
+        describe('when price from fallback B is NOT OK', function () {
+          it('should revert', async function () {
+            // given
+            aggregator['quoteUsdToToken(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
+              const [provider] = args
+              if (provider === Provider.CHAINLINK) return [0, 0]
+              if (provider === Provider.UNISWAP_V3) return [0, 0]
+              if (provider === Provider.UNISWAP_V2) return [0, 0]
+            })
+
+            // when
+            const call = chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('1'))
 
             // then
             await expect(call).revertedWith('fallbacks-failed')

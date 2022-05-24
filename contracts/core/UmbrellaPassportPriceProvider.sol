@@ -4,15 +4,15 @@ pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "../dependencies/@umb-network/lib/ValueDecoder.sol";
-import "../dependencies/@umb-network/interfaces/IDatumReceiver.sol";
 import "./UmbrellaPriceProvider.sol";
+import "../interfaces/core/IUmbrellaPassportPriceProvider.sol";
 
 /**
  * @title Umbrella Passport's Datum receiver & Price provider
  * @dev Based on https://bscscan.com/address/0xd3e5Bf479BF8A2252D89D2990dDE2173869166D0#code
  * Important: This contract assumes that all pallets are USD prices (i.e. `XYZ-USD` quotes).
  */
-contract UmbrellaPassportPriceProvider is IDatumReceiver, UmbrellaPriceProvider {
+contract UmbrellaPassportPriceProvider is IUmbrellaPassportPriceProvider, UmbrellaPriceProvider {
     using ValueDecoder for bytes32;
     using SafeCast for uint256;
 
@@ -84,24 +84,26 @@ contract UmbrellaPassportPriceProvider is IDatumReceiver, UmbrellaPriceProvider 
         });
     }
 
-    /// @notice Updates heartbeat
+    /// @inheritdoc IUmbrellaPassportPriceProvider
     function updateHeartbeatTimestamp(uint128 heartbeatTimestamp_) external onlyGovernor {
         emit HeartbeatTimestampUpdated(updatePolicy.heartbeatTimestamp, heartbeatTimestamp_);
         updatePolicy.heartbeatTimestamp = heartbeatTimestamp_;
     }
 
-    /// @notice Updates deviation threshold
+    /// @inheritdoc IUmbrellaPassportPriceProvider
     function updateDeviationThreshold(uint128 deviationThreshold_) external onlyGovernor {
         emit DeviationThresholdUpdated(updatePolicy.deviationThreshold, deviationThreshold_);
         updatePolicy.deviationThreshold = deviationThreshold_;
     }
 
-    /// @inheritdoc UmbrellaPriceProvider
-    /// @dev Get the latest price between Chain and Passport data
-    function _getUsdPriceOfAsset(address token_)
-        internal
+    /**
+     * @inheritdoc IPriceProvider
+     * @dev Get the latest price between Chain (Firs Class Data) and Passport data
+     */
+    function getPriceInUsd(address token_)
+        public
         view
-        override
+        override(IPriceProvider, UmbrellaPriceProvider)
         returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
     {
         bytes32 _key = _toKey(token_);

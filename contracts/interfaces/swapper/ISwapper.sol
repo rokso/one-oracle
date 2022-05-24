@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.9;
 
-import "../periphery/IChainlinkAndFallbacksOracle.sol";
+import "../periphery/IOracle.sol";
 import "./IExchange.sol";
 
 /**
@@ -20,7 +20,7 @@ interface ISwapper {
      * @notice Oracle to get prices from
      * @dev Is used combined with `slippage` in order to check swaps outcomes and reject if aren't acceptable
      */
-    function oracle() external view returns (IChainlinkAndFallbacksOracle);
+    function oracle() external view returns (IOracle);
 
     /**
      * @notice Get max acceptable slippage

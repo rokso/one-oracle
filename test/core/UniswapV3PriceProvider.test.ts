@@ -11,6 +11,8 @@ import {
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, parseUnits, HOUR} from '../helpers'
+import {FakeContract, smock} from '@defi-wonderland/smock'
+import {BigNumber} from 'ethers'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
@@ -34,7 +36,7 @@ describe('UniswapV3PriceProvider', function () {
   })
 
   describe('UniswapV3PriceProvider @mainnet', function () {
-    const {USDC_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.mainnet
+    const {USDC_ADDRESS, DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.mainnet
 
     beforeEach(async function () {
       usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
@@ -46,55 +48,60 @@ describe('UniswapV3PriceProvider', function () {
       await crossPoolOracle.deployed()
 
       const priceProviderFactory = new UniswapV3PriceProvider__factory(deployer)
-      priceProvider = await priceProviderFactory.deploy(crossPoolOracle.address, DEFAULT_TWAP_PERIOD, DEFAULT_POOLS_FEE)
+      priceProvider = await priceProviderFactory.deploy(
+        crossPoolOracle.address,
+        DEFAULT_TWAP_PERIOD,
+        DEFAULT_POOLS_FEE,
+        ethers.constants.AddressZero
+      )
       await priceProvider.deployed()
       await priceProvider.transferGovernorship(governor.address)
       await priceProvider.connect(governor).acceptGovernorship()
     })
 
+    describe('updateDefaultTwapPeriod', function () {
+      it('should revert if not governor', async function () {
+        const tx = priceProvider.updateDefaultTwapPeriod(0)
+        await expect(tx).revertedWith('not-governor')
+      })
+
+      it('should update default TWAP period', async function () {
+        // given
+        const before = await priceProvider.defaultTwapPeriod()
+        expect(before).eq(DEFAULT_TWAP_PERIOD).gt(0)
+
+        // when
+        const newDefaultTwap = before * 2
+        await priceProvider.connect(governor).updateDefaultTwapPeriod(newDefaultTwap)
+
+        // then
+        const after = await priceProvider.defaultTwapPeriod()
+        expect(after).eq(newDefaultTwap)
+      })
+    })
+
+    describe('updateDefaultPoolFee', function () {
+      it('should revert if not governor', async function () {
+        const tx = priceProvider.updateDefaultPoolFee(0)
+        await expect(tx).revertedWith('not-governor')
+      })
+
+      it('should update default pool fee', async function () {
+        // given
+        const before = await priceProvider.defaultPoolFee()
+        expect(before).eq(DEFAULT_POOLS_FEE).gt(0)
+
+        // when
+        const newDefaultPoolFee = before * 2
+        await priceProvider.connect(governor).updateDefaultPoolFee(newDefaultPoolFee)
+
+        // then
+        const after = await priceProvider.defaultPoolFee()
+        expect(after).eq(newDefaultPoolFee)
+      })
+    })
+
     describe('quote', function () {
-      describe('updateDefaultTwapPeriod', function () {
-        it('should revert if not governor', async function () {
-          const tx = priceProvider.updateDefaultTwapPeriod(0)
-          await expect(tx).revertedWith('not-governor')
-        })
-
-        it('should update default TWAP period', async function () {
-          // given
-          const before = await priceProvider.defaultTwapPeriod()
-          expect(before).eq(DEFAULT_TWAP_PERIOD).gt(0)
-
-          // when
-          const newDefaultTwap = before * 2
-          await priceProvider.connect(governor).updateDefaultTwapPeriod(newDefaultTwap)
-
-          // then
-          const after = await priceProvider.defaultTwapPeriod()
-          expect(after).eq(newDefaultTwap)
-        })
-      })
-
-      describe('updateDefaultPoolFee', function () {
-        it('should revert if not governor', async function () {
-          const tx = priceProvider.updateDefaultPoolFee(0)
-          await expect(tx).revertedWith('not-governor')
-        })
-
-        it('should update default pool fee', async function () {
-          // given
-          const before = await priceProvider.defaultPoolFee()
-          expect(before).eq(DEFAULT_POOLS_FEE).gt(0)
-
-          // when
-          const newDefaultPoolFee = before * 2
-          await priceProvider.connect(governor).updateDefaultPoolFee(newDefaultPoolFee)
-
-          // then
-          const after = await priceProvider.defaultPoolFee()
-          expect(after).eq(newDefaultPoolFee)
-        })
-      })
-
       it('should quote same token to same token', async function () {
         const amountIn = parseEther('100')
         const {_amountOut} = await priceProvider['quote(address,address,uint256)'](weth.address, weth.address, amountIn)
@@ -130,6 +137,42 @@ describe('UniswapV3PriceProvider', function () {
         expect(_amountOut).closeTo(parseUnits('43,676', 6), parseUnits('1', 6))
       })
     })
+
+    describe('getPriceInUsd', function () {
+      it('should revert if stable coin provider is null', async function () {
+        const tx = priceProvider['getPriceInUsd(address)'](WETH_ADDRESS)
+        await expect(tx).revertedWith('stable-coin-not-supported')
+      })
+
+      describe('when stable coin provider is set', function () {
+        let stableCoinProvider: FakeContract
+
+        beforeEach(async function () {
+          stableCoinProvider = await smock.fake('StableCoinProvider')
+          stableCoinProvider.getStableCoinIfPegged.returns(USDC_ADDRESS)
+          stableCoinProvider.toUsdRepresentation.returns((args: BigNumber[]) => {
+            const [stableCoinAmount_] = args
+            return stableCoinAmount_.mul(parseUnits('1', 12)) // USDC amount to 18 decimals
+          })
+          await priceProvider.connect(governor).updateStableCoinProvider(stableCoinProvider.address)
+        })
+
+        it('should WETH price', async function () {
+          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WETH_ADDRESS)
+          expect(_priceInUsd).closeTo(parseEther('3,230'), parseEther('1'))
+        })
+
+        it('should WBTC price', async function () {
+          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WBTC_ADDRESS)
+          expect(_priceInUsd).closeTo(parseEther('43,711'), parseEther('1'))
+        })
+
+        it('should DAI price', async function () {
+          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](USDC_ADDRESS)
+          expect(_priceInUsd).closeTo(parseEther('1'), parseEther('0.1'))
+        })
+      })
+    })
   })
 
   describe('UniswapV3PriceProvider @arbitrum', function () {
@@ -145,7 +188,12 @@ describe('UniswapV3PriceProvider', function () {
       await crossPoolOracle.deployed()
 
       const priceProviderFactory = new UniswapV3PriceProvider__factory(deployer)
-      priceProvider = await priceProviderFactory.deploy(crossPoolOracle.address, DEFAULT_TWAP_PERIOD, DEFAULT_POOLS_FEE)
+      priceProvider = await priceProviderFactory.deploy(
+        crossPoolOracle.address,
+        DEFAULT_TWAP_PERIOD,
+        DEFAULT_POOLS_FEE,
+        ethers.constants.AddressZero // stableCoinProvider
+      )
       await priceProvider.deployed()
       await priceProvider.transferGovernorship(governor.address)
       await priceProvider.connect(governor).acceptGovernorship()
@@ -192,7 +240,12 @@ describe('UniswapV3PriceProvider', function () {
       await crossPoolOracle.deployed()
 
       const priceProviderFactory = new UniswapV3PriceProvider__factory(deployer)
-      priceProvider = await priceProviderFactory.deploy(crossPoolOracle.address, DEFAULT_TWAP_PERIOD, DEFAULT_POOLS_FEE)
+      priceProvider = await priceProviderFactory.deploy(
+        crossPoolOracle.address,
+        DEFAULT_TWAP_PERIOD,
+        DEFAULT_POOLS_FEE,
+        ethers.constants.AddressZero // stableCoinProvider
+      )
       await priceProvider.deployed()
       await priceProvider.transferGovernorship(governor.address)
       await priceProvider.connect(governor).acceptGovernorship()

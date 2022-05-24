@@ -26,7 +26,7 @@ contract Swapper is ISwapper, Governable {
      * @notice The oracle contract
      * @dev This is used to set acceptable slippage parameters
      */
-    IChainlinkAndFallbacksOracle public override oracle;
+    IOracle public override oracle;
 
     /**
      * @notice Max slippage acceptable
@@ -41,12 +41,12 @@ contract Swapper is ISwapper, Governable {
     event ExchangeRemoved(address exchange);
 
     /// @notice Emitted when the oracle is updated
-    event OracleUpdated(IChainlinkAndFallbacksOracle oldOracle, IChainlinkAndFallbacksOracle newOracle);
+    event OracleUpdated(IOracle oldOracle, IOracle newOracle);
 
     /// @notice Emitted when the max slippage is updated
     event MaxSlippageUpdated(uint256 oldMaxSlippage, uint256 newMaxSlippage);
 
-    constructor(IChainlinkAndFallbacksOracle oracle_, uint256 maxSlippage_) {
+    constructor(IOracle oracle_, uint256 maxSlippage_) {
         require(address(oracle_) != address(0), "oracle-is-null");
         oracle = oracle_;
         maxSlippage = maxSlippage_;
@@ -224,7 +224,7 @@ contract Swapper is ISwapper, Governable {
     /**
      * @notice Update oracle contract
      */
-    function updateOracle(IChainlinkAndFallbacksOracle oracle_) external onlyGovernor {
+    function updateOracle(IOracle oracle_) external onlyGovernor {
         require(address(oracle_) != address(0), "address-is-null");
         emit OracleUpdated(oracle, oracle_);
         oracle = oracle_;

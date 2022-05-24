@@ -107,7 +107,8 @@ describe('Swapper @mainnet', function () {
       uniswapV2Provider = await priceProviderFactory.deploy(
         UNISWAP_V2_FACTORY_ADDRESS,
         DEFAULT_TWAP_PERIOD,
-        WETH_ADDRESS
+        WETH_ADDRESS,
+        ethers.constants.AddressZero // stableCoinProvider
       )
       await uniswapV2Provider.deployed()
 
@@ -129,7 +130,8 @@ describe('Swapper @mainnet', function () {
       uniswapV3Provider = await uniswapV3ProviderFactory.deploy(
         crossPoolOracle.address,
         DEFAULT_TWAP_PERIOD,
-        DEFAULT_POOLS_FEE
+        DEFAULT_POOLS_FEE,
+        ethers.constants.AddressZero // stableCoinProvider
       )
       await uniswapV3Provider.deployed()
 
@@ -164,7 +166,7 @@ describe('Swapper @mainnet', function () {
         await wbtc.approve(swapper.address, amountIn)
         const tx = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('347000', 1000)
+        expect(receipt.gasUsed).closeTo('348000', 1000)
       })
 
       it('swapExactOutput', async function () {

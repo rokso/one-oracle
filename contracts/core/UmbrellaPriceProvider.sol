@@ -8,18 +8,18 @@ import "@umb-network/toolbox/dist/contracts/IChain.sol";
 import "@umb-network/toolbox/dist/contracts/IRegistry.sol";
 import "../access/Governable.sol";
 import "../interfaces/core/IUmbrellaPriceProvider.sol";
+import "./PriceProvider.sol";
 
 /**
  * @notice Umbrella's price provider
  */
-contract UmbrellaPriceProvider is IUmbrellaPriceProvider, Governable {
+contract UmbrellaPriceProvider is IUmbrellaPriceProvider, PriceProvider, Governable {
     bytes32 private constant CHAIN = bytes32("Chain");
 
     /**
      * @notice Umbrella's Registry
-     * @dev Has other contracts' addresses
+     * @dev Stores the other Umbrella's contracts' addresses
      */
-
     IRegistry public immutable registry;
 
     constructor(IRegistry registry_) {
@@ -27,9 +27,18 @@ contract UmbrellaPriceProvider is IUmbrellaPriceProvider, Governable {
         registry = registry_;
     }
 
-    /// @inheritdoc IUSDPriceProvider
-    function getPriceInUsd(address token_) public view override returns (uint256 _priceInUsd, uint256 _lastUpdatedAt) {
-        return _getUsdPriceOfAsset(token_);
+    /// @inheritdoc IPriceProvider
+    function getPriceInUsd(address token_)
+        public
+        view
+        virtual
+        override(IPriceProvider, PriceProvider)
+        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
+    {
+        bytes32 _key = _toKey(token_);
+
+        (_priceInUsd, _lastUpdatedAt) = _chain().getCurrentValue(_key);
+        require(_lastUpdatedAt > 0, "invalid-quote");
     }
 
     /// @inheritdoc IPriceProvider
@@ -43,53 +52,11 @@ contract UmbrellaPriceProvider is IUmbrellaPriceProvider, Governable {
         _lastUpdatedAt = Math.min(_lastUpdatedAt0, _lastUpdatedAt);
     }
 
-    /// @inheritdoc IUSDPriceProvider
-    function quoteTokenToUsd(address token_, uint256 amountIn_)
-        public
-        view
-        override
-        returns (uint256 _amountOut, uint256 _lastUpdatedAt)
-    {
-        uint256 _price;
-        (_price, _lastUpdatedAt) = _getUsdPriceOfAsset(token_);
-        _amountOut = (amountIn_ * _price) / 10**IERC20Metadata(token_).decimals();
-    }
-
-    /// @inheritdoc IUSDPriceProvider
-    function quoteUsdToToken(address token_, uint256 amountIn_)
-        public
-        view
-        override
-        returns (uint256 _amountOut, uint256 _lastUpdatedAt)
-    {
-        uint256 _price;
-        (_price, _lastUpdatedAt) = _getUsdPriceOfAsset(token_);
-        _amountOut = (amountIn_ * 10**IERC20Metadata(token_).decimals()) / _price;
-    }
-
     /**
      * @notice Get Umbrella's main contract
      */
     function _chain() internal view returns (IChain umbChain) {
         umbChain = IChain(registry.getAddress(CHAIN));
-    }
-
-    /**
-     * @notice Get token's price
-     * @param token_ The token
-     * @return _priceInUsd The USD price
-     * @return _lastUpdatedAt Last updated timestamp
-     */
-    function _getUsdPriceOfAsset(address token_)
-        internal
-        view
-        virtual
-        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
-    {
-        bytes32 _key = _toKey(token_);
-
-        (_priceInUsd, _lastUpdatedAt) = _chain().getCurrentValue(_key);
-        require(_lastUpdatedAt > 0, "invalid-quote");
     }
 
     /**
