@@ -197,27 +197,6 @@ describe('FluxPriceProvider @mumbai', function () {
     })
   })
 
-  describe('updateMaxDeviation', function () {
-    it('should revert if not governor', async function () {
-      const tx = priceProvider.updateMaxDeviation(0)
-      await expect(tx).revertedWith('not-governor')
-    })
-
-    it('should update max deviation', async function () {
-      // given
-      const before = await priceProvider.maxDeviation()
-      expect(before).not.eq(ethers.constants.AddressZero)
-
-      // when
-      const maxDeviation = MAX_DEVIATION.mul(2)
-      await priceProvider.connect(governor).updateMaxDeviation(maxDeviation)
-
-      // then
-      const after = await priceProvider.maxDeviation()
-      expect(after).eq(maxDeviation).not.eq(before)
-    })
-  })
-
   describe('addAggregator', function () {
     let someAggregator: FakeContract
 

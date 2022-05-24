@@ -6,16 +6,15 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../interfaces/core/IChainlinkPriceProvider.sol";
 import "../interfaces/core/IUSDPriceProvider.sol";
 import "../interfaces/periphery/IUSDOracle.sol";
-import "../access/Governable.sol";
 import "./ChainlinkAndFallbacksOracle.sol";
 
 /**
  * @title The Synth Oracle
  * @dev Extends `ChainlinkAndFallbacksOracle` contract
- * @dev This contract maps synth assets (i.e. vsAssets and vsdAssets) with their underlyings
+ * @dev This contract maps synth assets (i.e. vsAssets and vsdAssets) with their underlying
  * @dev The fallback providers MUST implement the `IUSDPriceProvider` interface
  */
-contract SynthDefaultOracle is IUSDOracle, Governable, ChainlinkAndFallbacksOracle {
+contract SynthDefaultOracle is IUSDOracle, ChainlinkAndFallbacksOracle {
     uint256 public constant ONE_USD = 1e18;
 
     /**
@@ -29,7 +28,7 @@ contract SynthDefaultOracle is IUSDOracle, Governable, ChainlinkAndFallbacksOrac
     }
 
     /**
-     * @notice Avaliable assets
+     * @notice Available assets
      */
     mapping(IERC20 => Asset) public assets;
 
@@ -129,7 +128,7 @@ contract SynthDefaultOracle is IUSDOracle, Governable, ChainlinkAndFallbacksOrac
 
         // 7. Check fallback prices deviation
         require(_aPriceOK && _bPriceOK, "fallbacks-failed");
-        require(OracleHelpers.isDeviationOK(_amountOutA, _amountOutB, maxDeviation), "prices-deviation-too-high");
+        require(_isDeviationOK(_amountOutA, _amountOutB), "prices-deviation-too-high");
 
         // 8. If deviation is OK, return price from fallback A
         return _amountOutA;

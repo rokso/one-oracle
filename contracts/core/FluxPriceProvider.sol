@@ -9,24 +9,19 @@ import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "../interfaces/core/IFluxPriceProvider.sol";
 import "../access/Governable.sol";
-import "../libraries/OracleHelpers.sol";
+import "../features/UsingMaxDeviation.sol";
 
 /**
  * @title Flux's price provider
  * @dev The Flux uses the same aggregator's interface as Chainlink
  */
-contract FluxPriceProvider is IFluxPriceProvider, Governable {
+contract FluxPriceProvider is IFluxPriceProvider, UsingMaxDeviation {
     using SafeCast for int256;
     using EnumerableSet for EnumerableSet.AddressSet;
 
     uint256 public constant FLUX_DECIMALS = 8;
     uint256 public constant USD_DECIMALS = 18;
     uint256 public constant TO_SCALE = 10**(USD_DECIMALS - FLUX_DECIMALS);
-
-    /**
-     * @notice Max deviation accepted for aggregators of the same token
-     */
-    uint256 public maxDeviation;
 
     /**
      * @notice Aggregators map (token => aggregator[])
@@ -39,12 +34,7 @@ contract FluxPriceProvider is IFluxPriceProvider, Governable {
     /// Emitted when an agreggator is removed
     event AggregatorRemoved(address token, address aggregator);
 
-    /// Emitted when max deviation is updated
-    event MaxDeviationUpdated(uint256 oldMaxDeviation, uint256 newMaxDeviation);
-
-    constructor(uint256 maxDeviation_) {
-        maxDeviation = maxDeviation_;
-    }
+    constructor(uint256 maxDeviation_) UsingMaxDeviation(maxDeviation_) {}
 
     /**
      * @notice Get all aggregators of token
@@ -119,10 +109,7 @@ contract FluxPriceProvider is IFluxPriceProvider, Governable {
         for (uint256 i = 1; i < _len; ++i) {
             (, int256 _iPrice, , uint256 _iLastUpdatedAt, ) = _aggregatorOf(token_, i).latestRoundData();
 
-            require(
-                OracleHelpers.isDeviationOK(_iPrice.toUint256(), _price.toUint256(), maxDeviation),
-                "prices-deviation-too-high"
-            );
+            require(_isDeviationOK(_iPrice.toUint256(), _price.toUint256()), "prices-deviation-too-high");
 
             if (_iLastUpdatedAt > _lastUpdatedAt) {
                 _price = _iPrice;
@@ -155,13 +142,5 @@ contract FluxPriceProvider is IFluxPriceProvider, Governable {
         require(aggregatorsOf[token_].remove(aggregator_), "aggregator-doesnt-exist");
 
         emit AggregatorRemoved(token_, aggregator_);
-    }
-
-    /**
-     * @notice Update max deviation
-     */
-    function updateMaxDeviation(uint256 maxDeviation_) external onlyGovernor {
-        emit MaxDeviationUpdated(maxDeviation, maxDeviation_);
-        maxDeviation = maxDeviation_;
     }
 }
