@@ -94,8 +94,7 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable {
             return (amountIn_, block.timestamp);
         }
 
-        IUniswapV2Pair _pair = pairFor(tokenIn_, tokenOut_);
-        if (hasOracle(_pair, twapPeriod_)) {
+        if (hasOracle(pairFor(tokenIn_, tokenOut_), twapPeriod_)) {
             (_amountOut, _lastUpdatedAt) = _getAmountOut(tokenIn_, tokenOut_, twapPeriod_, amountIn_);
         } else {
             (_amountOut, _lastUpdatedAt) = _getAmountOut(tokenIn_, nativeToken, twapPeriod_, amountIn_);

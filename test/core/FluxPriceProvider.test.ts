@@ -80,6 +80,7 @@ describe('FluxPriceProvider @mumbai', function () {
       beforeEach(async function () {
         firstAggregator = AggregatorV3Interface__factory.connect(FLUX_ETH_USD_AGGREGATOR, deployer)
         secondAggregator = await smock.fake('AggregatorV3Interface')
+        secondAggregator.decimals.returns(() => 8)
         await priceProvider.connect(governor).addAggregator(weth.address, secondAggregator.address)
       })
 
@@ -218,15 +219,20 @@ describe('FluxPriceProvider @mumbai', function () {
   })
 
   describe('addAggregator', function () {
-    const someAggregator = '0xdeaDDeADDEaDdeaDdEAddEADDEAdDeadDEADDEaD'
+    let someAggregator: FakeContract
+
+    beforeEach(async function () {
+      someAggregator = await smock.fake('AggregatorV3Interface')
+      someAggregator.decimals.returns(() => 8)
+    })
 
     it('should revert if not governor', async function () {
-      const tx = priceProvider.addAggregator(weth.address, someAggregator)
+      const tx = priceProvider.addAggregator(weth.address, someAggregator.address)
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should revert if token is null', async function () {
-      const tx = priceProvider.connect(governor).addAggregator(ethers.constants.AddressZero, someAggregator)
+      const tx = priceProvider.connect(governor).addAggregator(ethers.constants.AddressZero, someAggregator.address)
       await expect(tx).revertedWith('token-is-null')
     })
 
@@ -246,7 +252,7 @@ describe('FluxPriceProvider @mumbai', function () {
       expect(before.length).eq(1)
 
       // when
-      await priceProvider.connect(governor).addAggregator(weth.address, someAggregator)
+      await priceProvider.connect(governor).addAggregator(weth.address, someAggregator.address)
 
       // then
       const after = await priceProvider.getAggregatorsOf(weth.address)

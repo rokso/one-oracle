@@ -62,7 +62,6 @@ contract UniswapV3CrossPoolOracle {
         address routeThruToken_,
         uint24[2] memory poolFees_
     ) public view returns (uint256 amountOut) {
-        require(poolFees_.length <= 2, "uniV3CPOracle: bad fees length");
         uint24 _pool0Fee = poolFees_[0];
         uint24 _pool1Fee = poolFees_[1];
         address _routeThruToken = routeThruToken_ == address(0) ? nativeToken : routeThruToken_;

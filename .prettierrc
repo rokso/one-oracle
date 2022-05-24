@@ -10,6 +10,7 @@
     },
     {
       "files": [
+        "contracts/core/ChainlinkMainnetPriceProvider.sol",
         "contracts/core/ChainlinkAvalanchePriceProvider.sol",
         "contracts/core/ChainlinkArbitrumPriceProvider.sol",
         "contracts/core/ChainlinkPolygonPriceProvider.sol"

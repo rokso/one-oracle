@@ -128,14 +128,14 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         IERC20(path_[0]).safeApprove(address(router), amountInMax_);
         _amountIn = router.swapTokensForExactTokens(amountOut_, amountInMax_, path_, outRecipient_, block.timestamp)[0];
         // If swap end up costly less than _amountInMax then return remaining
-        uint256 _remainingAmountIn = IERC20(path_[0]).balanceOf(address(this));
+        uint256 _remainingAmountIn = amountInMax_ - _amountIn;
         if (_remainingAmountIn > 0) {
             IERC20(path_[0]).safeTransfer(inSender_, _remainingAmountIn);
         }
     }
 
     /**
-     * @notice Wrapps `router.getAmountsOut()` function
+     * @notice Wraps `router.getAmountsOut()` function
      * @dev Returns `0` if reverts
      */
     function _getAmountsOut(uint256 amountIn_, address[] memory path_) internal view returns (uint256 _amountOut) {
@@ -145,7 +145,7 @@ contract UniswapV2LikeExchange is IExchange, Governable {
     }
 
     /**
-     * @notice Wrapps `router.getAmountsIn()` function
+     * @notice Wraps `router.getAmountsIn()` function
      * @dev Returns `0` if reverts
      */
     function _getAmountsIn(uint256 _amountOut, address[] memory _path) internal view returns (uint256 _amountIn) {

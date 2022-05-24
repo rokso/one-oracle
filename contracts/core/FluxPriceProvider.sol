@@ -19,10 +19,9 @@ contract FluxPriceProvider is IFluxPriceProvider, Governable {
     using SafeCast for int256;
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    /**
-     * @notice Used to convert 8-decimals from Chainlink to 18-decimals values
-     */
-    uint256 public constant TEN_DECIMALS = 1e10;
+    uint256 public constant FLUX_DECIMALS = 8;
+    uint256 public constant USD_DECIMALS = 18;
+    uint256 public constant TO_SCALE = 10**(USD_DECIMALS - FLUX_DECIMALS);
 
     /**
      * @notice Max deviation accepted for aggregators of the same token
@@ -131,7 +130,7 @@ contract FluxPriceProvider is IFluxPriceProvider, Governable {
             }
         }
 
-        return (_price.toUint256() * TEN_DECIMALS, _lastUpdatedAt);
+        return (_price.toUint256() * TO_SCALE, _lastUpdatedAt);
     }
 
     /**
@@ -140,7 +139,7 @@ contract FluxPriceProvider is IFluxPriceProvider, Governable {
     function addAggregator(address token_, address aggregator_) external onlyGovernor {
         require(token_ != address(0), "token-is-null");
         require(aggregator_ != address(0), "aggregator-is-null");
-
+        require(AggregatorV3Interface(aggregator_).decimals() == FLUX_DECIMALS, "invalid-decimals");
         require(aggregatorsOf[token_].add(aggregator_), "aggregator-exists");
 
         emit AggregatorAdded(token_, aggregator_);
