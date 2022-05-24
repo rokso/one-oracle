@@ -5,6 +5,18 @@ pragma solidity 0.8.9;
 import "../../libraries/DataTypes.sol";
 import "./IPriceProvider.sol";
 
+/**
+ * @notice PriceProvidersAggregator interface
+ * @dev Worth noting that the `_lastUpdatedAt` logic depends on the underlying price provider. In summary:
+ * ChainLink: returns the last updated date from the aggregator
+ * UniswapV2: returns the date of the latest pair oracle update
+ * UniswapV3: assumes that the price is always updated (returns block.timestamp)
+ * Flux: returns the last updated date from the aggregator
+ * Umbrella (FCD): returns the last updated date returned from their oracle contract
+ * Umbrella (Passport): returns the date of the latest pallet submission
+ * Anytime that a quote performs more than one query, it uses the oldest date as the `_lastUpdatedAt`.
+ * See more: https://github.com/bloqpriv/one-oracle/issues/64
+ */
 interface IPriceProvidersAggregator {
     /**
      * @notice Get USD (or equivalent) price of an asset
