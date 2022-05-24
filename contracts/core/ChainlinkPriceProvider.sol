@@ -16,7 +16,6 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, PriceProvider, Gover
     using SafeCast for int256;
 
     uint256 public constant CHAINLINK_DECIMALS = 8;
-    uint256 public constant USD_DECIMALS = 18;
     uint256 public constant TO_SCALE = 10**(USD_DECIMALS - CHAINLINK_DECIMALS);
 
     /**

@@ -11,6 +11,8 @@ import {
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, parseUnits, HOUR} from '../helpers'
+import {FakeContract, smock} from '@defi-wonderland/smock'
+import {BigNumber} from 'ethers'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
@@ -50,8 +52,6 @@ describe('UniswapV3PriceProvider', function () {
         crossPoolOracle.address,
         DEFAULT_TWAP_PERIOD,
         DEFAULT_POOLS_FEE,
-        // null stable coins
-        ethers.constants.AddressZero,
         ethers.constants.AddressZero
       )
       await priceProvider.deployed()
@@ -139,14 +139,22 @@ describe('UniswapV3PriceProvider', function () {
     })
 
     describe('getPriceInUsd', function () {
-      it('should revert if stable coin is null', async function () {
+      it('should revert if stable coin provider is null', async function () {
         const tx = priceProvider['getPriceInUsd(address)'](WETH_ADDRESS)
         await expect(tx).revertedWith('stable-coin-not-supported')
       })
 
-      describe('when stable coin is set', function () {
+      describe('when stable coin provider is set', function () {
+        let stableCoinProvider: FakeContract
+
         beforeEach(async function () {
-          await priceProvider.connect(governor).updateStableCoins(USDC_ADDRESS, DAI_ADDRESS)
+          stableCoinProvider = await smock.fake('StableCoinProvider')
+          stableCoinProvider.getStableCoinIfPegged.returns(USDC_ADDRESS)
+          stableCoinProvider.toUsdRepresentation.returns((args: BigNumber[]) => {
+            const [stableCoinAmount_] = args
+            return stableCoinAmount_.mul(parseUnits('1', 12)) // USDC amount to 18 decimals
+          })
+          await priceProvider.connect(governor).updateStableCoinProvider(stableCoinProvider.address)
         })
 
         it('should WETH price', async function () {
@@ -184,9 +192,7 @@ describe('UniswapV3PriceProvider', function () {
         crossPoolOracle.address,
         DEFAULT_TWAP_PERIOD,
         DEFAULT_POOLS_FEE,
-        // null stable coins
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero
+        ethers.constants.AddressZero // stableCoinProvider
       )
       await priceProvider.deployed()
       await priceProvider.transferGovernorship(governor.address)
@@ -238,9 +244,7 @@ describe('UniswapV3PriceProvider', function () {
         crossPoolOracle.address,
         DEFAULT_TWAP_PERIOD,
         DEFAULT_POOLS_FEE,
-        // null stable coins
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero
+        ethers.constants.AddressZero // stableCoinProvider
       )
       await priceProvider.deployed()
       await priceProvider.transferGovernorship(governor.address)

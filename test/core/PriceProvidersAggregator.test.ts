@@ -49,9 +49,7 @@ describe('PriceProvidersAggregator @mainnet', function () {
       crossPoolOracle.address,
       DEFAULT_TWAP_PERIOD,
       DEFAULT_POOLS_FEE,
-      // null stable coins
-      ethers.constants.AddressZero,
-      ethers.constants.AddressZero
+      ethers.constants.AddressZero // stableCoinProvider
     )
     await uniswapV3Provider.deployed()
     await uniswapV3Provider.transferGovernorship(governor.address)

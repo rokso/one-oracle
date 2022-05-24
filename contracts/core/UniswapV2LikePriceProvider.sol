@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@uniswap/lib/contracts/libraries/FixedPoint.sol";
 import "@uniswap/v2-periphery/contracts/libraries/UniswapV2OracleLibrary.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
-import "../features/UsingStableAsUsd.sol";
+import "../features/UsingStableCoinProvider.sol";
 import "../interfaces/core/IUniswapV2LikePriceProvider.sol";
 import "./PriceProvider.sol";
 
@@ -15,7 +15,7 @@ import "./PriceProvider.sol";
  * @title UniswapV2 (and forks) TWAP Oracle implementation
  * Based on https://github.com/Uniswap/v2-periphery/blob/master/contracts/examples/ExampleOracleSimple.sol
  */
-contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, PriceProvider, UsingStableAsUsd {
+contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, PriceProvider, UsingStableCoinProvider {
     using FixedPoint for *;
 
     /**
@@ -54,9 +54,8 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, PriceProvide
         address factory_,
         uint256 defaultTwapPeriod_,
         address nativeToken_,
-        address primaryStableCoin_,
-        address secondaryStableCoin_
-    ) UsingStableAsUsd(primaryStableCoin_, secondaryStableCoin_) {
+        IStableCoinProvider stableCoinProvider_
+    ) UsingStableCoinProvider(stableCoinProvider_) {
         require(factory_ != address(0), "factory-is-null");
         defaultTwapPeriod = defaultTwapPeriod_;
         factory = factory_;
@@ -95,14 +94,16 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, PriceProvide
         override
         returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
     {
+        require(address(stableCoinProvider) != address(0), "stable-coin-not-supported");
+
         uint256 _stableCoinAmount;
         (_stableCoinAmount, _lastUpdatedAt) = quote(
             token_,
-            _getStableCoinIfPegged(this),
+            stableCoinProvider.getStableCoinIfPegged(),
             twapPeriod_,
             10**IERC20Metadata(token_).decimals() // ONE
         );
-        _priceInUsd = _toUsdRepresentation(_stableCoinAmount);
+        _priceInUsd = stableCoinProvider.toUsdRepresentation(_stableCoinAmount);
     }
 
     /// @inheritdoc IPriceProvider

@@ -5,7 +5,7 @@ pragma solidity 0.8.9;
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "../../features/UsingProvidersAggregator.sol";
 import "../../features/UsingMaxDeviation.sol";
-import "../../features/UsingStableAsUsd.sol";
+import "../../features/UsingStableCoinProvider.sol";
 import "../../features/UsingStalePeriod.sol";
 import "../../interfaces/periphery/ITokenOracle.sol";
 
@@ -17,7 +17,7 @@ contract VspMainnetOracle is
     ITokenOracle,
     UsingProvidersAggregator,
     UsingMaxDeviation,
-    UsingStableAsUsd,
+    UsingStableCoinProvider,
     UsingStalePeriod
 {
     uint256 public constant ONE_VSP = 1e18;
@@ -25,16 +25,17 @@ contract VspMainnetOracle is
 
     constructor(
         IPriceProvidersAggregator providersAggregator_,
-        address stableCoinA_,
-        address stableCoinB_,
+        IStableCoinProvider stableCoinProvider_,
         uint256 maxDeviation_,
         uint256 stalePeriod_
     )
         UsingProvidersAggregator(providersAggregator_)
-        UsingStableAsUsd(stableCoinA_, stableCoinB_)
+        UsingStableCoinProvider(stableCoinProvider_)
         UsingMaxDeviation(maxDeviation_)
         UsingStalePeriod(stalePeriod_)
-    {}
+    {
+        require(address(stableCoinProvider_) != address(0), "stable-coin-provider-is-null");
+    }
 
     /// @inheritdoc ITokenOracle
     function getPriceInUsd(address _asset) external view returns (uint256 _priceInUsd) {
@@ -42,7 +43,8 @@ contract VspMainnetOracle is
         uint256 _lastUpdatedAt;
         IPriceProvidersAggregator _aggregator = providersAggregator;
 
-        address _stableCoin = _getStableCoinIfPegged(_aggregator.priceProviders(DataTypes.Provider.UNISWAP_V2));
+        address _stableCoin = stableCoinProvider.getStableCoinIfPegged();
+
         (_priceInUsd, _lastUpdatedAt) = _aggregator.quote(
             DataTypes.Provider.UNISWAP_V2,
             VSP_ADDRESS,

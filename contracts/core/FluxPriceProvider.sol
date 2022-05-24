@@ -19,7 +19,6 @@ contract FluxPriceProvider is IFluxPriceProvider, PriceProvider, UsingMaxDeviati
     using EnumerableSet for EnumerableSet.AddressSet;
 
     uint256 public constant FLUX_DECIMALS = 8;
-    uint256 public constant USD_DECIMALS = 18;
     uint256 public constant TO_SCALE = 10**(USD_DECIMALS - FLUX_DECIMALS);
 
     /**

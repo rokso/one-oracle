@@ -108,9 +108,7 @@ describe('Swapper @mainnet', function () {
         UNISWAP_V2_FACTORY_ADDRESS,
         DEFAULT_TWAP_PERIOD,
         WETH_ADDRESS,
-        // null stable coins
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero
+        ethers.constants.AddressZero // stableCoinProvider
       )
       await uniswapV2Provider.deployed()
 
@@ -133,9 +131,7 @@ describe('Swapper @mainnet', function () {
         crossPoolOracle.address,
         DEFAULT_TWAP_PERIOD,
         DEFAULT_POOLS_FEE,
-        // null stable coins
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero
+        ethers.constants.AddressZero // stableCoinProvider
       )
       await uniswapV3Provider.deployed()
 

@@ -9,6 +9,8 @@ import "../interfaces/core/IPriceProvider.sol";
  * @title Price providers' super class that implements common functions
  */
 abstract contract PriceProvider is IPriceProvider {
+    uint256 public constant USD_DECIMALS = 18;
+
     /// @inheritdoc IPriceProvider
     function getPriceInUsd(address token_) public view virtual returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);
 

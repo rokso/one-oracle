@@ -10,6 +10,7 @@ import {
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, parseUnits, HOUR, increaseTime} from '../helpers'
+import {FakeContract, smock} from '@defi-wonderland/smock'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 
@@ -21,6 +22,7 @@ describe('UniswapV2LikePriceProvider', function () {
   let usdc: IERC20
   let nativeToken: IERC20
   let wbtc: IERC20
+  let stableCoinProvider: FakeContract
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
@@ -57,9 +59,7 @@ describe('UniswapV2LikePriceProvider', function () {
           UNISWAP_V2_FACTORY_ADDRESS,
           DEFAULT_TWAP_PERIOD,
           WETH_ADDRESS,
-          // null stable coins
-          ethers.constants.AddressZero,
-          ethers.constants.AddressZero
+          ethers.constants.AddressZero // stableCoinProvider
         )
         await priceProvider.deployed()
         await priceProvider.transferGovernorship(governor.address)
@@ -74,6 +74,10 @@ describe('UniswapV2LikePriceProvider', function () {
         await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
         await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
         await priceProvider['updateOrAdd(address,address)'](USDC_ADDRESS, WETH_ADDRESS)
+
+        stableCoinProvider = await smock.fake('StableCoinProvider')
+        stableCoinProvider.getStableCoinIfPegged.returns(DAI_ADDRESS)
+        stableCoinProvider.toUsdRepresentation.returns((amount: string) => amount)
       })
 
       describe('updateDefaultTwapPeriod', function () {
@@ -173,14 +177,14 @@ describe('UniswapV2LikePriceProvider', function () {
       })
 
       describe('getPriceInUsd', function () {
-        it('should revert if stable coin is null', async function () {
+        it('should revert if stable coin provider is null', async function () {
           const tx = priceProvider['getPriceInUsd(address)'](WETH_ADDRESS)
           await expect(tx).revertedWith('stable-coin-not-supported')
         })
 
-        describe('when stable coin is set', function () {
+        describe('when stable coin provider is set', function () {
           beforeEach(async function () {
-            await priceProvider.connect(governor).updateStableCoins(DAI_ADDRESS, USDC_ADDRESS)
+            await priceProvider.connect(governor).updateStableCoinProvider(stableCoinProvider.address)
           })
 
           it('should WETH price', async function () {
@@ -210,9 +214,7 @@ describe('UniswapV2LikePriceProvider', function () {
           SUSHISWAP_FACTORY_ADDRESS,
           DEFAULT_TWAP_PERIOD,
           WETH_ADDRESS,
-          // null stable coins
-          ethers.constants.AddressZero,
-          ethers.constants.AddressZero
+          ethers.constants.AddressZero // stableCoinProvider
         )
         await priceProvider.deployed()
         await priceProvider.transferGovernorship(governor.address)
@@ -278,9 +280,7 @@ describe('UniswapV2LikePriceProvider', function () {
           TRADERJOE_FACTORY_ADDRESS,
           DEFAULT_TWAP_PERIOD,
           WAVAX_ADDRESS,
-          // null stable coins
-          ethers.constants.AddressZero,
-          ethers.constants.AddressZero
+          ethers.constants.AddressZero // stableCoinProvider
         )
         await priceProvider.deployed()
         await priceProvider.transferGovernorship(governor.address)
@@ -335,9 +335,7 @@ describe('UniswapV2LikePriceProvider', function () {
           PANGOLIN_FACTORY_ADDRESS,
           DEFAULT_TWAP_PERIOD,
           WAVAX_ADDRESS,
-          // null stable coins
-          ethers.constants.AddressZero,
-          ethers.constants.AddressZero
+          ethers.constants.AddressZero // stableCoinProvider
         )
         await priceProvider.deployed()
         await priceProvider.transferGovernorship(governor.address)
@@ -402,9 +400,7 @@ describe('UniswapV2LikePriceProvider', function () {
           SUSHISWAP_FACTORY_ADDRESS,
           DEFAULT_TWAP_PERIOD,
           WETH_ADDRESS,
-          // null stable coins
-          ethers.constants.AddressZero,
-          ethers.constants.AddressZero
+          ethers.constants.AddressZero // stableCoinProvider
         )
         await priceProvider.deployed()
         await priceProvider.transferGovernorship(governor.address)
@@ -470,9 +466,7 @@ describe('UniswapV2LikePriceProvider', function () {
           SUSHISWAP_FACTORY_ADDRESS,
           DEFAULT_TWAP_PERIOD,
           WMATIC_ADDRESS,
-          // null stable coins
-          ethers.constants.AddressZero,
-          ethers.constants.AddressZero
+          ethers.constants.AddressZero // stableCoinProvider
         )
         await priceProvider.deployed()
         await priceProvider.transferGovernorship(governor.address)
@@ -527,9 +521,7 @@ describe('UniswapV2LikePriceProvider', function () {
           QUICKSWAP_FACTORY_ADDRESS,
           DEFAULT_TWAP_PERIOD,
           WMATIC_ADDRESS,
-          // null stable coins
-          ethers.constants.AddressZero,
-          ethers.constants.AddressZero
+          ethers.constants.AddressZero // stableCoinProvider
         )
         await priceProvider.deployed()
         await priceProvider.transferGovernorship(governor.address)
