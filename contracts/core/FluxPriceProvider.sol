@@ -3,7 +3,6 @@
 pragma solidity 0.8.9;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
-import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "../interfaces/core/IFluxPriceProvider.sol";
@@ -73,17 +72,6 @@ contract FluxPriceProvider is IFluxPriceProvider, PriceProvider, UsingMaxDeviati
         }
 
         return (_price.toUint256() * TO_SCALE, _lastUpdatedAt);
-    }
-
-    /// @inheritdoc IPriceProvider
-    function quote(
-        address tokenIn_,
-        address tokenOut_,
-        uint256 amountIn_
-    ) external view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
-        (uint256 _amountInUsd, uint256 _lastUpdatedAt0) = quoteTokenToUsd(tokenIn_, amountIn_);
-        (_amountOut, _lastUpdatedAt) = quoteUsdToToken(tokenOut_, _amountInUsd);
-        _lastUpdatedAt = Math.min(_lastUpdatedAt0, _lastUpdatedAt);
     }
 
     /// @inheritdoc IFluxPriceProvider
