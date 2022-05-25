@@ -24,7 +24,7 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, PriceProvider, Gover
     mapping(address => AggregatorV3Interface) public aggregators;
 
     /// Emitted when an aggregator is updated
-    event AggregatorUpdated(AggregatorV3Interface oldAggregator, AggregatorV3Interface newAggregator);
+    event AggregatorUpdated(address token, AggregatorV3Interface oldAggregator, AggregatorV3Interface newAggregator);
 
     /// @inheritdoc IPriceProvider
     function getPriceInUsd(address token_)
@@ -58,7 +58,7 @@ contract ChainlinkPriceProvider is IChainlinkPriceProvider, PriceProvider, Gover
         AggregatorV3Interface _current = aggregators[token_];
         require(aggregator_ != _current, "same-as-current");
         _setAggregator(token_, aggregator_);
-        emit AggregatorUpdated(_current, aggregator_);
+        emit AggregatorUpdated(token_, _current, aggregator_);
     }
 
     function _setAggregator(address token_, AggregatorV3Interface aggregator_) internal {

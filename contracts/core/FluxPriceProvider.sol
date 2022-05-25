@@ -53,13 +53,16 @@ contract FluxPriceProvider is IFluxPriceProvider, PriceProvider, UsingMaxDeviati
         override(IPriceProvider, PriceProvider)
         returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
     {
-        require(aggregatorsOf[token_].length() > 0, "aggregator-not-found");
-        int256 _price;
-        (, _price, , _lastUpdatedAt, ) = _aggregatorOf(token_, 0).latestRoundData();
+        EnumerableSet.AddressSet storage _aggregatorOf = aggregatorsOf[token_];
 
         uint256 _len = aggregatorsOf[token_].length();
+        require(_len > 0, "aggregator-not-found");
+        int256 _price;
+        (, _price, , _lastUpdatedAt, ) = AggregatorV3Interface(_aggregatorOf.at(0)).latestRoundData();
+
         for (uint256 i = 1; i < _len; ++i) {
-            (, int256 _iPrice, , uint256 _iLastUpdatedAt, ) = _aggregatorOf(token_, i).latestRoundData();
+            (, int256 _iPrice, , uint256 _iLastUpdatedAt, ) = AggregatorV3Interface(_aggregatorOf.at(i))
+                .latestRoundData();
 
             require(_isDeviationOK(_iPrice.toUint256(), _price.toUint256()), "prices-deviation-too-high");
 
@@ -81,16 +84,6 @@ contract FluxPriceProvider is IFluxPriceProvider, PriceProvider, UsingMaxDeviati
         (uint256 _amountInUsd, uint256 _lastUpdatedAt0) = quoteTokenToUsd(tokenIn_, amountIn_);
         (_amountOut, _lastUpdatedAt) = quoteUsdToToken(tokenOut_, _amountInUsd);
         _lastUpdatedAt = Math.min(_lastUpdatedAt0, _lastUpdatedAt);
-    }
-
-    /**
-     * @notice Get a token's aggregator
-     * @param token_ The token to get aggregator from
-     * @param i_ The aggregator's index
-     * @return _aggregator The aggregator
-     */
-    function _aggregatorOf(address token_, uint256 i_) private view returns (AggregatorV3Interface _aggregator) {
-        _aggregator = AggregatorV3Interface(aggregatorsOf[token_].at(i_));
     }
 
     /// @inheritdoc IFluxPriceProvider
