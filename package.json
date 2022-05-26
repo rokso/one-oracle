@@ -14,7 +14,7 @@
     "hardhat": "hardhat",
     "clean": "hardhat clean",
     "compile": "hardhat compile",
-    "coverage": "hardhat coverage",
+    "coverage": "./scripts/coverage-all-chains.sh",
     "deploy": "hardhat deploy",
     "pretest": "hardhat typechain",
     "test": "hardhat test",
