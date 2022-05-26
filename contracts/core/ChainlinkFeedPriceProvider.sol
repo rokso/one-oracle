@@ -8,7 +8,7 @@ import "../libraries/OracleHelpers.sol";
 
 /**
  * @title ChainLink's price provider that uses price feed (only available on Mainnet currently)
- * @dev This contract is more expensive (+ ~1.3k) than others contracts, that don't use feed,
+ * @dev This contract is more expensive (+ ~1.3k) than others contracts (that don't use feed)
  * because they get decimals during aggregator addition
  */
 contract ChainlinkFeedPriceProvider is ChainlinkPriceProvider {
