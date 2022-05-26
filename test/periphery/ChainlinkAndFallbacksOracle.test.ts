@@ -3,9 +3,9 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {ChainlinkAndFallbacksOracle, ChainlinkAndFallbacksOracle__factory} from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Address, Provider} from '../../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
-import {parseEther, timestampFromLatestBlock, Provider} from '../helpers'
+import {parseEther, timestampFromLatestBlock} from '../helpers'
 import {BigNumber} from 'ethers'
 
 const STALE_PERIOD = ethers.constants.MaxUint256

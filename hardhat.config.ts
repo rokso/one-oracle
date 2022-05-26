@@ -8,9 +8,12 @@ import 'hardhat-gas-reporter'
 import 'hardhat-contract-sizer'
 import '@typechain/hardhat'
 import 'hardhat-spdx-license-identifier'
+import '@nomiclabs/hardhat-etherscan'
 import dotenv from 'dotenv'
 
 dotenv.config()
+
+const accounts = process.env.MNEMONIC ? {mnemonic: process.env.MNEMONIC} : undefined
 
 const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
@@ -20,14 +23,33 @@ const config: HardhatUserConfig = {
     },
     hardhat: {
       forking: {
-        url: process.env.NODE_URL || 'http://localhost',
-        blockNumber: process.env.BLOCK_NUMBER ? parseInt(process.env.BLOCK_NUMBER) : undefined,
+        url: process.env.FORK_NODE_URL || 'http://localhost',
+        blockNumber: process.env.FORK_BLOCK_NUMBER ? parseInt(process.env.FORK_BLOCK_NUMBER) : undefined,
       },
     },
     mainnet: {
-      url: process.env.NODE_URL,
+      url: process.env.MAINNET_NODE_URL || '',
       chainId: 1,
       gas: 6700000,
+      verify: {etherscan: {apiKey: process.env.MAINNET_ETHERSCAN_API_KEY}},
+      deploy: 'deploy/mainnet',
+      accounts,
+    },
+    polygon: {
+      url: process.env.POLYGON_NODE_URL || '',
+      chainId: 137,
+      gas: 11700000,
+      verify: {etherscan: {apiKey: process.env.POLYGON_ETHERSCAN_API_KEY}},
+      deploy: 'deploy/polygon',
+      accounts,
+    },
+    avalanche: {
+      url: process.env.AVALANCHE_NODE_URL || '',
+      chainId: 43114,
+      gas: 8000000,
+      verify: {etherscan: {apiKey: process.env.AVALANCHE_ETHERSCAN_API_KEY}},
+      deploy: 'deploy/avalanche',
+      accounts,
     },
   },
   namedAccounts: {

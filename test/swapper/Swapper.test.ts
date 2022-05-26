@@ -21,8 +21,8 @@ import {
   UniswapV2LikePriceProvider,
   UniswapV2LikePriceProvider__factory,
 } from '../../typechain-types'
-import Address from '../../helpers/address'
-import {HOUR, increaseTime, parseEther, parseUnits, Provider} from '../helpers'
+import {Address, Provider} from '../../helpers'
+import {HOUR, increaseTime, parseEther, parseUnits} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {adjustBalance} from '../helpers/balance'
 

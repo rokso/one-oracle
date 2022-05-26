@@ -4,7 +4,7 @@ import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {ChainlinkPriceProvider, ChainlinkPriceProvider__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
-import {parseEther, parseUnits} from '../helpers'
+import {parseEther} from '../helpers'
 
 const {
   DAI_ADDRESS,

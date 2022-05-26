@@ -105,3 +105,12 @@ To run code coverage (all networks), use:
 ```sh
 npm run coverage
 ```
+
+## Deployment
+
+Setup the deployment related env vars properly (See `.env.template` file)
+
+```sh
+npm run deploy -- --gasprice <gas price in wei> --network <network>
+npm run verify
+```
