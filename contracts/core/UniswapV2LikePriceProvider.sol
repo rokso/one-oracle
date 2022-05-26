@@ -111,7 +111,7 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, PriceProvide
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    ) external view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    ) external view override(IPriceProvider, PriceProvider) returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
         return quote(tokenIn_, tokenOut_, defaultTwapPeriod, amountIn_);
     }
 

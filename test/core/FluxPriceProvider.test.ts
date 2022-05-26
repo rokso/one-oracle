@@ -106,44 +106,6 @@ describe('FluxPriceProvider @mumbai', function () {
     })
   })
 
-  describe('quote', function () {
-    it('should revert if aggregator does not exist', async function () {
-      const tx = priceProvider.quote(WETH_ADDRESS, ethers.constants.AddressZero, parseEther('1'))
-      await expect(tx).revertedWith('aggregator-not-found')
-    })
-
-    it('should quote same token to same token', async function () {
-      const amountIn = parseEther('100')
-      const {_amountOut} = await priceProvider.quote(WETH_ADDRESS, WETH_ADDRESS, amountIn)
-      expect(_amountOut).eq(amountIn)
-    })
-
-    it('should quote 1 WETH to USDC', async function () {
-      const {_amountOut} = await priceProvider.quote(WETH_ADDRESS, USDC_ADDRESS, parseEther('1'))
-      expect(_amountOut).closeTo(parseUnits('2,341', 6), parseUnits('1', 6))
-    })
-
-    it('should quote 1 WMATIC to USDC', async function () {
-      const {_amountOut} = await priceProvider.quote(WMATIC_ADDRESS, USDC_ADDRESS, parseEther('1'))
-      expect(_amountOut).closeTo(parseUnits('0.9191', 6), parseUnits('0.01', 6))
-    })
-
-    it('should quote 1 WMATIC to WETH', async function () {
-      const {_amountOut} = await priceProvider.quote(WMATIC_ADDRESS, WETH_ADDRESS, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('0.0003926'), parseEther('0.0001'))
-    })
-
-    it('should quote 1 USDC to WETH', async function () {
-      const {_amountOut} = await priceProvider.quote(USDC_ADDRESS, WETH_ADDRESS, parseUnits('1', 6))
-      expect(_amountOut).closeTo(parseEther('0.000427'), parseEther('0.0001'))
-    })
-
-    it('should quote 1 USDC to WMATIC', async function () {
-      const {_amountOut} = await priceProvider.quote(USDC_ADDRESS, WMATIC_ADDRESS, parseUnits('1', 6))
-      expect(_amountOut).closeTo(parseEther('1.0879'), parseEther('0.001'))
-    })
-  })
-
   describe('addAggregator', function () {
     let someAggregator: FakeContract
 

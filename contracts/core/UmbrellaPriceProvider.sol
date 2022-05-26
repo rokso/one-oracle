@@ -2,7 +2,6 @@
 
 pragma solidity 0.8.9;
 
-import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@umb-network/toolbox/dist/contracts/IChain.sol";
 import "@umb-network/toolbox/dist/contracts/IRegistry.sol";
@@ -39,17 +38,6 @@ contract UmbrellaPriceProvider is IUmbrellaPriceProvider, PriceProvider, Governa
 
         (_priceInUsd, _lastUpdatedAt) = _chain().getCurrentValue(_key);
         require(_lastUpdatedAt > 0, "invalid-quote");
-    }
-
-    /// @inheritdoc IPriceProvider
-    function quote(
-        address tokenIn_,
-        address tokenOut_,
-        uint256 amountIn_
-    ) external view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
-        (uint256 _amountInUsd, uint256 _lastUpdatedAt0) = quoteTokenToUsd(tokenIn_, amountIn_);
-        (_amountOut, _lastUpdatedAt) = quoteUsdToToken(tokenOut_, _amountInUsd);
-        _lastUpdatedAt = Math.min(_lastUpdatedAt0, _lastUpdatedAt);
     }
 
     /**
