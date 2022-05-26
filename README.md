@@ -6,23 +6,101 @@ The `one-oracle` repository has two modules, the `OneOracle` and the `Swapper`.
 
 2. The `Swapper` module encapsulates token swap logic by looking for the best swap path among available DEXes and interacts with `ChainlinkAndFallbacksOracle` (from `OneOracle/periphery`) for slippage check.
 
-## Setup
+## Highlevel Architecture
 
-1. Install
+### Oracle
 
-   ```sh
-   npm i
-   ```
-
-2. Set env vars in `.env` file (use `.env.template` as reference)
-
-3. Test
-
-```sh
-npm t
+```
+  ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │                                                                                                       │
+  │                                                                                                       │
+  │                                    ┌──────────────────────────────┐                                   │
+  │                                    │ ChainlinkAndFallbacksOracle  │                                   │
+  │                                    └─────────────┬────────────────┘                                   │
+  │                                                  │                                                    │
+  │ periphery                                        │                                                    │
+  ├──────────────────────────────────────────────────┼────────────────────────────────────────────────────┤
+  │ core                                             │                                                    │
+  │                                                  │                                                    │
+  │                                                  │                                                    │
+  │                                      ┌───────────▼──────────────┐                                     │
+  │                                      │ PriceProvidersAggregator │                                     │
+  │                                      └─────────┬────────────────┘                                     │
+  │                                                │                                                      │
+  │              ┌──────────────────┬──────────────┼────────────────┬────────────┬─────────────────┐      │
+  │              │                  │              │                │            │                 │      │
+  │              │                  │              │                │            │                 │      │
+  │              │                  │              │                │            │                 │      │
+  │  ┌───────────▼────────────────┐ │   ┌──────────▼─────────────┐  │  ┌─────────▼─────────────┐   │      │
+  │  │ UniswapV2LikePriceProvider │ │   │ ChainlinkPriceProvider │  │  │ UmbrellaPriceProvider │   │      │
+  │  └────────────────────────────┘ │   └────────────────────────┘  │  └───────────────────────┘   │      │
+  │                                 │                               │                              │      │
+  │                                 │                               │                              │      │
+  │                       ┌─────────▼──────────────┐       ┌────────┴──────────┐    ┌─ ─ ─ ─ ─ ─ ─ ▼ ──┐  │
+  │                       │ UniswapV3PriceProvider │       │ FluxPriceProvider │    │ XYZPriceProvider │  │
+  │                       └────────────────────────┘       └───────────────────┘    └─ ─ ─ ─ ─ ─ ── ─ ─┘  │
+  │                                                                                                       │
+  │                                                                                                       │
+  └───────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Run test with coverage
+### Swapper
+
+```
+     ┌────────────────────────────────────────────────────────────────────────────┐
+     │                                                                            │
+     │          ┌───────────┐                                                     │
+     │          │  Swapper  ├─────────────────────────┐                           │
+     │          └─────┬─────┘                         │                           │
+     │                │                  ┌────────────┼───────────┐               │
+     │                │                  │            │           │               │
+     │                │                  │            │           │               │
+     │                │                  │            │           │               │
+     │                │      ┌───────────▼──────────┐ │ ┌─ ─ ─ ─ ─▼─ ─ ─ ─ ─┐     │
+     │                │      │ UniswapV2LikeExchange│ │ │ UniswapV3Exchange │     │
+     │                │      └──────────────────────┘ │ └─ ─ ─ ─ ─ ─ ─ ─ ─ ─┘     │
+     │                │       UniswapV2               │                           │
+     │                │       Sushiswap               │                           │
+     │                │       etc                     │                           │
+     │                │                               │                           │
+     │                │                         ┌─ ─ ─▼─ ─ ─ ─┐                   │
+     │                │                         │ XYZExchange │                   │
+     │                │                         └─ ─ ─ ─ ─ ─ ─┘                   │
+     │ Swapper        │                                                           │
+     ├────────────────┼───────────────────────────────────────────────────────────┤
+     │ OneOracle      │                                                           │
+     │               ┌▼────────────────────────────┐                              │
+     │               │ ChainlinkAndFallbacksOracle │                              │
+     │               └─────────────────────────────┘                              │
+     │                                                                            │
+     └────────────────────────────────────────────────────────────────────────────┘
+```
+
+## Install
+
+```sh
+npm i
+```
+
+## Setup
+
+Set env vars in `.env` file (use `.env.template` as reference)
+
+## Test
+
+This repo has tests against many EVM networks (e.g. mainnet, polygoin, arbitrum, etc), to run all of them, use:
+
+```sh
+npm run test:all
+```
+
+To run test related to an specific network, use:
+
+```sh
+npm run test:<network>
+```
+
+To run code coverage (all networks), use:
 
 ```sh
 npm run coverage
