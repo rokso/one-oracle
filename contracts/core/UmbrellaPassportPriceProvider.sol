@@ -106,7 +106,7 @@ contract UmbrellaPassportPriceProvider is IUmbrellaPassportPriceProvider, Umbrel
         override(IPriceProvider, UmbrellaPriceProvider)
         returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
     {
-        bytes32 _key = _toKey(token_);
+        bytes32 _key = keyOfToken[token_];
 
         (_priceInUsd, _lastUpdatedAt) = _chain().getCurrentValue(_key);
         PriceData memory _priceData = latestPriceOf[_key];
