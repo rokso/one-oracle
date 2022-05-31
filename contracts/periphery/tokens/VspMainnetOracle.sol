@@ -7,14 +7,15 @@ import "../../features/UsingProvidersAggregator.sol";
 import "../../features/UsingMaxDeviation.sol";
 import "../../features/UsingStableCoinProvider.sol";
 import "../../features/UsingStalePeriod.sol";
-import "../../interfaces/periphery/ITokenOracle.sol";
+import "../../interfaces/periphery/IVspOracle.sol";
+import "../../interfaces/core/IUniswapV2LikePriceProvider.sol";
 
 /**
  * @title Main oracle
  * @dev Reuses `PriceProvidersAggregator` and add support to USD quotes
  */
 contract VspMainnetOracle is
-    ITokenOracle,
+    IVspOracle,
     UsingProvidersAggregator,
     UsingMaxDeviation,
     UsingStableCoinProvider,
@@ -64,5 +65,19 @@ contract VspMainnetOracle is
         );
         require(_isDeviationOK(_priceInUsd, _priceInUsd1), "prices-deviation-too-high");
         _lastUpdatedAt = Math.min(_lastUpdatedAt, _lastUpdatedAt1);
+    }
+
+    /// @inheritdoc IVspOracle
+    function update() external {
+        IPriceProvidersAggregator _aggregator = providersAggregator;
+        address _stableCoin = stableCoinProvider.getStableCoinIfPegged();
+        IUniswapV2LikePriceProvider(address(_aggregator.priceProviders(DataTypes.Provider.UNISWAP_V2))).updateOrAdd(
+            VSP_ADDRESS,
+            _stableCoin
+        );
+        IUniswapV2LikePriceProvider(address(_aggregator.priceProviders(DataTypes.Provider.SUSHISWAP))).updateOrAdd(
+            VSP_ADDRESS,
+            _stableCoin
+        );
     }
 }
