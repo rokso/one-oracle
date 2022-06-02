@@ -16,10 +16,17 @@ contract UmbrellaPriceProvider is IUmbrellaPriceProvider, PriceProvider, Governa
     bytes32 private constant CHAIN = bytes32("Chain");
 
     /**
+     * @notice token => Umbrella's key mapping (e.g. WBTC => "BTC-USD")
+     */
+    mapping(address => bytes32) public keyOfToken;
+
+    /**
      * @notice Umbrella's Registry
      * @dev Stores the other Umbrella's contracts' addresses
      */
     IRegistry public immutable registry;
+
+    event KeyOfTokenUpdated(address indexed token, bytes32 oldKey, bytes32 newKey);
 
     constructor(IRegistry registry_) {
         require(address(registry_) != address(0), "registry-is-null");
@@ -34,9 +41,7 @@ contract UmbrellaPriceProvider is IUmbrellaPriceProvider, PriceProvider, Governa
         override(IPriceProvider, PriceProvider)
         returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
     {
-        bytes32 _key = _toKey(token_);
-
-        (_priceInUsd, _lastUpdatedAt) = _chain().getCurrentValue(_key);
+        (_priceInUsd, _lastUpdatedAt) = _chain().getCurrentValue(keyOfToken[token_]);
         require(_lastUpdatedAt > 0, "invalid-quote");
     }
 
@@ -53,24 +58,25 @@ contract UmbrellaPriceProvider is IUmbrellaPriceProvider, PriceProvider, Governa
      * but Umbrella expects left padded bytes as key
      * @dev See if there is a simpler way to do the same as this function
      */
-    function _toKey(address token_) internal view returns (bytes32) {
-        require(token_ != address(0), "invalid-token");
-        // Note: Assuming that the symbol is a upper case string
-        // If need to handle tokens where it isn't true, we can use a function like this
-        // https://gist.github.com/kepler-296e/f9196a8d4cb94e833302c464479e5b65
-        string memory _base = IERC20Metadata(token_).symbol();
-        bytes32 _baseHash = keccak256(abi.encodePacked(_base));
-        if (_baseHash == keccak256("WBTC")) _base = "BTC";
-        else if (_baseHash == keccak256("WETH")) _base = "ETH";
-
-        bytes memory bytes_ = abi.encodePacked(_base, "-USD");
-
+    function _toKey(bytes memory quotePairAsBytes_) private pure returns (bytes32) {
         bytes memory _aux = new bytes(32);
-        uint256 _len = bytes_.length;
+        uint256 _len = quotePairAsBytes_.length;
         for (uint256 i; i < _len; ++i) {
             uint256 _idx = 32 - _len + i;
-            _aux[_idx] = bytes_[i];
+            _aux[_idx] = quotePairAsBytes_[i];
         }
         return bytes32(_aux);
+    }
+
+    /**
+     * @notice Update Umbrella's key of a token
+     * Use `BASE-QUOTE` format (e.g. BTC-USD, ETH-USD, etc)
+     */
+    function updateKeyOfToken(address token_, string memory quotePair_) external onlyGovernor {
+        require(token_ != address(0), "address-is-null");
+        bytes32 _currentKey = keyOfToken[token_];
+        bytes32 _newKey = _toKey(bytes(quotePair_));
+        keyOfToken[token_] = _newKey;
+        emit KeyOfTokenUpdated(token_, _currentKey, _newKey);
     }
 }

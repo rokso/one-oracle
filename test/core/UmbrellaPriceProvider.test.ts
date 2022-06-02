@@ -5,8 +5,9 @@ import {ethers} from 'hardhat'
 import {UmbrellaPriceProvider, UmbrellaPriceProvider__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther} from '../helpers'
+import {encodeKey} from '../helpers/umbrella'
 
-const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS, CDAI_ADDRESS, UMBRELLA_REGISTRY} = Address.mainnet
+const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS, CDAI_ADDRESS, UMB_ADDRESS, UMBRELLA_REGISTRY} = Address.mainnet
 
 describe('UmbrellaPriceProvider @mainnet', function () {
   let snapshotId: string
@@ -23,6 +24,10 @@ describe('UmbrellaPriceProvider @mainnet', function () {
     await priceProvider.deployed()
     await priceProvider.transferGovernorship(governor.address)
     await priceProvider.connect(governor).acceptGovernorship()
+
+    await priceProvider.connect(governor).updateKeyOfToken(WETH_ADDRESS, 'ETH-USD')
+    await priceProvider.connect(governor).updateKeyOfToken(WBTC_ADDRESS, 'BTC-USD')
+    await priceProvider.connect(governor).updateKeyOfToken(DAI_ADDRESS, 'DAI-USD')
   })
 
   afterEach(async function () {
@@ -30,11 +35,6 @@ describe('UmbrellaPriceProvider @mainnet', function () {
   })
 
   describe('getPriceInUsd', function () {
-    it('should revert if token is invalid', async function () {
-      const tx = priceProvider.quote(WETH_ADDRESS, ethers.constants.AddressZero, parseEther('1'))
-      await expect(tx).revertedWith('invalid-token')
-    })
-
     it('should WETH price', async function () {
       const {_priceInUsd} = await priceProvider.getPriceInUsd(WETH_ADDRESS)
       expect(_priceInUsd).closeTo(parseEther('3,231'), parseEther('1'))
@@ -53,6 +53,31 @@ describe('UmbrellaPriceProvider @mainnet', function () {
     it('should revert if token is not supported', async function () {
       const tx = priceProvider.getPriceInUsd(CDAI_ADDRESS)
       await expect(tx).revertedWith('invalid-quote')
+    })
+  })
+
+  describe('updateKeyOfToken', function () {
+    it('should revert if not governor', async function () {
+      const tx = priceProvider.updateKeyOfToken(WBTC_ADDRESS, 'BTC-USD')
+      await expect(tx).revertedWith('not-governor')
+    })
+
+    it('should revert if token is null', async function () {
+      const tx = priceProvider.connect(governor).updateKeyOfToken(ethers.constants.AddressZero, 'BTC-USD')
+      await expect(tx).revertedWith('address-is-null')
+    })
+
+    it('should update key', async function () {
+      // given
+      const before = await priceProvider.keyOfToken(UMB_ADDRESS)
+      expect(before).eq(ethers.utils.formatBytes32String(''))
+
+      // when
+      await priceProvider.connect(governor).updateKeyOfToken(UMB_ADDRESS, 'UMB-USD')
+
+      // then
+      const after = await priceProvider.keyOfToken(UMB_ADDRESS)
+      expect(after).eq(encodeKey('UMB-USD'))
     })
   })
 })

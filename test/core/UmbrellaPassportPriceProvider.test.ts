@@ -12,18 +12,14 @@ import {
 import Address from '../../helpers/address'
 import {HOUR, impersonateAccount, MINUTE, parseEther} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
-import {LeafKeyCoder, ABI, LeafValueCoder} from '@umb-network/toolbox'
+import {ABI} from '@umb-network/toolbox'
 import {Contract} from 'ethers'
+import {encodeKeys, encodeKey, encodeValue} from '../helpers/umbrella'
 
 const {UMBRELLA_REGISTRY, UMB_ADDRESS, WETH_ADDRESS, USDC_ADDRESS} = Address.bsc
 
 const HEARTBEAT_TIMESTAMP = HOUR.mul(24)
 const DEVIATION_THRESHOLD = parseEther('0.01') // 1%
-
-// Umbrella's utils
-const encodeKey = (quote: string) => `0x${LeafKeyCoder.encode(quote).toString('hex')}`
-const encodeKeys = (quotes: string[]) => quotes.map(encodeKey)
-const encodeValue = (n: number) => LeafValueCoder.encode(n, '')
 
 // Note: Passport service is only available on BSC right now
 describe('UmbrellaPassportPriceProvider @bsc', function () {
@@ -31,7 +27,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
   let deployer: SignerWithAddress
   let governor: SignerWithAddress
   let funder: SignerWithAddress
-  let datumReceiver: UmbrellaPassportPriceProvider
+  let priceProvider: UmbrellaPassportPriceProvider
   let datumRegistry: Contract
   let datumRegistryWallet: SignerWithAddress
   let chain: Contract
@@ -47,10 +43,10 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
     await adjustBalance(UMB_ADDRESS, funder.address, parseEther('1,000,000'))
 
     const datumReceiverFactory = new UmbrellaPassportPriceProvider__factory(deployer)
-    datumReceiver = await datumReceiverFactory.deploy(UMBRELLA_REGISTRY, HEARTBEAT_TIMESTAMP, DEVIATION_THRESHOLD)
-    await datumReceiver.deployed()
-    await datumReceiver.transferGovernorship(governor.address)
-    await datumReceiver.connect(governor).acceptGovernorship()
+    priceProvider = await datumReceiverFactory.deploy(UMBRELLA_REGISTRY, HEARTBEAT_TIMESTAMP, DEVIATION_THRESHOLD)
+    await priceProvider.deployed()
+    await priceProvider.transferGovernorship(governor.address)
+    await priceProvider.connect(governor).acceptGovernorship()
 
     const umbrellaRegistry = IRegistry__factory.connect(UMBRELLA_REGISTRY, deployer)
     const datumRegistryAddress = await umbrellaRegistry.getAddressByString('DatumRegistry')
@@ -64,7 +60,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
     // Register DatumReceiver
     const depositAmount = parseEther('100')
     await umb.approve(datumRegistry.address, ethers.constants.MaxUint256)
-    await datumRegistry.create(datumReceiver.address, funder.address, encodedKeys, depositAmount)
+    await datumRegistry.create(priceProvider.address, funder.address, encodedKeys, depositAmount)
   })
 
   afterEach(async function () {
@@ -74,27 +70,27 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
   describe('should perform administrative functions', function () {
     it('should manage balance', async function () {
       // given
-      const balanceBefore = await datumRegistry.getBalance(datumReceiver.address, funder.address)
+      const balanceBefore = await datumRegistry.getBalance(priceProvider.address, funder.address)
 
       // when
-      await datumRegistry.deposit(datumReceiver.address, balanceBefore)
-      await datumRegistry.withdraw(datumReceiver.address, balanceBefore)
+      await datumRegistry.deposit(priceProvider.address, balanceBefore)
+      await datumRegistry.withdraw(priceProvider.address, balanceBefore)
 
       // then
-      const balanceAfter = await datumRegistry.getBalance(datumReceiver.address, funder.address)
+      const balanceAfter = await datumRegistry.getBalance(priceProvider.address, funder.address)
       expect(balanceAfter).eq(balanceBefore)
     })
 
     it('should manage keys', async function () {
       // given
-      const datumId = await datumRegistry.resolveId(datumReceiver.address, funder.address)
+      const datumId = await datumRegistry.resolveId(priceProvider.address, funder.address)
       const [[, keysBefore, , ,]] = await datumRegistry.getManyDatums([datumId])
       expect(keysBefore).deep.eq(encodedKeys)
 
       // when
       const keysToAdd = encodeKeys(['DAI-USD', 'USDC-USD'])
-      await datumRegistry.addKeys(datumReceiver.address, keysToAdd)
-      await datumRegistry.removeKeys(datumReceiver.address, keysToAdd)
+      await datumRegistry.addKeys(priceProvider.address, keysToAdd)
+      await datumRegistry.removeKeys(priceProvider.address, keysToAdd)
 
       // then
       const [[, keysAfter, , ,]] = await datumRegistry.getManyDatums([datumId])
@@ -109,11 +105,11 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
     let lastUpdatedAt: number
 
     beforeEach(async function () {
-      await datumReceiver.connect(governor).updateHeartbeatTimestamp(heartbeat)
+      await priceProvider.connect(governor).updateHeartbeatTimestamp(heartbeat)
 
       const blockId = (await chain.getLatestBlockId()) - 5 // ~5 min before the latest block
       const block = await chain.blocks(blockId)
-      await datumReceiver
+      await priceProvider
         .connect(datumRegistryWallet)
         .receivePallet({blockId, key, value: encodeValue(currentPrice), proof: []})
 
@@ -128,7 +124,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
       const value = encodeValue(currentPrice * 2)
 
       // when-then
-      expect(await datumReceiver.approvePallet({blockId, key, value, proof: []})).eq(true)
+      expect(await priceProvider.approvePallet({blockId, key, value, proof: []})).eq(true)
     })
 
     it('should return true if did reach heartbeat and did not reach deviation', async function () {
@@ -139,7 +135,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
       const value = encodeValue(currentPrice)
 
       // when-then
-      expect(await datumReceiver.approvePallet({blockId, key, value, proof: []})).eq(true)
+      expect(await priceProvider.approvePallet({blockId, key, value, proof: []})).eq(true)
     })
 
     it('should return true if did not reach heartbeat and did reach deviation', async function () {
@@ -150,7 +146,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
       const value = encodeValue(currentPrice * 2)
 
       // when-then
-      expect(await datumReceiver.approvePallet({blockId, key, value, proof: []})).eq(true)
+      expect(await priceProvider.approvePallet({blockId, key, value, proof: []})).eq(true)
     })
 
     it('should revert if did not reach heartbeat nor deviation', async function () {
@@ -161,7 +157,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
       const value = encodeValue(currentPrice)
 
       // when-then
-      await expect(datumReceiver.approvePallet({blockId, key, value, proof: []})).revertedWith(
+      await expect(priceProvider.approvePallet({blockId, key, value, proof: []})).revertedWith(
         'did-not-match-conditions'
       )
     })
@@ -169,7 +165,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
 
   describe('receivePallet', function () {
     beforeEach(async function () {
-      datumReceiver = datumReceiver.connect(datumRegistryWallet)
+      priceProvider = priceProvider.connect(datumRegistryWallet)
     })
 
     it('should revert if sender is not datum registry', async function () {
@@ -177,7 +173,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
       const blockId = await chain.getLatestBlockId()
       const key = encodeKey('BTC-USD')
       const value = encodeValue(32023.23)
-      const tx = datumReceiver.connect(deployer).receivePallet({blockId, key, value, proof: []})
+      const tx = priceProvider.connect(deployer).receivePallet({blockId, key, value, proof: []})
 
       // then
       await expect(tx).revertedWith('not-datum-registry')
@@ -188,10 +184,10 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
       const blockId = await chain.getLatestBlockId()
       const key = encodeKey('BTC-USD')
       const value = encodeValue(32023.23)
-      await datumReceiver.receivePallet({blockId, key, value, proof: []})
+      await priceProvider.receivePallet({blockId, key, value, proof: []})
 
       // when
-      const tx = datumReceiver.receivePallet({blockId, key, value, proof: []})
+      const tx = priceProvider.receivePallet({blockId, key, value, proof: []})
 
       // then
       await expect(tx).revertedWith('update-already-received')
@@ -205,12 +201,12 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
       const latestBlock = await chain.blocks(blockId)
 
       // when
-      await datumReceiver.receivePallet({blockId, key: keyBTC, value: encodeValue(32023.23), proof: []})
-      await datumReceiver.receivePallet({blockId, key: keyETH, value: encodeValue(2431.41), proof: []})
+      await priceProvider.receivePallet({blockId, key: keyBTC, value: encodeValue(32023.23), proof: []})
+      await priceProvider.receivePallet({blockId, key: keyETH, value: encodeValue(2431.41), proof: []})
 
       // then
-      const btc = await datumReceiver.latestPriceOf(keyBTC)
-      const eth = await datumReceiver.latestPriceOf(keyETH)
+      const btc = await priceProvider.latestPriceOf(keyBTC)
+      const eth = await priceProvider.latestPriceOf(keyETH)
       expect(btc.priceInUsd).eq(parseEther('32,023.23'))
       expect(eth.priceInUsd).eq(parseEther('2,431.41'))
       expect(btc.lastUpdatedAt).eq(eth.lastUpdatedAt).eq(latestBlock.dataTimestamp)
@@ -219,17 +215,17 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
     it('should receive price from datum registry', async function () {
       // given
       const key = encodeKey('BTC-USD')
-      const before = await datumReceiver.latestPriceOf(key)
+      const before = await priceProvider.latestPriceOf(key)
       expect(before.priceInUsd).eq(0)
       expect(before.lastUpdatedAt).eq(0)
 
       // when
       const blockId = await chain.getLatestBlockId()
       const latestBlock = await chain.blocks(blockId)
-      await datumReceiver.receivePallet({blockId, key, value: encodeValue(32023.23), proof: []})
+      await priceProvider.receivePallet({blockId, key, value: encodeValue(32023.23), proof: []})
 
       // then
-      const {priceInUsd, lastUpdatedAt} = await datumReceiver.latestPriceOf(key)
+      const {priceInUsd, lastUpdatedAt} = await priceProvider.latestPriceOf(key)
       expect(priceInUsd).eq(parseEther('32,023.23'))
       expect(lastUpdatedAt).eq(latestBlock.dataTimestamp)
     })
@@ -238,7 +234,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
   describe('updateHeartbeatTimestamp', function () {
     it('should revert if sender is not governor', async function () {
       // when
-      const tx = datumReceiver.updateHeartbeatTimestamp(123)
+      const tx = priceProvider.updateHeartbeatTimestamp(123)
 
       // then
       await expect(tx).revertedWith('not-governor')
@@ -246,15 +242,15 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
 
     it('should update heartbeat', async function () {
       // given
-      const {heartbeatTimestamp: before} = await datumReceiver.updatePolicy()
+      const {heartbeatTimestamp: before} = await priceProvider.updatePolicy()
 
       // when
       const after = before.mul('2')
       expect(after).not.eq(before)
-      await datumReceiver.connect(governor).updateHeartbeatTimestamp(after)
+      await priceProvider.connect(governor).updateHeartbeatTimestamp(after)
 
       // then
-      const {heartbeatTimestamp} = await datumReceiver.updatePolicy()
+      const {heartbeatTimestamp} = await priceProvider.updatePolicy()
       expect(heartbeatTimestamp).eq(after)
     })
   })
@@ -262,7 +258,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
   describe('updateDeviationThreshold', function () {
     it('should revert if sender is not governor', async function () {
       // when
-      const tx = datumReceiver.updateDeviationThreshold(123)
+      const tx = priceProvider.updateDeviationThreshold(123)
 
       // then
       await expect(tx).revertedWith('not-governor')
@@ -270,29 +266,33 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
 
     it('should update deviation threshold', async function () {
       // given
-      const {deviationThreshold: before} = await datumReceiver.updatePolicy()
+      const {deviationThreshold: before} = await priceProvider.updatePolicy()
 
       // when
       const after = before.mul('2')
       expect(after).not.eq(before)
-      await datumReceiver.connect(governor).updateDeviationThreshold(after)
+      await priceProvider.connect(governor).updateDeviationThreshold(after)
 
       // then
-      const {deviationThreshold} = await datumReceiver.updatePolicy()
+      const {deviationThreshold} = await priceProvider.updatePolicy()
       expect(deviationThreshold).eq(after)
     })
   })
 
   describe('getPriceInUsd', function () {
+    beforeEach(async function () {
+      await priceProvider.connect(governor).updateKeyOfToken(WETH_ADDRESS, 'ETH-USD')
+    })
+
     it('should get price from Chain if it is the latest ', async function () {
       // when
       const key = encodeKey('ETH-USD')
-      const {priceInUsd: priceInUsd0, lastUpdatedAt: lastUpdatedAt0} = await datumReceiver.latestPriceOf(key)
+      const {priceInUsd: priceInUsd0, lastUpdatedAt: lastUpdatedAt0} = await priceProvider.latestPriceOf(key)
       expect(lastUpdatedAt0).eq(0)
       expect(priceInUsd0).eq(0)
 
       // then
-      const {_priceInUsd: priceInUsd1, _lastUpdatedAt: lastUpdatedAt1} = await datumReceiver.getPriceInUsd(WETH_ADDRESS)
+      const {_priceInUsd: priceInUsd1, _lastUpdatedAt: lastUpdatedAt1} = await priceProvider.getPriceInUsd(WETH_ADDRESS)
 
       // then
       expect(lastUpdatedAt1).gt(0)
@@ -301,18 +301,18 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
 
     it('should get price from Passport if it is the latest ', async function () {
       // given
-      const {_lastUpdatedAt: lastUpdatedAtFromChain} = await datumReceiver.getPriceInUsd(WETH_ADDRESS)
+      const {_lastUpdatedAt: lastUpdatedAtFromChain} = await priceProvider.getPriceInUsd(WETH_ADDRESS)
       const key = encodeKey('ETH-USD')
       const blockId = await chain.getLatestBlockId()
       const latestBlock = await chain.blocks(blockId)
-      await datumReceiver
+      await priceProvider
         .connect(datumRegistryWallet)
         .receivePallet({blockId, key, value: encodeValue(2431.41), proof: []})
-      const {lastUpdatedAt: lastUpdatedAtFromPassport} = await datumReceiver.latestPriceOf(key)
+      const {lastUpdatedAt: lastUpdatedAtFromPassport} = await priceProvider.latestPriceOf(key)
       expect(lastUpdatedAtFromPassport).gte(lastUpdatedAtFromChain)
 
       // then
-      const {_priceInUsd: priceInUsd, _lastUpdatedAt: lastUpdatedAt} = await datumReceiver.getPriceInUsd(WETH_ADDRESS)
+      const {_priceInUsd: priceInUsd, _lastUpdatedAt: lastUpdatedAt} = await priceProvider.getPriceInUsd(WETH_ADDRESS)
 
       // then
       expect(lastUpdatedAt).eq(latestBlock.dataTimestamp)
@@ -322,12 +322,12 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
     it('should revert if did not find price for the token', async function () {
       // when
       const key = encodeKey('USDC-USD')
-      const {priceInUsd: priceInUsd0, lastUpdatedAt: lastUpdatedAt0} = await datumReceiver.latestPriceOf(key)
+      const {priceInUsd: priceInUsd0, lastUpdatedAt: lastUpdatedAt0} = await priceProvider.latestPriceOf(key)
       expect(lastUpdatedAt0).eq(0)
       expect(priceInUsd0).eq(0)
 
       // then
-      const tx = datumReceiver.getPriceInUsd(USDC_ADDRESS)
+      const tx = priceProvider.getPriceInUsd(USDC_ADDRESS)
 
       // then
       await expect(tx).revertedWith('invalid-quote')
