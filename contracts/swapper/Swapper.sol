@@ -46,6 +46,25 @@ contract Swapper is ISwapper, Governable {
     /// @notice Emitted when the max slippage is updated
     event MaxSlippageUpdated(uint256 oldMaxSlippage, uint256 newMaxSlippage);
 
+    event SwapExactInput(
+        IExchange indexed exchange,
+        address[] path,
+        address indexed tokenIn,
+        address indexed tokenOut,
+        uint256 amountIn,
+        uint256 amountOut
+    );
+
+    event SwapExactOutput(
+        IExchange indexed exchange,
+        address[] path,
+        address indexed tokenIn,
+        address indexed tokenOut,
+        uint256 amountInMax,
+        uint256 amountIn,
+        uint256 amountOut
+    );
+
     constructor(IOracle oracle_, uint256 maxSlippage_) {
         require(address(oracle_) != address(0), "oracle-is-null");
         oracle = oracle_;
@@ -146,7 +165,8 @@ contract Swapper is ISwapper, Governable {
             amountIn_
         );
         IERC20(tokenIn_).safeTransferFrom(_msgSender(), address(_exchange), amountIn_);
-        return _exchange.swapExactInput(_path, amountIn_, _amountOutMin, receiver_);
+        _amountOut = _exchange.swapExactInput(_path, amountIn_, _amountOutMin, receiver_);
+        emit SwapExactInput(_exchange, _path, tokenIn_, tokenOut_, amountIn_, _amountOut);
     }
 
     /// @inheritdoc ISwapper
@@ -163,7 +183,8 @@ contract Swapper is ISwapper, Governable {
         );
         address _caller = _msgSender();
         IERC20(tokenIn_).safeTransferFrom(_caller, address(_exchange), _amountInMax);
-        return _exchange.swapExactOutput(_path, amountOut_, _amountInMax, _caller, receiver_);
+        _amountIn = _exchange.swapExactOutput(_path, amountOut_, _amountInMax, _caller, receiver_);
+        emit SwapExactOutput(_exchange, _path, tokenIn_, tokenOut_, _amountInMax, _amountIn, amountOut_);
     }
 
     /**

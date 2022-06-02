@@ -5,6 +5,8 @@ import {ethers} from 'hardhat'
 import {
   UniswapV2LikeExchange,
   UniswapV2LikeExchange__factory,
+  UniswapV3Exchange,
+  UniswapV3Exchange__factory,
   Swapper,
   Swapper__factory,
   IERC20,
@@ -44,6 +46,7 @@ describe('Swapper @mainnet', function () {
   let invalidToken: SignerWithAddress
   let uniswapV2Exchange: UniswapV2LikeExchange
   let sushiswapExchange: UniswapV2LikeExchange
+  let uniswapV3Exchange: UniswapV3Exchange
   let chainlinkAndFallbacksOracleFake: FakeContract
   let swapper: Swapper
   let weth: IERC20
@@ -64,6 +67,10 @@ describe('Swapper @mainnet', function () {
     sushiswapExchange = await uniswapV2LikeExchangeFactory.deploy(SUSHISWAP_ROUTER_ADDRESS, WETH_ADDRESS)
     await sushiswapExchange.deployed()
 
+    const uniswapV3ExchangeFactory = new UniswapV3Exchange__factory(deployer)
+    uniswapV3Exchange = await uniswapV3ExchangeFactory.deploy(WETH_ADDRESS)
+    await uniswapV3Exchange.deployed()
+
     chainlinkAndFallbacksOracleFake = await smock.fake('ChainlinkAndFallbacksOracle')
 
     const swapperFactory = new Swapper__factory(deployer)
@@ -72,6 +79,7 @@ describe('Swapper @mainnet', function () {
 
     await swapper.addExchange(uniswapV2Exchange.address)
     await swapper.addExchange(sushiswapExchange.address)
+    await swapper.addExchange(uniswapV3Exchange.address)
 
     weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
     dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
@@ -157,7 +165,7 @@ describe('Swapper @mainnet', function () {
       await swapper.updateOracle(chainlinkAndFallbacksOracle.address)
     })
 
-    describe('worst case - non-chainlink token + 3 length path', function () {
+    describe('worst case: 3 exchanges + non-chainlink token + 3 length path', function () {
       it('swapExactInput', async function () {
         const amountIn = parseUnits('1', 8)
         const {_path} = await swapper.getBestAmountOut(WBTC_ADDRESS, BTT_ADDRESS, amountIn)
@@ -166,7 +174,7 @@ describe('Swapper @mainnet', function () {
         await wbtc.approve(swapper.address, amountIn)
         const tx = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('348000', 1000)
+        expect(receipt.gasUsed).closeTo('396000', 1000)
       })
 
       it('swapExactOutput', async function () {
@@ -177,11 +185,15 @@ describe('Swapper @mainnet', function () {
         await btt.approve(swapper.address, _amountIn.mul('10'))
         const tx = await swapper.swapExactOutput(BTT_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('381000', 1000)
+        expect(receipt.gasUsed).closeTo('421000', 1000)
       })
     })
 
-    describe('best case - chainlink tokens + 2 length path', function () {
+    describe('best case: 2 exchanges + chainlink tokens + 2 length path', function () {
+      beforeEach(async function () {
+        await swapper.removeExchange(uniswapV3Exchange.address)
+      })
+
       it('swapExactInput', async function () {
         const amountIn = parseUnits('1', 8)
         const {_path} = await swapper.getBestAmountOut(WBTC_ADDRESS, WETH_ADDRESS, amountIn)
@@ -190,7 +202,7 @@ describe('Swapper @mainnet', function () {
         await wbtc.approve(swapper.address, amountIn)
         const tx = await swapper.swapExactInput(WBTC_ADDRESS, WETH_ADDRESS, amountIn, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('234000', 1000)
+        expect(receipt.gasUsed).closeTo('238000', 1000)
       })
 
       it('swapExactOutput', async function () {
@@ -201,7 +213,7 @@ describe('Swapper @mainnet', function () {
         await weth.approve(swapper.address, _amountIn.mul('10'))
         const tx = await swapper.swapExactOutput(WETH_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('264000', 1000)
+        expect(receipt.gasUsed).closeTo('267000', 1000)
       })
     })
   })
@@ -259,12 +271,13 @@ describe('Swapper @mainnet', function () {
       // given
       const amountOut = parseEther('43,221')
       const {_amountIn: amountInA} = await uniswapV2Exchange.getBestAmountIn(WBTC_ADDRESS, DAI_ADDRESS, amountOut)
-      const {_amountIn: bestAmountIn, _path: bestPath} = await sushiswapExchange.getBestAmountIn(
+      const {_amountIn: amountInB} = await sushiswapExchange.getBestAmountIn(WBTC_ADDRESS, DAI_ADDRESS, amountOut)
+      const {_amountIn: bestAmountIn, _path: bestPath} = await uniswapV3Exchange.getBestAmountIn(
         WBTC_ADDRESS,
         DAI_ADDRESS,
         amountOut
       )
-      expect(bestAmountIn).lt(amountInA)
+      expect(bestAmountIn).lt(amountInB).lt(amountInA)
       expect(bestAmountIn).closeTo(parseUnits('1', 8), parseUnits('0.1', 8))
 
       // when
@@ -329,13 +342,15 @@ describe('Swapper @mainnet', function () {
       // given
       const amountIn = parseUnits('1', 8)
       const {_amountOut: amountOutA} = await uniswapV2Exchange.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
-      const {_amountOut: bestAmountOut, _path: bestPath} = await sushiswapExchange.getBestAmountOut(
+      const {_amountOut: amountOutB} = await sushiswapExchange.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
+      const {_amountOut: bestAmountOut, _path: bestPath} = await uniswapV3Exchange.getBestAmountOut(
         WBTC_ADDRESS,
         DAI_ADDRESS,
         amountIn
       )
-      expect(bestAmountOut).gt(amountOutA)
-      expect(bestAmountOut).closeTo(parseEther('43,432'), parseEther('1'))
+
+      expect(bestAmountOut).gt(amountOutB).gt(amountOutA)
+      expect(bestAmountOut).closeTo(parseEther('43,521'), parseEther('1'))
 
       // when
       const {_amountOut, _path} = await swapper.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
@@ -412,8 +427,10 @@ describe('Swapper @mainnet', function () {
       // then
       const usdcAfter = await usdc.balanceOf(deployer.address)
       const wbtcAfter = await wbtc.balanceOf(deployer.address)
-      expect(usdcAfter).eq(usdcBefore.sub(_amountIn)) // no slippage scenario
-      expect(wbtcAfter).eq(wbtcBefore.add(amountOut))
+      const actualAmountIn = usdcBefore.sub(usdcAfter)
+      const actualAmountOut = wbtcAfter.sub(wbtcBefore)
+      expect(actualAmountIn).closeTo(_amountIn, parseUnits('50', 6))
+      expect(actualAmountOut).eq(amountOut)
     })
 
     it('should return remaining if any', async function () {
@@ -432,8 +449,10 @@ describe('Swapper @mainnet', function () {
       // then
       const usdcAfter = await usdc.balanceOf(deployer.address)
       const wbtcAfter = await wbtc.balanceOf(deployer.address)
-      expect(usdcAfter).eq(usdcBefore.sub(_amountIn)) // no slippage scenario
-      expect(wbtcAfter).eq(wbtcBefore.add(amountOut))
+      const actualAmountIn = usdcBefore.sub(usdcAfter)
+      const actualAmountOut = wbtcAfter.sub(wbtcBefore)
+      expect(actualAmountIn).closeTo(_amountIn, parseUnits('50', 6))
+      expect(actualAmountOut).eq(amountOut)
     })
   })
 })
