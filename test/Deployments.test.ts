@@ -51,6 +51,8 @@ describe('Deployments ', function () {
       priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
       synthOracle = SynthOracle__factory.connect(SynthOracle.address, deployer)
 
+      await umbrellaPriceProvider.updateKeyOfToken(WETH_ADDRESS, 'ETH-USD')
+
       const ERC20MockFactory = new ERC20Mock__factory(deployer)
       vsETH = await ERC20MockFactory.deploy('vsETH', 'vsETH')
       await synthOracle.addOrUpdateAsset(vsETH.address, WETH_ADDRESS)
