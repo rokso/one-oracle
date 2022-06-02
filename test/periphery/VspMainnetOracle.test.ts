@@ -3,9 +3,9 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {VspMainnetOracle, VspMainnetOracle__factory} from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Address, Provider} from '../../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
-import {parseEther, timestampFromLatestBlock, Provider, HOUR, parseUnits} from '../helpers'
+import {parseEther, timestampFromLatestBlock, HOUR, parseUnits} from '../helpers'
 import {BigNumber} from 'ethers'
 
 const STALE_PERIOD = HOUR
@@ -13,7 +13,7 @@ const MAX_DEVIATION = parseEther('0.1') // 10%
 
 const VSP_ADDRESS = '0x1b40183EFB4Dd766f11bDa7A7c3AD8982e998421'
 
-const {DAI_ADDRESS, USDC_ADDRESS} = Address.mainnet
+const {DAI_ADDRESS} = Address.mainnet
 
 describe('VspMainnetOracle @mainnet', function () {
   let snapshotId: string

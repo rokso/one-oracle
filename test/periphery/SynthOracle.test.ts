@@ -12,8 +12,8 @@ import {
   PriceProvidersAggregator,
   PriceProvidersAggregator__factory,
 } from '../../typechain-types'
-import Address from '../../helpers/address'
-import {toUSD, HOUR, Provider, parseEther, parseUnits} from '../helpers'
+import {Address, Provider} from '../../helpers'
+import {toUSD, HOUR, parseEther, parseUnits} from '../helpers'
 
 const STALE_PERIOD = HOUR
 const MAX_DEVIATION = parseEther('0.1') // 10%
