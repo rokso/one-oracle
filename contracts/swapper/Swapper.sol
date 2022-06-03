@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../access/Governable.sol";
 import "../interfaces/swapper/ISwapper.sol";
 import "../interfaces/swapper/IExchange.sol";
+import "../libraries/DataTypes.sol";
 
 /**
  * @notice Swapper contract
@@ -48,7 +49,7 @@ contract Swapper is ISwapper, Governable {
 
     event SwapExactInput(
         IExchange indexed exchange,
-        address[] path,
+        bytes path,
         address indexed tokenIn,
         address indexed tokenOut,
         uint256 amountIn,
@@ -57,7 +58,7 @@ contract Swapper is ISwapper, Governable {
 
     event SwapExactOutput(
         IExchange indexed exchange,
-        address[] path,
+        bytes path,
         address indexed tokenIn,
         address indexed tokenOut,
         uint256 amountInMax,
@@ -78,25 +79,19 @@ contract Swapper is ISwapper, Governable {
         uint256 amountOut_
     )
         public
-        view
         returns (
             uint256 _amountIn,
             uint256 _amountInMax,
             IExchange _exchange,
-            address[] memory _path
+            bytes memory _path
         )
     {
-        _exchange = IExchange(exchanges.at(0));
-        (_amountIn, _path) = _getBestAmountIn(_exchange, tokenIn_, tokenOut_, amountOut_);
+        _amountIn = type(uint256).max;
+
         uint256 _len = exchanges.length();
-        for (uint256 i = 1; i < _len; ++i) {
+        for (uint256 i = 0; i < _len; ++i) {
             IExchange _iExchange = IExchange(exchanges.at(i));
-            (uint256 _iAmountIn, address[] memory _iPath) = _getBestAmountIn(
-                _iExchange,
-                tokenIn_,
-                tokenOut_,
-                amountOut_
-            );
+            (uint256 _iAmountIn, bytes memory _iPath) = _getBestAmountIn(_iExchange, tokenIn_, tokenOut_, amountOut_);
             if (_iAmountIn > 0 && _iAmountIn < _amountIn) {
                 _amountIn = _iAmountIn;
                 _exchange = _iExchange;
@@ -105,8 +100,7 @@ contract Swapper is ISwapper, Governable {
         }
         require(_path.length > 0, "no-path-found");
 
-        uint256 _amountInFromOracle = oracle.quote(tokenOut_, tokenIn_, amountOut_);
-        _amountInMax = (_amountInFromOracle * (1e18 + maxSlippage)) / 1e18;
+        _amountInMax = (oracle.quote(tokenOut_, tokenIn_, amountOut_) * (1e18 + maxSlippage)) / 1e18;
     }
 
     /// @inheritdoc ISwapper
@@ -116,25 +110,19 @@ contract Swapper is ISwapper, Governable {
         uint256 amountIn_
     )
         public
-        view
         returns (
             uint256 _amountOut,
             uint256 _amountOutMin,
             IExchange _exchange,
-            address[] memory _path
+            bytes memory _path
         )
     {
-        _exchange = IExchange(exchanges.at(0));
-        (_amountOut, _path) = _getBestAmountOut(_exchange, tokenIn_, tokenOut_, amountIn_);
+        _amountOut = 0;
+
         uint256 _len = exchanges.length();
-        for (uint256 i = 1; i < _len; ++i) {
+        for (uint256 i = 0; i < _len; ++i) {
             IExchange _iExchange = IExchange(exchanges.at(i));
-            (uint256 _iAmountOut, address[] memory _iPath) = _getBestAmountOut(
-                _iExchange,
-                tokenIn_,
-                tokenOut_,
-                amountIn_
-            );
+            (uint256 _iAmountOut, bytes memory _iPath) = _getBestAmountOut(_iExchange, tokenIn_, tokenOut_, amountIn_);
             if (_iAmountOut > _amountOut) {
                 _amountOut = _iAmountOut;
                 _exchange = _iExchange;
@@ -143,8 +131,7 @@ contract Swapper is ISwapper, Governable {
         }
         require(_path.length > 0, "no-path-found");
 
-        uint256 _amountOutFromOracle = oracle.quote(tokenIn_, tokenOut_, amountIn_);
-        _amountOutMin = (_amountOutFromOracle * (1e18 - maxSlippage)) / 1e18;
+        _amountOutMin = (oracle.quote(tokenIn_, tokenOut_, amountIn_) * (1e18 - maxSlippage)) / 1e18;
     }
 
     /// @inheritdoc ISwapper
@@ -159,7 +146,7 @@ contract Swapper is ISwapper, Governable {
         uint256 amountIn_,
         address receiver_
     ) external returns (uint256 _amountOut) {
-        (, uint256 _amountOutMin, IExchange _exchange, address[] memory _path) = getBestAmountOut(
+        (, uint256 _amountOutMin, IExchange _exchange, bytes memory _path) = getBestAmountOut(
             tokenIn_,
             tokenOut_,
             amountIn_
@@ -176,7 +163,7 @@ contract Swapper is ISwapper, Governable {
         uint256 amountOut_,
         address receiver_
     ) external returns (uint256 _amountIn) {
-        (, uint256 _amountInMax, IExchange _exchange, address[] memory _path) = getBestAmountIn(
+        (, uint256 _amountInMax, IExchange _exchange, bytes memory _path) = getBestAmountIn(
             tokenIn_,
             tokenOut_,
             amountOut_
@@ -196,10 +183,10 @@ contract Swapper is ISwapper, Governable {
         address tokenIn_,
         address tokenOut_,
         uint256 amountOut_
-    ) private view returns (uint256 _amountIn, address[] memory _path) {
+    ) private returns (uint256 _amountIn, bytes memory _path) {
         try exchange_.getBestAmountIn(tokenIn_, tokenOut_, amountOut_) returns (
             uint256 __amountIn,
-            address[] memory __path
+            bytes memory __path
         ) {
             _amountIn = __amountIn;
             _path = __path;
@@ -215,10 +202,10 @@ contract Swapper is ISwapper, Governable {
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    ) private view returns (uint256 _amountOut, address[] memory _path) {
+    ) private returns (uint256 _amountOut, bytes memory _path) {
         try exchange_.getBestAmountOut(tokenIn_, tokenOut_, amountIn_) returns (
             uint256 __amountOut,
-            address[] memory __path
+            bytes memory __path
         ) {
             _amountOut = __amountOut;
             _path = __path;

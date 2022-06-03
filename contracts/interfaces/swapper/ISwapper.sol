@@ -39,12 +39,11 @@ interface ISwapper {
         uint256 amountOut_
     )
         external
-        view
         returns (
             uint256 _amountIn,
             uint256 _amountInMax,
             IExchange _exchange,
-            address[] memory _path
+            bytes memory _path
         );
 
     /**
@@ -58,12 +57,11 @@ interface ISwapper {
         uint256 amountIn_
     )
         external
-        view
         returns (
             uint256 _amountOut,
             uint256 _amountOutMin,
             IExchange _exchange,
-            address[] memory _path
+            bytes memory _path
         );
 
     /**

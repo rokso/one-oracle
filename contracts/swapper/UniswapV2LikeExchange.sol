@@ -43,7 +43,7 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         address tokenIn_,
         address tokenOut_,
         uint256 amountOut_
-    ) external view returns (uint256 _amountIn, address[] memory _path) {
+    ) external returns (uint256 _amountIn, bytes memory _path) {
         // 1. Check IN-OUT pair
         address[] memory _pathA = new address[](2);
         _pathA[0] = tokenIn_;
@@ -53,7 +53,7 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         if (tokenIn_ == wethLike || tokenOut_ == wethLike) {
             // Returns if one of the token is WETH-Like
             require(_amountInA > 0, "invalid-swap");
-            return (_amountInA, _pathA);
+            return (_amountInA, _encodePath(_pathA));
         }
 
         // 2. Check IN-WETH-OUT path
@@ -68,9 +68,9 @@ contract UniswapV2LikeExchange is IExchange, Governable {
 
         // Returns A if it's valid and better than B or if B isn't valid
         if ((_amountInA > 0 && _amountInA < _amountInB) || _amountInB == 0) {
-            return (_amountInA, _pathA);
+            return (_amountInA, _encodePath(_pathA));
         }
-        return (_amountInB, _pathB);
+        return (_amountInB, _encodePath(_pathB));
     }
 
     /// @inheritdoc IExchange
@@ -78,7 +78,7 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    ) external view returns (uint256 _amountOut, address[] memory _path) {
+    ) external returns (uint256 _amountOut, bytes memory _path) {
         // 1. Check IN-OUT pair
         address[] memory _pathA = new address[](2);
         _pathA[0] = tokenIn_;
@@ -88,7 +88,7 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         if (tokenIn_ == wethLike || tokenOut_ == wethLike) {
             // Returns if one of the token is WETH-Like
             require(_amountOutA > 0, "invalid-swap");
-            return (_amountOutA, _pathA);
+            return (_amountOutA, _encodePath(_pathA));
         }
 
         // 2. Check IN-WETH-OUT path
@@ -100,37 +100,49 @@ contract UniswapV2LikeExchange is IExchange, Governable {
 
         // 3. Get best route between paths A and B
         require(_amountOutA > 0 || _amountOutB > 0, "invalid-swap");
-        if (_amountOutA > _amountOutB) return (_amountOutA, _pathA);
-        return (_amountOutB, _pathB);
+        if (_amountOutA > _amountOutB) return (_amountOutA, _encodePath(_pathA));
+        return (_amountOutB, _encodePath(_pathB));
     }
 
     /// @inheritdoc IExchange
     function swapExactInput(
-        address[] calldata path_,
+        bytes calldata path_,
         uint256 amountIn_,
         uint256 amountOutMin_,
         address outReceiver_
     ) external returns (uint256 _amountOut) {
-        IERC20(path_[0]).safeApprove(address(router), amountIn_);
-        _amountOut = router.swapExactTokensForTokens(amountIn_, amountOutMin_, path_, outReceiver_, block.timestamp)[
-            path_.length - 1
-        ];
+        address[] memory _decodedPath = _decodePath(path_);
+        IERC20(_decodedPath[0]).safeApprove(address(router), amountIn_);
+        _amountOut = router.swapExactTokensForTokens(
+            amountIn_,
+            amountOutMin_,
+            _decodedPath,
+            outReceiver_,
+            block.timestamp
+        )[_decodedPath.length - 1];
     }
 
     /// @inheritdoc IExchange
     function swapExactOutput(
-        address[] calldata path_,
+        bytes calldata path_,
         uint256 amountOut_,
         uint256 amountInMax_,
         address inSender_,
         address outRecipient_
     ) external returns (uint256 _amountIn) {
-        IERC20(path_[0]).safeApprove(address(router), amountInMax_);
-        _amountIn = router.swapTokensForExactTokens(amountOut_, amountInMax_, path_, outRecipient_, block.timestamp)[0];
+        address[] memory _decodedPath = _decodePath(path_);
+        IERC20(_decodedPath[0]).safeApprove(address(router), amountInMax_);
+        _amountIn = router.swapTokensForExactTokens(
+            amountOut_,
+            amountInMax_,
+            _decodedPath,
+            outRecipient_,
+            block.timestamp
+        )[0];
         // If swap end up costly less than _amountInMax then return remaining
         uint256 _remainingAmountIn = amountInMax_ - _amountIn;
         if (_remainingAmountIn > 0) {
-            IERC20(path_[0]).safeTransfer(inSender_, _remainingAmountIn);
+            IERC20(_decodedPath[0]).safeTransfer(inSender_, _remainingAmountIn);
         }
     }
 
@@ -152,6 +164,20 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         try router.getAmountsIn(_amountOut, _path) returns (uint256[] memory amounts) {
             _amountIn = amounts[0];
         } catch {}
+    }
+
+    /**
+     * @notice Encode path from `address[]` to `bytes`
+     */
+    function _encodePath(address[] memory path_) public pure returns (bytes memory _path) {
+        return abi.encode(path_);
+    }
+
+    /**
+     * @notice Encode path from `bytes` to `address[]`
+     */
+    function _decodePath(bytes memory path_) public pure returns (address[] memory _path) {
+        return abi.decode(path_, (address[]));
     }
 
     /**
