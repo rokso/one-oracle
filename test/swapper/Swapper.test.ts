@@ -11,33 +11,14 @@ import {
   Swapper__factory,
   IERC20,
   IERC20__factory,
-  ChainlinkAndFallbacksOracle__factory,
-  ChainlinkMainnetPriceProvider,
-  ChainlinkMainnetPriceProvider__factory,
-  PriceProvidersAggregator,
-  PriceProvidersAggregator__factory,
-  UniswapV3CrossPoolOracle__factory,
-  UniswapV3PriceProvider,
-  UniswapV3PriceProvider__factory,
-  ChainlinkAndFallbacksOracle,
-  UniswapV2LikePriceProvider,
-  UniswapV2LikePriceProvider__factory,
 } from '../../typechain-types'
-import {Address} from '../../helpers'
-import {ExchangeType, HOUR, increaseTime, parseEther, parseUnits, Provider, SwapType} from '../helpers'
+import {ExchangeType, parseEther, parseUnits, SwapType} from '../helpers'
+import Address from '../../helpers/address'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {adjustBalance} from '../helpers/balance'
 
-const {
-  WETH_ADDRESS,
-  DAI_ADDRESS,
-  WBTC_ADDRESS,
-  USDC_ADDRESS,
-  UNISWAP_V2_FACTORY_ADDRESS,
-  UNISWAP_V2_ROUTER_ADDRESS,
-  SUSHISWAP_ROUTER_ADDRESS,
-  NOT_ON_CHAINLINK_TOKEN: BTT_ADDRESS,
-} = Address.mainnet
+const {WETH_ADDRESS, DAI_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS, UNISWAP_V2_ROUTER_ADDRESS, SUSHISWAP_ROUTER_ADDRESS} =
+  Address.mainnet
 const MAX_SLIPPAGE = parseEther('0.2')
 
 describe('Swapper @mainnet', function () {
@@ -48,14 +29,12 @@ describe('Swapper @mainnet', function () {
   let uniswapV2Exchange: UniswapV2LikeExchange
   let sushiswapExchange: UniswapV2LikeExchange
   let uniswapV3Exchange: UniswapV3Exchange
-  let uniswapV3DefaultPoolFee: number
   let chainlinkAndFallbacksOracleFake: FakeContract
   let swapper: Swapper
   let weth: IERC20
   let dai: IERC20
   let wbtc: IERC20
   let usdc: IERC20
-  let btt: IERC20
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
@@ -72,7 +51,6 @@ describe('Swapper @mainnet', function () {
     const uniswapV3ExchangeFactory = new UniswapV3Exchange__factory(deployer)
     uniswapV3Exchange = await uniswapV3ExchangeFactory.deploy(WETH_ADDRESS)
     await uniswapV3Exchange.deployed()
-    uniswapV3DefaultPoolFee = await uniswapV3Exchange.defaultPoolFee()
 
     chainlinkAndFallbacksOracleFake = await smock.fake('ChainlinkAndFallbacksOracle')
 
@@ -88,337 +66,15 @@ describe('Swapper @mainnet', function () {
     dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
     wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
     usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
-    btt = IERC20__factory.connect(BTT_ADDRESS, deployer)
 
     await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(wbtc.address, deployer.address, parseUnits('1,000,000', 8))
     await adjustBalance(usdc.address, deployer.address, parseUnits('1,000,000', 6))
-    await adjustBalance(usdc.address, deployer.address, parseUnits('1,000,000', 6))
-    await adjustBalance(btt.address, deployer.address, parseEther('1,000,000,000,000'))
   })
 
   afterEach(async function () {
     await ethers.provider.send('evm_revert', [snapshotId])
-  })
-
-  describe('gas usage', function () {
-    const MAX_DEVIATION = parseEther('0.1') // 10%
-    const STALE_PERIOD = ethers.constants.MaxUint256
-    const DEFAULT_TWAP_PERIOD = HOUR
-    const DEFAULT_POOLS_FEE = 3000 // 0.3%
-    let uniswapV2Provider: UniswapV2LikePriceProvider
-    let uniswapV3Provider: UniswapV3PriceProvider
-    let chainlinkProvider: ChainlinkMainnetPriceProvider
-    let aggregator: PriceProvidersAggregator
-    let chainlinkAndFallbacksOracle: ChainlinkAndFallbacksOracle
-
-    beforeEach(async function () {
-      const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
-      uniswapV2Provider = await priceProviderFactory.deploy(
-        UNISWAP_V2_FACTORY_ADDRESS,
-        DEFAULT_TWAP_PERIOD,
-        WETH_ADDRESS,
-        ethers.constants.AddressZero // stableCoinProvider
-      )
-      await uniswapV2Provider.deployed()
-
-      await uniswapV2Provider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
-      await uniswapV2Provider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
-      await uniswapV2Provider['updateOrAdd(address,address)'](USDC_ADDRESS, WETH_ADDRESS)
-
-      await increaseTime(DEFAULT_TWAP_PERIOD)
-
-      await uniswapV2Provider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
-      await uniswapV2Provider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
-      await uniswapV2Provider['updateOrAdd(address,address)'](USDC_ADDRESS, WETH_ADDRESS)
-
-      const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
-      const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
-      await crossPoolOracle.deployed()
-
-      const uniswapV3ProviderFactory = new UniswapV3PriceProvider__factory(deployer)
-      uniswapV3Provider = await uniswapV3ProviderFactory.deploy(
-        crossPoolOracle.address,
-        DEFAULT_TWAP_PERIOD,
-        DEFAULT_POOLS_FEE,
-        ethers.constants.AddressZero // stableCoinProvider
-      )
-      await uniswapV3Provider.deployed()
-
-      const chainlinkProviderFactory = new ChainlinkMainnetPriceProvider__factory(deployer)
-      chainlinkProvider = await chainlinkProviderFactory.deploy()
-      await chainlinkProvider.deployed()
-
-      const aggregatorProviderFactory = new PriceProvidersAggregator__factory(deployer)
-      aggregator = await aggregatorProviderFactory.deploy(WETH_ADDRESS)
-      await aggregator.deployed()
-
-      await aggregator.setPriceProvider(Provider.UNISWAP_V3, uniswapV3Provider.address)
-      await aggregator.setPriceProvider(Provider.CHAINLINK, chainlinkProvider.address)
-
-      const chainlinkAndFallbacksOracleFactory = new ChainlinkAndFallbacksOracle__factory(deployer)
-      chainlinkAndFallbacksOracle = await chainlinkAndFallbacksOracleFactory.deploy(
-        aggregator.address,
-        MAX_DEVIATION,
-        STALE_PERIOD,
-        Provider.UNISWAP_V3,
-        Provider.UNISWAP_V2
-      )
-      await swapper.updateOracle(chainlinkAndFallbacksOracle.address)
-    })
-
-    describe('worst case: 3 exchanges + non-chainlink token + 3 length path', function () {
-      it('swapExactInput', async function () {
-        const amountIn = parseUnits('1', 8)
-        const {_path, _exchange} = await swapper.callStatic.getBestAmountOut(WBTC_ADDRESS, BTT_ADDRESS, amountIn)
-        expect(_exchange).eq(uniswapV3Exchange.address)
-        expect(_path).eq(
-          ethers.utils.solidityPack(
-            ['address', 'uint24', 'address', 'uint24', 'address'],
-            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, BTT_ADDRESS]
-          )
-        )
-
-        await wbtc.approve(swapper.address, amountIn)
-        const tx = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, deployer.address)
-        const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('516000', 1000)
-      })
-
-      it('swapExactOutput', async function () {
-        const amountOut = parseUnits('1', 8)
-        const {_path, _exchange} = await swapper.callStatic.getBestAmountIn(BTT_ADDRESS, WBTC_ADDRESS, amountOut)
-        const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(BTT_ADDRESS, WBTC_ADDRESS, amountOut)
-        expect(_exchange).eq(uniswapV3Exchange.address)
-        expect(_path).eq(
-          ethers.utils.solidityPack(
-            ['address', 'uint24', 'address', 'uint24', 'address'],
-            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, BTT_ADDRESS]
-          )
-        )
-
-        await btt.approve(swapper.address, _amountIn.mul('10'))
-        const tx = await swapper.swapExactOutput(BTT_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
-        const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('539000', 1000)
-      })
-
-      describe('with preferable path', function () {
-        it('swapExactInput', async function () {
-          // given
-          const preferablePath = ethers.utils.solidityPack(
-            ['address', 'uint24', 'address', 'uint24', 'address'],
-            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, BTT_ADDRESS]
-          )
-          await swapper.setPreferablePath(
-            SwapType.EXACT_INPUT,
-            WBTC_ADDRESS,
-            BTT_ADDRESS,
-            ExchangeType.UNISWAP_V3,
-            preferablePath
-          )
-
-          // when
-          const amountIn = parseUnits('1', 8)
-          await wbtc.approve(swapper.address, amountIn)
-          const tx = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, deployer.address)
-
-          // then
-          const receipt = await tx.wait()
-          expect(receipt.gasUsed).closeTo('323000', 1000)
-        })
-
-        it('swapExactOutput', async function () {
-          // given
-          const preferablePath = ethers.utils.solidityPack(
-            ['address', 'uint24', 'address', 'uint24', 'address'],
-            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, BTT_ADDRESS]
-          )
-          await swapper.setPreferablePath(
-            SwapType.EXACT_OUTPUT,
-            BTT_ADDRESS,
-            WBTC_ADDRESS,
-            ExchangeType.UNISWAP_V3,
-            preferablePath
-          )
-
-          // when
-          const amountOut = parseUnits('1', 8)
-          const {_amountInMax} = await swapper.callStatic.getBestAmountIn(BTT_ADDRESS, WBTC_ADDRESS, amountOut)
-          await btt.approve(swapper.address, _amountInMax)
-          const tx = await swapper.swapExactOutput(BTT_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
-
-          // then
-          const receipt = await tx.wait()
-          expect(receipt.gasUsed).closeTo('344000', 1000)
-        })
-      })
-    })
-
-    describe('avg case: 3 exchanges + chainlink tokens + 3 length path', function () {
-      it('swapExactInput', async function () {
-        const amountIn = parseUnits('1', 8)
-        const {_path, _exchange} = await swapper.callStatic.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
-        expect(_exchange).eq(uniswapV3Exchange.address)
-        expect(_path).eq(
-          ethers.utils.solidityPack(
-            ['address', 'uint24', 'address', 'uint24', 'address'],
-            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, DAI_ADDRESS]
-          )
-        )
-
-        await wbtc.approve(swapper.address, amountIn)
-        const tx = await swapper.swapExactInput(WBTC_ADDRESS, DAI_ADDRESS, amountIn, deployer.address)
-        const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('498000', 1000)
-      })
-
-      it('swapExactOutput', async function () {
-        const amountOut = parseUnits('1', 8)
-        const {_path, _exchange} = await swapper.callStatic.getBestAmountIn(DAI_ADDRESS, WBTC_ADDRESS, amountOut)
-        const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(DAI_ADDRESS, WBTC_ADDRESS, amountOut)
-        expect(_exchange).eq(uniswapV3Exchange.address)
-        expect(_path).eq(
-          ethers.utils.solidityPack(
-            ['address', 'uint24', 'address', 'uint24', 'address'],
-            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, DAI_ADDRESS]
-          )
-        )
-
-        await dai.approve(swapper.address, _amountIn.mul('10'))
-        const tx = await swapper.swapExactOutput(DAI_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
-        const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('520000', 1000)
-      })
-
-      describe('with preferable path', function () {
-        it('swapExactInput', async function () {
-          // given
-          const preferablePath = ethers.utils.solidityPack(
-            ['address', 'uint24', 'address', 'uint24', 'address'],
-            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, DAI_ADDRESS]
-          )
-          await swapper.setPreferablePath(
-            SwapType.EXACT_INPUT,
-            WBTC_ADDRESS,
-            DAI_ADDRESS,
-            ExchangeType.UNISWAP_V3,
-            preferablePath
-          )
-
-          // when
-          const amountIn = parseUnits('1', 8)
-          await wbtc.approve(swapper.address, amountIn)
-          const tx = await swapper.swapExactInput(WBTC_ADDRESS, DAI_ADDRESS, amountIn, deployer.address)
-
-          // then
-          const receipt = await tx.wait()
-          expect(receipt.gasUsed).closeTo('303000', 1000)
-        })
-
-        it('swapExactOutput', async function () {
-          // given
-          const preferablePath = ethers.utils.solidityPack(
-            ['address', 'uint24', 'address', 'uint24', 'address'],
-            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, DAI_ADDRESS]
-          )
-          await swapper.setPreferablePath(
-            SwapType.EXACT_OUTPUT,
-            DAI_ADDRESS,
-            WBTC_ADDRESS,
-            ExchangeType.UNISWAP_V3,
-            preferablePath
-          )
-
-          // when
-          const amountOut = parseUnits('1', 8)
-          const {_amountInMax} = await swapper.callStatic.getBestAmountIn(DAI_ADDRESS, WBTC_ADDRESS, amountOut)
-          await dai.approve(swapper.address, _amountInMax)
-          const tx = await swapper.swapExactOutput(DAI_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
-
-          // then
-          const receipt = await tx.wait()
-          expect(receipt.gasUsed).closeTo('320831', 1000)
-        })
-      })
-    })
-
-    describe('best case: 2 exchanges + chainlink tokens + 2 length path', function () {
-      const abi = ethers.utils.defaultAbiCoder
-
-      beforeEach(async function () {
-        await swapper.setExchange(ExchangeType.UNISWAP_V3, ethers.constants.AddressZero)
-      })
-
-      it('swapExactInput', async function () {
-        const amountIn = parseUnits('1', 8)
-        const {_path, _exchange} = await swapper.callStatic.getBestAmountOut(WBTC_ADDRESS, WETH_ADDRESS, amountIn)
-        expect(_exchange).eq(sushiswapExchange.address)
-        expect(_path).eq(abi.encode(['address[]'], [[WBTC_ADDRESS, WETH_ADDRESS]]))
-
-        await wbtc.approve(swapper.address, amountIn)
-        const tx = await swapper.swapExactInput(WBTC_ADDRESS, WETH_ADDRESS, amountIn, deployer.address)
-        const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('245000', 1000)
-      })
-
-      it('swapExactOutput', async function () {
-        const amountOut = parseUnits('1', 8)
-        const {_exchange, _path} = await swapper.callStatic.getBestAmountIn(WETH_ADDRESS, WBTC_ADDRESS, amountOut)
-        const {_amountIn} = await sushiswapExchange.callStatic.getBestAmountIn(WETH_ADDRESS, WBTC_ADDRESS, amountOut)
-        expect(_path).eq(abi.encode(['address[]'], [[WETH_ADDRESS, WBTC_ADDRESS]]))
-        expect(_exchange).eq(sushiswapExchange.address)
-
-        await weth.approve(swapper.address, _amountIn.mul('10'))
-        const tx = await swapper.swapExactOutput(WETH_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
-        const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('273000', 1000)
-      })
-
-      describe('with preferable path', function () {
-        it('swapExactInput', async function () {
-          // given
-          const preferablePath = abi.encode(['address[]'], [[WBTC_ADDRESS, WETH_ADDRESS]])
-          await swapper.setPreferablePath(
-            SwapType.EXACT_INPUT,
-            WBTC_ADDRESS,
-            WETH_ADDRESS,
-            ExchangeType.SUSHISWAP,
-            preferablePath
-          )
-
-          // when
-          const amountIn = parseUnits('1', 8)
-          await wbtc.approve(swapper.address, amountIn)
-          const tx = await swapper.swapExactInput(WBTC_ADDRESS, WETH_ADDRESS, amountIn, deployer.address)
-
-          // then
-          const receipt = await tx.wait()
-          expect(receipt.gasUsed).closeTo('224000', 1000)
-        })
-
-        it('swapExactOutput', async function () {
-          // given
-          const preferablePath = abi.encode(['address[]'], [[WETH_ADDRESS, WBTC_ADDRESS]])
-          await swapper.setPreferablePath(
-            SwapType.EXACT_OUTPUT,
-            WETH_ADDRESS,
-            WBTC_ADDRESS,
-            ExchangeType.SUSHISWAP,
-            preferablePath
-          )
-
-          // when
-          const amountOut = parseUnits('1', 8)
-          const {_amountInMax} = await swapper.callStatic.getBestAmountIn(WETH_ADDRESS, WBTC_ADDRESS, amountOut)
-          await weth.approve(swapper.address, _amountInMax)
-          const tx = await swapper.swapExactOutput(WETH_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
-          const receipt = await tx.wait()
-          expect(receipt.gasUsed).closeTo('247000', 1000)
-        })
-      })
-    })
   })
 
   describe('getBestAmountIn', function () {
