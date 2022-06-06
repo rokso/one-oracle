@@ -22,10 +22,15 @@ library DataTypes {
 
     enum ExchangeType {
         UNISWAP_V2,
-        UNISWAP_V3,
         SUSHISWAP,
         TRADERJOE,
         PANGOLIN,
-        QUICKSWAP
+        QUICKSWAP,
+        UNISWAP_V3
+    }
+
+    enum SwapType {
+        EXACT_INPUT,
+        EXACT_OUTPUT
     }
 }

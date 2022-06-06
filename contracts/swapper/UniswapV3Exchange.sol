@@ -41,28 +41,19 @@ contract UniswapV3Exchange is IExchange {
         address tokenOut_,
         uint256 amountOut_
     ) external override returns (uint256 _amountIn, bytes memory _path) {
-        // 1. Check IN-OUT pair
-        bytes memory _pathA = abi.encodePacked(tokenOut_, defaultPoolFee, tokenIn_);
-        uint256 _amountInA = getAmountsIn(amountOut_, _pathA);
-
+        // 1. Check IN-OUT pair if one of the tokens is WETH-like
         if (tokenIn_ == wethLike || tokenOut_ == wethLike) {
-            // Returns if one of the token is WETH-Like
-            require(_amountInA > 0, "invalid-swap");
-            return (_amountInA, _pathA);
+            _path = abi.encodePacked(tokenOut_, defaultPoolFee, tokenIn_);
+            _amountIn = getAmountsIn(amountOut_, _path);
+            require(_amountIn > 0, "invalid-swap");
+            return (_amountIn, _path);
         }
 
         // 2. Check IN-WETH-OUT path
-        bytes memory _pathB = abi.encodePacked(tokenOut_, defaultPoolFee, wethLike, defaultPoolFee, tokenIn_);
-        uint256 _amountInB = getAmountsIn(amountOut_, _pathB);
-
-        // 3. Get best route between paths A and B
-        require(_amountInA > 0 || _amountInB > 0, "invalid-swap");
-
-        // Returns A if it's valid and better than B or if B isn't valid
-        if ((_amountInA > 0 && _amountInA < _amountInB) || _amountInB == 0) {
-            return (_amountInA, _pathA);
-        }
-        return (_amountInB, _pathB);
+        _path = abi.encodePacked(tokenOut_, defaultPoolFee, wethLike, defaultPoolFee, tokenIn_);
+        _amountIn = getAmountsIn(amountOut_, _path);
+        require(_amountIn > 0, "invalid-swap");
+        return (_amountIn, _path);
     }
 
     /// @inheritdoc IExchange
@@ -71,24 +62,18 @@ contract UniswapV3Exchange is IExchange {
         address tokenOut_,
         uint256 amountIn_
     ) external override returns (uint256 _amountOut, bytes memory _path) {
-        // 1. Check IN-OUT pair
-        bytes memory _pathA = abi.encodePacked(tokenIn_, defaultPoolFee, tokenOut_);
-        uint256 _amountOutA = getAmountsOut(amountIn_, _pathA);
-
+        // 1. Check IN-OUT pair if one of the tokens is WETH-like
         if (tokenIn_ == wethLike || tokenOut_ == wethLike) {
-            // Returns if one of the token is WETH-Like
-            require(_amountOutA > 0, "invalid-swap1");
-            return (_amountOutA, _pathA);
+            _path = abi.encodePacked(tokenIn_, defaultPoolFee, tokenOut_);
+            _amountOut = getAmountsOut(amountIn_, _path);
+            require(_amountOut > 0, "invalid-swap");
+            return (_amountOut, _path);
         }
 
         // 2. Check IN-WETH-OUT path
-        bytes memory _pathB = abi.encodePacked(tokenIn_, defaultPoolFee, wethLike, defaultPoolFee, tokenOut_);
-        uint256 _amountOutB = getAmountsOut(amountIn_, _pathB);
-
-        // 3. Get best route between paths A and B
-        require(_amountOutA > 0 || _amountOutB > 0, "invalid-swap2");
-        if (_amountOutA > _amountOutB) return (_amountOutA, _pathA);
-        return (_amountOutB, _pathB);
+        _path = abi.encodePacked(tokenIn_, defaultPoolFee, wethLike, defaultPoolFee, tokenOut_);
+        _amountOut = getAmountsOut(amountIn_, _path);
+        require(_amountOut > 0, "invalid-swap");
     }
 
     function getAmountsIn(uint256 amountOut_, bytes memory path_) public returns (uint256 _amountIn) {

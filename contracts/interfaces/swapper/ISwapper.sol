@@ -40,7 +40,6 @@ interface ISwapper {
     )
         external
         returns (
-            uint256 _amountIn,
             uint256 _amountInMax,
             IExchange _exchange,
             bytes memory _path
@@ -58,7 +57,6 @@ interface ISwapper {
     )
         external
         returns (
-            uint256 _amountOut,
             uint256 _amountOutMin,
             IExchange _exchange,
             bytes memory _path

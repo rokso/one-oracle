@@ -23,8 +23,8 @@ import {
   UniswapV2LikePriceProvider,
   UniswapV2LikePriceProvider__factory,
 } from '../../typechain-types'
-import {Address, Provider} from '../../helpers'
-import {HOUR, increaseTime, parseEther, parseUnits} from '../helpers'
+import {Address} from '../../helpers'
+import {ExchangeType, HOUR, increaseTime, parseEther, parseUnits, Provider, SwapType} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {adjustBalance} from '../helpers/balance'
 
@@ -43,6 +43,7 @@ const MAX_SLIPPAGE = parseEther('0.2')
 describe('Swapper @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
+  let user: SignerWithAddress
   let invalidToken: SignerWithAddress
   let uniswapV2Exchange: UniswapV2LikeExchange
   let sushiswapExchange: UniswapV2LikeExchange
@@ -58,7 +59,7 @@ describe('Swapper @mainnet', function () {
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer, invalidToken] = await ethers.getSigners()
+    ;[deployer, user, invalidToken] = await ethers.getSigners()
 
     const uniswapV2LikeExchangeFactory = new UniswapV2LikeExchange__factory(deployer)
 
@@ -79,9 +80,9 @@ describe('Swapper @mainnet', function () {
     swapper = await swapperFactory.deploy(chainlinkAndFallbacksOracleFake.address, MAX_SLIPPAGE)
     await swapper.deployed()
 
-    await swapper.addExchange(uniswapV2Exchange.address)
-    await swapper.addExchange(sushiswapExchange.address)
-    await swapper.addExchange(uniswapV3Exchange.address)
+    await swapper.setExchange(ExchangeType.UNISWAP_V2, uniswapV2Exchange.address)
+    await swapper.setExchange(ExchangeType.SUSHISWAP, sushiswapExchange.address)
+    await swapper.setExchange(ExchangeType.UNISWAP_V3, uniswapV3Exchange.address)
 
     weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
     dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
@@ -182,16 +183,13 @@ describe('Swapper @mainnet', function () {
         await wbtc.approve(swapper.address, amountIn)
         const tx = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('519000', 1000)
+        expect(receipt.gasUsed).closeTo('516000', 1000)
       })
 
       it('swapExactOutput', async function () {
         const amountOut = parseUnits('1', 8)
-        const {_amountIn, _path, _exchange} = await swapper.callStatic.getBestAmountIn(
-          BTT_ADDRESS,
-          WBTC_ADDRESS,
-          amountOut
-        )
+        const {_path, _exchange} = await swapper.callStatic.getBestAmountIn(BTT_ADDRESS, WBTC_ADDRESS, amountOut)
+        const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(BTT_ADDRESS, WBTC_ADDRESS, amountOut)
         expect(_exchange).eq(uniswapV3Exchange.address)
         expect(_path).eq(
           ethers.utils.solidityPack(
@@ -203,7 +201,146 @@ describe('Swapper @mainnet', function () {
         await btt.approve(swapper.address, _amountIn.mul('10'))
         const tx = await swapper.swapExactOutput(BTT_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('563000', 1000)
+        expect(receipt.gasUsed).closeTo('539000', 1000)
+      })
+
+      describe('with preferable path', function () {
+        it('swapExactInput', async function () {
+          // given
+          const preferablePath = ethers.utils.solidityPack(
+            ['address', 'uint24', 'address', 'uint24', 'address'],
+            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, BTT_ADDRESS]
+          )
+          await swapper.setPreferablePath(
+            SwapType.EXACT_INPUT,
+            WBTC_ADDRESS,
+            BTT_ADDRESS,
+            ExchangeType.UNISWAP_V3,
+            preferablePath
+          )
+
+          // when
+          const amountIn = parseUnits('1', 8)
+          await wbtc.approve(swapper.address, amountIn)
+          const tx = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, deployer.address)
+
+          // then
+          const receipt = await tx.wait()
+          expect(receipt.gasUsed).closeTo('323000', 1000)
+        })
+
+        it('swapExactOutput', async function () {
+          // given
+          const preferablePath = ethers.utils.solidityPack(
+            ['address', 'uint24', 'address', 'uint24', 'address'],
+            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, BTT_ADDRESS]
+          )
+          await swapper.setPreferablePath(
+            SwapType.EXACT_OUTPUT,
+            BTT_ADDRESS,
+            WBTC_ADDRESS,
+            ExchangeType.UNISWAP_V3,
+            preferablePath
+          )
+
+          // when
+          const amountOut = parseUnits('1', 8)
+          const {_amountInMax} = await swapper.callStatic.getBestAmountIn(BTT_ADDRESS, WBTC_ADDRESS, amountOut)
+          await btt.approve(swapper.address, _amountInMax)
+          const tx = await swapper.swapExactOutput(BTT_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
+
+          // then
+          const receipt = await tx.wait()
+          expect(receipt.gasUsed).closeTo('344000', 1000)
+        })
+      })
+    })
+
+    describe('avg case: 3 exchanges + chainlink tokens + 3 length path', function () {
+      it('swapExactInput', async function () {
+        const amountIn = parseUnits('1', 8)
+        const {_path, _exchange} = await swapper.callStatic.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
+        expect(_exchange).eq(uniswapV3Exchange.address)
+        expect(_path).eq(
+          ethers.utils.solidityPack(
+            ['address', 'uint24', 'address', 'uint24', 'address'],
+            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, DAI_ADDRESS]
+          )
+        )
+
+        await wbtc.approve(swapper.address, amountIn)
+        const tx = await swapper.swapExactInput(WBTC_ADDRESS, DAI_ADDRESS, amountIn, deployer.address)
+        const receipt = await tx.wait()
+        expect(receipt.gasUsed).closeTo('498000', 1000)
+      })
+
+      it('swapExactOutput', async function () {
+        const amountOut = parseUnits('1', 8)
+        const {_path, _exchange} = await swapper.callStatic.getBestAmountIn(DAI_ADDRESS, WBTC_ADDRESS, amountOut)
+        const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(DAI_ADDRESS, WBTC_ADDRESS, amountOut)
+        expect(_exchange).eq(uniswapV3Exchange.address)
+        expect(_path).eq(
+          ethers.utils.solidityPack(
+            ['address', 'uint24', 'address', 'uint24', 'address'],
+            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, DAI_ADDRESS]
+          )
+        )
+
+        await dai.approve(swapper.address, _amountIn.mul('10'))
+        const tx = await swapper.swapExactOutput(DAI_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
+        const receipt = await tx.wait()
+        expect(receipt.gasUsed).closeTo('520000', 1000)
+      })
+
+      describe('with preferable path', function () {
+        it('swapExactInput', async function () {
+          // given
+          const preferablePath = ethers.utils.solidityPack(
+            ['address', 'uint24', 'address', 'uint24', 'address'],
+            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, DAI_ADDRESS]
+          )
+          await swapper.setPreferablePath(
+            SwapType.EXACT_INPUT,
+            WBTC_ADDRESS,
+            DAI_ADDRESS,
+            ExchangeType.UNISWAP_V3,
+            preferablePath
+          )
+
+          // when
+          const amountIn = parseUnits('1', 8)
+          await wbtc.approve(swapper.address, amountIn)
+          const tx = await swapper.swapExactInput(WBTC_ADDRESS, DAI_ADDRESS, amountIn, deployer.address)
+
+          // then
+          const receipt = await tx.wait()
+          expect(receipt.gasUsed).closeTo('303000', 1000)
+        })
+
+        it('swapExactOutput', async function () {
+          // given
+          const preferablePath = ethers.utils.solidityPack(
+            ['address', 'uint24', 'address', 'uint24', 'address'],
+            [WBTC_ADDRESS, uniswapV3DefaultPoolFee, WETH_ADDRESS, uniswapV3DefaultPoolFee, DAI_ADDRESS]
+          )
+          await swapper.setPreferablePath(
+            SwapType.EXACT_OUTPUT,
+            DAI_ADDRESS,
+            WBTC_ADDRESS,
+            ExchangeType.UNISWAP_V3,
+            preferablePath
+          )
+
+          // when
+          const amountOut = parseUnits('1', 8)
+          const {_amountInMax} = await swapper.callStatic.getBestAmountIn(DAI_ADDRESS, WBTC_ADDRESS, amountOut)
+          await dai.approve(swapper.address, _amountInMax)
+          const tx = await swapper.swapExactOutput(DAI_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
+
+          // then
+          const receipt = await tx.wait()
+          expect(receipt.gasUsed).closeTo('320831', 1000)
+        })
       })
     })
 
@@ -211,7 +348,7 @@ describe('Swapper @mainnet', function () {
       const abi = ethers.utils.defaultAbiCoder
 
       beforeEach(async function () {
-        await swapper.removeExchange(uniswapV3Exchange.address)
+        await swapper.setExchange(ExchangeType.UNISWAP_V3, ethers.constants.AddressZero)
       })
 
       it('swapExactInput', async function () {
@@ -223,23 +360,63 @@ describe('Swapper @mainnet', function () {
         await wbtc.approve(swapper.address, amountIn)
         const tx = await swapper.swapExactInput(WBTC_ADDRESS, WETH_ADDRESS, amountIn, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('242000', 1000)
+        expect(receipt.gasUsed).closeTo('245000', 1000)
       })
 
       it('swapExactOutput', async function () {
         const amountOut = parseUnits('1', 8)
-        const {_amountIn, _exchange, _path} = await swapper.callStatic.getBestAmountIn(
-          WETH_ADDRESS,
-          WBTC_ADDRESS,
-          amountOut
-        )
+        const {_exchange, _path} = await swapper.callStatic.getBestAmountIn(WETH_ADDRESS, WBTC_ADDRESS, amountOut)
+        const {_amountIn} = await sushiswapExchange.callStatic.getBestAmountIn(WETH_ADDRESS, WBTC_ADDRESS, amountOut)
         expect(_path).eq(abi.encode(['address[]'], [[WETH_ADDRESS, WBTC_ADDRESS]]))
         expect(_exchange).eq(sushiswapExchange.address)
 
         await weth.approve(swapper.address, _amountIn.mul('10'))
         const tx = await swapper.swapExactOutput(WETH_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).closeTo('270000', 1000)
+        expect(receipt.gasUsed).closeTo('273000', 1000)
+      })
+
+      describe('with preferable path', function () {
+        it('swapExactInput', async function () {
+          // given
+          const preferablePath = abi.encode(['address[]'], [[WBTC_ADDRESS, WETH_ADDRESS]])
+          await swapper.setPreferablePath(
+            SwapType.EXACT_INPUT,
+            WBTC_ADDRESS,
+            WETH_ADDRESS,
+            ExchangeType.SUSHISWAP,
+            preferablePath
+          )
+
+          // when
+          const amountIn = parseUnits('1', 8)
+          await wbtc.approve(swapper.address, amountIn)
+          const tx = await swapper.swapExactInput(WBTC_ADDRESS, WETH_ADDRESS, amountIn, deployer.address)
+
+          // then
+          const receipt = await tx.wait()
+          expect(receipt.gasUsed).closeTo('224000', 1000)
+        })
+
+        it('swapExactOutput', async function () {
+          // given
+          const preferablePath = abi.encode(['address[]'], [[WETH_ADDRESS, WBTC_ADDRESS]])
+          await swapper.setPreferablePath(
+            SwapType.EXACT_OUTPUT,
+            WETH_ADDRESS,
+            WBTC_ADDRESS,
+            ExchangeType.SUSHISWAP,
+            preferablePath
+          )
+
+          // when
+          const amountOut = parseUnits('1', 8)
+          const {_amountInMax} = await swapper.callStatic.getBestAmountIn(WETH_ADDRESS, WBTC_ADDRESS, amountOut)
+          await weth.approve(swapper.address, _amountInMax)
+          const tx = await swapper.swapExactOutput(WETH_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
+          const receipt = await tx.wait()
+          expect(receipt.gasUsed).closeTo('247000', 1000)
+        })
       })
     })
   })
@@ -249,8 +426,8 @@ describe('Swapper @mainnet', function () {
       const amountOut = parseEther('1,000')
       const call0 = swapper.getBestAmountIn(WETH_ADDRESS, invalidToken.address, amountOut)
       const call1 = swapper.getBestAmountIn(DAI_ADDRESS, invalidToken.address, amountOut)
-      await expect(call0).revertedWith('no-path-found')
-      await expect(call1).revertedWith('no-path-found')
+      await expect(call0).revertedWith('invalid-swap')
+      await expect(call1).revertedWith('invalid-swap')
     })
 
     it('should get best amountIn for WETH->DAI', async function () {
@@ -270,10 +447,10 @@ describe('Swapper @mainnet', function () {
       expect(bestAmountIn).closeTo(parseEther('1'), parseEther('0.1'))
 
       // when
-      const {_amountIn, _path} = await swapper.callStatic.getBestAmountIn(WETH_ADDRESS, DAI_ADDRESS, amountOut)
+      const {_exchange, _path} = await swapper.callStatic.getBestAmountIn(WETH_ADDRESS, DAI_ADDRESS, amountOut)
 
       // then
-      expect(_amountIn).eq(bestAmountIn)
+      expect(_exchange).eq(sushiswapExchange.address)
       expect(_path).deep.eq(bestPath)
     })
 
@@ -294,10 +471,10 @@ describe('Swapper @mainnet', function () {
       expect(bestAmountIn).closeTo(parseUnits('1002', 6), parseUnits('1', 6))
 
       // when
-      const {_amountIn, _path} = await swapper.callStatic.getBestAmountIn(USDC_ADDRESS, DAI_ADDRESS, amountOut)
+      const {_exchange, _path} = await swapper.callStatic.getBestAmountIn(USDC_ADDRESS, DAI_ADDRESS, amountOut)
 
       // then
-      expect(_amountIn).eq(bestAmountIn)
+      expect(_exchange).eq(uniswapV2Exchange.address)
       expect(_path).deep.eq(bestPath)
     })
 
@@ -323,10 +500,10 @@ describe('Swapper @mainnet', function () {
       expect(bestAmountIn).closeTo(parseUnits('1', 8), parseUnits('0.1', 8))
 
       // when
-      const {_amountIn, _path} = await swapper.callStatic.getBestAmountIn(WBTC_ADDRESS, DAI_ADDRESS, amountOut)
+      const {_exchange, _path} = await swapper.callStatic.getBestAmountIn(WBTC_ADDRESS, DAI_ADDRESS, amountOut)
 
       // then
-      expect(_amountIn).eq(bestAmountIn)
+      expect(_exchange).eq(uniswapV3Exchange.address)
       expect(_path).deep.eq(bestPath)
     })
   })
@@ -336,8 +513,8 @@ describe('Swapper @mainnet', function () {
       const amountIn = parseEther('1,000')
       const call0 = swapper.getBestAmountOut(WETH_ADDRESS, invalidToken.address, amountIn)
       const call1 = swapper.getBestAmountOut(DAI_ADDRESS, invalidToken.address, amountIn)
-      await expect(call0).revertedWith('no-path-found')
-      await expect(call1).revertedWith('no-path-found')
+      await expect(call0).revertedWith('invalid-swap')
+      await expect(call1).revertedWith('invalid-swap')
     })
 
     it('should get best amountOut for WETH->DAI', async function () {
@@ -357,10 +534,10 @@ describe('Swapper @mainnet', function () {
       expect(bestAmountOut).closeTo(parseEther('3,228'), parseEther('1'))
 
       // when
-      const {_amountOut, _path} = await swapper.callStatic.getBestAmountOut(WETH_ADDRESS, DAI_ADDRESS, amountIn)
+      const {_exchange, _path} = await swapper.callStatic.getBestAmountOut(WETH_ADDRESS, DAI_ADDRESS, amountIn)
 
       // then
-      expect(_amountOut).eq(bestAmountOut)
+      expect(_exchange).eq(sushiswapExchange.address)
       expect(_path).deep.eq(bestPath)
     })
 
@@ -381,10 +558,10 @@ describe('Swapper @mainnet', function () {
       expect(bestAmountOut).closeTo(parseEther('997'), parseEther('1'))
 
       // when
-      const {_amountOut, _path} = await swapper.callStatic.getBestAmountOut(USDC_ADDRESS, DAI_ADDRESS, amountIn)
+      const {_exchange, _path} = await swapper.callStatic.getBestAmountOut(USDC_ADDRESS, DAI_ADDRESS, amountIn)
 
       // then
-      expect(_amountOut).eq(bestAmountOut)
+      expect(_exchange).eq(uniswapV2Exchange.address)
       expect(_path).deep.eq(bestPath)
     })
 
@@ -411,10 +588,10 @@ describe('Swapper @mainnet', function () {
       expect(bestAmountOut).closeTo(parseEther('43,515'), parseEther('1'))
 
       // when
-      const {_amountOut, _path} = await swapper.callStatic.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
+      const {_exchange, _path} = await swapper.callStatic.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
 
       // then
-      expect(_amountOut).eq(bestAmountOut)
+      expect(_exchange).eq(uniswapV3Exchange.address)
       expect(_path).deep.eq(bestPath)
     })
   })
@@ -423,7 +600,9 @@ describe('Swapper @mainnet', function () {
     it('should revert if slippage is too high', async function () {
       // given
       const amountIn = parseUnits('1', 8)
-      const {_amountOut} = await swapper.callStatic.getBestAmountOut(WBTC_ADDRESS, USDC_ADDRESS, amountIn)
+      const {_exchange} = await swapper.callStatic.getBestAmountOut(WBTC_ADDRESS, USDC_ADDRESS, amountIn)
+      expect(_exchange).eq(sushiswapExchange.address)
+      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(WBTC_ADDRESS, USDC_ADDRESS, amountIn)
 
       // when
       chainlinkAndFallbacksOracleFake.quote.returns(() => _amountOut.mul('10'))
@@ -437,7 +616,9 @@ describe('Swapper @mainnet', function () {
     it('should perform an exact input swap', async function () {
       // given
       const amountIn = parseUnits('1', 8)
-      const {_amountOut} = await swapper.callStatic.getBestAmountOut(WBTC_ADDRESS, USDC_ADDRESS, amountIn)
+      const {_exchange} = await swapper.callStatic.getBestAmountOut(WBTC_ADDRESS, USDC_ADDRESS, amountIn)
+      expect(_exchange).eq(sushiswapExchange.address)
+      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(WBTC_ADDRESS, USDC_ADDRESS, amountIn)
       const wbtcBefore = await wbtc.balanceOf(deployer.address)
       const usdcBefore = await usdc.balanceOf(deployer.address)
 
@@ -458,7 +639,9 @@ describe('Swapper @mainnet', function () {
     it('should revert if slippage is too high', async function () {
       // given
       const amountOut = parseUnits('1', 8)
-      const {_amountIn, _amountInMax} = await swapper.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+      const {_exchange, _amountInMax} = await swapper.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+      expect(_exchange).eq(uniswapV3Exchange.address)
+      const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
       chainlinkAndFallbacksOracleFake.quote.returns(() => _amountIn.div('10'))
 
       // when
@@ -472,7 +655,9 @@ describe('Swapper @mainnet', function () {
     it('should perform an exact output swap', async function () {
       // given
       const amountOut = parseUnits('1', 8)
-      const {_amountIn} = await swapper.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+      const {_exchange} = await swapper.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+      expect(_exchange).eq(uniswapV3Exchange.address)
+      const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
       const usdcBefore = await usdc.balanceOf(deployer.address)
       const wbtcBefore = await wbtc.balanceOf(deployer.address)
 
@@ -494,7 +679,9 @@ describe('Swapper @mainnet', function () {
     it('should return remaining if any', async function () {
       // given
       const amountOut = parseUnits('1', 8)
-      const {_amountIn} = await swapper.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+      const {_exchange} = await swapper.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+      expect(_exchange).eq(uniswapV3Exchange.address)
+      const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
       const usdcBefore = await usdc.balanceOf(deployer.address)
       const wbtcBefore = await wbtc.balanceOf(deployer.address)
 
@@ -511,6 +698,138 @@ describe('Swapper @mainnet', function () {
       const actualAmountOut = wbtcAfter.sub(wbtcBefore)
       expect(actualAmountIn).closeTo(_amountIn, parseUnits('50', 6))
       expect(actualAmountOut).eq(amountOut)
+    })
+  })
+
+  describe('setExchange', function () {
+    it('should revert if not governor', async function () {
+      const tx = swapper.connect(user).setExchange(ExchangeType.UNISWAP_V2, ethers.constants.AddressZero)
+      await expect(tx).revertedWith('not-governor')
+    })
+
+    it('should add exchange', async function () {
+      // given
+      const before = await swapper.addressOf(ExchangeType.PANGOLIN)
+      expect(before).eq(ethers.constants.AddressZero)
+
+      // when
+      await swapper.setExchange(ExchangeType.PANGOLIN, user.address)
+
+      // then
+      const after = await swapper.addressOf(ExchangeType.PANGOLIN)
+      expect(after).eq(user.address)
+    })
+
+    it('should update exchange', async function () {
+      // given
+      const before = await swapper.addressOf(ExchangeType.UNISWAP_V2)
+      expect(before).eq(uniswapV2Exchange.address)
+
+      // when
+      await swapper.setExchange(ExchangeType.UNISWAP_V2, user.address)
+
+      // then
+      const after = await swapper.addressOf(ExchangeType.UNISWAP_V2)
+      expect(after).eq(user.address)
+    })
+
+    it('should remove exchange', async function () {
+      // given
+      const before = await swapper.addressOf(ExchangeType.UNISWAP_V2)
+      expect(before).eq(uniswapV2Exchange.address)
+
+      // when
+      await swapper.setExchange(ExchangeType.UNISWAP_V2, ethers.constants.AddressZero)
+
+      // then
+      const after = await swapper.addressOf(ExchangeType.UNISWAP_V2)
+      expect(after).eq(ethers.constants.AddressZero)
+    })
+  })
+
+  describe('updateMaxSlippage', function () {
+    it('should revert if not governor', async function () {
+      const tx = swapper.connect(user).updateMaxSlippage(0)
+      await expect(tx).revertedWith('not-governor')
+    })
+
+    it('should update max slippage', async function () {
+      // given
+      const before = await swapper.maxSlippage()
+
+      // when
+      await swapper.updateMaxSlippage(before.mul('2'))
+
+      // then
+      const after = await swapper.maxSlippage()
+      expect(after).not.eq(before)
+    })
+  })
+
+  describe('updateOracle', function () {
+    it('should revert if not governor', async function () {
+      const tx = swapper.connect(user).updateOracle(user.address)
+      await expect(tx).revertedWith('not-governor')
+    })
+
+    it('should update oracle', async function () {
+      // given
+      const before = await swapper.oracle()
+
+      // when
+      await swapper.updateOracle(user.address)
+
+      // then
+      const after = await swapper.oracle()
+      expect(after).not.eq(before)
+    })
+  })
+
+  describe('setPreferablePath', function () {
+    it('should revert if not governor', async function () {
+      const tx = swapper
+        .connect(user)
+        .setPreferablePath(SwapType.EXACT_INPUT, WETH_ADDRESS, WBTC_ADDRESS, ExchangeType.UNISWAP_V3, '0x')
+      await expect(tx).revertedWith('not-governor')
+    })
+
+    it('should add a preferable path', async function () {
+      // given
+      const key = ethers.utils.solidityPack(
+        ['uint8', 'address', 'address'],
+        [SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS]
+      )
+      const before = await swapper.preferablePaths(key)
+      expect(before).eq('0x')
+
+      // when
+      const exchangeType = ExchangeType.UNISWAP_V2
+      const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS]])
+      await swapper.setPreferablePath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
+
+      // then
+      const after = await swapper.preferablePaths(key)
+      expect(after).eq(ethers.utils.defaultAbiCoder.encode(['uint8', 'bytes'], [exchangeType, path]))
+    })
+
+    it('should remove a preferable path', async function () {
+      // given
+      const key = ethers.utils.solidityPack(
+        ['uint8', 'address', 'address'],
+        [SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS]
+      )
+      const exchangeType = ExchangeType.UNISWAP_V2
+      const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS]])
+      await swapper.setPreferablePath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
+      const before = await swapper.preferablePaths(key)
+      expect(before).eq(ethers.utils.defaultAbiCoder.encode(['uint8', 'bytes'], [exchangeType, path]))
+
+      // when
+      await swapper.setPreferablePath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, '0x')
+
+      // then
+      const after = await swapper.preferablePaths(key)
+      expect(after).eq('0x')
     })
   })
 })
