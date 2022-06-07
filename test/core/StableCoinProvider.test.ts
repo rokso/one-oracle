@@ -86,10 +86,13 @@ describe('StableCoinProvider @mainnet', function () {
       lastUpdatedAt = await timestampFromLatestBlock()
     })
 
-    it('should revert if stables price is invalid', async function () {
+    it('should revert if prices are invalid', async function () {
       // given
-      priceProvider['quote(address,address,uint256)'].returns(() => {
-        return [0, 0]
+      priceProvider['getPriceInUsd(address)'].returns((args: [string]) => {
+        const [token] = args
+        if (token === DAI_ADDRESS) return [0, 0]
+        if (token === USDC_ADDRESS) return [0, 0]
+        throw Error('not-expected')
       })
 
       // when
@@ -99,42 +102,29 @@ describe('StableCoinProvider @mainnet', function () {
       await expect(tx).revertedWith('stable-prices-invalid')
     })
 
-    it('should revert if stables price deviation is too high (different decimals)', async function () {
+    it('should revert if stables prices deviation are too far from $1', async function () {
       // given
-      await stableCoinProvider.connect(governor).updateStableCoins(USDC_ADDRESS, DAI_ADDRESS)
-
-      priceProvider['quote(address,address,uint256)'].returns(() => {
-        return [parseEther('0.85'), lastUpdatedAt] // 1 USDC = 0.85 DAI
+      priceProvider['getPriceInUsd(address)'].returns((args: [string]) => {
+        const [token] = args
+        if (token === DAI_ADDRESS) return [parseEther('0.85'), lastUpdatedAt]
+        if (token === USDC_ADDRESS) return [parseEther('0.85'), lastUpdatedAt]
+        throw Error('not-expected')
       })
 
       // when
       const tx = stableCoinProvider.getStableCoinIfPegged()
 
       // then
-      await expect(tx).revertedWith('stable-coins-deviation-too-high')
+      await expect(tx).revertedWith('stable-prices-invalid')
     })
 
-    it('should revert if stables price deviation is too high (same decimals)', async function () {
+    it('should get primary stable coin if it is OK', async function () {
       // given
-      await stableCoinProvider.connect(governor).updateStableCoins(USDC_ADDRESS, USDT_ADDRESS)
-
-      priceProvider['quote(address,address,uint256)'].returns(() => {
-        return [parseUnits('0.85', 6), lastUpdatedAt] // 1 USDC = 0.85 USDT
-      })
-
-      // when
-      const tx = stableCoinProvider.getStableCoinIfPegged()
-
-      // then
-      await expect(tx).revertedWith('stable-coins-deviation-too-high')
-    })
-
-    it('should get primary stable coin if peg is OK (different decimals)', async function () {
-      // given
-      await stableCoinProvider.connect(governor).updateStableCoins(DAI_ADDRESS, USDT_ADDRESS)
-
-      priceProvider['quote(address,address,uint256)'].returns(() => {
-        return [parseUnits('0.99', 6), lastUpdatedAt] // 1 DAI = 0.99 USDT
+      priceProvider['getPriceInUsd(address)'].returns((args: [string]) => {
+        const [token] = args
+        if (token === DAI_ADDRESS) return [parseEther('0.99'), lastUpdatedAt]
+        if (token === USDC_ADDRESS) return [0, 0]
+        throw Error('not-expected')
       })
 
       // when
@@ -144,12 +134,13 @@ describe('StableCoinProvider @mainnet', function () {
       expect(stableCoinAddress).eq(DAI_ADDRESS)
     })
 
-    it('should get primary stable coin if peg is OK (same decimals)', async function () {
+    it('should get secondary stable coin if the primary is NOT OK', async function () {
       // given
-      await stableCoinProvider.connect(governor).updateStableCoins(USDC_ADDRESS, USDT_ADDRESS)
-
-      priceProvider['quote(address,address,uint256)'].returns(() => {
-        return [parseUnits('0.99', 6), lastUpdatedAt] // 1 USDC = 0.99 USDT
+      priceProvider['getPriceInUsd(address)'].returns((args: [string]) => {
+        const [token] = args
+        if (token === DAI_ADDRESS) return [parseEther('0.55'), lastUpdatedAt]
+        if (token === USDC_ADDRESS) return [parseEther('0.99'), lastUpdatedAt]
+        throw Error('not-expected')
       })
 
       // when

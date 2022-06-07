@@ -17,6 +17,7 @@ contract StableCoinProvider is IStableCoinProvider, UsingStalePeriod, UsingMaxDe
     using OracleHelpers for uint256;
 
     uint256 public constant USD_DECIMALS = 18;
+    uint256 public constant ONE_USD = 10**USD_DECIMALS;
 
     /**
      * @notice A stable coin to use as USD price reference
@@ -52,26 +53,20 @@ contract StableCoinProvider is IStableCoinProvider, UsingStalePeriod, UsingMaxDe
 
     /// @inheritdoc IStableCoinProvider
     function getStableCoinIfPegged() external view returns (address _stableCoin) {
-        uint256 _amountIn = 10**__primaryStableCoinDecimals;
-
         // Note: Chainlink supports DAI/USDC/USDT on all chains that we're using
-        (uint256 _amountOut, uint256 _lastUpdatedAt) = providersAggregator
-            .priceProviders(DataTypes.Provider.CHAINLINK)
-            .quote(primaryStableCoin, secondaryStableCoin, _amountIn);
+        IPriceProvider _chainlink = providersAggregator.priceProviders(DataTypes.Provider.CHAINLINK);
 
-        require(_amountOut > 0 && !_priceIsStale(_lastUpdatedAt), "stable-prices-invalid");
-        if (__primaryStableCoinDecimals == __secondaryStableCoinDecimals) {
-            require(_isDeviationOK(_amountIn, _amountOut), "stable-coins-deviation-too-high");
-        } else {
-            require(
-                _isDeviationOK(
-                    _amountIn,
-                    _amountOut.scaleDecimal(__secondaryStableCoinDecimals, __primaryStableCoinDecimals)
-                ),
-                "stable-coins-deviation-too-high"
-            );
+        (uint256 _priceInUsd, uint256 _lastUpdatedAt) = _chainlink.getPriceInUsd(primaryStableCoin);
+
+        if (!_priceIsStale(_lastUpdatedAt) && _isDeviationOK(_priceInUsd, ONE_USD)) {
+            return primaryStableCoin;
         }
-        _stableCoin = primaryStableCoin;
+
+        (_priceInUsd, _lastUpdatedAt) = _chainlink.getPriceInUsd(secondaryStableCoin);
+
+        require(!_priceIsStale(_lastUpdatedAt) && _isDeviationOK(_priceInUsd, ONE_USD), "stable-prices-invalid");
+
+        return secondaryStableCoin;
     }
 
     /// @inheritdoc IStableCoinProvider
