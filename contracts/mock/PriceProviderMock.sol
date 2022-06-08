@@ -15,4 +15,13 @@ contract PriceProviderMock is PriceProvider {
         _priceInUsd = priceInUsd[token_];
         _lastUpdatedAt = block.timestamp;
     }
+
+    function checkGasOfQuote(
+        IPriceProvider _pp,
+        address tokenIn_,
+        address tokenOut_,
+        uint256 amountIn_
+    ) public returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+        return _pp.quote(tokenIn_, tokenOut_, amountIn_);
+    }
 }

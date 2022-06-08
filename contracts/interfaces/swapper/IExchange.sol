@@ -15,7 +15,7 @@ interface IExchange {
         address tokenIn_,
         address tokenOut_,
         uint256 amountOut_
-    ) external view returns (uint256 _amountIn, address[] memory _path);
+    ) external returns (uint256 _amountIn, bytes memory _path);
 
     /**
      * @notice Get *spot* quote
@@ -26,14 +26,14 @@ interface IExchange {
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    ) external view returns (uint256 _amountOut, address[] memory _path);
+    ) external returns (uint256 _amountOut, bytes memory _path);
 
     /**
      * @notice Perform an exact input swap
      * @dev Should transfer `amountIn_` before performing swap
      */
     function swapExactInput(
-        address[] calldata path_,
+        bytes calldata path_,
         uint256 amountIn_,
         uint256 amountOutMin_,
         address outReceiver_
@@ -45,7 +45,7 @@ interface IExchange {
      * @dev Sends swap remains - if any - to the `inSender_`
      */
     function swapExactOutput(
-        address[] calldata path_,
+        bytes calldata path_,
         uint256 amountOut_,
         uint256 amountInMax_,
         address inSender_,

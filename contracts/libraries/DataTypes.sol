@@ -19,4 +19,18 @@ library DataTypes {
         UMBRELLA_PASSPORT,
         FLUX
     }
+
+    enum ExchangeType {
+        UNISWAP_V2,
+        SUSHISWAP,
+        TRADERJOE,
+        PANGOLIN,
+        QUICKSWAP,
+        UNISWAP_V3
+    }
+
+    enum SwapType {
+        EXACT_INPUT,
+        EXACT_OUTPUT
+    }
 }

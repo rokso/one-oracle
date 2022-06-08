@@ -14,6 +14,8 @@ import Address from '../../helpers/address'
 import {parseEther, min, max, parseUnits} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
 
+const abi = ethers.utils.defaultAbiCoder
+
 describe('UniswapV2LikeExchange', function () {
   describe('UniswapV2LikeExchange @mainnet', function () {
     const {WETH_ADDRESS, DAI_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS, UNISWAP_V2_ROUTER_ADDRESS} = Address.mainnet
@@ -57,8 +59,8 @@ describe('UniswapV2LikeExchange', function () {
         const amountOut = parseEther('1,000')
         const call0 = dex.getBestAmountIn(WETH_ADDRESS, invalidToken.address, amountOut)
         const call1 = dex.getBestAmountIn(DAI_ADDRESS, invalidToken.address, amountOut)
-        await expect(call0).revertedWith('invalid-swap')
-        await expect(call1).revertedWith('invalid-swap')
+        await expect(call0).revertedWith('no-path-found')
+        await expect(call1).revertedWith('no-path-found')
       })
 
       it('should get best amountIn for USDC->DAI', async function () {
@@ -70,7 +72,7 @@ describe('UniswapV2LikeExchange', function () {
         expect(bestAmountIn).closeTo(parseUnits('1,000', 6), parseUnits('1', 6))
 
         // when
-        const {_amountIn} = await dex.getBestAmountIn(USDC_ADDRESS, DAI_ADDRESS, amountOut)
+        const {_amountIn} = await dex.callStatic.getBestAmountIn(USDC_ADDRESS, DAI_ADDRESS, amountOut)
 
         // then
         expect(_amountIn).eq(bestAmountIn)
@@ -85,7 +87,7 @@ describe('UniswapV2LikeExchange', function () {
         expect(bestAmountIn).closeTo(parseUnits('1', 8), parseUnits('0.1', 8))
 
         // when
-        const {_amountIn} = await dex.getBestAmountIn(WBTC_ADDRESS, DAI_ADDRESS, amountOut)
+        const {_amountIn} = await dex.callStatic.getBestAmountIn(WBTC_ADDRESS, DAI_ADDRESS, amountOut)
 
         // then
         expect(_amountIn).eq(bestAmountIn)
@@ -97,8 +99,8 @@ describe('UniswapV2LikeExchange', function () {
         const amountIn = parseEther('1,000')
         const call0 = dex.getBestAmountOut(WETH_ADDRESS, invalidToken.address, amountIn)
         const call1 = dex.getBestAmountOut(DAI_ADDRESS, invalidToken.address, amountIn)
-        await expect(call0).revertedWith('invalid-swap')
-        await expect(call1).revertedWith('invalid-swap')
+        await expect(call0).revertedWith('no-path-found')
+        await expect(call1).revertedWith('no-path-found')
       })
 
       it('should get best amountOut for USDC->DAI', async function () {
@@ -110,7 +112,7 @@ describe('UniswapV2LikeExchange', function () {
         expect(bestAmountOut).closeTo(parseEther('997'), parseEther('1'))
 
         // when
-        const {_amountOut} = await dex.getBestAmountOut(USDC_ADDRESS, DAI_ADDRESS, amountIn)
+        const {_amountOut} = await dex.callStatic.getBestAmountOut(USDC_ADDRESS, DAI_ADDRESS, amountIn)
 
         // then
         expect(_amountOut).eq(bestAmountOut)
@@ -125,7 +127,7 @@ describe('UniswapV2LikeExchange', function () {
         expect(bestAmountOut).closeTo(parseEther('43,221'), parseEther('1'))
 
         // when
-        const {_amountOut} = await dex.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
+        const {_amountOut} = await dex.callStatic.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
 
         // then
         expect(_amountOut).eq(bestAmountOut)
@@ -136,7 +138,7 @@ describe('UniswapV2LikeExchange', function () {
       it('should swap WBTC->USDC', async function () {
         // given
         const amountIn = parseUnits('1', 8)
-        const {_amountOut, _path} = await dex.getBestAmountOut(WBTC_ADDRESS, USDC_ADDRESS, amountIn)
+        const {_amountOut, _path} = await dex.callStatic.getBestAmountOut(WBTC_ADDRESS, USDC_ADDRESS, amountIn)
         const wbtcBefore = await wbtc.balanceOf(deployer.address)
         const usdcBefore = await usdc.balanceOf(deployer.address)
 
@@ -156,7 +158,7 @@ describe('UniswapV2LikeExchange', function () {
       it('should swap USDC->WBTC', async function () {
         // given
         const amountOut = parseUnits('1', 8)
-        const {_amountIn, _path} = await dex.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+        const {_amountIn, _path} = await dex.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
         const usdcBefore = await usdc.balanceOf(deployer.address)
         const wbtcBefore = await wbtc.balanceOf(deployer.address)
 
@@ -174,7 +176,7 @@ describe('UniswapV2LikeExchange', function () {
       it('should return remaining if any', async function () {
         // given
         const amountOut = parseUnits('1', 8)
-        const {_amountIn, _path} = await dex.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+        const {_amountIn, _path} = await dex.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
         const usdcBefore = await usdc.balanceOf(deployer.address)
         const wbtcBefore = await wbtc.balanceOf(deployer.address)
 
@@ -235,8 +237,8 @@ describe('UniswapV2LikeExchange', function () {
         const amountOut = parseEther('1,000')
         const call0 = dex.getBestAmountIn(WAVAX_ADDRESS, invalidToken.address, amountOut)
         const call1 = dex.getBestAmountIn(DAI_ADDRESS, invalidToken.address, amountOut)
-        await expect(call0).revertedWith('invalid-swap')
-        await expect(call1).revertedWith('invalid-swap')
+        await expect(call0).revertedWith('no-path-found')
+        await expect(call1).revertedWith('no-path-found')
       })
 
       it('should get best amountIn for USDC->DAI', async function () {
@@ -248,7 +250,7 @@ describe('UniswapV2LikeExchange', function () {
         expect(bestAmountIn).closeTo(parseUnits('1,002', 6), parseUnits('1', 6))
 
         // when
-        const {_amountIn} = await dex.getBestAmountIn(USDC_ADDRESS, DAI_ADDRESS, amountOut)
+        const {_amountIn} = await dex.callStatic.getBestAmountIn(USDC_ADDRESS, DAI_ADDRESS, amountOut)
 
         // then
         expect(_amountIn).eq(bestAmountIn)
@@ -260,8 +262,8 @@ describe('UniswapV2LikeExchange', function () {
         const amountIn = parseEther('1,000')
         const call0 = dex.getBestAmountOut(WAVAX_ADDRESS, invalidToken.address, amountIn)
         const call1 = dex.getBestAmountOut(DAI_ADDRESS, invalidToken.address, amountIn)
-        await expect(call0).revertedWith('invalid-swap')
-        await expect(call1).revertedWith('invalid-swap')
+        await expect(call0).revertedWith('no-path-found')
+        await expect(call1).revertedWith('no-path-found')
       })
 
       it('should get best amountOut for WBTC->DAI', async function () {
@@ -273,7 +275,7 @@ describe('UniswapV2LikeExchange', function () {
         expect(bestAmountOut).closeTo(parseEther('38,754'), parseEther('1'))
 
         // when
-        const {_amountOut} = await dex.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
+        const {_amountOut} = await dex.callStatic.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
 
         // then
         expect(_amountOut).eq(bestAmountOut)
@@ -284,8 +286,8 @@ describe('UniswapV2LikeExchange', function () {
       it('should swap WAVAX->DAI', async function () {
         // given
         const amountIn = parseEther('1')
-        const {_amountOut, _path} = await dex.getBestAmountOut(WAVAX_ADDRESS, DAI_ADDRESS, amountIn)
-        expect(_path).deep.eq([WAVAX_ADDRESS, DAI_ADDRESS])
+        const {_amountOut, _path} = await dex.callStatic.getBestAmountOut(WAVAX_ADDRESS, DAI_ADDRESS, amountIn)
+        expect(_path).deep.eq(abi.encode(['address[]'], [[WAVAX_ADDRESS, DAI_ADDRESS]]))
         const wavaxBefore = await wavax.balanceOf(deployer.address)
         const daiBefore = await dai.balanceOf(deployer.address)
 
@@ -303,8 +305,8 @@ describe('UniswapV2LikeExchange', function () {
       it('should swap WBTC->USDC', async function () {
         // given
         const amountIn = parseUnits('1', 8)
-        const {_amountOut, _path} = await dex.getBestAmountOut(WBTC_ADDRESS, USDC_ADDRESS, amountIn)
-        expect(_path).deep.eq([WBTC_ADDRESS, WAVAX_ADDRESS, USDC_ADDRESS])
+        const {_amountOut, _path} = await dex.callStatic.getBestAmountOut(WBTC_ADDRESS, USDC_ADDRESS, amountIn)
+        expect(_path).deep.eq(abi.encode(['address[]'], [[WBTC_ADDRESS, WAVAX_ADDRESS, USDC_ADDRESS]]))
         const wbtcBefore = await wbtc.balanceOf(deployer.address)
         const usdcBefore = await usdc.balanceOf(deployer.address)
 
@@ -324,8 +326,8 @@ describe('UniswapV2LikeExchange', function () {
       it('should swap DAI->WAVAX', async function () {
         // given
         const amountOut = parseEther('1')
-        const {_amountIn, _path} = await dex.getBestAmountIn(DAI_ADDRESS, WAVAX_ADDRESS, amountOut)
-        expect(_path).deep.eq([DAI_ADDRESS, WAVAX_ADDRESS])
+        const {_amountIn, _path} = await dex.callStatic.getBestAmountIn(DAI_ADDRESS, WAVAX_ADDRESS, amountOut)
+        expect(_path).deep.eq(abi.encode(['address[]'], [[DAI_ADDRESS, WAVAX_ADDRESS]]))
         const daiBefore = await dai.balanceOf(deployer.address)
         const wavaxBefore = await wavax.balanceOf(deployer.address)
 
@@ -343,8 +345,8 @@ describe('UniswapV2LikeExchange', function () {
       it('should swap USDC->WBTC', async function () {
         // given
         const amountOut = parseUnits('1', 8)
-        const {_amountIn, _path} = await dex.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
-        expect(_path).deep.eq([USDC_ADDRESS, WAVAX_ADDRESS, WBTC_ADDRESS])
+        const {_amountIn, _path} = await dex.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+        expect(_path).deep.eq(abi.encode(['address[]'], [[USDC_ADDRESS, WAVAX_ADDRESS, WBTC_ADDRESS]]))
         const usdcBefore = await usdc.balanceOf(deployer.address)
         const wbtcBefore = await wbtc.balanceOf(deployer.address)
 
@@ -362,7 +364,7 @@ describe('UniswapV2LikeExchange', function () {
       it('should return remaining if any', async function () {
         // given
         const amountOut = parseUnits('1', 8)
-        const {_amountIn, _path} = await dex.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+        const {_amountIn, _path} = await dex.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
         const usdcBefore = await usdc.balanceOf(deployer.address)
         const wbtcBefore = await wbtc.balanceOf(deployer.address)
 

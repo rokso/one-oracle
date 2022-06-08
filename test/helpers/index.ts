@@ -9,6 +9,37 @@ export const WEEK = DAY.mul(7)
 export const MONTH = DAY.mul(30)
 export const YEAR = DAY.mul(365)
 
+// Note: See `contracts/libraries/DataTypes.sol`
+export enum Provider {
+  NONE = 0,
+  CHAINLINK = 1,
+  UNISWAP_V3 = 2,
+  UNISWAP_V2 = 3,
+  SUSHISWAP = 4,
+  TRADERJOE = 5,
+  PANGOLIN = 6,
+  QUICKSWAP = 7,
+  UMBRELLA_FIRST_CLASS = 8,
+  UMBRELLA_PASSPORT = 9,
+  FLUX = 10,
+}
+
+// Note: See `contracts/libraries/DataTypes.sol`
+export enum ExchangeType {
+  UNISWAP_V2 = 0,
+  SUSHISWAP = 1,
+  TRADERJOE = 2,
+  PANGOLIN = 3,
+  QUICKSWAP = 4,
+  UNISWAP_V3 = 5,
+}
+
+// Note: See `contracts/libraries/DataTypes.sol`
+export enum SwapType {
+  EXACT_INPUT = 0,
+  EXACT_OUTPUT = 1,
+}
+
 export const parseUnits = (n: string, d: number) => ethers.utils.parseUnits(n.replace(new RegExp(/,/g), ''), d)
 
 export const parseEther = (n: string) => parseUnits(n, 18)
