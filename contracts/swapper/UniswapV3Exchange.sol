@@ -104,7 +104,9 @@ contract UniswapV3Exchange is IExchange {
         });
 
         (address _tokenInAddress, , ) = path_.decodeFirstPool();
-        IERC20(_tokenInAddress).safeApprove(address(UNI3_ROUTER), amountIn_);
+        IERC20 _tokenIn = IERC20(_tokenInAddress);
+        _tokenIn.safeApprove(address(UNI3_ROUTER), 0);
+        _tokenIn.safeApprove(address(UNI3_ROUTER), amountIn_);
         _amountOut = UNI3_ROUTER.exactInput(params);
     }
 
