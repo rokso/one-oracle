@@ -82,8 +82,8 @@ describe('Swapper @mainnet', function () {
       const amountOut = parseEther('1,000')
       const call0 = swapper.getBestAmountIn(WETH_ADDRESS, invalidToken.address, amountOut)
       const call1 = swapper.getBestAmountIn(DAI_ADDRESS, invalidToken.address, amountOut)
-      await expect(call0).revertedWith('invalid-swap')
-      await expect(call1).revertedWith('invalid-swap')
+      await expect(call0).revertedWith('no-path-found')
+      await expect(call1).revertedWith('no-path-found')
     })
 
     it('should get best amountIn for WETH->DAI', async function () {
@@ -169,8 +169,8 @@ describe('Swapper @mainnet', function () {
       const amountIn = parseEther('1,000')
       const call0 = swapper.getBestAmountOut(WETH_ADDRESS, invalidToken.address, amountIn)
       const call1 = swapper.getBestAmountOut(DAI_ADDRESS, invalidToken.address, amountIn)
-      await expect(call0).revertedWith('invalid-swap')
-      await expect(call1).revertedWith('invalid-swap')
+      await expect(call0).revertedWith('no-path-found')
+      await expect(call1).revertedWith('no-path-found')
     })
 
     it('should get best amountOut for WETH->DAI', async function () {

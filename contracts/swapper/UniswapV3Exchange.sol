@@ -45,14 +45,14 @@ contract UniswapV3Exchange is IExchange {
         if (tokenIn_ == wethLike || tokenOut_ == wethLike) {
             _path = abi.encodePacked(tokenOut_, defaultPoolFee, tokenIn_);
             _amountIn = getAmountsIn(amountOut_, _path);
-            require(_amountIn > 0, "invalid-swap");
+            require(_amountIn > 0, "no-path-found");
             return (_amountIn, _path);
         }
 
         // 2. Check IN-WETH-OUT path
         _path = abi.encodePacked(tokenOut_, defaultPoolFee, wethLike, defaultPoolFee, tokenIn_);
         _amountIn = getAmountsIn(amountOut_, _path);
-        require(_amountIn > 0, "invalid-swap");
+        require(_amountIn > 0, "no-path-found");
         return (_amountIn, _path);
     }
 
@@ -66,14 +66,14 @@ contract UniswapV3Exchange is IExchange {
         if (tokenIn_ == wethLike || tokenOut_ == wethLike) {
             _path = abi.encodePacked(tokenIn_, defaultPoolFee, tokenOut_);
             _amountOut = getAmountsOut(amountIn_, _path);
-            require(_amountOut > 0, "invalid-swap");
+            require(_amountOut > 0, "no-path-found");
             return (_amountOut, _path);
         }
 
         // 2. Check IN-WETH-OUT path
         _path = abi.encodePacked(tokenIn_, defaultPoolFee, wethLike, defaultPoolFee, tokenOut_);
         _amountOut = getAmountsOut(amountIn_, _path);
-        require(_amountOut > 0, "invalid-swap");
+        require(_amountOut > 0, "no-path-found");
     }
 
     function getAmountsIn(uint256 amountOut_, bytes memory path_) public returns (uint256 _amountIn) {

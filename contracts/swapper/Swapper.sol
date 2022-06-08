@@ -110,14 +110,14 @@ contract Swapper is ISwapper, Governable {
             abi.encodePacked(DataTypes.SwapType.EXACT_OUTPUT, tokenIn_, tokenOut_)
         ];
         if (_preferablePath.length > 0) {
-            DataTypes.ExchangeType exchangeType_;
-            (exchangeType_, _path) = abi.decode(_preferablePath, (DataTypes.ExchangeType, bytes));
-            return (_amountInMax, IExchange(addressOf[exchangeType_]), _path);
+            DataTypes.ExchangeType _exchangeType;
+            (_exchangeType, _path) = abi.decode(_preferablePath, (DataTypes.ExchangeType, bytes));
+            return (_amountInMax, IExchange(addressOf[_exchangeType]), _path);
         }
 
         // 2. Look for the best path
         uint256 _len = exchanges.length();
-        for (uint256 i = 0; i < _len; ++i) {
+        for (uint256 i; i < _len; ++i) {
             IExchange _iExchange = IExchange(exchanges.at(i));
             (uint256 _iAmountIn, bytes memory _iPath) = _iExchange.getBestAmountIn(tokenIn_, tokenOut_, amountOut_);
             if (_iAmountIn > 0 && _iAmountIn < _amountIn) {
@@ -143,21 +143,21 @@ contract Swapper is ISwapper, Governable {
         )
     {
         _amountOutMin = (oracle.quote(tokenIn_, tokenOut_, amountIn_) * (1e18 - maxSlippage)) / 1e18;
-        uint256 _amountOut = 0;
+        uint256 _amountOut;
 
         // 1. Return preferable path if any
         bytes memory _preferablePath = preferablePaths[
             abi.encodePacked(DataTypes.SwapType.EXACT_INPUT, tokenIn_, tokenOut_)
         ];
         if (_preferablePath.length > 0) {
-            DataTypes.ExchangeType exchangeType_;
-            (exchangeType_, _path) = abi.decode(_preferablePath, (DataTypes.ExchangeType, bytes));
-            return (_amountOutMin, IExchange(addressOf[exchangeType_]), _path);
+            DataTypes.ExchangeType _exchangeType;
+            (_exchangeType, _path) = abi.decode(_preferablePath, (DataTypes.ExchangeType, bytes));
+            return (_amountOutMin, IExchange(addressOf[_exchangeType]), _path);
         }
 
         // 2. Look for the best path
         uint256 _len = exchanges.length();
-        for (uint256 i = 0; i < _len; ++i) {
+        for (uint256 i; i < _len; ++i) {
             IExchange _iExchange = IExchange(exchanges.at(i));
             (uint256 _iAmountOut, bytes memory _iPath) = _iExchange.getBestAmountOut(tokenIn_, tokenOut_, amountIn_);
             if (_iAmountOut > _amountOut) {

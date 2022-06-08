@@ -49,8 +49,8 @@ describe('UniswapV3Exchange @mainnet', function () {
       const amountOut = parseEther('1,000')
       const call0 = dex.callStatic.getBestAmountIn(WETH_ADDRESS, invalidToken.address, amountOut)
       const call1 = dex.callStatic.getBestAmountIn(DAI_ADDRESS, invalidToken.address, amountOut)
-      await expect(call0).revertedWith('invalid-swap')
-      await expect(call1).revertedWith('invalid-swap')
+      await expect(call0).revertedWith('no-path-found')
+      await expect(call1).revertedWith('no-path-found')
     })
 
     it('should get best amountIn for WETH->DAI', async function () {
@@ -74,8 +74,8 @@ describe('UniswapV3Exchange @mainnet', function () {
       // given
       const amountOut = parseEther('100')
       const path = ethers.utils.solidityPack(
-        ['address', 'uint24', 'address'],
-        [DAI_ADDRESS, defaultPoolFee, USDC_ADDRESS]
+        ['address', 'uint24', 'address', 'uint24', 'address'],
+        [DAI_ADDRESS, defaultPoolFee, WETH_ADDRESS, defaultPoolFee, USDC_ADDRESS]
       )
       const bestAmountIn = await dex.callStatic.getAmountsIn(amountOut, path)
       expect(bestAmountIn).closeTo(parseUnits('100', 6), parseUnits('1', 6))
@@ -111,8 +111,8 @@ describe('UniswapV3Exchange @mainnet', function () {
       const amountIn = parseEther('1,000')
       const call0 = dex.callStatic.getBestAmountOut(WETH_ADDRESS, invalidToken.address, amountIn)
       const call1 = dex.callStatic.getBestAmountOut(DAI_ADDRESS, invalidToken.address, amountIn)
-      await expect(call0).revertedWith('invalid-swap')
-      await expect(call1).revertedWith('invalid-swap')
+      await expect(call0).revertedWith('no-path-found')
+      await expect(call1).revertedWith('no-path-found')
     })
 
     it('should get best amountOut for WETH->DAI', async function () {
