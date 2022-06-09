@@ -86,6 +86,18 @@ describe('Swapper @mainnet', function () {
       await expect(call1).revertedWith('no-path-found')
     })
 
+    it('should revert if amountInMax < amountIn', async function () {
+      // given
+      chainlinkAndFallbacksOracleFake.quote.returns(() => 1)
+
+      // when
+      const amountOut = parseEther('1,000')
+      const tx = swapper.getBestAmountIn(WETH_ADDRESS, DAI_ADDRESS, amountOut)
+
+      // then
+      await expect(tx).revertedWith('no-path-found')
+    })
+
     it('should get best amountIn for WETH->DAI', async function () {
       // given
       const amountOut = parseEther('3,222')
@@ -101,6 +113,7 @@ describe('Swapper @mainnet', function () {
       )
       expect(bestAmountIn).lt(amountInA)
       expect(bestAmountIn).closeTo(parseEther('1'), parseEther('0.1'))
+      chainlinkAndFallbacksOracleFake.quote.returns(() => bestAmountIn)
 
       // when
       const {_exchange, _path} = await swapper.callStatic.getBestAmountIn(WETH_ADDRESS, DAI_ADDRESS, amountOut)
@@ -125,6 +138,7 @@ describe('Swapper @mainnet', function () {
       )
       expect(bestAmountIn).lt(amountInA)
       expect(bestAmountIn).closeTo(parseUnits('1002', 6), parseUnits('1', 6))
+      chainlinkAndFallbacksOracleFake.quote.returns(() => bestAmountIn)
 
       // when
       const {_exchange, _path} = await swapper.callStatic.getBestAmountIn(USDC_ADDRESS, DAI_ADDRESS, amountOut)
@@ -154,6 +168,7 @@ describe('Swapper @mainnet', function () {
       )
       expect(bestAmountIn).lt(amountInB).lt(amountInA)
       expect(bestAmountIn).closeTo(parseUnits('1', 8), parseUnits('0.1', 8))
+      chainlinkAndFallbacksOracleFake.quote.returns(() => bestAmountIn)
 
       // when
       const {_exchange, _path} = await swapper.callStatic.getBestAmountIn(WBTC_ADDRESS, DAI_ADDRESS, amountOut)
@@ -171,6 +186,18 @@ describe('Swapper @mainnet', function () {
       const call1 = swapper.getBestAmountOut(DAI_ADDRESS, invalidToken.address, amountIn)
       await expect(call0).revertedWith('no-path-found')
       await expect(call1).revertedWith('no-path-found')
+    })
+
+    it('should revert if amountOutMin > amountOut', async function () {
+      // given
+      chainlinkAndFallbacksOracleFake.quote.returns(() => parseEther('1,000,000,000'))
+
+      // when
+      const amountOut = parseEther('1,000')
+      const tx = swapper.getBestAmountOut(WETH_ADDRESS, DAI_ADDRESS, amountOut)
+
+      // then
+      await expect(tx).revertedWith('no-path-found')
     })
 
     it('should get best amountOut for WETH->DAI', async function () {
@@ -295,12 +322,13 @@ describe('Swapper @mainnet', function () {
     it('should revert if slippage is too high', async function () {
       // given
       const amountOut = parseUnits('1', 8)
+      const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+      chainlinkAndFallbacksOracleFake.quote.returns(() => _amountIn)
       const {_exchange, _amountInMax} = await swapper.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
       expect(_exchange).eq(uniswapV3Exchange.address)
-      const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
-      chainlinkAndFallbacksOracleFake.quote.returns(() => _amountIn.div('10'))
 
       // when
+      chainlinkAndFallbacksOracleFake.quote.returns(() => _amountIn.div('10'))
       await usdc.approve(swapper.address, _amountInMax)
       const tx = swapper.swapExactOutput(USDC_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
 
@@ -311,9 +339,10 @@ describe('Swapper @mainnet', function () {
     it('should perform an exact output swap', async function () {
       // given
       const amountOut = parseUnits('1', 8)
+      const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+      chainlinkAndFallbacksOracleFake.quote.returns(() => _amountIn)
       const {_exchange} = await swapper.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
       expect(_exchange).eq(uniswapV3Exchange.address)
-      const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
       const usdcBefore = await usdc.balanceOf(deployer.address)
       const wbtcBefore = await wbtc.balanceOf(deployer.address)
 
@@ -335,9 +364,10 @@ describe('Swapper @mainnet', function () {
     it('should return remaining if any', async function () {
       // given
       const amountOut = parseUnits('1', 8)
+      const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
+      chainlinkAndFallbacksOracleFake.quote.returns(() => _amountIn)
       const {_exchange} = await swapper.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
       expect(_exchange).eq(uniswapV3Exchange.address)
-      const {_amountIn} = await uniswapV3Exchange.callStatic.getBestAmountIn(USDC_ADDRESS, WBTC_ADDRESS, amountOut)
       const usdcBefore = await usdc.balanceOf(deployer.address)
       const wbtcBefore = await wbtc.balanceOf(deployer.address)
 

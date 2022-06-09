@@ -120,7 +120,7 @@ contract Swapper is ISwapper, Governable {
         for (uint256 i; i < _len; ++i) {
             IExchange _iExchange = IExchange(exchanges.at(i));
             (uint256 _iAmountIn, bytes memory _iPath) = _iExchange.getBestAmountIn(tokenIn_, tokenOut_, amountOut_);
-            if (_iAmountIn > 0 && _iAmountIn < _amountIn) {
+            if (_iAmountIn > 0 && _iAmountIn < _amountIn && _iAmountIn <= _amountInMax) {
                 _amountIn = _iAmountIn;
                 _exchange = _iExchange;
                 _path = _iPath;
@@ -160,7 +160,7 @@ contract Swapper is ISwapper, Governable {
         for (uint256 i; i < _len; ++i) {
             IExchange _iExchange = IExchange(exchanges.at(i));
             (uint256 _iAmountOut, bytes memory _iPath) = _iExchange.getBestAmountOut(tokenIn_, tokenOut_, amountIn_);
-            if (_iAmountOut > _amountOut) {
+            if (_iAmountOut > _amountOut && _iAmountOut >= _amountOutMin) {
                 _amountOut = _iAmountOut;
                 _exchange = _iExchange;
                 _path = _iPath;
