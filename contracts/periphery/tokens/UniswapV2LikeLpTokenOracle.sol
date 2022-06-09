@@ -21,7 +21,7 @@ contract UniswapV2LikeLpTokenOracle is ITokenOracle {
     /**
      * @notice The oracle that resolves the price of underlying token
      */
-    IOracle public underlyingOracle;
+    IOracle public immutable underlyingOracle;
 
     constructor(IOracle _underlyingOracle) {
         underlyingOracle = _underlyingOracle;
