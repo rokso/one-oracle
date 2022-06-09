@@ -282,7 +282,7 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingProvidersAggregator, Using
      * @dev The fallback provider B is optional
      */
     function updateFallbackProviders(DataTypes.Provider fallbackProviderA_, DataTypes.Provider fallbackProviderB_)
-        public
+        external
         onlyGovernor
     {
         require(fallbackProviderA_ != DataTypes.Provider.NONE, "fallback-a-is-null");

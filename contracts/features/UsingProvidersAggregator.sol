@@ -26,7 +26,7 @@ abstract contract UsingProvidersAggregator is Governable {
     /**
      * @notice Update PriceProvidersAggregator contract
      */
-    function updateProvidersAggregator(IPriceProvidersAggregator providersAggregator_) public onlyGovernor {
+    function updateProvidersAggregator(IPriceProvidersAggregator providersAggregator_) external onlyGovernor {
         require(address(providersAggregator_) != address(0), "address-is-null");
         emit ProvidersAggregatorUpdated(providersAggregator, providersAggregator_);
         providersAggregator = providersAggregator_;

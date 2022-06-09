@@ -208,13 +208,13 @@ contract UniswapV3PriceProvider is IUniswapV3PriceProvider, PriceProvider, Using
     }
 
     /// @inheritdoc IUniswapV3PriceProvider
-    function updateDefaultTwapPeriod(uint32 newDefaultTwapPeriod_) public onlyGovernor {
+    function updateDefaultTwapPeriod(uint32 newDefaultTwapPeriod_) external onlyGovernor {
         emit DefaultTwapPeriodUpdated(defaultTwapPeriod, newDefaultTwapPeriod_);
         defaultTwapPeriod = newDefaultTwapPeriod_;
     }
 
     /// @inheritdoc IUniswapV3PriceProvider
-    function updateDefaultPoolFee(uint24 newDefaultPoolFee_) public onlyGovernor {
+    function updateDefaultPoolFee(uint24 newDefaultPoolFee_) external onlyGovernor {
         emit DefaultPoolFeeUpdated(defaultPoolFee, newDefaultPoolFee_);
         defaultPoolFee = newDefaultPoolFee_;
     }

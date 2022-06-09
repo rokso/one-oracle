@@ -260,7 +260,7 @@ contract Swapper is ISwapper, Governable {
         address tokenOut_,
         DataTypes.ExchangeType exchange_,
         bytes calldata path_
-    ) public onlyGovernor {
+    ) external onlyGovernor {
         bytes memory _key = abi.encodePacked(swapType_, tokenIn_, tokenOut_);
         bytes memory _currentPath = preferablePaths[_key];
         bytes memory _newPath = abi.encode(exchange_, path_);

@@ -25,7 +25,7 @@ abstract contract UsingStableCoinProvider is Governable {
     /**
      * @notice Update StableCoinProvider contract
      */
-    function updateStableCoinProvider(IStableCoinProvider stableCoinProvider_) public onlyGovernor {
+    function updateStableCoinProvider(IStableCoinProvider stableCoinProvider_) external onlyGovernor {
         emit StableCoinProviderUpdated(stableCoinProvider, stableCoinProvider_);
         stableCoinProvider = stableCoinProvider_;
     }
