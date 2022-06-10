@@ -187,7 +187,7 @@ contract Swapper is ISwapper, Governable {
             tokenOut_,
             amountIn_
         );
-        IERC20(tokenIn_).safeTransferFrom(_msgSender(), address(_exchange), amountIn_);
+        IERC20(tokenIn_).safeTransferFrom(msg.sender, address(_exchange), amountIn_);
         _amountOut = _exchange.swapExactInput(_path, amountIn_, _amountOutMin, receiver_);
         emit SwapExactInput(_exchange, _path, tokenIn_, tokenOut_, amountIn_, _amountOut);
     }
@@ -204,9 +204,8 @@ contract Swapper is ISwapper, Governable {
             tokenOut_,
             amountOut_
         );
-        address _caller = _msgSender();
-        IERC20(tokenIn_).safeTransferFrom(_caller, address(_exchange), _amountInMax);
-        _amountIn = _exchange.swapExactOutput(_path, amountOut_, _amountInMax, _caller, receiver_);
+        IERC20(tokenIn_).safeTransferFrom(msg.sender, address(_exchange), _amountInMax);
+        _amountIn = _exchange.swapExactOutput(_path, amountOut_, _amountInMax, msg.sender, receiver_);
         emit SwapExactOutput(_exchange, _path, tokenIn_, tokenOut_, _amountInMax, _amountIn, amountOut_);
     }
 
