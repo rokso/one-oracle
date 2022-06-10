@@ -163,14 +163,14 @@ contract UniswapV2LikeExchange is IExchange, Governable {
     /**
      * @notice Encode path from `address[]` to `bytes`
      */
-    function _encodePath(address[] memory path_) public pure returns (bytes memory _path) {
+    function _encodePath(address[] memory path_) private pure returns (bytes memory _path) {
         return abi.encode(path_);
     }
 
     /**
      * @notice Encode path from `bytes` to `address[]`
      */
-    function _decodePath(bytes memory path_) public pure returns (address[] memory _path) {
+    function _decodePath(bytes memory path_) private pure returns (address[] memory _path) {
         return abi.decode(path_, (address[]));
     }
 

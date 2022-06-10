@@ -273,7 +273,7 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, PriceProvide
     }
 
     /// @inheritdoc IUniswapV2LikePriceProvider
-    function updateDefaultTwapPeriod(uint256 newDefaultTwapPeriod_) public override onlyGovernor {
+    function updateDefaultTwapPeriod(uint256 newDefaultTwapPeriod_) external override onlyGovernor {
         emit DefaultTwapPeriodUpdated(defaultTwapPeriod, newDefaultTwapPeriod_);
         defaultTwapPeriod = newDefaultTwapPeriod_;
     }

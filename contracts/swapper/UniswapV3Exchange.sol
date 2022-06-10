@@ -76,12 +76,20 @@ contract UniswapV3Exchange is IExchange {
         require(_amountOut > 0, "no-path-found");
     }
 
+    /**
+     * @notice Wraps `quoter.quoteExactOutput()` function
+     * @dev Returns `0` if reverts
+     */
     function getAmountsIn(uint256 amountOut_, bytes memory path_) public returns (uint256 _amountIn) {
         try QUOTER.quoteExactOutput(path_, amountOut_) returns (uint256 __amountIn) {
             _amountIn = __amountIn;
         } catch {}
     }
 
+    /**
+     * @notice Wraps `quoter.quoteExactInput()` function
+     * @dev Returns `0` if reverts
+     */
     function getAmountsOut(uint256 amountIn_, bytes memory path_) public returns (uint256 _amountOut) {
         try QUOTER.quoteExactInput(path_, amountIn_) returns (uint256 __amountOut) {
             _amountOut = __amountOut;

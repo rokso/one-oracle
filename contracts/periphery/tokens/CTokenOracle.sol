@@ -15,12 +15,12 @@ contract CTokenOracle is ITokenOracle {
     /**
      * @notice The oracle that resolves the price of underlying token
      */
-    IOracle public underlyingOracle;
+    IOracle public immutable underlyingOracle;
 
     /**
      * @notice The address of the `CEther` underlying (Usually WETH)
      */
-    address public wethLike;
+    address public immutable wethLike;
 
     constructor(IOracle _underlyingOracle, address _wethLike) {
         underlyingOracle = _underlyingOracle;
