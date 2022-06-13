@@ -230,6 +230,7 @@ contract Swapper is ISwapper, Governable {
      * @notice Update max slippage
      */
     function updateMaxSlippage(uint256 maxSlippage_) external onlyGovernor {
+        require(maxSlippage_ <= 1e18, "max-slippage-gt-100%");
         emit MaxSlippageUpdated(maxSlippage, maxSlippage_);
         maxSlippage = maxSlippage_;
     }
