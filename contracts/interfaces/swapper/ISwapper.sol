@@ -14,7 +14,13 @@ interface ISwapper {
      * @notice The list of supported DEXes
      * @dev This function is gas intensive
      */
-    function getExchanges() external view returns (address[] memory);
+    function getAllExchanges() external view returns (address[] memory);
+
+    /**
+     * @notice The list of main DEXes
+     * @dev This function is gas intensive
+     */
+    function getMainExchanges() external view returns (address[] memory);
 
     /**
      * @notice Oracle to get prices from

@@ -21,7 +21,12 @@ contract Swapper is ISwapper, Governable {
     /**
      * @notice List of the supported exchanges
      */
-    EnumerableSet.AddressSet private exchanges;
+    EnumerableSet.AddressSet private allExchanges;
+
+    /**
+     * @notice List of the exchanges to loop over when getting best paths
+     */
+    EnumerableSet.AddressSet private mainExchanges;
 
     /**
      * @notice Mapping of exchanges' addresses by type
@@ -52,6 +57,9 @@ contract Swapper is ISwapper, Governable {
         address indexed oldExchange,
         address indexed newExchange
     );
+
+    /// @notice Emitted when an exchanges to loop over are updated
+    event ExchangeAsMainUpdated(DataTypes.ExchangeType indexed exchangeType, bool isMain);
 
     /// @notice Emitted when the oracle is updated
     event OracleUpdated(IOracle indexed oldOracle, IOracle indexed newOracle);
@@ -116,9 +124,9 @@ contract Swapper is ISwapper, Governable {
         }
 
         // 2. Look for the best path
-        uint256 _len = exchanges.length();
+        uint256 _len = mainExchanges.length();
         for (uint256 i; i < _len; ++i) {
-            IExchange _iExchange = IExchange(exchanges.at(i));
+            IExchange _iExchange = IExchange(mainExchanges.at(i));
             (uint256 _iAmountIn, bytes memory _iPath) = _iExchange.getBestAmountIn(tokenIn_, tokenOut_, amountOut_);
             if (_iAmountIn > 0 && _iAmountIn < _amountIn && _iAmountIn <= _amountInMax) {
                 _amountIn = _iAmountIn;
@@ -156,9 +164,9 @@ contract Swapper is ISwapper, Governable {
         }
 
         // 2. Look for the best path
-        uint256 _len = exchanges.length();
+        uint256 _len = mainExchanges.length();
         for (uint256 i; i < _len; ++i) {
-            IExchange _iExchange = IExchange(exchanges.at(i));
+            IExchange _iExchange = IExchange(mainExchanges.at(i));
             (uint256 _iAmountOut, bytes memory _iPath) = _iExchange.getBestAmountOut(tokenIn_, tokenOut_, amountIn_);
             if (_iAmountOut > _amountOut && _iAmountOut >= _amountOutMin) {
                 _amountOut = _iAmountOut;
@@ -171,8 +179,13 @@ contract Swapper is ISwapper, Governable {
     }
 
     /// @inheritdoc ISwapper
-    function getExchanges() external view override returns (address[] memory) {
-        return exchanges.values();
+    function getAllExchanges() external view override returns (address[] memory) {
+        return allExchanges.values();
+    }
+
+    /// @inheritdoc ISwapper
+    function getMainExchanges() external view override returns (address[] memory) {
+        return mainExchanges.values();
     }
 
     /// @inheritdoc ISwapper
@@ -215,14 +228,45 @@ contract Swapper is ISwapper, Governable {
      */
     function setExchange(DataTypes.ExchangeType type_, address exchange_) external onlyGovernor {
         address _currentExchange = addressOf[type_];
-        if (exchange_ == address(0)) {
-            require(exchanges.remove(_currentExchange), "exchange-does-not-exist");
+
+        if (_currentExchange == address(0)) {
+            // Adding
+            require(allExchanges.add(exchange_), "exchange-exists");
+            require(mainExchanges.add(exchange_), "main-exchange-exists");
+            addressOf[type_] = exchange_;
+        } else if (exchange_ == address(0)) {
+            // Removing
+            require(allExchanges.remove(_currentExchange), "exchange-does-not-exist");
+            if (mainExchanges.contains(_currentExchange)) {
+                mainExchanges.remove(_currentExchange);
+            }
             delete addressOf[type_];
         } else {
-            require(exchanges.add(exchange_), "exchange-exists");
+            // Updating
+            if (mainExchanges.contains(_currentExchange)) {
+                mainExchanges.remove(_currentExchange);
+            }
+            require(allExchanges.remove(_currentExchange), "exchange-does-not-exist");
+            require(allExchanges.add(exchange_), "exchange-exists");
+            require(mainExchanges.add(exchange_), "main-exchange-exists");
             addressOf[type_] = exchange_;
         }
         emit ExchangeUpdated(type_, _currentExchange, exchange_);
+    }
+
+    /**
+     * @notice Toggle exchange as main
+     */
+    function setExchangeAsMain(DataTypes.ExchangeType type_) public onlyGovernor {
+        address _address = addressOf[type_];
+        require(_address != address(0), "exchange-does-not-exist");
+        if (mainExchanges.contains(_address)) {
+            mainExchanges.remove(_address);
+            emit ExchangeAsMainUpdated(type_, false);
+        } else {
+            mainExchanges.add(_address);
+            emit ExchangeAsMainUpdated(type_, true);
+        }
     }
 
     /**

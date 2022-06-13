@@ -397,6 +397,8 @@ describe('Swapper @mainnet', function () {
       // given
       const before = await swapper.addressOf(ExchangeType.PANGOLIN)
       expect(before).eq(ethers.constants.AddressZero)
+      const allExchangesBefore = await swapper.getAllExchanges()
+      const mainExchangesBefore = await swapper.getMainExchanges()
 
       // when
       await swapper.setExchange(ExchangeType.PANGOLIN, user.address)
@@ -404,12 +406,18 @@ describe('Swapper @mainnet', function () {
       // then
       const after = await swapper.addressOf(ExchangeType.PANGOLIN)
       expect(after).eq(user.address)
+      const allExchangesAfter = await swapper.getAllExchanges()
+      const mainExchangesAfter = await swapper.getMainExchanges()
+      expect(allExchangesAfter.length).eq(allExchangesBefore.length + 1)
+      expect(mainExchangesAfter.length).eq(mainExchangesBefore.length + 1)
     })
 
     it('should update exchange', async function () {
       // given
       const before = await swapper.addressOf(ExchangeType.UNISWAP_V2)
       expect(before).eq(uniswapV2Exchange.address)
+      const allExchangesBefore = await swapper.getAllExchanges()
+      const mainExchangesBefore = await swapper.getMainExchanges()
 
       // when
       await swapper.setExchange(ExchangeType.UNISWAP_V2, user.address)
@@ -417,12 +425,18 @@ describe('Swapper @mainnet', function () {
       // then
       const after = await swapper.addressOf(ExchangeType.UNISWAP_V2)
       expect(after).eq(user.address)
+      const allExchangesAfter = await swapper.getAllExchanges()
+      const mainExchangesAfter = await swapper.getMainExchanges()
+      expect(allExchangesAfter.length).eq(allExchangesBefore.length)
+      expect(mainExchangesAfter.length).eq(mainExchangesBefore.length)
     })
 
     it('should remove exchange', async function () {
       // given
       const before = await swapper.addressOf(ExchangeType.UNISWAP_V2)
       expect(before).eq(uniswapV2Exchange.address)
+      const allExchangesBefore = await swapper.getAllExchanges()
+      const mainExchangesBefore = await swapper.getMainExchanges()
 
       // when
       await swapper.setExchange(ExchangeType.UNISWAP_V2, ethers.constants.AddressZero)
@@ -430,6 +444,81 @@ describe('Swapper @mainnet', function () {
       // then
       const after = await swapper.addressOf(ExchangeType.UNISWAP_V2)
       expect(after).eq(ethers.constants.AddressZero)
+      const allExchangesAfter = await swapper.getAllExchanges()
+      const mainExchangesAfter = await swapper.getMainExchanges()
+      expect(allExchangesAfter.length).eq(allExchangesBefore.length - 1)
+      expect(mainExchangesAfter.length).eq(mainExchangesBefore.length - 1)
+    })
+
+    it('should revert when updating type for the same address', async function () {
+      // given
+      const before = await swapper.addressOf(ExchangeType.UNISWAP_V2)
+      expect(before).eq(uniswapV2Exchange.address)
+
+      // when
+      const tx = swapper.setExchange(ExchangeType.UNISWAP_V3, uniswapV2Exchange.address)
+
+      // then
+      await expect(tx).revertedWith('exchange-exists')
+    })
+
+    it('should update address of an exchange', async function () {
+      // given
+      await swapper.setExchange(ExchangeType.PANGOLIN, user.address)
+      const allExchangesBefore = await swapper.getAllExchanges()
+      const mainExchangesBefore = await swapper.getMainExchanges()
+
+      // when
+      await swapper.setExchange(ExchangeType.PANGOLIN, deployer.address)
+
+      // then
+      const addressAfter = await swapper.addressOf(ExchangeType.PANGOLIN)
+      expect(addressAfter).eq(deployer.address)
+      const allExchangesAfter = await swapper.getAllExchanges()
+      const mainExchangesAfter = await swapper.getMainExchanges()
+      expect(allExchangesAfter.length).eq(allExchangesBefore.length)
+      expect(mainExchangesAfter.length).eq(mainExchangesBefore.length)
+    })
+  })
+
+  describe('setExchangeAsMain', function () {
+    it('should revert if not governor', async function () {
+      const tx = swapper.connect(user).setExchangeAsMain(ExchangeType.UNISWAP_V2)
+      await expect(tx).revertedWith('not-governor')
+    })
+
+    it('should revert if exchange does not exist', async function () {
+      const tx = swapper.setExchangeAsMain(ExchangeType.PANGOLIN)
+      await expect(tx).revertedWith('exchange-does-not-exist')
+    })
+
+    it('should remove exchange from main list', async function () {
+      // given
+      const address = await swapper.addressOf(ExchangeType.UNISWAP_V2)
+      const before = await swapper.getMainExchanges()
+      expect(before).contains(address)
+
+      // when
+      await swapper.setExchangeAsMain(ExchangeType.UNISWAP_V2)
+
+      // then
+      const after = await swapper.getMainExchanges()
+      expect(after).not.contains(address)
+    })
+
+    it('should add exchange to main list', async function () {
+      // given
+      const address = await swapper.addressOf(ExchangeType.UNISWAP_V2)
+      await swapper.setExchangeAsMain(ExchangeType.UNISWAP_V2)
+      const before = await swapper.getMainExchanges()
+      expect(before).not.contains(address)
+
+      // when
+      await swapper.setExchangeAsMain(ExchangeType.UNISWAP_V2)
+
+      // then
+      const after = await swapper.getMainExchanges()
+      expect(after).contains(address)
     })
   })
 
