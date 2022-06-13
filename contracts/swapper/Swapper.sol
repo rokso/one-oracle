@@ -34,10 +34,10 @@ contract Swapper is ISwapper, Governable {
     mapping(DataTypes.ExchangeType => address) public addressOf;
 
     /**
-     * @notice Preferable swap paths
+     * @notice Default swap paths
      * @dev Used to save gas by using a preset path instead of looking for the best
      */
-    mapping(bytes => bytes) public preferablePaths;
+    mapping(bytes => bytes) public defaultPaths;
 
     /**
      * @notice The oracle contract
@@ -88,8 +88,8 @@ contract Swapper is ISwapper, Governable {
         uint256 amountOut
     );
 
-    /// @notice Emitted when preferable path is updated
-    event PreferablePathUpdated(bytes key, bytes oldPath, bytes newPath);
+    /// @notice Emitted when default path is updated
+    event DefaultPathUpdated(bytes key, bytes oldPath, bytes newPath);
 
     constructor(IOracle oracle_, uint256 maxSlippage_) {
         require(address(oracle_) != address(0), "oracle-is-null");
@@ -111,19 +111,19 @@ contract Swapper is ISwapper, Governable {
         )
     {
         _amountInMax = (oracle.quote(tokenOut_, tokenIn_, amountOut_) * (1e18 + maxSlippage)) / 1e18;
-        uint256 _amountIn = type(uint256).max;
 
-        // 1. Return preferable path if any
-        bytes memory _preferablePath = preferablePaths[
+        // 1. Return default path if any
+        bytes memory _defaultPath = defaultPaths[
             abi.encodePacked(DataTypes.SwapType.EXACT_OUTPUT, tokenIn_, tokenOut_)
         ];
-        if (_preferablePath.length > 0) {
+        if (_defaultPath.length > 0) {
             DataTypes.ExchangeType _exchangeType;
-            (_exchangeType, _path) = abi.decode(_preferablePath, (DataTypes.ExchangeType, bytes));
+            (_exchangeType, _path) = abi.decode(_defaultPath, (DataTypes.ExchangeType, bytes));
             return (_amountInMax, IExchange(addressOf[_exchangeType]), _path);
         }
 
         // 2. Look for the best path
+        uint256 _amountIn = type(uint256).max;
         uint256 _len = mainExchanges.length();
         for (uint256 i; i < _len; ++i) {
             IExchange _iExchange = IExchange(mainExchanges.at(i));
@@ -151,19 +151,17 @@ contract Swapper is ISwapper, Governable {
         )
     {
         _amountOutMin = (oracle.quote(tokenIn_, tokenOut_, amountIn_) * (1e18 - maxSlippage)) / 1e18;
-        uint256 _amountOut;
 
-        // 1. Return preferable path if any
-        bytes memory _preferablePath = preferablePaths[
-            abi.encodePacked(DataTypes.SwapType.EXACT_INPUT, tokenIn_, tokenOut_)
-        ];
-        if (_preferablePath.length > 0) {
+        // 1. Return default path if any
+        bytes memory _defaultPath = defaultPaths[abi.encodePacked(DataTypes.SwapType.EXACT_INPUT, tokenIn_, tokenOut_)];
+        if (_defaultPath.length > 0) {
             DataTypes.ExchangeType _exchangeType;
-            (_exchangeType, _path) = abi.decode(_preferablePath, (DataTypes.ExchangeType, bytes));
+            (_exchangeType, _path) = abi.decode(_defaultPath, (DataTypes.ExchangeType, bytes));
             return (_amountOutMin, IExchange(addressOf[_exchangeType]), _path);
         }
 
         // 2. Look for the best path
+        uint256 _amountOut;
         uint256 _len = mainExchanges.length();
         for (uint256 i; i < _len; ++i) {
             IExchange _iExchange = IExchange(mainExchanges.at(i));
@@ -200,9 +198,33 @@ contract Swapper is ISwapper, Governable {
             tokenOut_,
             amountIn_
         );
-        IERC20(tokenIn_).safeTransferFrom(msg.sender, address(_exchange), amountIn_);
-        _amountOut = _exchange.swapExactInput(_path, amountIn_, _amountOutMin, receiver_);
-        emit SwapExactInput(_exchange, _path, tokenIn_, tokenOut_, amountIn_, _amountOut);
+        return _swapExactInput(tokenIn_, tokenOut_, amountIn_, receiver_, _amountOutMin, _exchange, _path);
+    }
+
+    /// @inheritdoc ISwapper
+    function swapExactInputOnlyIfHasDefaultPath(
+        address tokenIn_,
+        address tokenOut_,
+        uint256 amountIn_,
+        address receiver_
+    ) external returns (uint256 _amountOut) {
+        bytes memory _defaultPath = defaultPaths[abi.encodePacked(DataTypes.SwapType.EXACT_INPUT, tokenIn_, tokenOut_)];
+        require(_defaultPath.length > 0, "no-default-path-found");
+        (DataTypes.ExchangeType _exchangeType, bytes memory _path) = abi.decode(
+            _defaultPath,
+            (DataTypes.ExchangeType, bytes)
+        );
+        uint256 _amountOutMin = (oracle.quote(tokenIn_, tokenOut_, amountIn_) * (1e18 - maxSlippage)) / 1e18;
+        return
+            _swapExactInput(
+                tokenIn_,
+                tokenOut_,
+                amountIn_,
+                receiver_,
+                _amountOutMin,
+                IExchange(addressOf[_exchangeType]),
+                _path
+            );
     }
 
     /// @inheritdoc ISwapper
@@ -217,9 +239,35 @@ contract Swapper is ISwapper, Governable {
             tokenOut_,
             amountOut_
         );
-        IERC20(tokenIn_).safeTransferFrom(msg.sender, address(_exchange), _amountInMax);
-        _amountIn = _exchange.swapExactOutput(_path, amountOut_, _amountInMax, msg.sender, receiver_);
-        emit SwapExactOutput(_exchange, _path, tokenIn_, tokenOut_, _amountInMax, _amountIn, amountOut_);
+        return _swapExactOutput(tokenIn_, tokenOut_, amountOut_, receiver_, _amountInMax, _exchange, _path);
+    }
+
+    /// @inheritdoc ISwapper
+    function swapExactOutputOnlyIfHasDefaultPath(
+        address tokenIn_,
+        address tokenOut_,
+        uint256 amountOut_,
+        address receiver_
+    ) external returns (uint256 _amountIn) {
+        bytes memory _defaultPath = defaultPaths[
+            abi.encodePacked(DataTypes.SwapType.EXACT_OUTPUT, tokenIn_, tokenOut_)
+        ];
+        require(_defaultPath.length > 0, "no-default-path-found");
+        (DataTypes.ExchangeType _exchangeType, bytes memory _path) = abi.decode(
+            _defaultPath,
+            (DataTypes.ExchangeType, bytes)
+        );
+        uint256 _amountInMax = (oracle.quote(tokenOut_, tokenIn_, amountOut_) * (1e18 + maxSlippage)) / 1e18;
+        return
+            _swapExactOutput(
+                tokenIn_,
+                tokenOut_,
+                amountOut_,
+                receiver_,
+                _amountInMax,
+                IExchange(addressOf[_exchangeType]),
+                _path
+            );
     }
 
     /**
@@ -287,7 +335,7 @@ contract Swapper is ISwapper, Governable {
     }
 
     /**
-     * @notice Set preferable path
+     * @notice Set default path
      * @dev Use empty `path_` for removal
      * @param swapType_ If the path is related to `EXACT_INPUT` or `EXACT_OUTPUT`
      * @param tokenIn_ The swap in token
@@ -297,7 +345,7 @@ contract Swapper is ISwapper, Governable {
      * @dev Use `abi.encodePacked(tokenA, poolFee1, tokenB, poolFee2, tokenC, ...)` for UniswapV3 exchange
      * @dev Use `abi.encode([tokenA, tokenB, tokenC, ...])` for UniswapV2-like exchanges
      */
-    function setPreferablePath(
+    function setDefaultPath(
         DataTypes.SwapType swapType_,
         address tokenIn_,
         address tokenOut_,
@@ -305,13 +353,49 @@ contract Swapper is ISwapper, Governable {
         bytes calldata path_
     ) external onlyGovernor {
         bytes memory _key = abi.encodePacked(swapType_, tokenIn_, tokenOut_);
-        bytes memory _currentPath = preferablePaths[_key];
+        bytes memory _currentPath = defaultPaths[_key];
         bytes memory _newPath = abi.encode(exchange_, path_);
         if (path_.length == 0) {
-            delete preferablePaths[_key];
+            delete defaultPaths[_key];
         } else {
-            preferablePaths[_key] = _newPath;
+            defaultPaths[_key] = _newPath;
         }
-        emit PreferablePathUpdated(_key, _currentPath, _newPath);
+        emit DefaultPathUpdated(_key, _currentPath, _newPath);
+    }
+
+    /**
+     * @notice Perform an exact input swap
+     * @dev This code is reused by public/external functions
+     */
+    function _swapExactInput(
+        address tokenIn_,
+        address tokenOut_,
+        uint256 amountIn_,
+        address receiver_,
+        uint256 _amountOutMin,
+        IExchange _exchange,
+        bytes memory _path
+    ) private returns (uint256 _amountOut) {
+        IERC20(tokenIn_).safeTransferFrom(msg.sender, address(_exchange), amountIn_);
+        _amountOut = _exchange.swapExactInput(_path, amountIn_, _amountOutMin, receiver_);
+        emit SwapExactInput(_exchange, _path, tokenIn_, tokenOut_, amountIn_, _amountOut);
+    }
+
+    /**
+     * @notice Perform an exact output swap
+     * @dev This code is reused by public/external functions
+     */
+    function _swapExactOutput(
+        address tokenIn_,
+        address tokenOut_,
+        uint256 amountOut_,
+        address receiver_,
+        uint256 _amountInMax,
+        IExchange _exchange,
+        bytes memory _path
+    ) private returns (uint256 _amountIn) {
+        IERC20(tokenIn_).safeTransferFrom(msg.sender, address(_exchange), _amountInMax);
+        _amountIn = _exchange.swapExactOutput(_path, amountOut_, _amountInMax, msg.sender, receiver_);
+        emit SwapExactOutput(_exchange, _path, tokenIn_, tokenOut_, _amountInMax, _amountIn, amountOut_);
     }
 }

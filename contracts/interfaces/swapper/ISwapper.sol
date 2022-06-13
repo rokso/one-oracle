@@ -79,6 +79,16 @@ interface ISwapper {
     ) external returns (uint256 _amountOut);
 
     /**
+     * @notice Perform an exact input swap - will revert if there is no default path
+     */
+    function swapExactInputOnlyIfHasDefaultPath(
+        address tokenIn_,
+        address tokenOut_,
+        uint256 amountIn_,
+        address _receiver
+    ) external returns (uint256 _amountOut);
+
+    /**
      * @notice Perform an exact output swap
      */
     function swapExactOutput(
@@ -86,5 +96,15 @@ interface ISwapper {
         address tokenOut_,
         uint256 amountOut_,
         address _receiver
+    ) external returns (uint256 _amountIn);
+
+    /**
+     * @notice Perform an exact output swap - will revert if there is no default path
+     */
+    function swapExactOutputOnlyIfHasDefaultPath(
+        address tokenIn_,
+        address tokenOut_,
+        uint256 amountOut_,
+        address receiver_
     ) external returns (uint256 _amountIn);
 }

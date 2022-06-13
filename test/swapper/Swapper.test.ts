@@ -560,34 +560,34 @@ describe('Swapper @mainnet', function () {
     })
   })
 
-  describe('setPreferablePath', function () {
+  describe('setDefaultPath', function () {
     it('should revert if not governor', async function () {
       const tx = swapper
         .connect(user)
-        .setPreferablePath(SwapType.EXACT_INPUT, WETH_ADDRESS, WBTC_ADDRESS, ExchangeType.UNISWAP_V3, '0x')
+        .setDefaultPath(SwapType.EXACT_INPUT, WETH_ADDRESS, WBTC_ADDRESS, ExchangeType.UNISWAP_V3, '0x')
       await expect(tx).revertedWith('not-governor')
     })
 
-    it('should add a preferable path', async function () {
+    it('should add a default path', async function () {
       // given
       const key = ethers.utils.solidityPack(
         ['uint8', 'address', 'address'],
         [SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS]
       )
-      const before = await swapper.preferablePaths(key)
+      const before = await swapper.defaultPaths(key)
       expect(before).eq('0x')
 
       // when
       const exchangeType = ExchangeType.UNISWAP_V2
       const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS]])
-      await swapper.setPreferablePath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
+      await swapper.setDefaultPath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
 
       // then
-      const after = await swapper.preferablePaths(key)
+      const after = await swapper.defaultPaths(key)
       expect(after).eq(ethers.utils.defaultAbiCoder.encode(['uint8', 'bytes'], [exchangeType, path]))
     })
 
-    it('should remove a preferable path', async function () {
+    it('should remove a default path', async function () {
       // given
       const key = ethers.utils.solidityPack(
         ['uint8', 'address', 'address'],
@@ -595,15 +595,15 @@ describe('Swapper @mainnet', function () {
       )
       const exchangeType = ExchangeType.UNISWAP_V2
       const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS]])
-      await swapper.setPreferablePath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
-      const before = await swapper.preferablePaths(key)
+      await swapper.setDefaultPath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
+      const before = await swapper.defaultPaths(key)
       expect(before).eq(ethers.utils.defaultAbiCoder.encode(['uint8', 'bytes'], [exchangeType, path]))
 
       // when
-      await swapper.setPreferablePath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, '0x')
+      await swapper.setDefaultPath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, '0x')
 
       // then
-      const after = await swapper.preferablePaths(key)
+      const after = await swapper.defaultPaths(key)
       expect(after).eq('0x')
     })
   })
