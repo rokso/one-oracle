@@ -95,7 +95,7 @@ describe('Swapper @mainnet', function () {
       const tx = swapper.getBestAmountIn(WETH_ADDRESS, DAI_ADDRESS, amountOut)
 
       // then
-      await expect(tx).revertedWith('no-path-found')
+      await expect(tx).revertedWith('no-routing-found')
     })
 
     it('should get best amountIn for WETH->DAI', async function () {
@@ -197,7 +197,7 @@ describe('Swapper @mainnet', function () {
       const tx = swapper.getBestAmountOut(WETH_ADDRESS, DAI_ADDRESS, amountOut)
 
       // then
-      await expect(tx).revertedWith('no-path-found')
+      await expect(tx).revertedWith('no-routing-found')
     })
 
     it('should get best amountOut for WETH->DAI', async function () {
@@ -397,6 +397,8 @@ describe('Swapper @mainnet', function () {
       // given
       const before = await swapper.addressOf(ExchangeType.PANGOLIN)
       expect(before).eq(ethers.constants.AddressZero)
+      const allExchangesBefore = await swapper.getAllExchanges()
+      const mainExchangesBefore = await swapper.getMainExchanges()
 
       // when
       await swapper.setExchange(ExchangeType.PANGOLIN, user.address)
@@ -404,12 +406,18 @@ describe('Swapper @mainnet', function () {
       // then
       const after = await swapper.addressOf(ExchangeType.PANGOLIN)
       expect(after).eq(user.address)
+      const allExchangesAfter = await swapper.getAllExchanges()
+      const mainExchangesAfter = await swapper.getMainExchanges()
+      expect(allExchangesAfter.length).eq(allExchangesBefore.length + 1)
+      expect(mainExchangesAfter.length).eq(mainExchangesBefore.length + 1)
     })
 
     it('should update exchange', async function () {
       // given
       const before = await swapper.addressOf(ExchangeType.UNISWAP_V2)
       expect(before).eq(uniswapV2Exchange.address)
+      const allExchangesBefore = await swapper.getAllExchanges()
+      const mainExchangesBefore = await swapper.getMainExchanges()
 
       // when
       await swapper.setExchange(ExchangeType.UNISWAP_V2, user.address)
@@ -417,12 +425,18 @@ describe('Swapper @mainnet', function () {
       // then
       const after = await swapper.addressOf(ExchangeType.UNISWAP_V2)
       expect(after).eq(user.address)
+      const allExchangesAfter = await swapper.getAllExchanges()
+      const mainExchangesAfter = await swapper.getMainExchanges()
+      expect(allExchangesAfter.length).eq(allExchangesBefore.length)
+      expect(mainExchangesAfter.length).eq(mainExchangesBefore.length)
     })
 
     it('should remove exchange', async function () {
       // given
       const before = await swapper.addressOf(ExchangeType.UNISWAP_V2)
       expect(before).eq(uniswapV2Exchange.address)
+      const allExchangesBefore = await swapper.getAllExchanges()
+      const mainExchangesBefore = await swapper.getMainExchanges()
 
       // when
       await swapper.setExchange(ExchangeType.UNISWAP_V2, ethers.constants.AddressZero)
@@ -430,6 +444,81 @@ describe('Swapper @mainnet', function () {
       // then
       const after = await swapper.addressOf(ExchangeType.UNISWAP_V2)
       expect(after).eq(ethers.constants.AddressZero)
+      const allExchangesAfter = await swapper.getAllExchanges()
+      const mainExchangesAfter = await swapper.getMainExchanges()
+      expect(allExchangesAfter.length).eq(allExchangesBefore.length - 1)
+      expect(mainExchangesAfter.length).eq(mainExchangesBefore.length - 1)
+    })
+
+    it('should revert when updating type for the same address', async function () {
+      // given
+      const before = await swapper.addressOf(ExchangeType.UNISWAP_V2)
+      expect(before).eq(uniswapV2Exchange.address)
+
+      // when
+      const tx = swapper.setExchange(ExchangeType.UNISWAP_V3, uniswapV2Exchange.address)
+
+      // then
+      await expect(tx).revertedWith('exchange-exists')
+    })
+
+    it('should update address of an exchange', async function () {
+      // given
+      await swapper.setExchange(ExchangeType.PANGOLIN, user.address)
+      const allExchangesBefore = await swapper.getAllExchanges()
+      const mainExchangesBefore = await swapper.getMainExchanges()
+
+      // when
+      await swapper.setExchange(ExchangeType.PANGOLIN, deployer.address)
+
+      // then
+      const addressAfter = await swapper.addressOf(ExchangeType.PANGOLIN)
+      expect(addressAfter).eq(deployer.address)
+      const allExchangesAfter = await swapper.getAllExchanges()
+      const mainExchangesAfter = await swapper.getMainExchanges()
+      expect(allExchangesAfter.length).eq(allExchangesBefore.length)
+      expect(mainExchangesAfter.length).eq(mainExchangesBefore.length)
+    })
+  })
+
+  describe('toggleExchangeAsMain', function () {
+    it('should revert if not governor', async function () {
+      const tx = swapper.connect(user).toggleExchangeAsMain(ExchangeType.UNISWAP_V2)
+      await expect(tx).revertedWith('not-governor')
+    })
+
+    it('should revert if exchange does not exist', async function () {
+      const tx = swapper.toggleExchangeAsMain(ExchangeType.PANGOLIN)
+      await expect(tx).revertedWith('exchange-does-not-exist')
+    })
+
+    it('should remove exchange from main list', async function () {
+      // given
+      const address = await swapper.addressOf(ExchangeType.UNISWAP_V2)
+      const before = await swapper.getMainExchanges()
+      expect(before).contains(address)
+
+      // when
+      await swapper.toggleExchangeAsMain(ExchangeType.UNISWAP_V2)
+
+      // then
+      const after = await swapper.getMainExchanges()
+      expect(after).not.contains(address)
+    })
+
+    it('should add exchange to main list', async function () {
+      // given
+      const address = await swapper.addressOf(ExchangeType.UNISWAP_V2)
+      await swapper.toggleExchangeAsMain(ExchangeType.UNISWAP_V2)
+      const before = await swapper.getMainExchanges()
+      expect(before).not.contains(address)
+
+      // when
+      await swapper.toggleExchangeAsMain(ExchangeType.UNISWAP_V2)
+
+      // then
+      const after = await swapper.getMainExchanges()
+      expect(after).contains(address)
     })
   })
 
@@ -471,34 +560,34 @@ describe('Swapper @mainnet', function () {
     })
   })
 
-  describe('setPreferablePath', function () {
+  describe('setDefaultRouting', function () {
     it('should revert if not governor', async function () {
       const tx = swapper
         .connect(user)
-        .setPreferablePath(SwapType.EXACT_INPUT, WETH_ADDRESS, WBTC_ADDRESS, ExchangeType.UNISWAP_V3, '0x')
+        .setDefaultRouting(SwapType.EXACT_INPUT, WETH_ADDRESS, WBTC_ADDRESS, ExchangeType.UNISWAP_V3, '0x')
       await expect(tx).revertedWith('not-governor')
     })
 
-    it('should add a preferable path', async function () {
+    it('should add a default routing', async function () {
       // given
       const key = ethers.utils.solidityPack(
         ['uint8', 'address', 'address'],
         [SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS]
       )
-      const before = await swapper.preferablePaths(key)
+      const before = await swapper.defaultRoutings(key)
       expect(before).eq('0x')
 
       // when
       const exchangeType = ExchangeType.UNISWAP_V2
       const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS]])
-      await swapper.setPreferablePath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
 
       // then
-      const after = await swapper.preferablePaths(key)
+      const after = await swapper.defaultRoutings(key)
       expect(after).eq(ethers.utils.defaultAbiCoder.encode(['uint8', 'bytes'], [exchangeType, path]))
     })
 
-    it('should remove a preferable path', async function () {
+    it('should remove a default routing', async function () {
       // given
       const key = ethers.utils.solidityPack(
         ['uint8', 'address', 'address'],
@@ -506,15 +595,15 @@ describe('Swapper @mainnet', function () {
       )
       const exchangeType = ExchangeType.UNISWAP_V2
       const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS]])
-      await swapper.setPreferablePath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
-      const before = await swapper.preferablePaths(key)
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
+      const before = await swapper.defaultRoutings(key)
       expect(before).eq(ethers.utils.defaultAbiCoder.encode(['uint8', 'bytes'], [exchangeType, path]))
 
       // when
-      await swapper.setPreferablePath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, '0x')
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, '0x')
 
       // then
-      const after = await swapper.preferablePaths(key)
+      const after = await swapper.defaultRoutings(key)
       expect(after).eq('0x')
     })
   })

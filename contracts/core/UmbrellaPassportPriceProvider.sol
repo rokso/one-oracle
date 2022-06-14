@@ -72,7 +72,7 @@ contract UmbrellaPassportPriceProvider is IUmbrellaPassportPriceProvider, Umbrel
 
     /// @inheritdoc IDatumReceiver
     function receivePallet(Pallet calldata pallet_) external virtual override {
-        require(_msgSender() == registry.getAddress(DATUM_REGISTRY), "not-datum-registry");
+        require(msg.sender == registry.getAddress(DATUM_REGISTRY), "not-datum-registry");
 
         uint32 _palletTimestamp = _chain().blocks(pallet_.blockId).dataTimestamp;
 

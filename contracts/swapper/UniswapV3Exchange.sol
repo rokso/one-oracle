@@ -113,8 +113,9 @@ contract UniswapV3Exchange is IExchange {
 
         (address _tokenInAddress, , ) = path_.decodeFirstPool();
         IERC20 _tokenIn = IERC20(_tokenInAddress);
-        _tokenIn.safeApprove(address(UNI3_ROUTER), 0);
-        _tokenIn.safeApprove(address(UNI3_ROUTER), amountIn_);
+        if (_tokenIn.allowance(address(this), address(UNI3_ROUTER)) < amountIn_) {
+            _tokenIn.approve(address(UNI3_ROUTER), type(uint256).max);
+        }
         _amountOut = UNI3_ROUTER.exactInput(params);
     }
 
@@ -136,8 +137,9 @@ contract UniswapV3Exchange is IExchange {
         }
 
         IERC20 _tokenIn = IERC20(_tokenInAddress);
-        _tokenIn.safeApprove(address(UNI3_ROUTER), 0);
-        _tokenIn.safeApprove(address(UNI3_ROUTER), amountInMax_);
+        if (_tokenIn.allowance(address(this), address(UNI3_ROUTER)) < amountInMax_) {
+            _tokenIn.approve(address(UNI3_ROUTER), type(uint256).max);
+        }
 
         ISwapRouter.ExactOutputParams memory params = ISwapRouter.ExactOutputParams({
             path: path_,
@@ -150,7 +152,7 @@ contract UniswapV3Exchange is IExchange {
         _amountIn = UNI3_ROUTER.exactOutput(params);
 
         // If swap end up costly less than _amountInMax then return remaining to caller
-        uint256 _remainingAmountIn = _tokenIn.balanceOf(address(this));
+        uint256 _remainingAmountIn = amountInMax_ - _amountIn;
         if (_remainingAmountIn > 0) {
             _tokenIn.safeTransfer(remainingReceiver_, _remainingAmountIn);
         }

@@ -113,8 +113,10 @@ contract UniswapV2LikeExchange is IExchange, Governable {
     ) external returns (uint256 _amountOut) {
         address[] memory _path = _decodePath(path_);
         IERC20 _tokenIn = IERC20(_path[0]);
-        _tokenIn.safeApprove(address(router), 0);
-        _tokenIn.safeApprove(address(router), amountIn_);
+        if (_tokenIn.allowance(address(this), address(router)) < amountIn_) {
+            _tokenIn.approve(address(router), type(uint256).max);
+        }
+
         _amountOut = router.swapExactTokensForTokens(amountIn_, amountOutMin_, _path, outReceiver_, block.timestamp)[
             _path.length - 1
         ];
@@ -130,8 +132,10 @@ contract UniswapV2LikeExchange is IExchange, Governable {
     ) external returns (uint256 _amountIn) {
         address[] memory _path = _decodePath(path_);
         IERC20 _tokenIn = IERC20(_path[0]);
-        _tokenIn.safeApprove(address(router), 0);
-        _tokenIn.safeApprove(address(router), amountInMax_);
+        if (_tokenIn.allowance(address(this), address(router)) < amountInMax_) {
+            _tokenIn.approve(address(router), type(uint256).max);
+        }
+
         _amountIn = router.swapTokensForExactTokens(amountOut_, amountInMax_, _path, outRecipient_, block.timestamp)[0];
         // If swap end up costly less than _amountInMax then return remaining
         uint256 _remainingAmountIn = amountInMax_ - _amountIn;

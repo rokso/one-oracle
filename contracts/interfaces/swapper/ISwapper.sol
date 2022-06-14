@@ -14,7 +14,13 @@ interface ISwapper {
      * @notice The list of supported DEXes
      * @dev This function is gas intensive
      */
-    function getExchanges() external view returns (address[] memory);
+    function getAllExchanges() external view returns (address[] memory);
+
+    /**
+     * @notice The list of main DEXes
+     * @dev This function is gas intensive
+     */
+    function getMainExchanges() external view returns (address[] memory);
 
     /**
      * @notice Oracle to get prices from
@@ -73,6 +79,17 @@ interface ISwapper {
     ) external returns (uint256 _amountOut);
 
     /**
+     * @notice Perform an exact input swap - will revert if there is no default routing
+     */
+    function swapExactInputWithDefaultRouting(
+        address tokenIn_,
+        address tokenOut_,
+        uint256 amountIn_,
+        uint256 amountOutMin_,
+        address _receiver
+    ) external returns (uint256 _amountOut);
+
+    /**
      * @notice Perform an exact output swap
      */
     function swapExactOutput(
@@ -80,5 +97,16 @@ interface ISwapper {
         address tokenOut_,
         uint256 amountOut_,
         address _receiver
+    ) external returns (uint256 _amountIn);
+
+    /**
+     * @notice Perform an exact output swap - will revert if there is no default routing
+     */
+    function swapExactOutputWithDefaultRouting(
+        address tokenIn_,
+        address tokenOut_,
+        uint256 amountOut_,
+        uint256 amountInMax_,
+        address receiver_
     ) external returns (uint256 _amountIn);
 }
