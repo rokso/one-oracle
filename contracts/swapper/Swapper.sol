@@ -309,7 +309,7 @@ contract Swapper is ISwapper, Governable {
     /**
      * @notice Toggle exchange as main
      */
-    function setExchangeAsMain(DataTypes.ExchangeType type_) public onlyGovernor {
+    function toggleExchangeAsMain(DataTypes.ExchangeType type_) public onlyGovernor {
         address _address = addressOf[type_];
         require(_address != address(0), "exchange-does-not-exist");
         if (mainExchanges.contains(_address)) {
