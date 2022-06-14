@@ -83,10 +83,8 @@ contract StableCoinProvider is IStableCoinProvider, UsingStalePeriod, UsingMaxDe
      * @dev Must have both as set or null
      */
     function _updateStableCoins(address primaryStableCoin_, address secondaryStableCoin_) private {
-        require(
-            address(primaryStableCoin_) != address(0) && address(secondaryStableCoin_) != address(0),
-            "stable-coins-are-null"
-        );
+        require(primaryStableCoin_ != address(0) && secondaryStableCoin_ != address(0), "stable-coins-are-null");
+        require(primaryStableCoin_ != secondaryStableCoin_, "stable-coins-are-the-same");
 
         // Update both
         primaryStableCoin = primaryStableCoin_;

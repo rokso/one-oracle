@@ -47,7 +47,7 @@ describe('StableCoinProvider @mainnet', function () {
     await ethers.provider.send('evm_revert', [snapshotId])
   })
 
-  describe('updateStableCoin', function () {
+  describe('updateStableCoins', function () {
     it('should revert if not governor', async function () {
       const tx = stableCoinProvider.updateStableCoins(USDC_ADDRESS, DAI_ADDRESS)
       await expect(tx).revertedWith('not-governor')
@@ -76,6 +76,14 @@ describe('StableCoinProvider @mainnet', function () {
 
       // then
       await expect(tx).revertedWith('stable-coins-are-null')
+    })
+
+    it('should revert if setting stable coins are the same', async function () {
+      // when
+      const tx = stableCoinProvider.connect(governor).updateStableCoins(DAI_ADDRESS, DAI_ADDRESS)
+
+      // then
+      await expect(tx).revertedWith('stable-coins-are-the-same')
     })
   })
 
