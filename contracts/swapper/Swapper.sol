@@ -34,10 +34,10 @@ contract Swapper is ISwapper, Governable {
     mapping(DataTypes.ExchangeType => address) public addressOf;
 
     /**
-     * @notice Default swap paths
-     * @dev Used to save gas by using a preset path instead of looking for the best
+     * @notice Default swap routings
+     * @dev Used to save gas by using a preset routing instead of looking for the best
      */
-    mapping(bytes => bytes) public defaultPaths;
+    mapping(bytes => bytes) public defaultRoutings;
 
     /**
      * @notice The oracle contract
@@ -88,8 +88,8 @@ contract Swapper is ISwapper, Governable {
         uint256 amountOut
     );
 
-    /// @notice Emitted when default path is updated
-    event DefaultPathUpdated(bytes key, bytes oldPath, bytes newPath);
+    /// @notice Emitted when default routing is updated
+    event DefaultRoutingUpdated(bytes key, bytes oldRouting, bytes newRouting);
 
     constructor(IOracle oracle_, uint256 maxSlippage_) {
         require(address(oracle_) != address(0), "oracle-is-null");
@@ -112,17 +112,17 @@ contract Swapper is ISwapper, Governable {
     {
         _amountInMax = (oracle.quote(tokenOut_, tokenIn_, amountOut_) * (1e18 + maxSlippage)) / 1e18;
 
-        // 1. Return default path if any
-        bytes memory _defaultPath = defaultPaths[
+        // 1. Return default routing if any
+        bytes memory _defaultRouting = defaultRoutings[
             abi.encodePacked(DataTypes.SwapType.EXACT_OUTPUT, tokenIn_, tokenOut_)
         ];
-        if (_defaultPath.length > 0) {
+        if (_defaultRouting.length > 0) {
             DataTypes.ExchangeType _exchangeType;
-            (_exchangeType, _path) = abi.decode(_defaultPath, (DataTypes.ExchangeType, bytes));
+            (_exchangeType, _path) = abi.decode(_defaultRouting, (DataTypes.ExchangeType, bytes));
             return (_amountInMax, IExchange(addressOf[_exchangeType]), _path);
         }
 
-        // 2. Look for the best path
+        // 2. Look for the best routing
         uint256 _amountIn = type(uint256).max;
         uint256 _len = mainExchanges.length();
         for (uint256 i; i < _len; ++i) {
@@ -134,7 +134,7 @@ contract Swapper is ISwapper, Governable {
                 _path = _iPath;
             }
         }
-        require(_path.length > 0, "no-path-found");
+        require(_path.length > 0, "no-routing-found");
     }
 
     /// @inheritdoc ISwapper
@@ -152,15 +152,17 @@ contract Swapper is ISwapper, Governable {
     {
         _amountOutMin = (oracle.quote(tokenIn_, tokenOut_, amountIn_) * (1e18 - maxSlippage)) / 1e18;
 
-        // 1. Return default path if any
-        bytes memory _defaultPath = defaultPaths[abi.encodePacked(DataTypes.SwapType.EXACT_INPUT, tokenIn_, tokenOut_)];
-        if (_defaultPath.length > 0) {
+        // 1. Return default routing if any
+        bytes memory _defaultRouting = defaultRoutings[
+            abi.encodePacked(DataTypes.SwapType.EXACT_INPUT, tokenIn_, tokenOut_)
+        ];
+        if (_defaultRouting.length > 0) {
             DataTypes.ExchangeType _exchangeType;
-            (_exchangeType, _path) = abi.decode(_defaultPath, (DataTypes.ExchangeType, bytes));
+            (_exchangeType, _path) = abi.decode(_defaultRouting, (DataTypes.ExchangeType, bytes));
             return (_amountOutMin, IExchange(addressOf[_exchangeType]), _path);
         }
 
-        // 2. Look for the best path
+        // 2. Look for the best routing
         uint256 _amountOut;
         uint256 _len = mainExchanges.length();
         for (uint256 i; i < _len; ++i) {
@@ -173,7 +175,7 @@ contract Swapper is ISwapper, Governable {
             }
         }
 
-        require(_path.length > 0, "no-path-found");
+        require(_path.length > 0, "no-routing-found");
     }
 
     /// @inheritdoc ISwapper
@@ -202,16 +204,18 @@ contract Swapper is ISwapper, Governable {
     }
 
     /// @inheritdoc ISwapper
-    function swapExactInputOnlyIfHasDefaultPath(
+    function swapExactInputWithDefaultRouting(
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_,
         address receiver_
     ) external returns (uint256 _amountOut) {
-        bytes memory _defaultPath = defaultPaths[abi.encodePacked(DataTypes.SwapType.EXACT_INPUT, tokenIn_, tokenOut_)];
-        require(_defaultPath.length > 0, "no-default-path-found");
+        bytes memory _defaultRouting = defaultRoutings[
+            abi.encodePacked(DataTypes.SwapType.EXACT_INPUT, tokenIn_, tokenOut_)
+        ];
+        require(_defaultRouting.length > 0, "no-default-routing-found");
         (DataTypes.ExchangeType _exchangeType, bytes memory _path) = abi.decode(
-            _defaultPath,
+            _defaultRouting,
             (DataTypes.ExchangeType, bytes)
         );
         uint256 _amountOutMin = (oracle.quote(tokenIn_, tokenOut_, amountIn_) * (1e18 - maxSlippage)) / 1e18;
@@ -243,18 +247,18 @@ contract Swapper is ISwapper, Governable {
     }
 
     /// @inheritdoc ISwapper
-    function swapExactOutputOnlyIfHasDefaultPath(
+    function swapExactOutputWithDefaultRouting(
         address tokenIn_,
         address tokenOut_,
         uint256 amountOut_,
         address receiver_
     ) external returns (uint256 _amountIn) {
-        bytes memory _defaultPath = defaultPaths[
+        bytes memory _defaultRouting = defaultRoutings[
             abi.encodePacked(DataTypes.SwapType.EXACT_OUTPUT, tokenIn_, tokenOut_)
         ];
-        require(_defaultPath.length > 0, "no-default-path-found");
+        require(_defaultRouting.length > 0, "no-default-routing-found");
         (DataTypes.ExchangeType _exchangeType, bytes memory _path) = abi.decode(
-            _defaultPath,
+            _defaultRouting,
             (DataTypes.ExchangeType, bytes)
         );
         uint256 _amountInMax = (oracle.quote(tokenOut_, tokenIn_, amountOut_) * (1e18 + maxSlippage)) / 1e18;
@@ -335,9 +339,9 @@ contract Swapper is ISwapper, Governable {
     }
 
     /**
-     * @notice Set default path
+     * @notice Set default routing
      * @dev Use empty `path_` for removal
-     * @param swapType_ If the path is related to `EXACT_INPUT` or `EXACT_OUTPUT`
+     * @param swapType_ If the routing is related to `EXACT_INPUT` or `EXACT_OUTPUT`
      * @param tokenIn_ The swap in token
      * @param tokenOut_ The swap out token
      * @param exchange_ The type (i.e. protocol) of the exchange
@@ -345,7 +349,7 @@ contract Swapper is ISwapper, Governable {
      * @dev Use `abi.encodePacked(tokenA, poolFee1, tokenB, poolFee2, tokenC, ...)` for UniswapV3 exchange
      * @dev Use `abi.encode([tokenA, tokenB, tokenC, ...])` for UniswapV2-like exchanges
      */
-    function setDefaultPath(
+    function setDefaultRouting(
         DataTypes.SwapType swapType_,
         address tokenIn_,
         address tokenOut_,
@@ -353,14 +357,14 @@ contract Swapper is ISwapper, Governable {
         bytes calldata path_
     ) external onlyGovernor {
         bytes memory _key = abi.encodePacked(swapType_, tokenIn_, tokenOut_);
-        bytes memory _currentPath = defaultPaths[_key];
-        bytes memory _newPath = abi.encode(exchange_, path_);
+        bytes memory _currentRouting = defaultRoutings[_key];
+        bytes memory _newRouting = abi.encode(exchange_, path_);
         if (path_.length == 0) {
-            delete defaultPaths[_key];
+            delete defaultRoutings[_key];
         } else {
-            defaultPaths[_key] = _newPath;
+            defaultRoutings[_key] = _newRouting;
         }
-        emit DefaultPathUpdated(_key, _currentPath, _newPath);
+        emit DefaultRoutingUpdated(_key, _currentRouting, _newRouting);
     }
 
     /**

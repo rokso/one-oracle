@@ -95,7 +95,7 @@ describe('Swapper @mainnet', function () {
       const tx = swapper.getBestAmountIn(WETH_ADDRESS, DAI_ADDRESS, amountOut)
 
       // then
-      await expect(tx).revertedWith('no-path-found')
+      await expect(tx).revertedWith('no-routing-found')
     })
 
     it('should get best amountIn for WETH->DAI', async function () {
@@ -197,7 +197,7 @@ describe('Swapper @mainnet', function () {
       const tx = swapper.getBestAmountOut(WETH_ADDRESS, DAI_ADDRESS, amountOut)
 
       // then
-      await expect(tx).revertedWith('no-path-found')
+      await expect(tx).revertedWith('no-routing-found')
     })
 
     it('should get best amountOut for WETH->DAI', async function () {
@@ -560,34 +560,34 @@ describe('Swapper @mainnet', function () {
     })
   })
 
-  describe('setDefaultPath', function () {
+  describe('setDefaultRouting', function () {
     it('should revert if not governor', async function () {
       const tx = swapper
         .connect(user)
-        .setDefaultPath(SwapType.EXACT_INPUT, WETH_ADDRESS, WBTC_ADDRESS, ExchangeType.UNISWAP_V3, '0x')
+        .setDefaultRouting(SwapType.EXACT_INPUT, WETH_ADDRESS, WBTC_ADDRESS, ExchangeType.UNISWAP_V3, '0x')
       await expect(tx).revertedWith('not-governor')
     })
 
-    it('should add a default path', async function () {
+    it('should add a default routing', async function () {
       // given
       const key = ethers.utils.solidityPack(
         ['uint8', 'address', 'address'],
         [SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS]
       )
-      const before = await swapper.defaultPaths(key)
+      const before = await swapper.defaultRoutings(key)
       expect(before).eq('0x')
 
       // when
       const exchangeType = ExchangeType.UNISWAP_V2
       const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS]])
-      await swapper.setDefaultPath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
 
       // then
-      const after = await swapper.defaultPaths(key)
+      const after = await swapper.defaultRoutings(key)
       expect(after).eq(ethers.utils.defaultAbiCoder.encode(['uint8', 'bytes'], [exchangeType, path]))
     })
 
-    it('should remove a default path', async function () {
+    it('should remove a default routing', async function () {
       // given
       const key = ethers.utils.solidityPack(
         ['uint8', 'address', 'address'],
@@ -595,15 +595,15 @@ describe('Swapper @mainnet', function () {
       )
       const exchangeType = ExchangeType.UNISWAP_V2
       const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS]])
-      await swapper.setDefaultPath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
-      const before = await swapper.defaultPaths(key)
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, path)
+      const before = await swapper.defaultRoutings(key)
       expect(before).eq(ethers.utils.defaultAbiCoder.encode(['uint8', 'bytes'], [exchangeType, path]))
 
       // when
-      await swapper.setDefaultPath(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, '0x')
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, DAI_ADDRESS, WBTC_ADDRESS, exchangeType, '0x')
 
       // then
-      const after = await swapper.defaultPaths(key)
+      const after = await swapper.defaultRoutings(key)
       expect(after).eq('0x')
     })
   })

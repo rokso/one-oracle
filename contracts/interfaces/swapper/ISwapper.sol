@@ -79,9 +79,9 @@ interface ISwapper {
     ) external returns (uint256 _amountOut);
 
     /**
-     * @notice Perform an exact input swap - will revert if there is no default path
+     * @notice Perform an exact input swap - will revert if there is no default routing
      */
-    function swapExactInputOnlyIfHasDefaultPath(
+    function swapExactInputWithDefaultRouting(
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_,
@@ -99,9 +99,9 @@ interface ISwapper {
     ) external returns (uint256 _amountIn);
 
     /**
-     * @notice Perform an exact output swap - will revert if there is no default path
+     * @notice Perform an exact output swap - will revert if there is no default routing
      */
-    function swapExactOutputOnlyIfHasDefaultPath(
+    function swapExactOutputWithDefaultRouting(
         address tokenIn_,
         address tokenOut_,
         uint256 amountOut_,
