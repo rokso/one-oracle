@@ -208,6 +208,7 @@ contract Swapper is ISwapper, Governable {
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_,
+        uint256 amountOutMin_,
         address receiver_
     ) external returns (uint256 _amountOut) {
         bytes memory _defaultRouting = defaultRoutings[
@@ -218,14 +219,13 @@ contract Swapper is ISwapper, Governable {
             _defaultRouting,
             (DataTypes.ExchangeType, bytes)
         );
-        uint256 _amountOutMin = (oracle.quote(tokenIn_, tokenOut_, amountIn_) * (1e18 - maxSlippage)) / 1e18;
         return
             _swapExactInput(
                 tokenIn_,
                 tokenOut_,
                 amountIn_,
                 receiver_,
-                _amountOutMin,
+                amountOutMin_,
                 IExchange(addressOf[_exchangeType]),
                 _path
             );
@@ -251,6 +251,7 @@ contract Swapper is ISwapper, Governable {
         address tokenIn_,
         address tokenOut_,
         uint256 amountOut_,
+        uint256 amountInMax_,
         address receiver_
     ) external returns (uint256 _amountIn) {
         bytes memory _defaultRouting = defaultRoutings[
@@ -261,14 +262,13 @@ contract Swapper is ISwapper, Governable {
             _defaultRouting,
             (DataTypes.ExchangeType, bytes)
         );
-        uint256 _amountInMax = (oracle.quote(tokenOut_, tokenIn_, amountOut_) * (1e18 + maxSlippage)) / 1e18;
         return
             _swapExactOutput(
                 tokenIn_,
                 tokenOut_,
                 amountOut_,
                 receiver_,
-                _amountInMax,
+                amountInMax_,
                 IExchange(addressOf[_exchangeType]),
                 _path
             );

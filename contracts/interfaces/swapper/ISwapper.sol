@@ -85,6 +85,7 @@ interface ISwapper {
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_,
+        uint256 amountOutMin_,
         address _receiver
     ) external returns (uint256 _amountOut);
 
@@ -105,6 +106,7 @@ interface ISwapper {
         address tokenIn_,
         address tokenOut_,
         uint256 amountOut_,
+        uint256 amountInMax_,
         address receiver_
     ) external returns (uint256 _amountIn);
 }
