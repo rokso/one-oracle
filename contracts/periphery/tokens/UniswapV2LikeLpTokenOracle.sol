@@ -24,6 +24,7 @@ contract UniswapV2LikeLpTokenOracle is ITokenOracle {
     IOracle public immutable underlyingOracle;
 
     constructor(IOracle _underlyingOracle) {
+        require(address(_underlyingOracle) != address(0), "underlying-oracle-null");
         underlyingOracle = _underlyingOracle;
     }
 
