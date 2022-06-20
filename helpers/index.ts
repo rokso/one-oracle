@@ -1,5 +1,6 @@
 import Address from './address'
 
+// Note: See `contracts/libraries/DataTypes.sol`
 enum Provider {
   NONE = 0,
   CHAINLINK = 1,
@@ -14,4 +15,20 @@ enum Provider {
   FLUX = 10,
 }
 
-export {Address, Provider}
+// Note: See `contracts/libraries/DataTypes.sol`
+enum ExchangeType {
+  UNISWAP_V2 = 0,
+  SUSHISWAP = 1,
+  TRADERJOE = 2,
+  PANGOLIN = 3,
+  QUICKSWAP = 4,
+  UNISWAP_V3 = 5,
+}
+
+// Note: See `contracts/libraries/DataTypes.sol`
+enum SwapType {
+  EXACT_INPUT = 0,
+  EXACT_OUTPUT = 1,
+}
+
+export {Address, Provider, ExchangeType, SwapType}

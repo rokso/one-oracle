@@ -41,4 +41,4 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
 export default func
 func.dependencies = [ChainlinkAvalanchePriceProvider, UmbrellaPriceProvider]
-func.tags = [PriceProvidersAggregator]
+func.tags = ['avalanche', PriceProvidersAggregator]

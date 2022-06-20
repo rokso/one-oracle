@@ -12,8 +12,8 @@ import {
   IERC20,
   IERC20__factory,
 } from '../../typechain-types'
-import {ExchangeType, parseEther, parseUnits, SwapType} from '../helpers'
-import Address from '../../helpers/address'
+import {parseEther, parseUnits} from '../helpers'
+import {Address, ExchangeType, SwapType} from '../../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {adjustBalance} from '../helpers/balance'
 

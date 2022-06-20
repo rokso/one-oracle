@@ -92,7 +92,6 @@ contract Swapper is ISwapper, Governable {
     event DefaultRoutingUpdated(bytes key, bytes oldRouting, bytes newRouting);
 
     constructor(IOracle oracle_, uint256 maxSlippage_) {
-        require(address(oracle_) != address(0), "oracle-is-null");
         oracle = oracle_;
         maxSlippage = maxSlippage_;
     }

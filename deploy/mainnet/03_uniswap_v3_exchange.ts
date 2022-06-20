@@ -1,22 +1,22 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address} from '../../helpers'
+import {Address} from '../../helpers/index'
 
-const {UMBRELLA_REGISTRY} = Address.avalanche
+const {WETH_ADDRESS} = Address.mainnet
 
-const UmbrellaPriceProvider = 'UmbrellaPriceProvider'
+const UniswapV3Exchange = 'UniswapV3Exchange'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy} = deployments
   const {deployer} = await getNamedAccounts()
 
-  await deploy(UmbrellaPriceProvider, {
+  await deploy(UniswapV3Exchange, {
     from: deployer,
     log: true,
-    args: [UMBRELLA_REGISTRY],
+    args: [WETH_ADDRESS],
   })
 }
 
 export default func
-func.tags = ['avalanche', UmbrellaPriceProvider]
+func.tags = ['mainnet', UniswapV3Exchange]
