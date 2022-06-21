@@ -23,6 +23,8 @@ contract CTokenOracle is ITokenOracle {
     address public immutable wethLike;
 
     constructor(IOracle _underlyingOracle, address _wethLike) {
+        require(address(_underlyingOracle) != address(0), "underlying-oracle-null");
+        require(_wethLike != address(0), "weth-like-null");
         underlyingOracle = _underlyingOracle;
         wethLike = _wethLike;
     }
