@@ -27,8 +27,8 @@ import {
   StableCoinProvider__factory,
   StableCoinProvider,
 } from '../../typechain-types'
-import Address from '../../helpers/address'
-import {ExchangeType, HOUR, increaseTime, parseEther, parseUnits, Provider, SwapType} from '../helpers'
+import {Address, ExchangeType, Provider, SwapType} from '../../helpers'
+import {HOUR, increaseTime, parseEther, parseUnits} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
 
 const {

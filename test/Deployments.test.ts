@@ -13,9 +13,18 @@ import {
   UmbrellaPriceProvider,
   ERC20Mock,
   ERC20Mock__factory,
+  UniswapV2LikeExchange,
+  UniswapV3Exchange,
+  Swapper,
+  Swapper__factory,
+  UniswapV2LikeExchange__factory,
+  UniswapV3Exchange__factory,
 } from '../typechain-types'
-import {Address, Provider} from '../helpers'
-import {toUSD} from './helpers'
+import {Address, SwapType, Provider, ExchangeType} from '../helpers'
+import {parseEther, toUSD} from './helpers'
+import {IERC20} from '../typechain-types/@openzeppelin/contracts/token/ERC20'
+import {IERC20__factory} from '../typechain-types/factories/@openzeppelin/contracts/token/ERC20'
+import {adjustBalance} from './helpers/balance'
 
 describe('Deployments ', function () {
   let snapshotId: string
@@ -42,7 +51,7 @@ describe('Deployments ', function () {
     beforeEach(async function () {
       // eslint-disable-next-line no-shadow
       const {ChainlinkAvalanchePriceProvider, UmbrellaPriceProvider, PriceProvidersAggregator, SynthOracle} =
-        await deployments.fixture()
+        await deployments.fixture(['avalanche'])
       chainlinkAvalanchePriceProvider = ChainlinkAvalanchePriceProvider__factory.connect(
         ChainlinkAvalanchePriceProvider.address,
         deployer
@@ -85,6 +94,73 @@ describe('Deployments ', function () {
     it('SynthOracle', async function () {
       const price = await synthOracle.getPriceInUsd(vsETH.address)
       expect(price).eq(toUSD('3,251.6014'))
+    })
+  })
+
+  describe('@mainnet', function () {
+    let uniswapV2Exchange: UniswapV2LikeExchange
+    let sushiswapExchange: UniswapV2LikeExchange
+    let uniswapV3Exchange: UniswapV3Exchange
+    let swapper: Swapper
+    let weth: IERC20
+    let dai: IERC20
+
+    const {WETH_ADDRESS, DAI_ADDRESS} = Address.mainnet
+
+    beforeEach(async function () {
+      // eslint-disable-next-line no-shadow
+      const {UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange, Swapper} = await deployments.fixture(['mainnet'])
+
+      uniswapV2Exchange = UniswapV2LikeExchange__factory.connect(UniswapV2Exchange.address, deployer)
+      sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiswapExchange.address, deployer)
+      uniswapV3Exchange = UniswapV3Exchange__factory.connect(UniswapV3Exchange.address, deployer)
+      swapper = Swapper__factory.connect(Swapper.address, deployer)
+      weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
+      dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
+
+      await adjustBalance(WETH_ADDRESS, deployer.address, parseEther('1000'))
+    })
+
+    it('UniswapV2Exchange', async function () {
+      const {_amountOut} = await uniswapV2Exchange.callStatic.getBestAmountOut(
+        WETH_ADDRESS,
+        DAI_ADDRESS,
+        parseEther('1')
+      )
+      expect(_amountOut).closeTo(parseEther('3,222'), parseEther('1'))
+    })
+
+    it('SushiswapExchange', async function () {
+      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(
+        WETH_ADDRESS,
+        DAI_ADDRESS,
+        parseEther('1')
+      )
+      expect(_amountOut).closeTo(parseEther('3,228'), parseEther('1'))
+    })
+
+    it('UniswapV3Exchange', async function () {
+      const {_amountOut} = await uniswapV3Exchange.callStatic.getBestAmountOut(
+        WETH_ADDRESS,
+        DAI_ADDRESS,
+        parseEther('1')
+      )
+      expect(_amountOut).closeTo(parseEther('3,227'), parseEther('1'))
+    })
+
+    it('Swapper', async function () {
+      // given
+      const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[WETH_ADDRESS, DAI_ADDRESS]])
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, WETH_ADDRESS, DAI_ADDRESS, ExchangeType.UNISWAP_V2, path)
+      await weth.approve(swapper.address, ethers.constants.MaxUint256)
+
+      // when
+      const amountIn = parseEther('1')
+      const tx = () =>
+        swapper.swapExactInputWithDefaultRouting(WETH_ADDRESS, DAI_ADDRESS, amountIn, 0, deployer.address)
+
+      // then
+      await expect(tx).changeTokenBalance(dai, deployer, '3222760582677952358944') // ~3,227 DAI
     })
   })
 })
