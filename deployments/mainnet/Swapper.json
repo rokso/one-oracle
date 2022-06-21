@@ -1,0 +1,1054 @@
+{
+  "address": "0xC9c4bfB5Fe595Ab59B21fD13eA328C332CBf2fe4",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract IOracle",
+          "name": "oracle_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "maxSlippage_",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "key",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "oldRouting",
+          "type": "bytes"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "newRouting",
+          "type": "bytes"
+        }
+      ],
+      "name": "DefaultRoutingUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "enum DataTypes.ExchangeType",
+          "name": "exchangeType",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "isMain",
+          "type": "bool"
+        }
+      ],
+      "name": "ExchangeAsMainUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "enum DataTypes.ExchangeType",
+          "name": "exchangeType",
+          "type": "uint8"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "oldExchange",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newExchange",
+          "type": "address"
+        }
+      ],
+      "name": "ExchangeUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "version",
+          "type": "uint8"
+        }
+      ],
+      "name": "Initialized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "oldMaxSlippage",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "newMaxSlippage",
+          "type": "uint256"
+        }
+      ],
+      "name": "MaxSlippageUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "contract IOracle",
+          "name": "oldOracle",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "contract IOracle",
+          "name": "newOracle",
+          "type": "address"
+        }
+      ],
+      "name": "OracleUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "contract IExchange",
+          "name": "exchange",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "path",
+          "type": "bytes"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "tokenIn",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "tokenOut",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amountIn",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amountOut",
+          "type": "uint256"
+        }
+      ],
+      "name": "SwapExactInput",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "contract IExchange",
+          "name": "exchange",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "path",
+          "type": "bytes"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "tokenIn",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "tokenOut",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amountInMax",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amountIn",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amountOut",
+          "type": "uint256"
+        }
+      ],
+      "name": "SwapExactOutput",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousGovernor",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "proposedGovernor",
+          "type": "address"
+        }
+      ],
+      "name": "UpdatedGovernor",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "acceptGovernorship",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum DataTypes.ExchangeType",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "name": "addressOf",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "name": "defaultRoutings",
+      "outputs": [
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getAllExchanges",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "tokenIn_",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenOut_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountOut_",
+          "type": "uint256"
+        }
+      ],
+      "name": "getBestAmountIn",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountInMax",
+          "type": "uint256"
+        },
+        {
+          "internalType": "contract IExchange",
+          "name": "_exchange",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_path",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "tokenIn_",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenOut_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn_",
+          "type": "uint256"
+        }
+      ],
+      "name": "getBestAmountOut",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountOutMin",
+          "type": "uint256"
+        },
+        {
+          "internalType": "contract IExchange",
+          "name": "_exchange",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_path",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getMainExchanges",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "governor",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "maxSlippage",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "oracle",
+      "outputs": [
+        {
+          "internalType": "contract IOracle",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum DataTypes.SwapType",
+          "name": "swapType_",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenIn_",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenOut_",
+          "type": "address"
+        },
+        {
+          "internalType": "enum DataTypes.ExchangeType",
+          "name": "exchange_",
+          "type": "uint8"
+        },
+        {
+          "internalType": "bytes",
+          "name": "path_",
+          "type": "bytes"
+        }
+      ],
+      "name": "setDefaultRouting",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum DataTypes.ExchangeType",
+          "name": "type_",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "exchange_",
+          "type": "address"
+        }
+      ],
+      "name": "setExchange",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "tokenIn_",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenOut_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn_",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "receiver_",
+          "type": "address"
+        }
+      ],
+      "name": "swapExactInput",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountOut",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "tokenIn_",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenOut_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn_",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountOutMin_",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "receiver_",
+          "type": "address"
+        }
+      ],
+      "name": "swapExactInputWithDefaultRouting",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountOut",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "tokenIn_",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenOut_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountOut_",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "receiver_",
+          "type": "address"
+        }
+      ],
+      "name": "swapExactOutput",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountIn",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "tokenIn_",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenOut_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountOut_",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountInMax_",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "receiver_",
+          "type": "address"
+        }
+      ],
+      "name": "swapExactOutputWithDefaultRouting",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountIn",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum DataTypes.ExchangeType",
+          "name": "type_",
+          "type": "uint8"
+        }
+      ],
+      "name": "toggleExchangeAsMain",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_proposedGovernor",
+          "type": "address"
+        }
+      ],
+      "name": "transferGovernorship",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "maxSlippage_",
+          "type": "uint256"
+        }
+      ],
+      "name": "updateMaxSlippage",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IOracle",
+          "name": "oracle_",
+          "type": "address"
+        }
+      ],
+      "name": "updateOracle",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x259da8f3dd35e07325af58dfbd7f0f58a53b634e521d7ec7aa0192cc75650702",
+  "receipt": {
+    "to": null,
+    "from": "0xcc4ba6Ef2aC12FA5932ef584ebc4a762FE970919",
+    "contractAddress": "0xC9c4bfB5Fe595Ab59B21fD13eA328C332CBf2fe4",
+    "transactionIndex": 49,
+    "gasUsed": "2440674",
+    "logsBloom": "0x00000000000000000040000000000000000400000000000000000000000000000000000000000000000000000000000000000008000000000000800000000000000000000400000400000000000000000000000000000000000080000000000000000000020000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x48aec6c7de49cef3687d46430de309cfd0133a9522b66add0a6aa6256405867c",
+    "transactionHash": "0x259da8f3dd35e07325af58dfbd7f0f58a53b634e521d7ec7aa0192cc75650702",
+    "logs": [
+      {
+        "transactionIndex": 49,
+        "blockNumber": 15003804,
+        "transactionHash": "0x259da8f3dd35e07325af58dfbd7f0f58a53b634e521d7ec7aa0192cc75650702",
+        "address": "0xC9c4bfB5Fe595Ab59B21fD13eA328C332CBf2fe4",
+        "topics": [
+          "0xd4459d5b8b913cab0244230fd9b1c08b6ceace7fe9230e60d0f74cbffdf849d0",
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x000000000000000000000000cc4ba6ef2ac12fa5932ef584ebc4a762fe970919"
+        ],
+        "data": "0x",
+        "logIndex": 83,
+        "blockHash": "0x48aec6c7de49cef3687d46430de309cfd0133a9522b66add0a6aa6256405867c"
+      }
+    ],
+    "blockNumber": 15003804,
+    "cumulativeGasUsed": "5885500",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x0000000000000000000000000000000000000000",
+    0
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "e41066c15c2a88ae557b6f0d3059c5d2",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.9+commit.e5eed63a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract IOracle\",\"name\":\"oracle_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"maxSlippage_\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"key\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"oldRouting\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"newRouting\",\"type\":\"bytes\"}],\"name\":\"DefaultRoutingUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"enum DataTypes.ExchangeType\",\"name\":\"exchangeType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"isMain\",\"type\":\"bool\"}],\"name\":\"ExchangeAsMainUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"enum DataTypes.ExchangeType\",\"name\":\"exchangeType\",\"type\":\"uint8\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"oldExchange\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newExchange\",\"type\":\"address\"}],\"name\":\"ExchangeUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"version\",\"type\":\"uint8\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"oldMaxSlippage\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"newMaxSlippage\",\"type\":\"uint256\"}],\"name\":\"MaxSlippageUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"contract IOracle\",\"name\":\"oldOracle\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"contract IOracle\",\"name\":\"newOracle\",\"type\":\"address\"}],\"name\":\"OracleUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"contract IExchange\",\"name\":\"exchange\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"path\",\"type\":\"bytes\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"tokenIn\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"tokenOut\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountIn\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOut\",\"type\":\"uint256\"}],\"name\":\"SwapExactInput\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"contract IExchange\",\"name\":\"exchange\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"path\",\"type\":\"bytes\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"tokenIn\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"tokenOut\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountInMax\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountIn\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amountOut\",\"type\":\"uint256\"}],\"name\":\"SwapExactOutput\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousGovernor\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"proposedGovernor\",\"type\":\"address\"}],\"name\":\"UpdatedGovernor\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"acceptGovernorship\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum DataTypes.ExchangeType\",\"name\":\"\",\"type\":\"uint8\"}],\"name\":\"addressOf\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"defaultRoutings\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getAllExchanges\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenIn_\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountOut_\",\"type\":\"uint256\"}],\"name\":\"getBestAmountIn\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountInMax\",\"type\":\"uint256\"},{\"internalType\":\"contract IExchange\",\"name\":\"_exchange\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_path\",\"type\":\"bytes\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenIn_\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountIn_\",\"type\":\"uint256\"}],\"name\":\"getBestAmountOut\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountOutMin\",\"type\":\"uint256\"},{\"internalType\":\"contract IExchange\",\"name\":\"_exchange\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_path\",\"type\":\"bytes\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getMainExchanges\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"governor\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"maxSlippage\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"oracle\",\"outputs\":[{\"internalType\":\"contract IOracle\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum DataTypes.SwapType\",\"name\":\"swapType_\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"tokenIn_\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut_\",\"type\":\"address\"},{\"internalType\":\"enum DataTypes.ExchangeType\",\"name\":\"exchange_\",\"type\":\"uint8\"},{\"internalType\":\"bytes\",\"name\":\"path_\",\"type\":\"bytes\"}],\"name\":\"setDefaultRouting\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum DataTypes.ExchangeType\",\"name\":\"type_\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"exchange_\",\"type\":\"address\"}],\"name\":\"setExchange\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenIn_\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountIn_\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"receiver_\",\"type\":\"address\"}],\"name\":\"swapExactInput\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountOut\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenIn_\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountIn_\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amountOutMin_\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"receiver_\",\"type\":\"address\"}],\"name\":\"swapExactInputWithDefaultRouting\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountOut\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenIn_\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountOut_\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"receiver_\",\"type\":\"address\"}],\"name\":\"swapExactOutput\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountIn\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenIn_\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountOut_\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"amountInMax_\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"receiver_\",\"type\":\"address\"}],\"name\":\"swapExactOutputWithDefaultRouting\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountIn\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum DataTypes.ExchangeType\",\"name\":\"type_\",\"type\":\"uint8\"}],\"name\":\"toggleExchangeAsMain\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_proposedGovernor\",\"type\":\"address\"}],\"name\":\"transferGovernorship\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"maxSlippage_\",\"type\":\"uint256\"}],\"name\":\"updateMaxSlippage\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"contract IOracle\",\"name\":\"oracle_\",\"type\":\"address\"}],\"name\":\"updateOracle\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"acceptGovernorship()\":{\"details\":\"Allows new governor to accept governorship of the contract.\"},\"getAllExchanges()\":{\"details\":\"This function is gas intensive\"},\"getBestAmountIn(address,address,uint256)\":{\"details\":\"It shouldn't be used as oracle!!!\"},\"getBestAmountOut(address,address,uint256)\":{\"details\":\"It shouldn't be used as oracle!!!\"},\"getMainExchanges()\":{\"details\":\"This function is gas intensive\"},\"setDefaultRouting(uint8,address,address,uint8,bytes)\":{\"details\":\"Use empty `path_` for removalUse `abi.encodePacked(tokenA, poolFee1, tokenB, poolFee2, tokenC, ...)` for UniswapV3 exchangeUse `abi.encode([tokenA, tokenB, tokenC, ...])` for UniswapV2-like exchanges\",\"params\":{\"exchange_\":\"The type (i.e. protocol) of the exchange\",\"path_\":\"The swap path\",\"swapType_\":\"If the routing is related to `EXACT_INPUT` or `EXACT_OUTPUT`\",\"tokenIn_\":\"The swap in token\",\"tokenOut_\":\"The swap out token\"}},\"setExchange(uint8,address)\":{\"details\":\"Use null `exchange_` for removal\"},\"transferGovernorship(address)\":{\"details\":\"Transfers governorship of the contract to a new account (`proposedGovernor`). Can only be called by the current owner.\"}},\"stateVariables\":{\"defaultRoutings\":{\"details\":\"Used to save gas by using a preset routing instead of looking for the best\"},\"maxSlippage\":{\"details\":\"Use 18 decimals (e.g. 0.2e18 = 20%)\"},\"oracle\":{\"details\":\"This is used to set acceptable slippage parameters\"}},\"version\":1},\"userdoc\":{\"events\":{\"DefaultRoutingUpdated(bytes,bytes,bytes)\":{\"notice\":\"Emitted when default routing is updated\"},\"ExchangeAsMainUpdated(uint8,bool)\":{\"notice\":\"Emitted when an exchanges to loop over are updated\"},\"ExchangeUpdated(uint8,address,address)\":{\"notice\":\"Emitted when an exchange is added\"},\"MaxSlippageUpdated(uint256,uint256)\":{\"notice\":\"Emitted when the max slippage is updated\"},\"OracleUpdated(address,address)\":{\"notice\":\"Emitted when the oracle is updated\"},\"SwapExactInput(address,bytes,address,address,uint256,uint256)\":{\"notice\":\"Emitted when exact-input swap is executed\"},\"SwapExactOutput(address,bytes,address,address,uint256,uint256,uint256)\":{\"notice\":\"Emitted when exact-output swap is executed\"}},\"kind\":\"user\",\"methods\":{\"addressOf(uint8)\":{\"notice\":\"Mapping of exchanges' addresses by type\"},\"defaultRoutings(bytes)\":{\"notice\":\"Default swap routings\"},\"getAllExchanges()\":{\"notice\":\"The list of supported DEXes\"},\"getBestAmountIn(address,address,uint256)\":{\"notice\":\"Get *spot* quote It will return the swap amount based on the current reserves of the best pair/path found (i.e. spot price).\"},\"getBestAmountOut(address,address,uint256)\":{\"notice\":\"Get *spot* quote It will return the swap amount based on the current reserves of the best pair/path found (i.e. spot price).\"},\"getMainExchanges()\":{\"notice\":\"The list of main DEXes\"},\"maxSlippage()\":{\"notice\":\"Max slippage acceptable\"},\"oracle()\":{\"notice\":\"The oracle contract\"},\"setDefaultRouting(uint8,address,address,uint8,bytes)\":{\"notice\":\"Set default routing\"},\"setExchange(uint8,address)\":{\"notice\":\"Add or update exchange\"},\"swapExactInput(address,address,uint256,address)\":{\"notice\":\"Perform an exact input swap\"},\"swapExactInputWithDefaultRouting(address,address,uint256,uint256,address)\":{\"notice\":\"Perform an exact input swap - will revert if there is no default routing\"},\"swapExactOutput(address,address,uint256,address)\":{\"notice\":\"Perform an exact output swap\"},\"swapExactOutputWithDefaultRouting(address,address,uint256,uint256,address)\":{\"notice\":\"Perform an exact output swap - will revert if there is no default routing\"},\"toggleExchangeAsMain(uint8)\":{\"notice\":\"Toggle exchange as main\"},\"updateMaxSlippage(uint256)\":{\"notice\":\"Update max slippage\"},\"updateOracle(address)\":{\"notice\":\"Update oracle contract\"}},\"notice\":\"Swapper contract This contract encapsulates DEXes and use them to perform swaps using the best trade path as possible\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/swapper/Swapper.sol\":\"Swapper\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":5000},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/proxy/utils/Initializable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.6.0) (proxy/utils/Initializable.sol)\\n\\npragma solidity ^0.8.2;\\n\\nimport \\\"../../utils/Address.sol\\\";\\n\\n/**\\n * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed\\n * behind a proxy. Since proxied contracts do not make use of a constructor, it's common to move constructor logic to an\\n * external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer\\n * function so it can only be called once. The {initializer} modifier provided by this contract will have this effect.\\n *\\n * The initialization functions use a version number. Once a version number is used, it is consumed and cannot be\\n * reused. This mechanism prevents re-execution of each \\\"step\\\" but allows the creation of new initialization steps in\\n * case an upgrade adds a module that needs to be initialized.\\n *\\n * For example:\\n *\\n * [.hljs-theme-light.nopadding]\\n * ```\\n * contract MyToken is ERC20Upgradeable {\\n *     function initialize() initializer public {\\n *         __ERC20_init(\\\"MyToken\\\", \\\"MTK\\\");\\n *     }\\n * }\\n * contract MyTokenV2 is MyToken, ERC20PermitUpgradeable {\\n *     function initializeV2() reinitializer(2) public {\\n *         __ERC20Permit_init(\\\"MyToken\\\");\\n *     }\\n * }\\n * ```\\n *\\n * TIP: To avoid leaving the proxy in an uninitialized state, the initializer function should be called as early as\\n * possible by providing the encoded function call as the `_data` argument to {ERC1967Proxy-constructor}.\\n *\\n * CAUTION: When used with inheritance, manual care must be taken to not invoke a parent initializer twice, or to ensure\\n * that all initializers are idempotent. This is not verified automatically as constructors are by Solidity.\\n *\\n * [CAUTION]\\n * ====\\n * Avoid leaving a contract uninitialized.\\n *\\n * An uninitialized contract can be taken over by an attacker. This applies to both a proxy and its implementation\\n * contract, which may impact the proxy. To prevent the implementation contract from being used, you should invoke\\n * the {_disableInitializers} function in the constructor to automatically lock it when it is deployed:\\n *\\n * [.hljs-theme-light.nopadding]\\n * ```\\n * /// @custom:oz-upgrades-unsafe-allow constructor\\n * constructor() {\\n *     _disableInitializers();\\n * }\\n * ```\\n * ====\\n */\\nabstract contract Initializable {\\n    /**\\n     * @dev Indicates that the contract has been initialized.\\n     * @custom:oz-retyped-from bool\\n     */\\n    uint8 private _initialized;\\n\\n    /**\\n     * @dev Indicates that the contract is in the process of being initialized.\\n     */\\n    bool private _initializing;\\n\\n    /**\\n     * @dev Triggered when the contract has been initialized or reinitialized.\\n     */\\n    event Initialized(uint8 version);\\n\\n    /**\\n     * @dev A modifier that defines a protected initializer function that can be invoked at most once. In its scope,\\n     * `onlyInitializing` functions can be used to initialize parent contracts. Equivalent to `reinitializer(1)`.\\n     */\\n    modifier initializer() {\\n        bool isTopLevelCall = _setInitializedVersion(1);\\n        if (isTopLevelCall) {\\n            _initializing = true;\\n        }\\n        _;\\n        if (isTopLevelCall) {\\n            _initializing = false;\\n            emit Initialized(1);\\n        }\\n    }\\n\\n    /**\\n     * @dev A modifier that defines a protected reinitializer function that can be invoked at most once, and only if the\\n     * contract hasn't been initialized to a greater version before. In its scope, `onlyInitializing` functions can be\\n     * used to initialize parent contracts.\\n     *\\n     * `initializer` is equivalent to `reinitializer(1)`, so a reinitializer may be used after the original\\n     * initialization step. This is essential to configure modules that are added through upgrades and that require\\n     * initialization.\\n     *\\n     * Note that versions can jump in increments greater than 1; this implies that if multiple reinitializers coexist in\\n     * a contract, executing them in the right order is up to the developer or operator.\\n     */\\n    modifier reinitializer(uint8 version) {\\n        bool isTopLevelCall = _setInitializedVersion(version);\\n        if (isTopLevelCall) {\\n            _initializing = true;\\n        }\\n        _;\\n        if (isTopLevelCall) {\\n            _initializing = false;\\n            emit Initialized(version);\\n        }\\n    }\\n\\n    /**\\n     * @dev Modifier to protect an initialization function so that it can only be invoked by functions with the\\n     * {initializer} and {reinitializer} modifiers, directly or indirectly.\\n     */\\n    modifier onlyInitializing() {\\n        require(_initializing, \\\"Initializable: contract is not initializing\\\");\\n        _;\\n    }\\n\\n    /**\\n     * @dev Locks the contract, preventing any future reinitialization. This cannot be part of an initializer call.\\n     * Calling this in the constructor of a contract will prevent that contract from being initialized or reinitialized\\n     * to any version. It is recommended to use this to lock implementation contracts that are designed to be called\\n     * through proxies.\\n     */\\n    function _disableInitializers() internal virtual {\\n        _setInitializedVersion(type(uint8).max);\\n    }\\n\\n    function _setInitializedVersion(uint8 version) private returns (bool) {\\n        // If the contract is initializing we ignore whether _initialized is set in order to support multiple\\n        // inheritance patterns, but we only do this in the context of a constructor, and for the lowest level\\n        // of initializers, because in other contexts the contract may have been reentered.\\n        if (_initializing) {\\n            require(\\n                version == 1 && !Address.isContract(address(this)),\\n                \\\"Initializable: contract is already initialized\\\"\\n            );\\n            return false;\\n        } else {\\n            require(_initialized < version, \\\"Initializable: contract is already initialized\\\");\\n            _initialized = version;\\n            return true;\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xb68c2016cd41840646addd6f79f17f80f42a6279acb0cd4d9d85cab6e8d9b777\",\"license\":\"MIT\"},\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.6.0) (token/ERC20/IERC20.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Interface of the ERC20 standard as defined in the EIP.\\n */\\ninterface IERC20 {\\n    /**\\n     * @dev Emitted when `value` tokens are moved from one account (`from`) to\\n     * another (`to`).\\n     *\\n     * Note that `value` may be zero.\\n     */\\n    event Transfer(address indexed from, address indexed to, uint256 value);\\n\\n    /**\\n     * @dev Emitted when the allowance of a `spender` for an `owner` is set by\\n     * a call to {approve}. `value` is the new allowance.\\n     */\\n    event Approval(address indexed owner, address indexed spender, uint256 value);\\n\\n    /**\\n     * @dev Returns the amount of tokens in existence.\\n     */\\n    function totalSupply() external view returns (uint256);\\n\\n    /**\\n     * @dev Returns the amount of tokens owned by `account`.\\n     */\\n    function balanceOf(address account) external view returns (uint256);\\n\\n    /**\\n     * @dev Moves `amount` tokens from the caller's account to `to`.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transfer(address to, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Returns the remaining number of tokens that `spender` will be\\n     * allowed to spend on behalf of `owner` through {transferFrom}. This is\\n     * zero by default.\\n     *\\n     * This value changes when {approve} or {transferFrom} are called.\\n     */\\n    function allowance(address owner, address spender) external view returns (uint256);\\n\\n    /**\\n     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * IMPORTANT: Beware that changing an allowance with this method brings the risk\\n     * that someone may use both the old and the new allowance by unfortunate\\n     * transaction ordering. One possible solution to mitigate this race\\n     * condition is to first reduce the spender's allowance to 0 and set the\\n     * desired value afterwards:\\n     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\\n     *\\n     * Emits an {Approval} event.\\n     */\\n    function approve(address spender, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Moves `amount` tokens from `from` to `to` using the\\n     * allowance mechanism. `amount` is then deducted from the caller's\\n     * allowance.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transferFrom(\\n        address from,\\n        address to,\\n        uint256 amount\\n    ) external returns (bool);\\n}\\n\",\"keccak256\":\"0x9750c6b834f7b43000631af5cc30001c5f547b3ceb3635488f140f60e897ea6b\",\"license\":\"MIT\"},\"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts v4.4.1 (token/ERC20/utils/SafeERC20.sol)\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"../IERC20.sol\\\";\\nimport \\\"../../../utils/Address.sol\\\";\\n\\n/**\\n * @title SafeERC20\\n * @dev Wrappers around ERC20 operations that throw on failure (when the token\\n * contract returns false). Tokens that return no value (and instead revert or\\n * throw on failure) are also supported, non-reverting calls are assumed to be\\n * successful.\\n * To use this library you can add a `using SafeERC20 for IERC20;` statement to your contract,\\n * which allows you to call the safe operations as `token.safeTransfer(...)`, etc.\\n */\\nlibrary SafeERC20 {\\n    using Address for address;\\n\\n    function safeTransfer(\\n        IERC20 token,\\n        address to,\\n        uint256 value\\n    ) internal {\\n        _callOptionalReturn(token, abi.encodeWithSelector(token.transfer.selector, to, value));\\n    }\\n\\n    function safeTransferFrom(\\n        IERC20 token,\\n        address from,\\n        address to,\\n        uint256 value\\n    ) internal {\\n        _callOptionalReturn(token, abi.encodeWithSelector(token.transferFrom.selector, from, to, value));\\n    }\\n\\n    /**\\n     * @dev Deprecated. This function has issues similar to the ones found in\\n     * {IERC20-approve}, and its usage is discouraged.\\n     *\\n     * Whenever possible, use {safeIncreaseAllowance} and\\n     * {safeDecreaseAllowance} instead.\\n     */\\n    function safeApprove(\\n        IERC20 token,\\n        address spender,\\n        uint256 value\\n    ) internal {\\n        // safeApprove should only be called when setting an initial allowance,\\n        // or when resetting it to zero. To increase and decrease it, use\\n        // 'safeIncreaseAllowance' and 'safeDecreaseAllowance'\\n        require(\\n            (value == 0) || (token.allowance(address(this), spender) == 0),\\n            \\\"SafeERC20: approve from non-zero to non-zero allowance\\\"\\n        );\\n        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, value));\\n    }\\n\\n    function safeIncreaseAllowance(\\n        IERC20 token,\\n        address spender,\\n        uint256 value\\n    ) internal {\\n        uint256 newAllowance = token.allowance(address(this), spender) + value;\\n        _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));\\n    }\\n\\n    function safeDecreaseAllowance(\\n        IERC20 token,\\n        address spender,\\n        uint256 value\\n    ) internal {\\n        unchecked {\\n            uint256 oldAllowance = token.allowance(address(this), spender);\\n            require(oldAllowance >= value, \\\"SafeERC20: decreased allowance below zero\\\");\\n            uint256 newAllowance = oldAllowance - value;\\n            _callOptionalReturn(token, abi.encodeWithSelector(token.approve.selector, spender, newAllowance));\\n        }\\n    }\\n\\n    /**\\n     * @dev Imitates a Solidity high-level call (i.e. a regular function call to a contract), relaxing the requirement\\n     * on the return value: the return value is optional (but if data is returned, it must not be false).\\n     * @param token The token targeted by the call.\\n     * @param data The call data (encoded using abi.encode or one of its variants).\\n     */\\n    function _callOptionalReturn(IERC20 token, bytes memory data) private {\\n        // We need to perform a low level call here, to bypass Solidity's return data size checking mechanism, since\\n        // we're implementing it ourselves. We use {Address.functionCall} to perform this call, which verifies that\\n        // the target address contains contract code and also asserts for success in the low-level call.\\n\\n        bytes memory returndata = address(token).functionCall(data, \\\"SafeERC20: low-level call failed\\\");\\n        if (returndata.length > 0) {\\n            // Return data is optional\\n            require(abi.decode(returndata, (bool)), \\\"SafeERC20: ERC20 operation did not succeed\\\");\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xc3d946432c0ddbb1f846a0d3985be71299df331b91d06732152117f62f0be2b5\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Address.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.5.0) (utils/Address.sol)\\n\\npragma solidity ^0.8.1;\\n\\n/**\\n * @dev Collection of functions related to the address type\\n */\\nlibrary Address {\\n    /**\\n     * @dev Returns true if `account` is a contract.\\n     *\\n     * [IMPORTANT]\\n     * ====\\n     * It is unsafe to assume that an address for which this function returns\\n     * false is an externally-owned account (EOA) and not a contract.\\n     *\\n     * Among others, `isContract` will return false for the following\\n     * types of addresses:\\n     *\\n     *  - an externally-owned account\\n     *  - a contract in construction\\n     *  - an address where a contract will be created\\n     *  - an address where a contract lived, but was destroyed\\n     * ====\\n     *\\n     * [IMPORTANT]\\n     * ====\\n     * You shouldn't rely on `isContract` to protect against flash loan attacks!\\n     *\\n     * Preventing calls from contracts is highly discouraged. It breaks composability, breaks support for smart wallets\\n     * like Gnosis Safe, and does not provide security since it can be circumvented by calling from a contract\\n     * constructor.\\n     * ====\\n     */\\n    function isContract(address account) internal view returns (bool) {\\n        // This method relies on extcodesize/address.code.length, which returns 0\\n        // for contracts in construction, since the code is only stored at the end\\n        // of the constructor execution.\\n\\n        return account.code.length > 0;\\n    }\\n\\n    /**\\n     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to\\n     * `recipient`, forwarding all available gas and reverting on errors.\\n     *\\n     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost\\n     * of certain opcodes, possibly making contracts go over the 2300 gas limit\\n     * imposed by `transfer`, making them unable to receive funds via\\n     * `transfer`. {sendValue} removes this limitation.\\n     *\\n     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].\\n     *\\n     * IMPORTANT: because control is transferred to `recipient`, care must be\\n     * taken to not create reentrancy vulnerabilities. Consider using\\n     * {ReentrancyGuard} or the\\n     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].\\n     */\\n    function sendValue(address payable recipient, uint256 amount) internal {\\n        require(address(this).balance >= amount, \\\"Address: insufficient balance\\\");\\n\\n        (bool success, ) = recipient.call{value: amount}(\\\"\\\");\\n        require(success, \\\"Address: unable to send value, recipient may have reverted\\\");\\n    }\\n\\n    /**\\n     * @dev Performs a Solidity function call using a low level `call`. A\\n     * plain `call` is an unsafe replacement for a function call: use this\\n     * function instead.\\n     *\\n     * If `target` reverts with a revert reason, it is bubbled up by this\\n     * function (like regular Solidity function calls).\\n     *\\n     * Returns the raw returned data. To convert to the expected return value,\\n     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].\\n     *\\n     * Requirements:\\n     *\\n     * - `target` must be a contract.\\n     * - calling `target` with `data` must not revert.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCall(address target, bytes memory data) internal returns (bytes memory) {\\n        return functionCall(target, data, \\\"Address: low-level call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with\\n     * `errorMessage` as a fallback revert reason when `target` reverts.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCall(\\n        address target,\\n        bytes memory data,\\n        string memory errorMessage\\n    ) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, 0, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but also transferring `value` wei to `target`.\\n     *\\n     * Requirements:\\n     *\\n     * - the calling contract must have an ETH balance of at least `value`.\\n     * - the called Solidity function must be `payable`.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCallWithValue(\\n        address target,\\n        bytes memory data,\\n        uint256 value\\n    ) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, value, \\\"Address: low-level call with value failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but\\n     * with `errorMessage` as a fallback revert reason when `target` reverts.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCallWithValue(\\n        address target,\\n        bytes memory data,\\n        uint256 value,\\n        string memory errorMessage\\n    ) internal returns (bytes memory) {\\n        require(address(this).balance >= value, \\\"Address: insufficient balance for call\\\");\\n        require(isContract(target), \\\"Address: call to non-contract\\\");\\n\\n        (bool success, bytes memory returndata) = target.call{value: value}(data);\\n        return verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a static call.\\n     *\\n     * _Available since v3.3._\\n     */\\n    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {\\n        return functionStaticCall(target, data, \\\"Address: low-level static call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],\\n     * but performing a static call.\\n     *\\n     * _Available since v3.3._\\n     */\\n    function functionStaticCall(\\n        address target,\\n        bytes memory data,\\n        string memory errorMessage\\n    ) internal view returns (bytes memory) {\\n        require(isContract(target), \\\"Address: static call to non-contract\\\");\\n\\n        (bool success, bytes memory returndata) = target.staticcall(data);\\n        return verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a delegate call.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {\\n        return functionDelegateCall(target, data, \\\"Address: low-level delegate call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],\\n     * but performing a delegate call.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function functionDelegateCall(\\n        address target,\\n        bytes memory data,\\n        string memory errorMessage\\n    ) internal returns (bytes memory) {\\n        require(isContract(target), \\\"Address: delegate call to non-contract\\\");\\n\\n        (bool success, bytes memory returndata) = target.delegatecall(data);\\n        return verifyCallResult(success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Tool to verifies that a low level call was successful, and revert if it wasn't, either by bubbling the\\n     * revert reason using the provided one.\\n     *\\n     * _Available since v4.3._\\n     */\\n    function verifyCallResult(\\n        bool success,\\n        bytes memory returndata,\\n        string memory errorMessage\\n    ) internal pure returns (bytes memory) {\\n        if (success) {\\n            return returndata;\\n        } else {\\n            // Look for revert reason and bubble it up if present\\n            if (returndata.length > 0) {\\n                // The easiest way to bubble the revert reason is using memory via assembly\\n\\n                assembly {\\n                    let returndata_size := mload(returndata)\\n                    revert(add(32, returndata), returndata_size)\\n                }\\n            } else {\\n                revert(errorMessage);\\n            }\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x2ccf9d2313a313d41a791505f2b5abfdc62191b5d4334f7f7a82691c088a1c87\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Context.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts v4.4.1 (utils/Context.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Provides information about the current execution context, including the\\n * sender of the transaction and its data. While these are generally available\\n * via msg.sender and msg.data, they should not be accessed in such a direct\\n * manner, since when dealing with meta-transactions the account sending and\\n * paying for execution may not be the actual sender (as far as an application\\n * is concerned).\\n *\\n * This contract is only required for intermediate, library-like contracts.\\n */\\nabstract contract Context {\\n    function _msgSender() internal view virtual returns (address) {\\n        return msg.sender;\\n    }\\n\\n    function _msgData() internal view virtual returns (bytes calldata) {\\n        return msg.data;\\n    }\\n}\\n\",\"keccak256\":\"0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/structs/EnumerableSet.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.6.0) (utils/structs/EnumerableSet.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Library for managing\\n * https://en.wikipedia.org/wiki/Set_(abstract_data_type)[sets] of primitive\\n * types.\\n *\\n * Sets have the following properties:\\n *\\n * - Elements are added, removed, and checked for existence in constant time\\n * (O(1)).\\n * - Elements are enumerated in O(n). No guarantees are made on the ordering.\\n *\\n * ```\\n * contract Example {\\n *     // Add the library methods\\n *     using EnumerableSet for EnumerableSet.AddressSet;\\n *\\n *     // Declare a set state variable\\n *     EnumerableSet.AddressSet private mySet;\\n * }\\n * ```\\n *\\n * As of v3.3.0, sets of type `bytes32` (`Bytes32Set`), `address` (`AddressSet`)\\n * and `uint256` (`UintSet`) are supported.\\n */\\nlibrary EnumerableSet {\\n    // To implement this library for multiple types with as little code\\n    // repetition as possible, we write it in terms of a generic Set type with\\n    // bytes32 values.\\n    // The Set implementation uses private functions, and user-facing\\n    // implementations (such as AddressSet) are just wrappers around the\\n    // underlying Set.\\n    // This means that we can only create new EnumerableSets for types that fit\\n    // in bytes32.\\n\\n    struct Set {\\n        // Storage of set values\\n        bytes32[] _values;\\n        // Position of the value in the `values` array, plus 1 because index 0\\n        // means a value is not in the set.\\n        mapping(bytes32 => uint256) _indexes;\\n    }\\n\\n    /**\\n     * @dev Add a value to a set. O(1).\\n     *\\n     * Returns true if the value was added to the set, that is if it was not\\n     * already present.\\n     */\\n    function _add(Set storage set, bytes32 value) private returns (bool) {\\n        if (!_contains(set, value)) {\\n            set._values.push(value);\\n            // The value is stored at length-1, but we add 1 to all indexes\\n            // and use 0 as a sentinel value\\n            set._indexes[value] = set._values.length;\\n            return true;\\n        } else {\\n            return false;\\n        }\\n    }\\n\\n    /**\\n     * @dev Removes a value from a set. O(1).\\n     *\\n     * Returns true if the value was removed from the set, that is if it was\\n     * present.\\n     */\\n    function _remove(Set storage set, bytes32 value) private returns (bool) {\\n        // We read and store the value's index to prevent multiple reads from the same storage slot\\n        uint256 valueIndex = set._indexes[value];\\n\\n        if (valueIndex != 0) {\\n            // Equivalent to contains(set, value)\\n            // To delete an element from the _values array in O(1), we swap the element to delete with the last one in\\n            // the array, and then remove the last element (sometimes called as 'swap and pop').\\n            // This modifies the order of the array, as noted in {at}.\\n\\n            uint256 toDeleteIndex = valueIndex - 1;\\n            uint256 lastIndex = set._values.length - 1;\\n\\n            if (lastIndex != toDeleteIndex) {\\n                bytes32 lastValue = set._values[lastIndex];\\n\\n                // Move the last value to the index where the value to delete is\\n                set._values[toDeleteIndex] = lastValue;\\n                // Update the index for the moved value\\n                set._indexes[lastValue] = valueIndex; // Replace lastValue's index to valueIndex\\n            }\\n\\n            // Delete the slot where the moved value was stored\\n            set._values.pop();\\n\\n            // Delete the index for the deleted slot\\n            delete set._indexes[value];\\n\\n            return true;\\n        } else {\\n            return false;\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns true if the value is in the set. O(1).\\n     */\\n    function _contains(Set storage set, bytes32 value) private view returns (bool) {\\n        return set._indexes[value] != 0;\\n    }\\n\\n    /**\\n     * @dev Returns the number of values on the set. O(1).\\n     */\\n    function _length(Set storage set) private view returns (uint256) {\\n        return set._values.length;\\n    }\\n\\n    /**\\n     * @dev Returns the value stored at position `index` in the set. O(1).\\n     *\\n     * Note that there are no guarantees on the ordering of values inside the\\n     * array, and it may change when more values are added or removed.\\n     *\\n     * Requirements:\\n     *\\n     * - `index` must be strictly less than {length}.\\n     */\\n    function _at(Set storage set, uint256 index) private view returns (bytes32) {\\n        return set._values[index];\\n    }\\n\\n    /**\\n     * @dev Return the entire set in an array\\n     *\\n     * WARNING: This operation will copy the entire storage to memory, which can be quite expensive. This is designed\\n     * to mostly be used by view accessors that are queried without any gas fees. Developers should keep in mind that\\n     * this function has an unbounded cost, and using it as part of a state-changing function may render the function\\n     * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.\\n     */\\n    function _values(Set storage set) private view returns (bytes32[] memory) {\\n        return set._values;\\n    }\\n\\n    // Bytes32Set\\n\\n    struct Bytes32Set {\\n        Set _inner;\\n    }\\n\\n    /**\\n     * @dev Add a value to a set. O(1).\\n     *\\n     * Returns true if the value was added to the set, that is if it was not\\n     * already present.\\n     */\\n    function add(Bytes32Set storage set, bytes32 value) internal returns (bool) {\\n        return _add(set._inner, value);\\n    }\\n\\n    /**\\n     * @dev Removes a value from a set. O(1).\\n     *\\n     * Returns true if the value was removed from the set, that is if it was\\n     * present.\\n     */\\n    function remove(Bytes32Set storage set, bytes32 value) internal returns (bool) {\\n        return _remove(set._inner, value);\\n    }\\n\\n    /**\\n     * @dev Returns true if the value is in the set. O(1).\\n     */\\n    function contains(Bytes32Set storage set, bytes32 value) internal view returns (bool) {\\n        return _contains(set._inner, value);\\n    }\\n\\n    /**\\n     * @dev Returns the number of values in the set. O(1).\\n     */\\n    function length(Bytes32Set storage set) internal view returns (uint256) {\\n        return _length(set._inner);\\n    }\\n\\n    /**\\n     * @dev Returns the value stored at position `index` in the set. O(1).\\n     *\\n     * Note that there are no guarantees on the ordering of values inside the\\n     * array, and it may change when more values are added or removed.\\n     *\\n     * Requirements:\\n     *\\n     * - `index` must be strictly less than {length}.\\n     */\\n    function at(Bytes32Set storage set, uint256 index) internal view returns (bytes32) {\\n        return _at(set._inner, index);\\n    }\\n\\n    /**\\n     * @dev Return the entire set in an array\\n     *\\n     * WARNING: This operation will copy the entire storage to memory, which can be quite expensive. This is designed\\n     * to mostly be used by view accessors that are queried without any gas fees. Developers should keep in mind that\\n     * this function has an unbounded cost, and using it as part of a state-changing function may render the function\\n     * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.\\n     */\\n    function values(Bytes32Set storage set) internal view returns (bytes32[] memory) {\\n        return _values(set._inner);\\n    }\\n\\n    // AddressSet\\n\\n    struct AddressSet {\\n        Set _inner;\\n    }\\n\\n    /**\\n     * @dev Add a value to a set. O(1).\\n     *\\n     * Returns true if the value was added to the set, that is if it was not\\n     * already present.\\n     */\\n    function add(AddressSet storage set, address value) internal returns (bool) {\\n        return _add(set._inner, bytes32(uint256(uint160(value))));\\n    }\\n\\n    /**\\n     * @dev Removes a value from a set. O(1).\\n     *\\n     * Returns true if the value was removed from the set, that is if it was\\n     * present.\\n     */\\n    function remove(AddressSet storage set, address value) internal returns (bool) {\\n        return _remove(set._inner, bytes32(uint256(uint160(value))));\\n    }\\n\\n    /**\\n     * @dev Returns true if the value is in the set. O(1).\\n     */\\n    function contains(AddressSet storage set, address value) internal view returns (bool) {\\n        return _contains(set._inner, bytes32(uint256(uint160(value))));\\n    }\\n\\n    /**\\n     * @dev Returns the number of values in the set. O(1).\\n     */\\n    function length(AddressSet storage set) internal view returns (uint256) {\\n        return _length(set._inner);\\n    }\\n\\n    /**\\n     * @dev Returns the value stored at position `index` in the set. O(1).\\n     *\\n     * Note that there are no guarantees on the ordering of values inside the\\n     * array, and it may change when more values are added or removed.\\n     *\\n     * Requirements:\\n     *\\n     * - `index` must be strictly less than {length}.\\n     */\\n    function at(AddressSet storage set, uint256 index) internal view returns (address) {\\n        return address(uint160(uint256(_at(set._inner, index))));\\n    }\\n\\n    /**\\n     * @dev Return the entire set in an array\\n     *\\n     * WARNING: This operation will copy the entire storage to memory, which can be quite expensive. This is designed\\n     * to mostly be used by view accessors that are queried without any gas fees. Developers should keep in mind that\\n     * this function has an unbounded cost, and using it as part of a state-changing function may render the function\\n     * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.\\n     */\\n    function values(AddressSet storage set) internal view returns (address[] memory) {\\n        bytes32[] memory store = _values(set._inner);\\n        address[] memory result;\\n\\n        assembly {\\n            result := store\\n        }\\n\\n        return result;\\n    }\\n\\n    // UintSet\\n\\n    struct UintSet {\\n        Set _inner;\\n    }\\n\\n    /**\\n     * @dev Add a value to a set. O(1).\\n     *\\n     * Returns true if the value was added to the set, that is if it was not\\n     * already present.\\n     */\\n    function add(UintSet storage set, uint256 value) internal returns (bool) {\\n        return _add(set._inner, bytes32(value));\\n    }\\n\\n    /**\\n     * @dev Removes a value from a set. O(1).\\n     *\\n     * Returns true if the value was removed from the set, that is if it was\\n     * present.\\n     */\\n    function remove(UintSet storage set, uint256 value) internal returns (bool) {\\n        return _remove(set._inner, bytes32(value));\\n    }\\n\\n    /**\\n     * @dev Returns true if the value is in the set. O(1).\\n     */\\n    function contains(UintSet storage set, uint256 value) internal view returns (bool) {\\n        return _contains(set._inner, bytes32(value));\\n    }\\n\\n    /**\\n     * @dev Returns the number of values on the set. O(1).\\n     */\\n    function length(UintSet storage set) internal view returns (uint256) {\\n        return _length(set._inner);\\n    }\\n\\n    /**\\n     * @dev Returns the value stored at position `index` in the set. O(1).\\n     *\\n     * Note that there are no guarantees on the ordering of values inside the\\n     * array, and it may change when more values are added or removed.\\n     *\\n     * Requirements:\\n     *\\n     * - `index` must be strictly less than {length}.\\n     */\\n    function at(UintSet storage set, uint256 index) internal view returns (uint256) {\\n        return uint256(_at(set._inner, index));\\n    }\\n\\n    /**\\n     * @dev Return the entire set in an array\\n     *\\n     * WARNING: This operation will copy the entire storage to memory, which can be quite expensive. This is designed\\n     * to mostly be used by view accessors that are queried without any gas fees. Developers should keep in mind that\\n     * this function has an unbounded cost, and using it as part of a state-changing function may render the function\\n     * uncallable if the set grows to a point where copying to memory consumes too much gas to fit in a block.\\n     */\\n    function values(UintSet storage set) internal view returns (uint256[] memory) {\\n        bytes32[] memory store = _values(set._inner);\\n        uint256[] memory result;\\n\\n        assembly {\\n            result := store\\n        }\\n\\n        return result;\\n    }\\n}\\n\",\"keccak256\":\"0xacac2065b3ed1facff1163435890d4a6bcdc474e857e8e2c91ae5fb50418f723\",\"license\":\"MIT\"},\"contracts/access/Governable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"@openzeppelin/contracts/utils/Context.sol\\\";\\nimport \\\"@openzeppelin/contracts/proxy/utils/Initializable.sol\\\";\\nimport \\\"../interfaces/IGovernable.sol\\\";\\n\\n/**\\n * @dev Contract module which provides a basic access control mechanism, where\\n * there is an account (governor) that can be granted exclusive access to\\n * specific functions.\\n *\\n * By default, the governor account will be the one that deploys the contract. This\\n * can later be changed with {transferGovernorship}.\\n *\\n */\\nabstract contract Governable is IGovernable, Context, Initializable {\\n    address public governor;\\n    address private proposedGovernor;\\n\\n    event UpdatedGovernor(address indexed previousGovernor, address indexed proposedGovernor);\\n\\n    /**\\n     * @dev Initializes the contract setting the deployer as the initial governor.\\n     */\\n    constructor() {\\n        address msgSender = _msgSender();\\n        governor = msgSender;\\n        emit UpdatedGovernor(address(0), msgSender);\\n    }\\n\\n    /**\\n     * @dev If inheriting child is using proxy then child contract can use\\n     * __Governable_init() function to initialization this contract\\n     */\\n    // solhint-disable-next-line func-name-mixedcase\\n    function __Governable_init() internal initializer {\\n        address msgSender = _msgSender();\\n        governor = msgSender;\\n        emit UpdatedGovernor(address(0), msgSender);\\n    }\\n\\n    /**\\n     * @dev Throws if called by any account other than the governor.\\n     */\\n    modifier onlyGovernor() {\\n        require(governor == _msgSender(), \\\"not-governor\\\");\\n        _;\\n    }\\n\\n    /**\\n     * @dev Transfers governorship of the contract to a new account (`proposedGovernor`).\\n     * Can only be called by the current owner.\\n     */\\n    function transferGovernorship(address _proposedGovernor) external onlyGovernor {\\n        require(_proposedGovernor != address(0), \\\"proposed-governor-is-zero\\\");\\n        proposedGovernor = _proposedGovernor;\\n    }\\n\\n    /**\\n     * @dev Allows new governor to accept governorship of the contract.\\n     */\\n    function acceptGovernorship() external {\\n        require(proposedGovernor == _msgSender(), \\\"not-the-proposed-governor\\\");\\n        emit UpdatedGovernor(governor, proposedGovernor);\\n        governor = proposedGovernor;\\n        proposedGovernor = address(0);\\n    }\\n}\\n\",\"keccak256\":\"0x57b52a711313030d4d996899be3c248fbfd4ee72b5578d4b427dddb500d668ab\",\"license\":\"MIT\"},\"contracts/interfaces/IGovernable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\n/**\\n * @notice Governable interface\\n */\\ninterface IGovernable {\\n    function governor() external view returns (address _governor);\\n\\n    function transferGovernorship(address _proposedGovernor) external;\\n}\\n\",\"keccak256\":\"0xbe84461adf33aec1bf31b6d84a5380aaeb791de9a4b95346dd8270dc6632984e\",\"license\":\"MIT\"},\"contracts/interfaces/periphery/IOracle.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface IOracle {\\n    /**\\n     * @notice Get USD (or equivalent) price of an asset\\n     * @param token_ The address of asset\\n     * @return _priceInUsd The USD price\\n     */\\n    function getPriceInUsd(address token_) external view returns (uint256 _priceInUsd);\\n\\n    /**\\n     * @notice Get quote\\n     * @param tokenIn_ The address of assetIn\\n     * @param tokenOut_ The address of assetOut\\n     * @param amountIn_ Amount of input token\\n     * @return _amountOut Amount out\\n     */\\n    function quote(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    ) external view returns (uint256 _amountOut);\\n\\n    /**\\n     * @notice Get quote in USD (or equivalent) amount\\n     * @param token_ The address of assetIn\\n     * @param amountIn_ Amount of input token.\\n     * @return amountOut_ Amount in USD\\n     */\\n    function quoteTokenToUsd(address token_, uint256 amountIn_) external view returns (uint256 amountOut_);\\n\\n    /**\\n     * @notice Get quote from USD (or equivalent) amount to amount of token\\n     * @param token_ The address of assetOut\\n     * @param amountIn_ Input amount in USD\\n     * @return _amountOut Output amount of token\\n     */\\n    function quoteUsdToToken(address token_, uint256 amountIn_) external view returns (uint256 _amountOut);\\n}\\n\",\"keccak256\":\"0xb48d57d83e75abecacbd065d3df55ee50eef4998fad94560cb1dbb0644049caa\",\"license\":\"MIT\"},\"contracts/interfaces/swapper/IExchange.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity <=0.8.9;\\n\\n/**\\n * @notice Exchange interface\\n */\\ninterface IExchange {\\n    /**\\n     * @notice Get *spot* quote\\n     * It will return the swap amount based on the current reserves of the best pair/path found (i.e. spot price)\\n     * @dev It shouldn't be used as oracle!!!\\n     */\\n    function getBestAmountIn(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountOut_\\n    ) external returns (uint256 _amountIn, bytes memory _path);\\n\\n    /**\\n     * @notice Get *spot* quote\\n     * It will return the swap amount based on the current reserves of the best pair/path found (i.e. spot price)\\n     * @dev It shouldn't be used as oracle!!!\\n     */\\n    function getBestAmountOut(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    ) external returns (uint256 _amountOut, bytes memory _path);\\n\\n    /**\\n     * @notice Perform an exact input swap\\n     * @dev Should transfer `amountIn_` before performing swap\\n     */\\n    function swapExactInput(\\n        bytes calldata path_,\\n        uint256 amountIn_,\\n        uint256 amountOutMin_,\\n        address outReceiver_\\n    ) external returns (uint256 _amountOut);\\n\\n    /**\\n     * @notice Perform an exact output swap\\n     * @dev Should transfer `amountInMax_` before performing swap\\n     * @dev Sends swap remains - if any - to the `inSender_`\\n     */\\n    function swapExactOutput(\\n        bytes calldata path_,\\n        uint256 amountOut_,\\n        uint256 amountInMax_,\\n        address inSender_,\\n        address outRecipient_\\n    ) external returns (uint256 _amountIn);\\n}\\n\",\"keccak256\":\"0x47dad3eaeb559854b717ee883152b7ea6810bc34f660063bdaaabd172617eb17\",\"license\":\"MIT\"},\"contracts/interfaces/swapper/ISwapper.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"../periphery/IOracle.sol\\\";\\nimport \\\"./IExchange.sol\\\";\\n\\n/**\\n * @notice Swapper interface\\n * @dev This contract doesn't support native coins (e.g. ETH, AVAX, MATIC, etc) use wrapper tokens instead\\n */\\ninterface ISwapper {\\n    /**\\n     * @notice The list of supported DEXes\\n     * @dev This function is gas intensive\\n     */\\n    function getAllExchanges() external view returns (address[] memory);\\n\\n    /**\\n     * @notice The list of main DEXes\\n     * @dev This function is gas intensive\\n     */\\n    function getMainExchanges() external view returns (address[] memory);\\n\\n    /**\\n     * @notice Oracle to get prices from\\n     * @dev Is used combined with `slippage` in order to check swaps outcomes and reject if aren't acceptable\\n     */\\n    function oracle() external view returns (IOracle);\\n\\n    /**\\n     * @notice Get max acceptable slippage\\n     * @dev Swaps will revert if actual output from swap is too far from oracle price\\n     */\\n    function maxSlippage() external view returns (uint256);\\n\\n    /**\\n     * @notice Get *spot* quote\\n     * It will return the swap amount based on the current reserves of the best pair/path found (i.e. spot price).\\n     * @dev It shouldn't be used as oracle!!!\\n     */\\n    function getBestAmountIn(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountOut_\\n    )\\n        external\\n        returns (\\n            uint256 _amountInMax,\\n            IExchange _exchange,\\n            bytes memory _path\\n        );\\n\\n    /**\\n     * @notice Get *spot* quote\\n     * It will return the swap amount based on the current reserves of the best pair/path found (i.e. spot price).\\n     * @dev It shouldn't be used as oracle!!!\\n     */\\n    function getBestAmountOut(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    )\\n        external\\n        returns (\\n            uint256 _amountOutMin,\\n            IExchange _exchange,\\n            bytes memory _path\\n        );\\n\\n    /**\\n     * @notice Perform an exact input swap\\n     */\\n    function swapExactInput(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_,\\n        address _receiver\\n    ) external returns (uint256 _amountOut);\\n\\n    /**\\n     * @notice Perform an exact input swap - will revert if there is no default routing\\n     */\\n    function swapExactInputWithDefaultRouting(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_,\\n        uint256 amountOutMin_,\\n        address _receiver\\n    ) external returns (uint256 _amountOut);\\n\\n    /**\\n     * @notice Perform an exact output swap\\n     */\\n    function swapExactOutput(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountOut_,\\n        address _receiver\\n    ) external returns (uint256 _amountIn);\\n\\n    /**\\n     * @notice Perform an exact output swap - will revert if there is no default routing\\n     */\\n    function swapExactOutputWithDefaultRouting(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountOut_,\\n        uint256 amountInMax_,\\n        address receiver_\\n    ) external returns (uint256 _amountIn);\\n}\\n\",\"keccak256\":\"0xf05942573ca296442fced0c9dd0138ec5b114c9d45a0c884bbce9faa4bd925a6\",\"license\":\"MIT\"},\"contracts/libraries/DataTypes.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nlibrary DataTypes {\\n    /**\\n     * @notice Price providers enumeration\\n     */\\n    enum Provider {\\n        NONE,\\n        CHAINLINK,\\n        UNISWAP_V3,\\n        UNISWAP_V2,\\n        SUSHISWAP,\\n        TRADERJOE,\\n        PANGOLIN,\\n        QUICKSWAP,\\n        UMBRELLA_FIRST_CLASS,\\n        UMBRELLA_PASSPORT,\\n        FLUX\\n    }\\n\\n    enum ExchangeType {\\n        UNISWAP_V2,\\n        SUSHISWAP,\\n        TRADERJOE,\\n        PANGOLIN,\\n        QUICKSWAP,\\n        UNISWAP_V3\\n    }\\n\\n    enum SwapType {\\n        EXACT_INPUT,\\n        EXACT_OUTPUT\\n    }\\n}\\n\",\"keccak256\":\"0xfafdbf0aa3657f082acf0fba2742fddd38552382646a14193a78782f731dc393\",\"license\":\"MIT\"},\"contracts/swapper/Swapper.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"@openzeppelin/contracts/utils/structs/EnumerableSet.sol\\\";\\nimport \\\"@openzeppelin/contracts/token/ERC20/IERC20.sol\\\";\\nimport \\\"@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol\\\";\\nimport \\\"../access/Governable.sol\\\";\\nimport \\\"../interfaces/swapper/ISwapper.sol\\\";\\nimport \\\"../interfaces/swapper/IExchange.sol\\\";\\nimport \\\"../libraries/DataTypes.sol\\\";\\n\\n/**\\n * @notice Swapper contract\\n * This contract encapsulates DEXes and use them to perform swaps using the best trade path as possible\\n */\\ncontract Swapper is ISwapper, Governable {\\n    using SafeERC20 for IERC20;\\n    using EnumerableSet for EnumerableSet.AddressSet;\\n\\n    /**\\n     * @notice List of the supported exchanges\\n     */\\n    EnumerableSet.AddressSet private allExchanges;\\n\\n    /**\\n     * @notice List of the exchanges to loop over when getting best paths\\n     */\\n    EnumerableSet.AddressSet private mainExchanges;\\n\\n    /**\\n     * @notice Mapping of exchanges' addresses by type\\n     */\\n    mapping(DataTypes.ExchangeType => address) public addressOf;\\n\\n    /**\\n     * @notice Default swap routings\\n     * @dev Used to save gas by using a preset routing instead of looking for the best\\n     */\\n    mapping(bytes => bytes) public defaultRoutings;\\n\\n    /**\\n     * @notice The oracle contract\\n     * @dev This is used to set acceptable slippage parameters\\n     */\\n    IOracle public override oracle;\\n\\n    /**\\n     * @notice Max slippage acceptable\\n     * @dev Use 18 decimals (e.g. 0.2e18 = 20%)\\n     */\\n    uint256 public override maxSlippage;\\n\\n    /// @notice Emitted when an exchange is added\\n    event ExchangeUpdated(\\n        DataTypes.ExchangeType indexed exchangeType,\\n        address indexed oldExchange,\\n        address indexed newExchange\\n    );\\n\\n    /// @notice Emitted when an exchanges to loop over are updated\\n    event ExchangeAsMainUpdated(DataTypes.ExchangeType indexed exchangeType, bool isMain);\\n\\n    /// @notice Emitted when the oracle is updated\\n    event OracleUpdated(IOracle indexed oldOracle, IOracle indexed newOracle);\\n\\n    /// @notice Emitted when the max slippage is updated\\n    event MaxSlippageUpdated(uint256 oldMaxSlippage, uint256 newMaxSlippage);\\n\\n    /// @notice Emitted when exact-input swap is executed\\n    event SwapExactInput(\\n        IExchange indexed exchange,\\n        bytes path,\\n        address indexed tokenIn,\\n        address indexed tokenOut,\\n        uint256 amountIn,\\n        uint256 amountOut\\n    );\\n\\n    /// @notice Emitted when exact-output swap is executed\\n    event SwapExactOutput(\\n        IExchange indexed exchange,\\n        bytes path,\\n        address indexed tokenIn,\\n        address indexed tokenOut,\\n        uint256 amountInMax,\\n        uint256 amountIn,\\n        uint256 amountOut\\n    );\\n\\n    /// @notice Emitted when default routing is updated\\n    event DefaultRoutingUpdated(bytes key, bytes oldRouting, bytes newRouting);\\n\\n    constructor(IOracle oracle_, uint256 maxSlippage_) {\\n        oracle = oracle_;\\n        maxSlippage = maxSlippage_;\\n    }\\n\\n    /// @inheritdoc ISwapper\\n    function getBestAmountIn(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountOut_\\n    )\\n        public\\n        returns (\\n            uint256 _amountInMax,\\n            IExchange _exchange,\\n            bytes memory _path\\n        )\\n    {\\n        _amountInMax = (oracle.quote(tokenOut_, tokenIn_, amountOut_) * (1e18 + maxSlippage)) / 1e18;\\n\\n        // 1. Return default routing if any\\n        bytes memory _defaultRouting = defaultRoutings[\\n            abi.encodePacked(DataTypes.SwapType.EXACT_OUTPUT, tokenIn_, tokenOut_)\\n        ];\\n        if (_defaultRouting.length > 0) {\\n            DataTypes.ExchangeType _exchangeType;\\n            (_exchangeType, _path) = abi.decode(_defaultRouting, (DataTypes.ExchangeType, bytes));\\n            return (_amountInMax, IExchange(addressOf[_exchangeType]), _path);\\n        }\\n\\n        // 2. Look for the best routing\\n        uint256 _amountIn = type(uint256).max;\\n        uint256 _len = mainExchanges.length();\\n        for (uint256 i; i < _len; ++i) {\\n            IExchange _iExchange = IExchange(mainExchanges.at(i));\\n            (uint256 _iAmountIn, bytes memory _iPath) = _iExchange.getBestAmountIn(tokenIn_, tokenOut_, amountOut_);\\n            if (_iAmountIn > 0 && _iAmountIn < _amountIn && _iAmountIn <= _amountInMax) {\\n                _amountIn = _iAmountIn;\\n                _exchange = _iExchange;\\n                _path = _iPath;\\n            }\\n        }\\n        require(_path.length > 0, \\\"no-routing-found\\\");\\n    }\\n\\n    /// @inheritdoc ISwapper\\n    function getBestAmountOut(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    )\\n        public\\n        returns (\\n            uint256 _amountOutMin,\\n            IExchange _exchange,\\n            bytes memory _path\\n        )\\n    {\\n        _amountOutMin = (oracle.quote(tokenIn_, tokenOut_, amountIn_) * (1e18 - maxSlippage)) / 1e18;\\n\\n        // 1. Return default routing if any\\n        bytes memory _defaultRouting = defaultRoutings[\\n            abi.encodePacked(DataTypes.SwapType.EXACT_INPUT, tokenIn_, tokenOut_)\\n        ];\\n        if (_defaultRouting.length > 0) {\\n            DataTypes.ExchangeType _exchangeType;\\n            (_exchangeType, _path) = abi.decode(_defaultRouting, (DataTypes.ExchangeType, bytes));\\n            return (_amountOutMin, IExchange(addressOf[_exchangeType]), _path);\\n        }\\n\\n        // 2. Look for the best routing\\n        uint256 _amountOut;\\n        uint256 _len = mainExchanges.length();\\n        for (uint256 i; i < _len; ++i) {\\n            IExchange _iExchange = IExchange(mainExchanges.at(i));\\n            (uint256 _iAmountOut, bytes memory _iPath) = _iExchange.getBestAmountOut(tokenIn_, tokenOut_, amountIn_);\\n            if (_iAmountOut > _amountOut && _iAmountOut >= _amountOutMin) {\\n                _amountOut = _iAmountOut;\\n                _exchange = _iExchange;\\n                _path = _iPath;\\n            }\\n        }\\n\\n        require(_path.length > 0, \\\"no-routing-found\\\");\\n    }\\n\\n    /// @inheritdoc ISwapper\\n    function getAllExchanges() external view override returns (address[] memory) {\\n        return allExchanges.values();\\n    }\\n\\n    /// @inheritdoc ISwapper\\n    function getMainExchanges() external view override returns (address[] memory) {\\n        return mainExchanges.values();\\n    }\\n\\n    /// @inheritdoc ISwapper\\n    function swapExactInput(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_,\\n        address receiver_\\n    ) external returns (uint256 _amountOut) {\\n        (uint256 _amountOutMin, IExchange _exchange, bytes memory _path) = getBestAmountOut(\\n            tokenIn_,\\n            tokenOut_,\\n            amountIn_\\n        );\\n        return _swapExactInput(tokenIn_, tokenOut_, amountIn_, receiver_, _amountOutMin, _exchange, _path);\\n    }\\n\\n    /// @inheritdoc ISwapper\\n    function swapExactInputWithDefaultRouting(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_,\\n        uint256 amountOutMin_,\\n        address receiver_\\n    ) external returns (uint256 _amountOut) {\\n        bytes memory _defaultRouting = defaultRoutings[\\n            abi.encodePacked(DataTypes.SwapType.EXACT_INPUT, tokenIn_, tokenOut_)\\n        ];\\n        require(_defaultRouting.length > 0, \\\"no-default-routing-found\\\");\\n        (DataTypes.ExchangeType _exchangeType, bytes memory _path) = abi.decode(\\n            _defaultRouting,\\n            (DataTypes.ExchangeType, bytes)\\n        );\\n        return\\n            _swapExactInput(\\n                tokenIn_,\\n                tokenOut_,\\n                amountIn_,\\n                receiver_,\\n                amountOutMin_,\\n                IExchange(addressOf[_exchangeType]),\\n                _path\\n            );\\n    }\\n\\n    /// @inheritdoc ISwapper\\n    function swapExactOutput(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountOut_,\\n        address receiver_\\n    ) external returns (uint256 _amountIn) {\\n        (uint256 _amountInMax, IExchange _exchange, bytes memory _path) = getBestAmountIn(\\n            tokenIn_,\\n            tokenOut_,\\n            amountOut_\\n        );\\n        return _swapExactOutput(tokenIn_, tokenOut_, amountOut_, receiver_, _amountInMax, _exchange, _path);\\n    }\\n\\n    /// @inheritdoc ISwapper\\n    function swapExactOutputWithDefaultRouting(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountOut_,\\n        uint256 amountInMax_,\\n        address receiver_\\n    ) external returns (uint256 _amountIn) {\\n        bytes memory _defaultRouting = defaultRoutings[\\n            abi.encodePacked(DataTypes.SwapType.EXACT_OUTPUT, tokenIn_, tokenOut_)\\n        ];\\n        require(_defaultRouting.length > 0, \\\"no-default-routing-found\\\");\\n        (DataTypes.ExchangeType _exchangeType, bytes memory _path) = abi.decode(\\n            _defaultRouting,\\n            (DataTypes.ExchangeType, bytes)\\n        );\\n        return\\n            _swapExactOutput(\\n                tokenIn_,\\n                tokenOut_,\\n                amountOut_,\\n                receiver_,\\n                amountInMax_,\\n                IExchange(addressOf[_exchangeType]),\\n                _path\\n            );\\n    }\\n\\n    /**\\n     * @notice Add or update exchange\\n     * @dev Use null `exchange_` for removal\\n     */\\n    function setExchange(DataTypes.ExchangeType type_, address exchange_) external onlyGovernor {\\n        address _currentExchange = addressOf[type_];\\n\\n        if (_currentExchange == address(0)) {\\n            // Adding\\n            require(allExchanges.add(exchange_), \\\"exchange-exists\\\");\\n            require(mainExchanges.add(exchange_), \\\"main-exchange-exists\\\");\\n            addressOf[type_] = exchange_;\\n        } else if (exchange_ == address(0)) {\\n            // Removing\\n            require(allExchanges.remove(_currentExchange), \\\"exchange-does-not-exist\\\");\\n            if (mainExchanges.contains(_currentExchange)) {\\n                mainExchanges.remove(_currentExchange);\\n            }\\n            delete addressOf[type_];\\n        } else {\\n            // Updating\\n            if (mainExchanges.contains(_currentExchange)) {\\n                mainExchanges.remove(_currentExchange);\\n            }\\n            require(allExchanges.remove(_currentExchange), \\\"exchange-does-not-exist\\\");\\n            require(allExchanges.add(exchange_), \\\"exchange-exists\\\");\\n            require(mainExchanges.add(exchange_), \\\"main-exchange-exists\\\");\\n            addressOf[type_] = exchange_;\\n        }\\n        emit ExchangeUpdated(type_, _currentExchange, exchange_);\\n    }\\n\\n    /**\\n     * @notice Toggle exchange as main\\n     */\\n    function toggleExchangeAsMain(DataTypes.ExchangeType type_) public onlyGovernor {\\n        address _address = addressOf[type_];\\n        require(_address != address(0), \\\"exchange-does-not-exist\\\");\\n        if (mainExchanges.contains(_address)) {\\n            mainExchanges.remove(_address);\\n            emit ExchangeAsMainUpdated(type_, false);\\n        } else {\\n            mainExchanges.add(_address);\\n            emit ExchangeAsMainUpdated(type_, true);\\n        }\\n    }\\n\\n    /**\\n     * @notice Update max slippage\\n     */\\n    function updateMaxSlippage(uint256 maxSlippage_) external onlyGovernor {\\n        require(maxSlippage_ <= 1e18, \\\"max-slippage-gt-100%\\\");\\n        emit MaxSlippageUpdated(maxSlippage, maxSlippage_);\\n        maxSlippage = maxSlippage_;\\n    }\\n\\n    /**\\n     * @notice Update oracle contract\\n     */\\n    function updateOracle(IOracle oracle_) external onlyGovernor {\\n        require(address(oracle_) != address(0), \\\"address-is-null\\\");\\n        emit OracleUpdated(oracle, oracle_);\\n        oracle = oracle_;\\n    }\\n\\n    /**\\n     * @notice Set default routing\\n     * @dev Use empty `path_` for removal\\n     * @param swapType_ If the routing is related to `EXACT_INPUT` or `EXACT_OUTPUT`\\n     * @param tokenIn_ The swap in token\\n     * @param tokenOut_ The swap out token\\n     * @param exchange_ The type (i.e. protocol) of the exchange\\n     * @param path_ The swap path\\n     * @dev Use `abi.encodePacked(tokenA, poolFee1, tokenB, poolFee2, tokenC, ...)` for UniswapV3 exchange\\n     * @dev Use `abi.encode([tokenA, tokenB, tokenC, ...])` for UniswapV2-like exchanges\\n     */\\n    function setDefaultRouting(\\n        DataTypes.SwapType swapType_,\\n        address tokenIn_,\\n        address tokenOut_,\\n        DataTypes.ExchangeType exchange_,\\n        bytes calldata path_\\n    ) external onlyGovernor {\\n        bytes memory _key = abi.encodePacked(swapType_, tokenIn_, tokenOut_);\\n        bytes memory _currentRouting = defaultRoutings[_key];\\n        bytes memory _newRouting = abi.encode(exchange_, path_);\\n        if (path_.length == 0) {\\n            delete defaultRoutings[_key];\\n        } else {\\n            defaultRoutings[_key] = _newRouting;\\n        }\\n        emit DefaultRoutingUpdated(_key, _currentRouting, _newRouting);\\n    }\\n\\n    /**\\n     * @notice Perform an exact input swap\\n     * @dev This code is reused by public/external functions\\n     */\\n    function _swapExactInput(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_,\\n        address receiver_,\\n        uint256 _amountOutMin,\\n        IExchange _exchange,\\n        bytes memory _path\\n    ) private returns (uint256 _amountOut) {\\n        IERC20(tokenIn_).safeTransferFrom(msg.sender, address(_exchange), amountIn_);\\n        _amountOut = _exchange.swapExactInput(_path, amountIn_, _amountOutMin, receiver_);\\n        emit SwapExactInput(_exchange, _path, tokenIn_, tokenOut_, amountIn_, _amountOut);\\n    }\\n\\n    /**\\n     * @notice Perform an exact output swap\\n     * @dev This code is reused by public/external functions\\n     */\\n    function _swapExactOutput(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountOut_,\\n        address receiver_,\\n        uint256 _amountInMax,\\n        IExchange _exchange,\\n        bytes memory _path\\n    ) private returns (uint256 _amountIn) {\\n        IERC20(tokenIn_).safeTransferFrom(msg.sender, address(_exchange), _amountInMax);\\n        _amountIn = _exchange.swapExactOutput(_path, amountOut_, _amountInMax, msg.sender, receiver_);\\n        emit SwapExactOutput(_exchange, _path, tokenIn_, tokenOut_, _amountInMax, _amountIn, amountOut_);\\n    }\\n}\\n\",\"keccak256\":\"0xa7da8c4336984e78c073d9462d9df6e8b4b516e9213667275521372b2388fa98\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x60806040523480156200001157600080fd5b5060405162002bb638038062002bb68339810160408190526200003491620000a8565b6000805462010000600160b01b03191633620100008102919091178255604051909182917fd4459d5b8b913cab0244230fd9b1c08b6ceace7fe9230e60d0f74cbffdf849d0908290a350600880546001600160a01b0319166001600160a01b039390931692909217909155600955620000e4565b60008060408385031215620000bc57600080fd5b82516001600160a01b0381168114620000d457600080fd5b6020939093015192949293505050565b612ac280620000f46000396000f3fe608060405234801561001057600080fd5b506004361061016c5760003560e01c80637dc0d1d0116100cd578063b6aa515b11610081578063eaf8461f11610066578063eaf8461f14610306578063f3b27bc314610319578063f896acc71461032157600080fd5b8063b6aa515b146102e0578063c71f8f94146102f357600080fd5b80638c09d8f9116100b25780638c09d8f9146102b25780639eb252e0146102c5578063a819d47e146102d857600080fd5b80637dc0d1d0146102965780638c04166f146102a957600080fd5b80633254e7b111610124578063676b120611610109578063676b12061461024757806367b426451461025a57806370b247421461028357600080fd5b80633254e7b11461021257806337c03fb61461023257600080fd5b80631cb44dfc116101555780631cb44dfc146101c95780631ffd36b0146101de5780632aa3e6c6146101ff57600080fd5b80630c340a241461017157806319145798146101a7575b600080fd5b60005461018a906201000090046001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6101ba6101b536600461227e565b610334565b60405161019e93929190612317565b6101dc6101d7366004612348565b6106c4565b005b6101f16101ec366004612365565b6107ef565b60405190815260200161019e565b6101dc61020d3660046123d1565b610985565b610225610220366004612479565b610df2565b60405161019e91906124f9565b61023a610e97565b60405161019e919061250c565b6101f1610255366004612559565b610ea8565b61018a6102683660046125ac565b6006602052600090815260409020546001600160a01b031681565b6101ba61029136600461227e565b610eda565b60085461018a906001600160a01b031681565b6101f160095481565b6101dc6102c03660046125ac565b6111c1565b6101f16102d3366004612559565b61136a565b61023a611390565b6101dc6102ee366004612348565b61139c565b6101dc6103013660046125c9565b61148d565b6101f1610314366004612365565b611698565b6101dc611821565b6101dc61032f366004612689565b611921565b6000806060670de0b6b3a7640000600954670de0b6b3a764000061035891906126b8565b6008546040517fb64663840000000000000000000000000000000000000000000000000000000081526001600160a01b038a811660048301528981166024830152604482018990529091169063b64663849060640160206040518083038186803b1580156103c557600080fd5b505afa1580156103d9573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906103fd91906126cf565b61040791906126e8565b6104119190612707565b9250600060076000888860405160200161042d9392919061273f565b60408051601f198184030181529082905261044791612795565b90815260200160405180910390208054610460906127b1565b80601f016020809104026020016040519081016040528092919081815260200182805461048c906127b1565b80156104d95780601f106104ae576101008083540402835291602001916104d9565b820191906000526020600020905b8154815290600101906020018083116104bc57829003601f168201915b50505050509050600081511115610553576000818060200190518101906105009190612831565b93509050846006600083600581111561051b5761051b612729565b600581111561052c5761052c612729565b81526020810191909152604001600020549095506001600160a01b031693506106bb915050565b6000806105606004611a1a565b905060005b8181101561066057600061057a600483611a2a565b6040517f191457980000000000000000000000000000000000000000000000000000000081526001600160a01b038d811660048301528c81166024830152604482018c9052919250600091829190841690631914579890606401600060405180830381600087803b1580156105ee57600080fd5b505af1158015610602573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f1916820160405261062a9190810190612882565b91509150858211801561063d5750898210155b1561064c578195508298508097505b50505080610659906128b3565b9050610565565b5060008451116106b75760405162461bcd60e51b815260206004820152601060248201527f6e6f2d726f7574696e672d666f756e640000000000000000000000000000000060448201526064015b60405180910390fd5b5050505b93509350939050565b6000546001600160a01b03620100009091041633146107255760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016106ae565b6001600160a01b03811661077b5760405162461bcd60e51b815260206004820152600f60248201527f616464726573732d69732d6e756c6c000000000000000000000000000000000060448201526064016106ae565b6008546040516001600160a01b038084169216907f078c3b417dadf69374a59793b829c52001247130433427049317bde56607b1b790600090a3600880547fffffffffffffffffffffffff0000000000000000000000000000000000000000166001600160a01b0392909216919091179055565b60008060076001888860405160200161080a9392919061273f565b60408051601f198184030181529082905261082491612795565b9081526020016040518091039020805461083d906127b1565b80601f0160208091040260200160405190810160405280929190818152602001828054610869906127b1565b80156108b65780601f1061088b576101008083540402835291602001916108b6565b820191906000526020600020905b81548152906001019060200180831161089957829003601f168201915b50505050509050600081511161090e5760405162461bcd60e51b815260206004820152601860248201527f6e6f2d64656661756c742d726f7574696e672d666f756e64000000000000000060448201526064016106ae565b600080828060200190518101906109259190612831565b91509150610978898989888a6006600089600581111561094757610947612729565b600581111561095857610958612729565b81526020810191909152604001600020546001600160a01b031687611a3d565b9998505050505050505050565b6000546001600160a01b03620100009091041633146109e65760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016106ae565b6000600660008460058111156109fe576109fe612729565b6005811115610a0f57610a0f612729565b81526020810191909152604001600020546001600160a01b0316905080610b3d57610a3b600283611b5b565b610a875760405162461bcd60e51b815260206004820152600f60248201527f65786368616e67652d657869737473000000000000000000000000000000000060448201526064016106ae565b610a92600483611b5b565b610ade5760405162461bcd60e51b815260206004820152601460248201527f6d61696e2d65786368616e67652d65786973747300000000000000000000000060448201526064016106ae565b8160066000856005811115610af557610af5612729565b6005811115610b0657610b06612729565b815260200190815260200160002060006101000a8154816001600160a01b0302191690836001600160a01b03160217905550610d9e565b6001600160a01b038216610c2157610b56600282611b70565b610ba25760405162461bcd60e51b815260206004820152601760248201527f65786368616e67652d646f65732d6e6f742d657869737400000000000000000060448201526064016106ae565b610bad600482611b85565b15610bbf57610bbd600482611b70565b505b60066000846005811115610bd557610bd5612729565b6005811115610be657610be6612729565b8152602081019190915260400160002080547fffffffffffffffffffffffff0000000000000000000000000000000000000000169055610d9e565b610c2c600482611b85565b15610c3e57610c3c600482611b70565b505b610c49600282611b70565b610c955760405162461bcd60e51b815260206004820152601760248201527f65786368616e67652d646f65732d6e6f742d657869737400000000000000000060448201526064016106ae565b610ca0600283611b5b565b610cec5760405162461bcd60e51b815260206004820152600f60248201527f65786368616e67652d657869737473000000000000000000000000000000000060448201526064016106ae565b610cf7600483611b5b565b610d435760405162461bcd60e51b815260206004820152601460248201527f6d61696e2d65786368616e67652d65786973747300000000000000000000000060448201526064016106ae565b8160066000856005811115610d5a57610d5a612729565b6005811115610d6b57610d6b612729565b815260200190815260200160002060006101000a8154816001600160a01b0302191690836001600160a01b031602179055505b816001600160a01b0316816001600160a01b0316846005811115610dc457610dc4612729565b6040517fd368678e81cb4fa5855a3e8bc7c4df1cdfdc699b194e44bff3d1a4399ee6be1490600090a4505050565b805160208183018101805160078252928201919093012091528054610e16906127b1565b80601f0160208091040260200160405190810160405280929190818152602001828054610e42906127b1565b8015610e8f5780601f10610e6457610100808354040283529160200191610e8f565b820191906000526020600020905b815481529060010190602001808311610e7257829003601f168201915b505050505081565b6060610ea36002611ba7565b905090565b600080600080610eb9888888610eda565b925092509250610ece88888888878787611a3d565b98975050505050505050565b6000806060670de0b6b3a7640000600954670de0b6b3a7640000610efe91906128ce565b6008546040517fb64663840000000000000000000000000000000000000000000000000000000081526001600160a01b0389811660048301528a81166024830152604482018990529091169063b64663849060640160206040518083038186803b158015610f6b57600080fd5b505afa158015610f7f573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610fa391906126cf565b610fad91906126e8565b610fb79190612707565b92506000600760018888604051602001610fd39392919061273f565b60408051601f1981840301815290829052610fed91612795565b90815260200160405180910390208054611006906127b1565b80601f0160208091040260200160405190810160405280929190818152602001828054611032906127b1565b801561107f5780601f106110545761010080835404028352916020019161107f565b820191906000526020600020905b81548152906001019060200180831161106257829003601f168201915b505050505090506000815111156110a6576000818060200190518101906105009190612831565b60001960006110b56004611a1a565b905060005b818110156106605760006110cf600483611a2a565b6040517f70b247420000000000000000000000000000000000000000000000000000000081526001600160a01b038d811660048301528c81166024830152604482018c90529192506000918291908416906370b2474290606401600060405180830381600087803b15801561114357600080fd5b505af1158015611157573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f1916820160405261117f9190810190612882565b9150915060008211801561119257508582105b801561119e5750898211155b156111ad578195508298508097505b505050806111ba906128b3565b90506110ba565b6000546001600160a01b03620100009091041633146112225760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016106ae565b60006006600083600581111561123a5761123a612729565b600581111561124b5761124b612729565b81526020810191909152604001600020546001600160a01b03169050806112b45760405162461bcd60e51b815260206004820152601760248201527f65786368616e67652d646f65732d6e6f742d657869737400000000000000000060448201526064016106ae565b6112bf600482611b85565b1561131b576112cf600482611b70565b508160058111156112e2576112e2612729565b604051600081527f72a3a3b1f4c3b57a2e9e10b8efad2054b69a0299d8db7c2fbcaac55bedf2fffe906020015b60405180910390a25050565b611326600482611b5b565b5081600581111561133957611339612729565b604051600181527f72a3a3b1f4c3b57a2e9e10b8efad2054b69a0299d8db7c2fbcaac55bedf2fffe9060200161130f565b60008060008061137b888888610334565b925092509250610ece88888888878787611bb4565b6060610ea36004611ba7565b6000546001600160a01b03620100009091041633146113fd5760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016106ae565b6001600160a01b0381166114535760405162461bcd60e51b815260206004820152601960248201527f70726f706f7365642d676f7665726e6f722d69732d7a65726f0000000000000060448201526064016106ae565b600180547fffffffffffffffffffffffff0000000000000000000000000000000000000000166001600160a01b0392909216919091179055565b6000546001600160a01b03620100009091041633146114ee5760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016106ae565b60008686866040516020016115059392919061273f565b604051602081830303815290604052905060006007826040516115289190612795565b90815260200160405180910390208054611541906127b1565b80601f016020809104026020016040519081016040528092919081815260200182805461156d906127b1565b80156115ba5780601f1061158f576101008083540402835291602001916115ba565b820191906000526020600020905b81548152906001019060200180831161159d57829003601f168201915b5050505050905060008585856040516020016115d8939291906128e6565b60408051601f1981840301815291905290508361161e576007836040516115ff9190612795565b908152602001604051809103902060006116199190612193565b611652565b8060078460405161162f9190612795565b908152602001604051809103902090805190602001906116509291906121d0565b505b7f69f079d2078c67fbbdee50f8233f472aed9a0ddc1deb4c04fa3ed59fdee4db308383836040516116859392919061292f565b60405180910390a1505050505050505050565b6000806007600088886040516020016116b39392919061273f565b60408051601f19818403018152908290526116cd91612795565b908152602001604051809103902080546116e6906127b1565b80601f0160208091040260200160405190810160405280929190818152602001828054611712906127b1565b801561175f5780601f106117345761010080835404028352916020019161175f565b820191906000526020600020905b81548152906001019060200180831161174257829003601f168201915b5050505050905060008151116117b75760405162461bcd60e51b815260206004820152601860248201527f6e6f2d64656661756c742d726f7574696e672d666f756e64000000000000000060448201526064016106ae565b600080828060200190518101906117ce9190612831565b91509150610978898989888a600660008960058111156117f0576117f0612729565b600581111561180157611801612729565b81526020810191909152604001600020546001600160a01b031687611bb4565b6001546001600160a01b0316331461187b5760405162461bcd60e51b815260206004820152601960248201527f6e6f742d7468652d70726f706f7365642d676f7665726e6f720000000000000060448201526064016106ae565b600154600080546040516001600160a01b039384169362010000909204909116917fd4459d5b8b913cab0244230fd9b1c08b6ceace7fe9230e60d0f74cbffdf849d091a360018054600080547fffffffffffffffffffff0000000000000000000000000000000000000000ffff166001600160a01b03831662010000021790557fffffffffffffffffffffffff0000000000000000000000000000000000000000169055565b6000546001600160a01b03620100009091041633146119825760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016106ae565b670de0b6b3a76400008111156119da5760405162461bcd60e51b815260206004820152601460248201527f6d61782d736c6970706167652d67742d3130302500000000000000000000000060448201526064016106ae565b60095460408051918252602082018390527ed0adba8f44b48a2e609f42b3a1c04404a6d5bf30c24d7501cc72dd23406957910160405180910390a1600955565b6000611a24825490565b92915050565b6000611a368383611cbb565b9392505050565b6000611a546001600160a01b038916338587611ce5565b6040517f9d9f384d0000000000000000000000000000000000000000000000000000000081526001600160a01b03841690639d9f384d90611aa19085908a90899033908c90600401612972565b602060405180830381600087803b158015611abb57600080fd5b505af1158015611acf573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190611af391906126cf565b9050866001600160a01b0316886001600160a01b0316846001600160a01b03167fe2b399ee44535cc98392f9d1d787f5c925873e04562dee99db8c1f781240c0628588868c604051611b4894939291906129b2565b60405180910390a4979650505050505050565b6000611a36836001600160a01b038416611d73565b6000611a36836001600160a01b038416611dc2565b6001600160a01b03811660009081526001830160205260408120541515611a36565b60606000611a3683611eb5565b6000611bcb6001600160a01b038916338589611ce5565b6040517f4909c29a0000000000000000000000000000000000000000000000000000000081526001600160a01b03841690634909c29a90611c169085908a9089908b906004016129e1565b602060405180830381600087803b158015611c3057600080fd5b505af1158015611c44573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190611c6891906126cf565b9050866001600160a01b0316886001600160a01b0316846001600160a01b03167f332d883d1035df5d58d7a529e9dab834dbc4c3983a2d629a6424230ec1bf8c04858a86604051611b4893929190612a19565b6000826000018281548110611cd257611cd2612a3e565b9060005260206000200154905092915050565b604080516001600160a01b0385811660248301528416604482015260648082018490528251808303909101815260849091019091526020810180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff167f23b872dd00000000000000000000000000000000000000000000000000000000179052611d6d908590611f11565b50505050565b6000818152600183016020526040812054611dba57508154600181810184556000848152602080822090930184905584548482528286019093526040902091909155611a24565b506000611a24565b60008181526001830160205260408120548015611eab576000611de66001836126b8565b8554909150600090611dfa906001906126b8565b9050818114611e5f576000866000018281548110611e1a57611e1a612a3e565b9060005260206000200154905080876000018481548110611e3d57611e3d612a3e565b6000918252602080832090910192909255918252600188019052604090208390555b8554869080611e7057611e70612a54565b600190038181906000526020600020016000905590558560010160008681526020019081526020016000206000905560019350505050611a24565b6000915050611a24565b606081600001805480602002602001604051908101604052809291908181526020018280548015611f0557602002820191906000526020600020905b815481526020019060010190808311611ef1575b50505050509050919050565b6000611f66826040518060400160405280602081526020017f5361666545524332303a206c6f772d6c6576656c2063616c6c206661696c6564815250856001600160a01b0316611ffb9092919063ffffffff16565b805190915015611ff65780806020019051810190611f849190612a6a565b611ff65760405162461bcd60e51b815260206004820152602a60248201527f5361666545524332303a204552433230206f7065726174696f6e20646964206e60448201527f6f7420737563636565640000000000000000000000000000000000000000000060648201526084016106ae565b505050565b606061200a8484600085612012565b949350505050565b60608247101561208a5760405162461bcd60e51b815260206004820152602660248201527f416464726573733a20696e73756666696369656e742062616c616e636520666f60448201527f722063616c6c000000000000000000000000000000000000000000000000000060648201526084016106ae565b6001600160a01b0385163b6120e15760405162461bcd60e51b815260206004820152601d60248201527f416464726573733a2063616c6c20746f206e6f6e2d636f6e747261637400000060448201526064016106ae565b600080866001600160a01b031685876040516120fd9190612795565b60006040518083038185875af1925050503d806000811461213a576040519150601f19603f3d011682016040523d82523d6000602084013e61213f565b606091505b509150915061214f82828661215a565b979650505050505050565b60608315612169575081611a36565b8251156121795782518084602001fd5b8160405162461bcd60e51b81526004016106ae91906124f9565b50805461219f906127b1565b6000825580601f106121af575050565b601f0160209004906000526020600020908101906121cd9190612254565b50565b8280546121dc906127b1565b90600052602060002090601f0160209004810192826121fe5760008555612244565b82601f1061221757805160ff1916838001178555612244565b82800160010185558215612244579182015b82811115612244578251825591602001919060010190612229565b50612250929150612254565b5090565b5b808211156122505760008155600101612255565b6001600160a01b03811681146121cd57600080fd5b60008060006060848603121561229357600080fd5b833561229e81612269565b925060208401356122ae81612269565b929592945050506040919091013590565b60005b838110156122da5781810151838201526020016122c2565b83811115611d6d5750506000910152565b600081518084526123038160208601602086016122bf565b601f01601f19169290920160200192915050565b8381526001600160a01b038316602082015260606040820152600061233f60608301846122eb565b95945050505050565b60006020828403121561235a57600080fd5b8135611a3681612269565b600080600080600060a0868803121561237d57600080fd5b853561238881612269565b9450602086013561239881612269565b9350604086013592506060860135915060808601356123b681612269565b809150509295509295909350565b600681106121cd57600080fd5b600080604083850312156123e457600080fd5b82356123ef816123c4565b915060208301356123ff81612269565b809150509250929050565b634e487b7160e01b600052604160045260246000fd5b604051601f8201601f1916810167ffffffffffffffff811182821017156124495761244961240a565b604052919050565b600067ffffffffffffffff82111561246b5761246b61240a565b50601f01601f191660200190565b60006020828403121561248b57600080fd5b813567ffffffffffffffff8111156124a257600080fd5b8201601f810184136124b357600080fd5b80356124c66124c182612451565b612420565b8181528560208385010111156124db57600080fd5b81602084016020830137600091810160200191909152949350505050565b602081526000611a3660208301846122eb565b6020808252825182820181905260009190848201906040850190845b8181101561254d5783516001600160a01b031683529284019291840191600101612528565b50909695505050505050565b6000806000806080858703121561256f57600080fd5b843561257a81612269565b9350602085013561258a81612269565b92506040850135915060608501356125a181612269565b939692955090935050565b6000602082840312156125be57600080fd5b8135611a36816123c4565b60008060008060008060a087890312156125e257600080fd5b8635600281106125f157600080fd5b9550602087013561260181612269565b9450604087013561261181612269565b93506060870135612621816123c4565b9250608087013567ffffffffffffffff8082111561263e57600080fd5b818901915089601f83011261265257600080fd5b81358181111561266157600080fd5b8a602082850101111561267357600080fd5b6020830194508093505050509295509295509295565b60006020828403121561269b57600080fd5b5035919050565b634e487b7160e01b600052601160045260246000fd5b6000828210156126ca576126ca6126a2565b500390565b6000602082840312156126e157600080fd5b5051919050565b6000816000190483118215151615612702576127026126a2565b500290565b60008261272457634e487b7160e01b600052601260045260246000fd5b500490565b634e487b7160e01b600052602160045260246000fd5b60006002851061275157612751612729565b5060f89390931b83527fffffffffffffffffffffffffffffffffffffffff000000000000000000000000606092831b81166001850152911b16601582015260290190565b600082516127a78184602087016122bf565b9190910192915050565b600181811c908216806127c557607f821691505b602082108114156127e657634e487b7160e01b600052602260045260246000fd5b50919050565b600082601f8301126127fd57600080fd5b815161280b6124c182612451565b81815284602083860101111561282057600080fd5b61200a8260208301602087016122bf565b6000806040838503121561284457600080fd5b825161284f816123c4565b602084015190925067ffffffffffffffff81111561286c57600080fd5b612878858286016127ec565b9150509250929050565b6000806040838503121561289557600080fd5b82519150602083015167ffffffffffffffff81111561286c57600080fd5b60006000198214156128c7576128c76126a2565b5060010190565b600082198211156128e1576128e16126a2565b500190565b6000600685106128f8576128f8612729565b84825260406020830152826040830152828460608401376000606084840101526060601f19601f8501168301019050949350505050565b60608152600061294260608301866122eb565b828103602084015261295481866122eb565b9050828103604084015261296881856122eb565b9695505050505050565b60a08152600061298560a08301886122eb565b60208301969096525060408101939093526001600160a01b03918216606084015216608090910152919050565b6080815260006129c560808301876122eb565b6020830195909552506040810192909252606090910152919050565b6080815260006129f460808301876122eb565b60208301959095525060408101929092526001600160a01b0316606090910152919050565b606081526000612a2c60608301866122eb565b60208301949094525060400152919050565b634e487b7160e01b600052603260045260246000fd5b634e487b7160e01b600052603160045260246000fd5b600060208284031215612a7c57600080fd5b81518015158114611a3657600080fdfea2646970667358221220891763f4a8e399c6d8f18e3d28fc3417d3b142d27b5690116a02016e92d35b5064736f6c63430008090033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061016c5760003560e01c80637dc0d1d0116100cd578063b6aa515b11610081578063eaf8461f11610066578063eaf8461f14610306578063f3b27bc314610319578063f896acc71461032157600080fd5b8063b6aa515b146102e0578063c71f8f94146102f357600080fd5b80638c09d8f9116100b25780638c09d8f9146102b25780639eb252e0146102c5578063a819d47e146102d857600080fd5b80637dc0d1d0146102965780638c04166f146102a957600080fd5b80633254e7b111610124578063676b120611610109578063676b12061461024757806367b426451461025a57806370b247421461028357600080fd5b80633254e7b11461021257806337c03fb61461023257600080fd5b80631cb44dfc116101555780631cb44dfc146101c95780631ffd36b0146101de5780632aa3e6c6146101ff57600080fd5b80630c340a241461017157806319145798146101a7575b600080fd5b60005461018a906201000090046001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b6101ba6101b536600461227e565b610334565b60405161019e93929190612317565b6101dc6101d7366004612348565b6106c4565b005b6101f16101ec366004612365565b6107ef565b60405190815260200161019e565b6101dc61020d3660046123d1565b610985565b610225610220366004612479565b610df2565b60405161019e91906124f9565b61023a610e97565b60405161019e919061250c565b6101f1610255366004612559565b610ea8565b61018a6102683660046125ac565b6006602052600090815260409020546001600160a01b031681565b6101ba61029136600461227e565b610eda565b60085461018a906001600160a01b031681565b6101f160095481565b6101dc6102c03660046125ac565b6111c1565b6101f16102d3366004612559565b61136a565b61023a611390565b6101dc6102ee366004612348565b61139c565b6101dc6103013660046125c9565b61148d565b6101f1610314366004612365565b611698565b6101dc611821565b6101dc61032f366004612689565b611921565b6000806060670de0b6b3a7640000600954670de0b6b3a764000061035891906126b8565b6008546040517fb64663840000000000000000000000000000000000000000000000000000000081526001600160a01b038a811660048301528981166024830152604482018990529091169063b64663849060640160206040518083038186803b1580156103c557600080fd5b505afa1580156103d9573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906103fd91906126cf565b61040791906126e8565b6104119190612707565b9250600060076000888860405160200161042d9392919061273f565b60408051601f198184030181529082905261044791612795565b90815260200160405180910390208054610460906127b1565b80601f016020809104026020016040519081016040528092919081815260200182805461048c906127b1565b80156104d95780601f106104ae576101008083540402835291602001916104d9565b820191906000526020600020905b8154815290600101906020018083116104bc57829003601f168201915b50505050509050600081511115610553576000818060200190518101906105009190612831565b93509050846006600083600581111561051b5761051b612729565b600581111561052c5761052c612729565b81526020810191909152604001600020549095506001600160a01b031693506106bb915050565b6000806105606004611a1a565b905060005b8181101561066057600061057a600483611a2a565b6040517f191457980000000000000000000000000000000000000000000000000000000081526001600160a01b038d811660048301528c81166024830152604482018c9052919250600091829190841690631914579890606401600060405180830381600087803b1580156105ee57600080fd5b505af1158015610602573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f1916820160405261062a9190810190612882565b91509150858211801561063d5750898210155b1561064c578195508298508097505b50505080610659906128b3565b9050610565565b5060008451116106b75760405162461bcd60e51b815260206004820152601060248201527f6e6f2d726f7574696e672d666f756e640000000000000000000000000000000060448201526064015b60405180910390fd5b5050505b93509350939050565b6000546001600160a01b03620100009091041633146107255760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016106ae565b6001600160a01b03811661077b5760405162461bcd60e51b815260206004820152600f60248201527f616464726573732d69732d6e756c6c000000000000000000000000000000000060448201526064016106ae565b6008546040516001600160a01b038084169216907f078c3b417dadf69374a59793b829c52001247130433427049317bde56607b1b790600090a3600880547fffffffffffffffffffffffff0000000000000000000000000000000000000000166001600160a01b0392909216919091179055565b60008060076001888860405160200161080a9392919061273f565b60408051601f198184030181529082905261082491612795565b9081526020016040518091039020805461083d906127b1565b80601f0160208091040260200160405190810160405280929190818152602001828054610869906127b1565b80156108b65780601f1061088b576101008083540402835291602001916108b6565b820191906000526020600020905b81548152906001019060200180831161089957829003601f168201915b50505050509050600081511161090e5760405162461bcd60e51b815260206004820152601860248201527f6e6f2d64656661756c742d726f7574696e672d666f756e64000000000000000060448201526064016106ae565b600080828060200190518101906109259190612831565b91509150610978898989888a6006600089600581111561094757610947612729565b600581111561095857610958612729565b81526020810191909152604001600020546001600160a01b031687611a3d565b9998505050505050505050565b6000546001600160a01b03620100009091041633146109e65760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016106ae565b6000600660008460058111156109fe576109fe612729565b6005811115610a0f57610a0f612729565b81526020810191909152604001600020546001600160a01b0316905080610b3d57610a3b600283611b5b565b610a875760405162461bcd60e51b815260206004820152600f60248201527f65786368616e67652d657869737473000000000000000000000000000000000060448201526064016106ae565b610a92600483611b5b565b610ade5760405162461bcd60e51b815260206004820152601460248201527f6d61696e2d65786368616e67652d65786973747300000000000000000000000060448201526064016106ae565b8160066000856005811115610af557610af5612729565b6005811115610b0657610b06612729565b815260200190815260200160002060006101000a8154816001600160a01b0302191690836001600160a01b03160217905550610d9e565b6001600160a01b038216610c2157610b56600282611b70565b610ba25760405162461bcd60e51b815260206004820152601760248201527f65786368616e67652d646f65732d6e6f742d657869737400000000000000000060448201526064016106ae565b610bad600482611b85565b15610bbf57610bbd600482611b70565b505b60066000846005811115610bd557610bd5612729565b6005811115610be657610be6612729565b8152602081019190915260400160002080547fffffffffffffffffffffffff0000000000000000000000000000000000000000169055610d9e565b610c2c600482611b85565b15610c3e57610c3c600482611b70565b505b610c49600282611b70565b610c955760405162461bcd60e51b815260206004820152601760248201527f65786368616e67652d646f65732d6e6f742d657869737400000000000000000060448201526064016106ae565b610ca0600283611b5b565b610cec5760405162461bcd60e51b815260206004820152600f60248201527f65786368616e67652d657869737473000000000000000000000000000000000060448201526064016106ae565b610cf7600483611b5b565b610d435760405162461bcd60e51b815260206004820152601460248201527f6d61696e2d65786368616e67652d65786973747300000000000000000000000060448201526064016106ae565b8160066000856005811115610d5a57610d5a612729565b6005811115610d6b57610d6b612729565b815260200190815260200160002060006101000a8154816001600160a01b0302191690836001600160a01b031602179055505b816001600160a01b0316816001600160a01b0316846005811115610dc457610dc4612729565b6040517fd368678e81cb4fa5855a3e8bc7c4df1cdfdc699b194e44bff3d1a4399ee6be1490600090a4505050565b805160208183018101805160078252928201919093012091528054610e16906127b1565b80601f0160208091040260200160405190810160405280929190818152602001828054610e42906127b1565b8015610e8f5780601f10610e6457610100808354040283529160200191610e8f565b820191906000526020600020905b815481529060010190602001808311610e7257829003601f168201915b505050505081565b6060610ea36002611ba7565b905090565b600080600080610eb9888888610eda565b925092509250610ece88888888878787611a3d565b98975050505050505050565b6000806060670de0b6b3a7640000600954670de0b6b3a7640000610efe91906128ce565b6008546040517fb64663840000000000000000000000000000000000000000000000000000000081526001600160a01b0389811660048301528a81166024830152604482018990529091169063b64663849060640160206040518083038186803b158015610f6b57600080fd5b505afa158015610f7f573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610fa391906126cf565b610fad91906126e8565b610fb79190612707565b92506000600760018888604051602001610fd39392919061273f565b60408051601f1981840301815290829052610fed91612795565b90815260200160405180910390208054611006906127b1565b80601f0160208091040260200160405190810160405280929190818152602001828054611032906127b1565b801561107f5780601f106110545761010080835404028352916020019161107f565b820191906000526020600020905b81548152906001019060200180831161106257829003601f168201915b505050505090506000815111156110a6576000818060200190518101906105009190612831565b60001960006110b56004611a1a565b905060005b818110156106605760006110cf600483611a2a565b6040517f70b247420000000000000000000000000000000000000000000000000000000081526001600160a01b038d811660048301528c81166024830152604482018c90529192506000918291908416906370b2474290606401600060405180830381600087803b15801561114357600080fd5b505af1158015611157573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f1916820160405261117f9190810190612882565b9150915060008211801561119257508582105b801561119e5750898211155b156111ad578195508298508097505b505050806111ba906128b3565b90506110ba565b6000546001600160a01b03620100009091041633146112225760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016106ae565b60006006600083600581111561123a5761123a612729565b600581111561124b5761124b612729565b81526020810191909152604001600020546001600160a01b03169050806112b45760405162461bcd60e51b815260206004820152601760248201527f65786368616e67652d646f65732d6e6f742d657869737400000000000000000060448201526064016106ae565b6112bf600482611b85565b1561131b576112cf600482611b70565b508160058111156112e2576112e2612729565b604051600081527f72a3a3b1f4c3b57a2e9e10b8efad2054b69a0299d8db7c2fbcaac55bedf2fffe906020015b60405180910390a25050565b611326600482611b5b565b5081600581111561133957611339612729565b604051600181527f72a3a3b1f4c3b57a2e9e10b8efad2054b69a0299d8db7c2fbcaac55bedf2fffe9060200161130f565b60008060008061137b888888610334565b925092509250610ece88888888878787611bb4565b6060610ea36004611ba7565b6000546001600160a01b03620100009091041633146113fd5760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016106ae565b6001600160a01b0381166114535760405162461bcd60e51b815260206004820152601960248201527f70726f706f7365642d676f7665726e6f722d69732d7a65726f0000000000000060448201526064016106ae565b600180547fffffffffffffffffffffffff0000000000000000000000000000000000000000166001600160a01b0392909216919091179055565b6000546001600160a01b03620100009091041633146114ee5760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016106ae565b60008686866040516020016115059392919061273f565b604051602081830303815290604052905060006007826040516115289190612795565b90815260200160405180910390208054611541906127b1565b80601f016020809104026020016040519081016040528092919081815260200182805461156d906127b1565b80156115ba5780601f1061158f576101008083540402835291602001916115ba565b820191906000526020600020905b81548152906001019060200180831161159d57829003601f168201915b5050505050905060008585856040516020016115d8939291906128e6565b60408051601f1981840301815291905290508361161e576007836040516115ff9190612795565b908152602001604051809103902060006116199190612193565b611652565b8060078460405161162f9190612795565b908152602001604051809103902090805190602001906116509291906121d0565b505b7f69f079d2078c67fbbdee50f8233f472aed9a0ddc1deb4c04fa3ed59fdee4db308383836040516116859392919061292f565b60405180910390a1505050505050505050565b6000806007600088886040516020016116b39392919061273f565b60408051601f19818403018152908290526116cd91612795565b908152602001604051809103902080546116e6906127b1565b80601f0160208091040260200160405190810160405280929190818152602001828054611712906127b1565b801561175f5780601f106117345761010080835404028352916020019161175f565b820191906000526020600020905b81548152906001019060200180831161174257829003601f168201915b5050505050905060008151116117b75760405162461bcd60e51b815260206004820152601860248201527f6e6f2d64656661756c742d726f7574696e672d666f756e64000000000000000060448201526064016106ae565b600080828060200190518101906117ce9190612831565b91509150610978898989888a600660008960058111156117f0576117f0612729565b600581111561180157611801612729565b81526020810191909152604001600020546001600160a01b031687611bb4565b6001546001600160a01b0316331461187b5760405162461bcd60e51b815260206004820152601960248201527f6e6f742d7468652d70726f706f7365642d676f7665726e6f720000000000000060448201526064016106ae565b600154600080546040516001600160a01b039384169362010000909204909116917fd4459d5b8b913cab0244230fd9b1c08b6ceace7fe9230e60d0f74cbffdf849d091a360018054600080547fffffffffffffffffffff0000000000000000000000000000000000000000ffff166001600160a01b03831662010000021790557fffffffffffffffffffffffff0000000000000000000000000000000000000000169055565b6000546001600160a01b03620100009091041633146119825760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016106ae565b670de0b6b3a76400008111156119da5760405162461bcd60e51b815260206004820152601460248201527f6d61782d736c6970706167652d67742d3130302500000000000000000000000060448201526064016106ae565b60095460408051918252602082018390527ed0adba8f44b48a2e609f42b3a1c04404a6d5bf30c24d7501cc72dd23406957910160405180910390a1600955565b6000611a24825490565b92915050565b6000611a368383611cbb565b9392505050565b6000611a546001600160a01b038916338587611ce5565b6040517f9d9f384d0000000000000000000000000000000000000000000000000000000081526001600160a01b03841690639d9f384d90611aa19085908a90899033908c90600401612972565b602060405180830381600087803b158015611abb57600080fd5b505af1158015611acf573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190611af391906126cf565b9050866001600160a01b0316886001600160a01b0316846001600160a01b03167fe2b399ee44535cc98392f9d1d787f5c925873e04562dee99db8c1f781240c0628588868c604051611b4894939291906129b2565b60405180910390a4979650505050505050565b6000611a36836001600160a01b038416611d73565b6000611a36836001600160a01b038416611dc2565b6001600160a01b03811660009081526001830160205260408120541515611a36565b60606000611a3683611eb5565b6000611bcb6001600160a01b038916338589611ce5565b6040517f4909c29a0000000000000000000000000000000000000000000000000000000081526001600160a01b03841690634909c29a90611c169085908a9089908b906004016129e1565b602060405180830381600087803b158015611c3057600080fd5b505af1158015611c44573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190611c6891906126cf565b9050866001600160a01b0316886001600160a01b0316846001600160a01b03167f332d883d1035df5d58d7a529e9dab834dbc4c3983a2d629a6424230ec1bf8c04858a86604051611b4893929190612a19565b6000826000018281548110611cd257611cd2612a3e565b9060005260206000200154905092915050565b604080516001600160a01b0385811660248301528416604482015260648082018490528251808303909101815260849091019091526020810180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff167f23b872dd00000000000000000000000000000000000000000000000000000000179052611d6d908590611f11565b50505050565b6000818152600183016020526040812054611dba57508154600181810184556000848152602080822090930184905584548482528286019093526040902091909155611a24565b506000611a24565b60008181526001830160205260408120548015611eab576000611de66001836126b8565b8554909150600090611dfa906001906126b8565b9050818114611e5f576000866000018281548110611e1a57611e1a612a3e565b9060005260206000200154905080876000018481548110611e3d57611e3d612a3e565b6000918252602080832090910192909255918252600188019052604090208390555b8554869080611e7057611e70612a54565b600190038181906000526020600020016000905590558560010160008681526020019081526020016000206000905560019350505050611a24565b6000915050611a24565b606081600001805480602002602001604051908101604052809291908181526020018280548015611f0557602002820191906000526020600020905b815481526020019060010190808311611ef1575b50505050509050919050565b6000611f66826040518060400160405280602081526020017f5361666545524332303a206c6f772d6c6576656c2063616c6c206661696c6564815250856001600160a01b0316611ffb9092919063ffffffff16565b805190915015611ff65780806020019051810190611f849190612a6a565b611ff65760405162461bcd60e51b815260206004820152602a60248201527f5361666545524332303a204552433230206f7065726174696f6e20646964206e60448201527f6f7420737563636565640000000000000000000000000000000000000000000060648201526084016106ae565b505050565b606061200a8484600085612012565b949350505050565b60608247101561208a5760405162461bcd60e51b815260206004820152602660248201527f416464726573733a20696e73756666696369656e742062616c616e636520666f60448201527f722063616c6c000000000000000000000000000000000000000000000000000060648201526084016106ae565b6001600160a01b0385163b6120e15760405162461bcd60e51b815260206004820152601d60248201527f416464726573733a2063616c6c20746f206e6f6e2d636f6e747261637400000060448201526064016106ae565b600080866001600160a01b031685876040516120fd9190612795565b60006040518083038185875af1925050503d806000811461213a576040519150601f19603f3d011682016040523d82523d6000602084013e61213f565b606091505b509150915061214f82828661215a565b979650505050505050565b60608315612169575081611a36565b8251156121795782518084602001fd5b8160405162461bcd60e51b81526004016106ae91906124f9565b50805461219f906127b1565b6000825580601f106121af575050565b601f0160209004906000526020600020908101906121cd9190612254565b50565b8280546121dc906127b1565b90600052602060002090601f0160209004810192826121fe5760008555612244565b82601f1061221757805160ff1916838001178555612244565b82800160010185558215612244579182015b82811115612244578251825591602001919060010190612229565b50612250929150612254565b5090565b5b808211156122505760008155600101612255565b6001600160a01b03811681146121cd57600080fd5b60008060006060848603121561229357600080fd5b833561229e81612269565b925060208401356122ae81612269565b929592945050506040919091013590565b60005b838110156122da5781810151838201526020016122c2565b83811115611d6d5750506000910152565b600081518084526123038160208601602086016122bf565b601f01601f19169290920160200192915050565b8381526001600160a01b038316602082015260606040820152600061233f60608301846122eb565b95945050505050565b60006020828403121561235a57600080fd5b8135611a3681612269565b600080600080600060a0868803121561237d57600080fd5b853561238881612269565b9450602086013561239881612269565b9350604086013592506060860135915060808601356123b681612269565b809150509295509295909350565b600681106121cd57600080fd5b600080604083850312156123e457600080fd5b82356123ef816123c4565b915060208301356123ff81612269565b809150509250929050565b634e487b7160e01b600052604160045260246000fd5b604051601f8201601f1916810167ffffffffffffffff811182821017156124495761244961240a565b604052919050565b600067ffffffffffffffff82111561246b5761246b61240a565b50601f01601f191660200190565b60006020828403121561248b57600080fd5b813567ffffffffffffffff8111156124a257600080fd5b8201601f810184136124b357600080fd5b80356124c66124c182612451565b612420565b8181528560208385010111156124db57600080fd5b81602084016020830137600091810160200191909152949350505050565b602081526000611a3660208301846122eb565b6020808252825182820181905260009190848201906040850190845b8181101561254d5783516001600160a01b031683529284019291840191600101612528565b50909695505050505050565b6000806000806080858703121561256f57600080fd5b843561257a81612269565b9350602085013561258a81612269565b92506040850135915060608501356125a181612269565b939692955090935050565b6000602082840312156125be57600080fd5b8135611a36816123c4565b60008060008060008060a087890312156125e257600080fd5b8635600281106125f157600080fd5b9550602087013561260181612269565b9450604087013561261181612269565b93506060870135612621816123c4565b9250608087013567ffffffffffffffff8082111561263e57600080fd5b818901915089601f83011261265257600080fd5b81358181111561266157600080fd5b8a602082850101111561267357600080fd5b6020830194508093505050509295509295509295565b60006020828403121561269b57600080fd5b5035919050565b634e487b7160e01b600052601160045260246000fd5b6000828210156126ca576126ca6126a2565b500390565b6000602082840312156126e157600080fd5b5051919050565b6000816000190483118215151615612702576127026126a2565b500290565b60008261272457634e487b7160e01b600052601260045260246000fd5b500490565b634e487b7160e01b600052602160045260246000fd5b60006002851061275157612751612729565b5060f89390931b83527fffffffffffffffffffffffffffffffffffffffff000000000000000000000000606092831b81166001850152911b16601582015260290190565b600082516127a78184602087016122bf565b9190910192915050565b600181811c908216806127c557607f821691505b602082108114156127e657634e487b7160e01b600052602260045260246000fd5b50919050565b600082601f8301126127fd57600080fd5b815161280b6124c182612451565b81815284602083860101111561282057600080fd5b61200a8260208301602087016122bf565b6000806040838503121561284457600080fd5b825161284f816123c4565b602084015190925067ffffffffffffffff81111561286c57600080fd5b612878858286016127ec565b9150509250929050565b6000806040838503121561289557600080fd5b82519150602083015167ffffffffffffffff81111561286c57600080fd5b60006000198214156128c7576128c76126a2565b5060010190565b600082198211156128e1576128e16126a2565b500190565b6000600685106128f8576128f8612729565b84825260406020830152826040830152828460608401376000606084840101526060601f19601f8501168301019050949350505050565b60608152600061294260608301866122eb565b828103602084015261295481866122eb565b9050828103604084015261296881856122eb565b9695505050505050565b60a08152600061298560a08301886122eb565b60208301969096525060408101939093526001600160a01b03918216606084015216608090910152919050565b6080815260006129c560808301876122eb565b6020830195909552506040810192909252606090910152919050565b6080815260006129f460808301876122eb565b60208301959095525060408101929092526001600160a01b0316606090910152919050565b606081526000612a2c60608301866122eb565b60208301949094525060400152919050565b634e487b7160e01b600052603260045260246000fd5b634e487b7160e01b600052603160045260246000fd5b600060208284031215612a7c57600080fd5b81518015158114611a3657600080fdfea2646970667358221220891763f4a8e399c6d8f18e3d28fc3417d3b142d27b5690116a02016e92d35b5064736f6c63430008090033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "acceptGovernorship()": {
+        "details": "Allows new governor to accept governorship of the contract."
+      },
+      "getAllExchanges()": {
+        "details": "This function is gas intensive"
+      },
+      "getBestAmountIn(address,address,uint256)": {
+        "details": "It shouldn't be used as oracle!!!"
+      },
+      "getBestAmountOut(address,address,uint256)": {
+        "details": "It shouldn't be used as oracle!!!"
+      },
+      "getMainExchanges()": {
+        "details": "This function is gas intensive"
+      },
+      "setDefaultRouting(uint8,address,address,uint8,bytes)": {
+        "details": "Use empty `path_` for removalUse `abi.encodePacked(tokenA, poolFee1, tokenB, poolFee2, tokenC, ...)` for UniswapV3 exchangeUse `abi.encode([tokenA, tokenB, tokenC, ...])` for UniswapV2-like exchanges",
+        "params": {
+          "exchange_": "The type (i.e. protocol) of the exchange",
+          "path_": "The swap path",
+          "swapType_": "If the routing is related to `EXACT_INPUT` or `EXACT_OUTPUT`",
+          "tokenIn_": "The swap in token",
+          "tokenOut_": "The swap out token"
+        }
+      },
+      "setExchange(uint8,address)": {
+        "details": "Use null `exchange_` for removal"
+      },
+      "transferGovernorship(address)": {
+        "details": "Transfers governorship of the contract to a new account (`proposedGovernor`). Can only be called by the current owner."
+      }
+    },
+    "stateVariables": {
+      "defaultRoutings": {
+        "details": "Used to save gas by using a preset routing instead of looking for the best"
+      },
+      "maxSlippage": {
+        "details": "Use 18 decimals (e.g. 0.2e18 = 20%)"
+      },
+      "oracle": {
+        "details": "This is used to set acceptable slippage parameters"
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "events": {
+      "DefaultRoutingUpdated(bytes,bytes,bytes)": {
+        "notice": "Emitted when default routing is updated"
+      },
+      "ExchangeAsMainUpdated(uint8,bool)": {
+        "notice": "Emitted when an exchanges to loop over are updated"
+      },
+      "ExchangeUpdated(uint8,address,address)": {
+        "notice": "Emitted when an exchange is added"
+      },
+      "MaxSlippageUpdated(uint256,uint256)": {
+        "notice": "Emitted when the max slippage is updated"
+      },
+      "OracleUpdated(address,address)": {
+        "notice": "Emitted when the oracle is updated"
+      },
+      "SwapExactInput(address,bytes,address,address,uint256,uint256)": {
+        "notice": "Emitted when exact-input swap is executed"
+      },
+      "SwapExactOutput(address,bytes,address,address,uint256,uint256,uint256)": {
+        "notice": "Emitted when exact-output swap is executed"
+      }
+    },
+    "kind": "user",
+    "methods": {
+      "addressOf(uint8)": {
+        "notice": "Mapping of exchanges' addresses by type"
+      },
+      "defaultRoutings(bytes)": {
+        "notice": "Default swap routings"
+      },
+      "getAllExchanges()": {
+        "notice": "The list of supported DEXes"
+      },
+      "getBestAmountIn(address,address,uint256)": {
+        "notice": "Get *spot* quote It will return the swap amount based on the current reserves of the best pair/path found (i.e. spot price)."
+      },
+      "getBestAmountOut(address,address,uint256)": {
+        "notice": "Get *spot* quote It will return the swap amount based on the current reserves of the best pair/path found (i.e. spot price)."
+      },
+      "getMainExchanges()": {
+        "notice": "The list of main DEXes"
+      },
+      "maxSlippage()": {
+        "notice": "Max slippage acceptable"
+      },
+      "oracle()": {
+        "notice": "The oracle contract"
+      },
+      "setDefaultRouting(uint8,address,address,uint8,bytes)": {
+        "notice": "Set default routing"
+      },
+      "setExchange(uint8,address)": {
+        "notice": "Add or update exchange"
+      },
+      "swapExactInput(address,address,uint256,address)": {
+        "notice": "Perform an exact input swap"
+      },
+      "swapExactInputWithDefaultRouting(address,address,uint256,uint256,address)": {
+        "notice": "Perform an exact input swap - will revert if there is no default routing"
+      },
+      "swapExactOutput(address,address,uint256,address)": {
+        "notice": "Perform an exact output swap"
+      },
+      "swapExactOutputWithDefaultRouting(address,address,uint256,uint256,address)": {
+        "notice": "Perform an exact output swap - will revert if there is no default routing"
+      },
+      "toggleExchangeAsMain(uint8)": {
+        "notice": "Toggle exchange as main"
+      },
+      "updateMaxSlippage(uint256)": {
+        "notice": "Update max slippage"
+      },
+      "updateOracle(address)": {
+        "notice": "Update oracle contract"
+      }
+    },
+    "notice": "Swapper contract This contract encapsulates DEXes and use them to perform swaps using the best trade path as possible",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 420,
+        "contract": "contracts/swapper/Swapper.sol:Swapper",
+        "label": "_initialized",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_uint8"
+      },
+      {
+        "astId": 423,
+        "contract": "contracts/swapper/Swapper.sol:Swapper",
+        "label": "_initializing",
+        "offset": 1,
+        "slot": "0",
+        "type": "t_bool"
+      },
+      {
+        "astId": 6779,
+        "contract": "contracts/swapper/Swapper.sol:Swapper",
+        "label": "governor",
+        "offset": 2,
+        "slot": "0",
+        "type": "t_address"
+      },
+      {
+        "astId": 6781,
+        "contract": "contracts/swapper/Swapper.sol:Swapper",
+        "label": "proposedGovernor",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_address"
+      },
+      {
+        "astId": 14313,
+        "contract": "contracts/swapper/Swapper.sol:Swapper",
+        "label": "allExchanges",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_struct(AddressSet)2578_storage"
+      },
+      {
+        "astId": 14317,
+        "contract": "contracts/swapper/Swapper.sol:Swapper",
+        "label": "mainExchanges",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_struct(AddressSet)2578_storage"
+      },
+      {
+        "astId": 14323,
+        "contract": "contracts/swapper/Swapper.sol:Swapper",
+        "label": "addressOf",
+        "offset": 0,
+        "slot": "6",
+        "type": "t_mapping(t_enum(ExchangeType)12386,t_address)"
+      },
+      {
+        "astId": 14328,
+        "contract": "contracts/swapper/Swapper.sol:Swapper",
+        "label": "defaultRoutings",
+        "offset": 0,
+        "slot": "7",
+        "type": "t_mapping(t_bytes_memory_ptr,t_bytes_storage)"
+      },
+      {
+        "astId": 14333,
+        "contract": "contracts/swapper/Swapper.sol:Swapper",
+        "label": "oracle",
+        "offset": 0,
+        "slot": "8",
+        "type": "t_contract(IOracle)12086"
+      },
+      {
+        "astId": 14337,
+        "contract": "contracts/swapper/Swapper.sol:Swapper",
+        "label": "maxSlippage",
+        "offset": 0,
+        "slot": "9",
+        "type": "t_uint256"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_bytes32)dyn_storage": {
+        "base": "t_bytes32",
+        "encoding": "dynamic_array",
+        "label": "bytes32[]",
+        "numberOfBytes": "32"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_bytes32": {
+        "encoding": "inplace",
+        "label": "bytes32",
+        "numberOfBytes": "32"
+      },
+      "t_bytes_memory_ptr": {
+        "encoding": "bytes",
+        "label": "bytes",
+        "numberOfBytes": "32"
+      },
+      "t_bytes_storage": {
+        "encoding": "bytes",
+        "label": "bytes",
+        "numberOfBytes": "32"
+      },
+      "t_contract(IOracle)12086": {
+        "encoding": "inplace",
+        "label": "contract IOracle",
+        "numberOfBytes": "20"
+      },
+      "t_enum(ExchangeType)12386": {
+        "encoding": "inplace",
+        "label": "enum DataTypes.ExchangeType",
+        "numberOfBytes": "1"
+      },
+      "t_mapping(t_bytes32,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_bytes32",
+        "label": "mapping(bytes32 => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_mapping(t_bytes_memory_ptr,t_bytes_storage)": {
+        "encoding": "mapping",
+        "key": "t_bytes_memory_ptr",
+        "label": "mapping(bytes => bytes)",
+        "numberOfBytes": "32",
+        "value": "t_bytes_storage"
+      },
+      "t_mapping(t_enum(ExchangeType)12386,t_address)": {
+        "encoding": "mapping",
+        "key": "t_enum(ExchangeType)12386",
+        "label": "mapping(enum DataTypes.ExchangeType => address)",
+        "numberOfBytes": "32",
+        "value": "t_address"
+      },
+      "t_struct(AddressSet)2578_storage": {
+        "encoding": "inplace",
+        "label": "struct EnumerableSet.AddressSet",
+        "members": [
+          {
+            "astId": 2577,
+            "contract": "contracts/swapper/Swapper.sol:Swapper",
+            "label": "_inner",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_struct(Set)2277_storage"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_struct(Set)2277_storage": {
+        "encoding": "inplace",
+        "label": "struct EnumerableSet.Set",
+        "members": [
+          {
+            "astId": 2272,
+            "contract": "contracts/swapper/Swapper.sol:Swapper",
+            "label": "_values",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_array(t_bytes32)dyn_storage"
+          },
+          {
+            "astId": 2276,
+            "contract": "contracts/swapper/Swapper.sol:Swapper",
+            "label": "_indexes",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_mapping(t_bytes32,t_uint256)"
+          }
+        ],
+        "numberOfBytes": "64"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      },
+      "t_uint8": {
+        "encoding": "inplace",
+        "label": "uint8",
+        "numberOfBytes": "1"
+      }
+    }
+  }
+}
