@@ -8,6 +8,20 @@ pragma solidity <=0.8.9;
 interface IExchange {
     /**
      * @notice Get *spot* quote
+     * It will return the swap amount based on the current reserves of the given path (i.e. spot price)
+     * @dev It shouldn't be used as oracle!!!
+     */
+    function getAmountsIn(uint256 _amountOut, bytes memory path_) external returns (uint256 _amountIn);
+
+    /**
+     * @notice Get *spot* quote
+     * It will return the swap amount based on the current reserves of the given path (i.e. spot price)
+     * @dev It shouldn't be used as oracle!!!
+     */
+    function getAmountsOut(uint256 amountIn_, bytes memory path_) external returns (uint256 _amountOut);
+
+    /**
+     * @notice Get *spot* quote
      * It will return the swap amount based on the current reserves of the best pair/path found (i.e. spot price)
      * @dev It shouldn't be used as oracle!!!
      */

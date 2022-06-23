@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../access/Governable.sol";
 import "../interfaces/swapper/ISwapper.sol";
-import "../interfaces/swapper/IExchange.sol";
 import "../libraries/DataTypes.sol";
 
 /**
@@ -92,6 +91,7 @@ contract Swapper is ISwapper, Governable {
     event DefaultRoutingUpdated(bytes key, bytes oldRouting, bytes newRouting);
 
     constructor(IOracle oracle_, uint256 maxSlippage_) {
+        require(address(oracle_) != address(0), "oracle-is-null");
         oracle = oracle_;
         maxSlippage = maxSlippage_;
     }
@@ -203,34 +203,6 @@ contract Swapper is ISwapper, Governable {
     }
 
     /// @inheritdoc ISwapper
-    function swapExactInputWithDefaultRouting(
-        address tokenIn_,
-        address tokenOut_,
-        uint256 amountIn_,
-        uint256 amountOutMin_,
-        address receiver_
-    ) external returns (uint256 _amountOut) {
-        bytes memory _defaultRouting = defaultRoutings[
-            abi.encodePacked(DataTypes.SwapType.EXACT_INPUT, tokenIn_, tokenOut_)
-        ];
-        require(_defaultRouting.length > 0, "no-default-routing-found");
-        (DataTypes.ExchangeType _exchangeType, bytes memory _path) = abi.decode(
-            _defaultRouting,
-            (DataTypes.ExchangeType, bytes)
-        );
-        return
-            _swapExactInput(
-                tokenIn_,
-                tokenOut_,
-                amountIn_,
-                receiver_,
-                amountOutMin_,
-                IExchange(addressOf[_exchangeType]),
-                _path
-            );
-    }
-
-    /// @inheritdoc ISwapper
     function swapExactOutput(
         address tokenIn_,
         address tokenOut_,
@@ -243,34 +215,6 @@ contract Swapper is ISwapper, Governable {
             amountOut_
         );
         return _swapExactOutput(tokenIn_, tokenOut_, amountOut_, receiver_, _amountInMax, _exchange, _path);
-    }
-
-    /// @inheritdoc ISwapper
-    function swapExactOutputWithDefaultRouting(
-        address tokenIn_,
-        address tokenOut_,
-        uint256 amountOut_,
-        uint256 amountInMax_,
-        address receiver_
-    ) external returns (uint256 _amountIn) {
-        bytes memory _defaultRouting = defaultRoutings[
-            abi.encodePacked(DataTypes.SwapType.EXACT_OUTPUT, tokenIn_, tokenOut_)
-        ];
-        require(_defaultRouting.length > 0, "no-default-routing-found");
-        (DataTypes.ExchangeType _exchangeType, bytes memory _path) = abi.decode(
-            _defaultRouting,
-            (DataTypes.ExchangeType, bytes)
-        );
-        return
-            _swapExactOutput(
-                tokenIn_,
-                tokenOut_,
-                amountOut_,
-                receiver_,
-                amountInMax_,
-                IExchange(addressOf[_exchangeType]),
-                _path
-            );
     }
 
     /**
