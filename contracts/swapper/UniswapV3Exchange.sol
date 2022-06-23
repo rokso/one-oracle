@@ -80,7 +80,7 @@ contract UniswapV3Exchange is IExchange {
      * @notice Wraps `quoter.quoteExactOutput()` function
      * @dev Returns `0` if reverts
      */
-    function getAmountsIn(uint256 amountOut_, bytes memory path_) public returns (uint256 _amountIn) {
+    function getAmountsIn(uint256 amountOut_, bytes memory path_) public override returns (uint256 _amountIn) {
         try QUOTER.quoteExactOutput(path_, amountOut_) returns (uint256 __amountIn) {
             _amountIn = __amountIn;
         } catch {}
@@ -90,7 +90,7 @@ contract UniswapV3Exchange is IExchange {
      * @notice Wraps `quoter.quoteExactInput()` function
      * @dev Returns `0` if reverts
      */
-    function getAmountsOut(uint256 amountIn_, bytes memory path_) public returns (uint256 _amountOut) {
+    function getAmountsOut(uint256 amountIn_, bytes memory path_) public override returns (uint256 _amountOut) {
         try QUOTER.quoteExactInput(path_, amountIn_) returns (uint256 __amountOut) {
             _amountOut = __amountOut;
         } catch {}

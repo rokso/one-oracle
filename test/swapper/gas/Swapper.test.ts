@@ -26,10 +26,10 @@ import {
   PriceProviderMock__factory,
   StableCoinProvider__factory,
   StableCoinProvider,
-} from '../../typechain-types'
-import {Address, ExchangeType, Provider, SwapType} from '../../helpers'
-import {HOUR, increaseTime, parseEther, parseUnits} from '../helpers'
-import {adjustBalance} from '../helpers/balance'
+} from '../../../typechain-types'
+import {Address, ExchangeType, Provider, SwapType} from '../../../helpers'
+import {HOUR, increaseTime, parseEther, parseUnits} from '../../helpers'
+import {adjustBalance} from '../../helpers/balance'
 
 const {
   WETH_ADDRESS,
@@ -47,7 +47,7 @@ const STALE_PERIOD = ethers.constants.MaxUint256
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
 
-describe('GasUsage @mainnet', function () {
+describe('GasUsage:Swapper @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
   let uniswapV2Exchange: UniswapV2LikeExchange
@@ -259,7 +259,7 @@ describe('GasUsage @mainnet', function () {
         const amountIn = parseUnits('0.001', 8)
         const tx = await uniswapV2Exchange.getBestAmountOut(WBTC_ADDRESS, WETH_ADDRESS, amountIn)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('38951')
+        expect(receipt.gasUsed).eq('38950')
       })
 
       it('uniswapV3 exchange', async function () {
@@ -275,7 +275,7 @@ describe('GasUsage @mainnet', function () {
         const amountIn = parseUnits('0.001', 8)
         const tx = await uniswapV2Exchange.getBestAmountOut(WBTC_ADDRESS, BTT_ADDRESS, amountIn)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('52655')
+        expect(receipt.gasUsed).eq('52654')
       })
 
       it('uniswapV3 exchange', async function () {
@@ -293,7 +293,7 @@ describe('GasUsage @mainnet', function () {
         const amountOut = parseUnits('0.001', 8)
         const tx = await uniswapV2Exchange.getBestAmountIn(WETH_ADDRESS, WBTC_ADDRESS, amountOut)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('38831')
+        expect(receipt.gasUsed).eq('38830')
       })
 
       it('uniswapV3 exchange', async function () {
@@ -309,7 +309,7 @@ describe('GasUsage @mainnet', function () {
         const amountOut = parseUnits('0.001', 8)
         const tx = await uniswapV2Exchange.getBestAmountIn(BTT_ADDRESS, WBTC_ADDRESS, amountOut)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('52808')
+        expect(receipt.gasUsed).eq('52807')
       })
 
       it('uniswapV3 exchange', async function () {
@@ -543,7 +543,7 @@ describe('GasUsage @mainnet', function () {
         const amountIn = parseUnits('0.001', 8)
         const tx = await swapper.getBestAmountOut(WBTC_ADDRESS, BTT_ADDRESS, amountIn)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('359506')
+        expect(receipt.gasUsed).eq('359481')
       })
 
       it('swapExactInput', async function () {
@@ -557,14 +557,14 @@ describe('GasUsage @mainnet', function () {
         const tx2 = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, deployer.address)
 
         // then
-        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([514420, 494015])
+        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([514440, 494035])
       })
 
       it('getBestAmountIn', async function () {
         const amountOut = parseUnits('0.001', 8)
         const tx = await swapper.getBestAmountIn(BTT_ADDRESS, WBTC_ADDRESS, amountOut)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('363530')
+        expect(receipt.gasUsed).eq('363528')
       })
 
       it('swapExactOutput', async function () {
@@ -580,7 +580,7 @@ describe('GasUsage @mainnet', function () {
         const tx2 = await swapper.swapExactOutput(BTT_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
 
         // then
-        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([532114, 511842])
+        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([532112, 511840])
       })
 
       describe('with default routing', function () {
@@ -610,7 +610,7 @@ describe('GasUsage @mainnet', function () {
           const amountIn = parseUnits('0.001', 8)
           const tx = await swapper.getBestAmountOut(WBTC_ADDRESS, BTT_ADDRESS, amountIn)
           const receipt = await tx.wait()
-          expect(receipt.gasUsed).eq('153226')
+          expect(receipt.gasUsed).eq('153203')
         })
 
         it('swapExactInput', async function () {
@@ -625,36 +625,7 @@ describe('GasUsage @mainnet', function () {
 
           // then
           expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
-            331639, 311234,
-          ])
-        })
-
-        it('swapExactInputWithDefaultRouting', async function () {
-          // given
-          const amountIn = parseUnits('0.001', 8)
-          const amountOutMin = 0
-
-          // when
-          await wbtc.approve(swapper.address, amountIn)
-          const tx1 = await swapper.swapExactInputWithDefaultRouting(
-            WBTC_ADDRESS,
-            BTT_ADDRESS,
-            amountIn,
-            amountOutMin,
-            deployer.address
-          )
-          await wbtc.approve(swapper.address, amountIn)
-          const tx2 = await swapper.swapExactInputWithDefaultRouting(
-            WBTC_ADDRESS,
-            BTT_ADDRESS,
-            amountIn,
-            amountOutMin,
-            deployer.address
-          )
-
-          // then
-          expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
-            238365, 217960,
+            331661, 311256,
           ])
         })
 
@@ -681,35 +652,6 @@ describe('GasUsage @mainnet', function () {
             334625, 314316,
           ])
         })
-
-        it('swapExactOutputWithDefaultRouting', async function () {
-          // given
-          const amountOut = parseUnits('0.001', 8)
-          const {_amountInMax} = await swapper.callStatic.getBestAmountIn(BTT_ADDRESS, WBTC_ADDRESS, amountOut)
-
-          // when
-          await btt.approve(swapper.address, _amountInMax)
-          const tx1 = await swapper.swapExactOutputWithDefaultRouting(
-            BTT_ADDRESS,
-            WBTC_ADDRESS,
-            amountOut,
-            _amountInMax,
-            deployer.address
-          )
-          await btt.approve(swapper.address, _amountInMax)
-          const tx2 = await swapper.swapExactOutputWithDefaultRouting(
-            BTT_ADDRESS,
-            WBTC_ADDRESS,
-            amountOut,
-            _amountInMax,
-            deployer.address
-          )
-
-          // then
-          expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
-            241526, 221217,
-          ])
-        })
       })
     })
 
@@ -718,7 +660,7 @@ describe('GasUsage @mainnet', function () {
         const amountIn = parseUnits('0.001', 8)
         const tx = await swapper.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('338392')
+        expect(receipt.gasUsed).eq('338366')
       })
 
       it('swapExactInput', async function () {
@@ -732,14 +674,14 @@ describe('GasUsage @mainnet', function () {
         const tx2 = await swapper.swapExactInput(WBTC_ADDRESS, DAI_ADDRESS, amountIn, deployer.address)
 
         // then
-        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([448763, 428394])
+        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([448782, 428413])
       })
 
       it('getBestAmountIn', async function () {
         const amountOut = parseUnits('0.001', 8)
         const tx = await swapper.getBestAmountIn(DAI_ADDRESS, WBTC_ADDRESS, amountOut)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('342244')
+        expect(receipt.gasUsed).eq('342241')
       })
 
       it('swapExactOutput', async function () {
@@ -754,7 +696,7 @@ describe('GasUsage @mainnet', function () {
         const tx2 = await swapper.swapExactOutput(DAI_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
 
         // then
-        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([456812, 433854])
+        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([456809, 433851])
       })
 
       describe('with default routing', function () {
@@ -784,7 +726,7 @@ describe('GasUsage @mainnet', function () {
           const amountIn = parseUnits('0.001', 8)
           const tx = await swapper.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
           const receipt = await tx.wait()
-          expect(receipt.gasUsed).eq('117967')
+          expect(receipt.gasUsed).eq('117944')
         })
 
         it('swapExactInput', async function () {
@@ -799,36 +741,7 @@ describe('GasUsage @mainnet', function () {
 
           // then
           expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
-            305845, 285440,
-          ])
-        })
-
-        it('swapExactInputWithDefaultRouting', async function () {
-          // given
-          const amountIn = parseUnits('0.001', 8)
-          const amountOutMin = 0
-
-          // when
-          await wbtc.approve(swapper.address, amountIn)
-          const tx1 = await swapper.swapExactInputWithDefaultRouting(
-            WBTC_ADDRESS,
-            DAI_ADDRESS,
-            amountIn,
-            amountOutMin,
-            deployer.address
-          )
-          await wbtc.approve(swapper.address, amountIn)
-          const tx2 = await swapper.swapExactInputWithDefaultRouting(
-            WBTC_ADDRESS,
-            DAI_ADDRESS,
-            amountIn,
-            amountOutMin,
-            deployer.address
-          )
-
-          // then
-          expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
-            237330, 216925,
+            305867, 285462,
           ])
         })
 
@@ -853,35 +766,6 @@ describe('GasUsage @mainnet', function () {
           // then
           expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
             305233, 282238,
-          ])
-        })
-
-        it('swapExactOutputWithDefaultRouting', async function () {
-          // given
-          const amountOut = parseUnits('0.001', 8)
-          const {_amountInMax} = await swapper.callStatic.getBestAmountIn(DAI_ADDRESS, WBTC_ADDRESS, amountOut)
-
-          // when
-          await dai.approve(swapper.address, _amountInMax)
-          const tx1 = await swapper.swapExactOutputWithDefaultRouting(
-            DAI_ADDRESS,
-            WBTC_ADDRESS,
-            amountOut,
-            _amountInMax,
-            deployer.address
-          )
-          await dai.approve(swapper.address, _amountInMax)
-          const tx2 = await swapper.swapExactOutputWithDefaultRouting(
-            DAI_ADDRESS,
-            WBTC_ADDRESS,
-            amountOut,
-            _amountInMax,
-            deployer.address
-          )
-
-          // then
-          expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
-            236869, 213874,
           ])
         })
       })
@@ -896,7 +780,7 @@ describe('GasUsage @mainnet', function () {
         const amountIn = parseUnits('0.001', 8)
         const tx = await swapper.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('300699')
+        expect(receipt.gasUsed).eq('300674')
       })
 
       it('swapExactInput', async function () {
@@ -910,14 +794,14 @@ describe('GasUsage @mainnet', function () {
         const tx2 = await swapper.swapExactInput(WBTC_ADDRESS, DAI_ADDRESS, amountIn, deployer.address)
 
         // then
-        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([411070, 390701])
+        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([411090, 390721])
       })
 
       it('getBestAmountIn', async function () {
         const amountOut = parseUnits('0.001', 8)
         const tx = await swapper.getBestAmountIn(DAI_ADDRESS, WBTC_ADDRESS, amountOut)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('304293')
+        expect(receipt.gasUsed).eq('304291')
       })
 
       it('swapExactOutput', async function () {
@@ -932,7 +816,7 @@ describe('GasUsage @mainnet', function () {
         const tx2 = await swapper.swapExactOutput(DAI_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
 
         // then
-        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([418861, 395903])
+        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([418859, 395901])
       })
 
       describe('with default routing', function () {
@@ -962,7 +846,7 @@ describe('GasUsage @mainnet', function () {
           const amountIn = parseUnits('0.001', 8)
           const tx = await swapper.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
           const receipt = await tx.wait()
-          expect(receipt.gasUsed).eq('117967')
+          expect(receipt.gasUsed).eq('117944')
         })
 
         it('swapExactInput', async function () {
@@ -977,36 +861,7 @@ describe('GasUsage @mainnet', function () {
 
           // then
           expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
-            305845, 285440,
-          ])
-        })
-
-        it('swapExactInputWithDefaultRouting', async function () {
-          // given
-          const amountIn = parseUnits('0.001', 8)
-          const amountOutMin = 0
-
-          // when
-          await wbtc.approve(swapper.address, amountIn)
-          const tx1 = await swapper.swapExactInputWithDefaultRouting(
-            WBTC_ADDRESS,
-            DAI_ADDRESS,
-            amountIn,
-            amountOutMin,
-            deployer.address
-          )
-          await wbtc.approve(swapper.address, amountIn)
-          const tx2 = await swapper.swapExactInputWithDefaultRouting(
-            WBTC_ADDRESS,
-            DAI_ADDRESS,
-            amountIn,
-            amountOutMin,
-            deployer.address
-          )
-
-          // then
-          expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
-            237330, 216925,
+            305867, 285462,
           ])
         })
 
@@ -1031,35 +886,6 @@ describe('GasUsage @mainnet', function () {
           // then
           expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
             305233, 282238,
-          ])
-        })
-
-        it('swapExactOutputWithDefaultRouting', async function () {
-          // given
-          const amountOut = parseUnits('0.001', 8)
-          const {_amountInMax} = await swapper.callStatic.getBestAmountIn(DAI_ADDRESS, WBTC_ADDRESS, amountOut)
-
-          // when
-          await dai.approve(swapper.address, _amountInMax)
-          const tx1 = await swapper.swapExactOutputWithDefaultRouting(
-            DAI_ADDRESS,
-            WBTC_ADDRESS,
-            amountOut,
-            _amountInMax,
-            deployer.address
-          )
-          await dai.approve(swapper.address, _amountInMax)
-          const tx2 = await swapper.swapExactOutputWithDefaultRouting(
-            DAI_ADDRESS,
-            WBTC_ADDRESS,
-            amountOut,
-            _amountInMax,
-            deployer.address
-          )
-
-          // then
-          expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
-            236869, 213874,
           ])
         })
       })
@@ -1076,7 +902,7 @@ describe('GasUsage @mainnet', function () {
         const amountIn = parseUnits('0.001', 8)
         const tx = await swapper.getBestAmountOut(WBTC_ADDRESS, WETH_ADDRESS, amountIn)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('212796')
+        expect(receipt.gasUsed).eq('212772')
       })
 
       it('swapExactInput', async function () {
@@ -1090,14 +916,14 @@ describe('GasUsage @mainnet', function () {
         const tx2 = await swapper.swapExactInput(WBTC_ADDRESS, WETH_ADDRESS, amountIn, deployer.address)
 
         // then
-        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([322887, 302518])
+        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([322908, 302539])
       })
 
       it('getBestAmountIn', async function () {
         const amountOut = parseUnits('0.001', 8)
         const tx = await swapper.getBestAmountIn(WETH_ADDRESS, WBTC_ADDRESS, amountOut)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('215929')
+        expect(receipt.gasUsed).eq('215928')
       })
 
       it('swapExactOutput', async function () {
@@ -1112,7 +938,7 @@ describe('GasUsage @mainnet', function () {
         const tx2 = await swapper.swapExactOutput(WETH_ADDRESS, WBTC_ADDRESS, amountOut, deployer.address)
 
         // then
-        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([325538, 302637])
+        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([325537, 302636])
       })
 
       describe('with default routing', function () {
@@ -1137,7 +963,7 @@ describe('GasUsage @mainnet', function () {
           const amountIn = parseUnits('0.001', 8)
           const tx = await swapper.getBestAmountOut(WBTC_ADDRESS, WETH_ADDRESS, amountIn)
           const receipt = await tx.wait()
-          expect(receipt.gasUsed).eq('122450')
+          expect(receipt.gasUsed).eq('122427')
         })
 
         it('swapExactInput', async function () {
@@ -1152,36 +978,7 @@ describe('GasUsage @mainnet', function () {
 
           // then
           expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
-            242040, 221671,
-          ])
-        })
-
-        it('swapExactInputWithDefaultRouting', async function () {
-          // given
-          const amountIn = parseUnits('0.001', 8)
-          const amountOutMin = 0
-
-          // when
-          await wbtc.approve(swapper.address, amountIn)
-          const tx1 = await swapper.swapExactInputWithDefaultRouting(
-            WBTC_ADDRESS,
-            WETH_ADDRESS,
-            amountIn,
-            amountOutMin,
-            deployer.address
-          )
-          await wbtc.approve(swapper.address, amountIn)
-          const tx2 = await swapper.swapExactInputWithDefaultRouting(
-            WBTC_ADDRESS,
-            WETH_ADDRESS,
-            amountIn,
-            amountOutMin,
-            deployer.address
-          )
-
-          // then
-          expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
-            171321, 150952,
+            242062, 221693,
           ])
         })
 
@@ -1206,35 +1003,6 @@ describe('GasUsage @mainnet', function () {
           // then
           expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
             245186, 222322,
-          ])
-        })
-
-        it('swapExactOutputWithDefaultRouting', async function () {
-          // given
-          const amountOut = parseUnits('0.001', 8)
-          const {_amountInMax} = await swapper.callStatic.getBestAmountIn(WETH_ADDRESS, WBTC_ADDRESS, amountOut)
-          await weth.approve(swapper.address, _amountInMax)
-          const tx1 = await swapper.swapExactOutputWithDefaultRouting(
-            WETH_ADDRESS,
-            WBTC_ADDRESS,
-            amountOut,
-            _amountInMax,
-            deployer.address
-          )
-
-          // when
-          await weth.approve(swapper.address, _amountInMax)
-          const tx2 = await swapper.swapExactOutputWithDefaultRouting(
-            WETH_ADDRESS,
-            WBTC_ADDRESS,
-            amountOut,
-            _amountInMax,
-            deployer.address
-          )
-
-          // then
-          expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([
-            174594, 151730,
           ])
         })
       })

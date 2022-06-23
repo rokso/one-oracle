@@ -15,8 +15,8 @@ import {
   ERC20Mock__factory,
   UniswapV2LikeExchange,
   UniswapV3Exchange,
-  Swapper,
-  Swapper__factory,
+  RoutedSwapper,
+  RoutedSwapper__factory,
   UniswapV2LikeExchange__factory,
   UniswapV3Exchange__factory,
 } from '../typechain-types'
@@ -101,7 +101,7 @@ describe('Deployments ', function () {
     let uniswapV2Exchange: UniswapV2LikeExchange
     let sushiswapExchange: UniswapV2LikeExchange
     let uniswapV3Exchange: UniswapV3Exchange
-    let swapper: Swapper
+    let routedSwapper: RoutedSwapper
     let weth: IERC20
     let dai: IERC20
 
@@ -109,12 +109,14 @@ describe('Deployments ', function () {
 
     beforeEach(async function () {
       // eslint-disable-next-line no-shadow
-      const {UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange, Swapper} = await deployments.fixture(['mainnet'])
+      const {UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange, RoutedSwapper} = await deployments.fixture([
+        'mainnet',
+      ])
 
       uniswapV2Exchange = UniswapV2LikeExchange__factory.connect(UniswapV2Exchange.address, deployer)
       sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiswapExchange.address, deployer)
       uniswapV3Exchange = UniswapV3Exchange__factory.connect(UniswapV3Exchange.address, deployer)
-      swapper = Swapper__factory.connect(Swapper.address, deployer)
+      routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
       weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
       dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
 
@@ -151,13 +153,18 @@ describe('Deployments ', function () {
     it('Swapper', async function () {
       // given
       const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[WETH_ADDRESS, DAI_ADDRESS]])
-      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, WETH_ADDRESS, DAI_ADDRESS, ExchangeType.UNISWAP_V2, path)
-      await weth.approve(swapper.address, ethers.constants.MaxUint256)
+      await routedSwapper.setDefaultRouting(
+        SwapType.EXACT_INPUT,
+        WETH_ADDRESS,
+        DAI_ADDRESS,
+        ExchangeType.UNISWAP_V2,
+        path
+      )
+      await weth.approve(routedSwapper.address, ethers.constants.MaxUint256)
 
       // when
       const amountIn = parseEther('1')
-      const tx = () =>
-        swapper.swapExactInputWithDefaultRouting(WETH_ADDRESS, DAI_ADDRESS, amountIn, 0, deployer.address)
+      const tx = () => routedSwapper.swapExactInput(WETH_ADDRESS, DAI_ADDRESS, amountIn, 0, deployer.address)
 
       // then
       await expect(tx).changeTokenBalance(dai, deployer, '3222760582677952358944') // ~3,227 DAI

@@ -38,6 +38,23 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         wethLike = wethLike_;
     }
 
+    /**
+     * @notice Wraps `router.getAmountsIn()` function
+     */
+    function getAmountsIn(uint256 _amountOut, bytes memory path_) external view override returns (uint256 _amountIn) {
+        uint256[] memory _amounts = router.getAmountsIn(_amountOut, _decodePath(path_));
+        _amountIn = _amounts[0];
+    }
+
+    /**
+     * @notice Wraps `router.getAmountsOut()` function
+     */
+    function getAmountsOut(uint256 amountIn_, bytes memory path_) external view override returns (uint256 _amountOut) {
+        address[] memory _path = _decodePath(path_);
+        uint256[] memory _amounts = router.getAmountsOut(amountIn_, _path);
+        _amountOut = _amounts[_path.length - 1];
+    }
+
     /// @inheritdoc IExchange
     function getBestAmountIn(
         address tokenIn_,
