@@ -22,7 +22,7 @@ const {
   WBTC_ADDRESS,
   USDC_ADDRESS,
   NOT_ON_CHAINLINK_TOKEN: BTT_ADDRESS,
-  UNISWAP_V2_ROUTER_ADDRESS,
+  UNISWAP_V2_FACTORY_ADDRESS,
 } = Address.mainnet
 
 describe('GasUsage:RoutedSwapper @mainnet', function () {
@@ -56,7 +56,7 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
 
     const uniswapV2LikeExchangeFactory = new UniswapV2LikeExchange__factory(deployer)
 
-    uniswapV2Exchange = await uniswapV2LikeExchangeFactory.deploy(UNISWAP_V2_ROUTER_ADDRESS, WETH_ADDRESS)
+    uniswapV2Exchange = await uniswapV2LikeExchangeFactory.deploy(UNISWAP_V2_FACTORY_ADDRESS, WETH_ADDRESS)
     await uniswapV2Exchange.deployed()
 
     const uniswapV3ExchangeFactory = new UniswapV3Exchange__factory(deployer)
