@@ -32,7 +32,14 @@ describe('RoutedSwapper @mainnet', function () {
   let steth: IERC20
 
   beforeEach(async function () {
-    snapshotId = await ethers.provider.send('evm_snapshot', [])
+    // Essentially we are making sure we execute setup once only
+    // Check whether we ever created snapshot before.
+    if (snapshotId) {
+      // Recreate snapshot and return.
+      snapshotId = await ethers.provider.send('evm_snapshot', [])
+      return
+    }
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer, user, invalidToken] = await ethers.getSigners()
 
     const uniswapV2LikeExchangeFactory = new UniswapV2LikeExchange__factory(deployer)
@@ -116,9 +123,12 @@ describe('RoutedSwapper @mainnet', function () {
       ExchangeType.UNISWAP_V2,
       ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI_ADDRESS, WETH_ADDRESS]])
     )
+    // Take snapshot of setup
+    snapshotId = await ethers.provider.send('evm_snapshot', [])
   })
 
   afterEach(async function () {
+    // Revert to snapshot point
     await ethers.provider.send('evm_revert', [snapshotId])
   })
 

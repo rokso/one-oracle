@@ -71,7 +71,14 @@ describe('GasUsage:Swapper @mainnet', function () {
   let stableCoinProvider: StableCoinProvider
 
   beforeEach(async function () {
-    snapshotId = await ethers.provider.send('evm_snapshot', [])
+    // Essentially we are making sure we execute setup once only
+    // Check whether we ever created snapshot before.
+    if (snapshotId) {
+      // Recreate snapshot and return.
+      snapshotId = await ethers.provider.send('evm_snapshot', [])
+      return
+    }
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer] = await ethers.getSigners()
 
     weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
@@ -185,9 +192,12 @@ describe('GasUsage:Swapper @mainnet', function () {
     await swapper.setExchange(ExchangeType.UNISWAP_V2, uniswapV2Exchange.address)
     await swapper.setExchange(ExchangeType.SUSHISWAP, sushiswapExchange.address)
     await swapper.setExchange(ExchangeType.UNISWAP_V3, uniswapV3Exchange.address)
+    // Take snapshot of setup
+    snapshotId = await ethers.provider.send('evm_snapshot', [])
   })
 
   afterEach(async function () {
+    // Revert to snapshot point
     await ethers.provider.send('evm_revert', [snapshotId])
   })
 

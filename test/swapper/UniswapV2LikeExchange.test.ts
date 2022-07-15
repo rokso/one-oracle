@@ -268,7 +268,14 @@ describe('UniswapV2LikeExchange', function () {
     let usdc: IERC20
 
     beforeEach(async function () {
-      snapshotId = await ethers.provider.send('evm_snapshot', [])
+      // Essentially we are making sure we execute setup once only
+      // Check whether we ever created snapshot before.
+      if (snapshotId) {
+        // Recreate snapshot and return.
+        snapshotId = await ethers.provider.send('evm_snapshot', [])
+        return
+      }
+      // eslint-disable-next-line @typescript-eslint/no-extra-semi
       ;[deployer, invalidToken] = await ethers.getSigners()
 
       router = IUniswapV2Router02__factory.connect(PANGOLIN_ROUTER_ADDRESS, deployer)
@@ -286,9 +293,12 @@ describe('UniswapV2LikeExchange', function () {
       await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
       await adjustBalance(wbtc.address, deployer.address, parseUnits('1,000,000', 8))
       await adjustBalance(usdc.address, deployer.address, parseUnits('1,000,000', 6))
+      // Take snapshot of setup
+      snapshotId = await ethers.provider.send('evm_snapshot', [])
     })
 
     afterEach(async function () {
+      // Revert to snapshot point
       await ethers.provider.send('evm_revert', [snapshotId])
     })
 
