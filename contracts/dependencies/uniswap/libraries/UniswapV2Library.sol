@@ -6,12 +6,11 @@ import '@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol';
 import '@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol';
 import '@uniswap/v3-core/contracts/libraries/LowGasSafeMath.sol';
 
-
 /**
  * This is copied from Uniswap's V2SwapRouter.sol deployed at 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45
  * and licensed under GPL-2.0-or-later.
  * Changelog:
- * - Function pairFor() is updated as we are supporting multiple UniswapV2Like exchanges
+ * - Removed hardcoded initCodeHash and taking as param so that we can support multiple UniswapV2Like exchanges
  * - Added function getAmountsOut()
  */
 library UniswapV2Library {
@@ -24,23 +23,27 @@ library UniswapV2Library {
         require(token0 != address(0));
     }
 
-    // To support UniswapV2Like exchanges this function is modified to read pair from factory
-    function pairFor(
-        address factory,
-        address tokenA,
-        address tokenB
-    ) internal view returns (address pair) {
-        pair = IUniswapV2Factory(factory).getPair(tokenA, tokenB);
+    // calculates the CREATE2 address for a pair without making any external calls
+    function pairFor(address factory, bytes32 initCodeHash, address tokenA, address tokenB) internal pure returns (address pair) {
+        (address token0, address token1) = sortTokens(tokenA, tokenB);
+        pair = address(uint160
+        (uint256(keccak256(abi.encodePacked(
+                hex'ff',
+                factory,
+                keccak256(abi.encodePacked(token0, token1)),
+                initCodeHash
+            )))));
     }
 
     // fetches and sorts the reserves for a pair
     function getReserves(
         address factory,
+        bytes32 initCodeHash,
         address tokenA,
         address tokenB
     ) internal view returns (uint256 reserveA, uint256 reserveB) {
         (address token0, ) = sortTokens(tokenA, tokenB);
-        (uint256 reserve0, uint256 reserve1, ) = IUniswapV2Pair(pairFor(factory, tokenA, tokenB)).getReserves();
+        (uint256 reserve0, uint256 reserve1, ) = IUniswapV2Pair(pairFor(factory, initCodeHash, tokenA, tokenB)).getReserves();
         (reserveA, reserveB) = tokenA == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
     }
 
@@ -72,12 +75,17 @@ library UniswapV2Library {
     }
 
         // performs chained getAmountOut calculations on any number of pairs
-    function getAmountsOut(address factory, uint amountIn, address[] memory path) internal view returns (uint[] memory amounts) {
-        require(path.length >= 2, 'INVALID_PATH');
+    function getAmountsOut(
+        address factory,
+        bytes32 initCodeHash,
+        uint amountIn,
+        address[] memory path
+    ) internal view returns (uint[] memory amounts) {
+        require(path.length >= 2);
         amounts = new uint[](path.length);
         amounts[0] = amountIn;
         for (uint i; i < path.length - 1; i++) {
-            (uint reserveIn, uint reserveOut) = getReserves(factory, path[i], path[i + 1]);
+            (uint reserveIn, uint reserveOut) = getReserves(factory, initCodeHash, path[i], path[i + 1]);
             amounts[i + 1] = getAmountOut(amounts[i], reserveIn, reserveOut);
         }
     }
@@ -85,6 +93,7 @@ library UniswapV2Library {
     // performs chained getAmountIn calculations on any number of pairs
     function getAmountsIn(
         address factory,
+        bytes32 initCodeHash,
         uint256 amountOut,
         address[] memory path
     ) internal view returns (uint256[] memory amounts) {
@@ -92,7 +101,7 @@ library UniswapV2Library {
         amounts = new uint256[](path.length);
         amounts[amounts.length - 1] = amountOut;
         for (uint256 i = path.length - 1; i > 0; i--) {
-            (uint256 reserveIn, uint256 reserveOut) = getReserves(factory, path[i - 1], path[i]);
+            (uint256 reserveIn, uint256 reserveOut) = getReserves(factory,initCodeHash, path[i - 1], path[i]);
             amounts[i - 1] = getAmountIn(amounts[i], reserveIn, reserveOut);
         }
     }

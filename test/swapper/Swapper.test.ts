@@ -13,12 +13,16 @@ import {
   IERC20__factory,
 } from '../../typechain-types'
 import {parseEther, parseUnits} from '../helpers'
-import {Address, ExchangeType, SwapType} from '../../helpers'
+import {Address, ExchangeType, SwapType, InitCodeHash} from '../../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {adjustBalance} from '../helpers/balance'
 
 const {WETH_ADDRESS, DAI_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS, UNISWAP_V2_FACTORY_ADDRESS, SUSHISWAP_FACTORY_ADDRESS} =
   Address.mainnet
+
+const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
+const SUSHISWAP_INIT_CODE_HASH = InitCodeHash[SUSHISWAP_FACTORY_ADDRESS]
+
 const MAX_SLIPPAGE = parseEther('0.2')
 
 describe('Swapper @mainnet', function () {
@@ -42,10 +46,18 @@ describe('Swapper @mainnet', function () {
 
     const uniswapV2LikeExchangeFactory = new UniswapV2LikeExchange__factory(deployer)
 
-    uniswapV2Exchange = await uniswapV2LikeExchangeFactory.deploy(UNISWAP_V2_FACTORY_ADDRESS, WETH_ADDRESS)
+    uniswapV2Exchange = await uniswapV2LikeExchangeFactory.deploy(
+      UNISWAP_V2_FACTORY_ADDRESS,
+      UNISWAP_INIT_CODE_HASH,
+      WETH_ADDRESS
+    )
     await uniswapV2Exchange.deployed()
 
-    sushiswapExchange = await uniswapV2LikeExchangeFactory.deploy(SUSHISWAP_FACTORY_ADDRESS, WETH_ADDRESS)
+    sushiswapExchange = await uniswapV2LikeExchangeFactory.deploy(
+      SUSHISWAP_FACTORY_ADDRESS,
+      SUSHISWAP_INIT_CODE_HASH,
+      WETH_ADDRESS
+    )
     await sushiswapExchange.deployed()
 
     const uniswapV3ExchangeFactory = new UniswapV3Exchange__factory(deployer)

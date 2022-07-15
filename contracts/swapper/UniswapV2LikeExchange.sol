@@ -27,14 +27,20 @@ contract UniswapV2LikeExchange is IExchange, Governable {
      */
     address public immutable factory;
 
+    bytes32 internal immutable initCodeHash;
     /// @notice Emitted when wethLike token is updated
     event WethLikeTokenUpdated(address oldWethLike, address newWethLike);
 
     /**
      * @dev Doesn't consider router.WETH() as `wethLike` because isn't guaranteed that it's the most liquid token.
      */
-    constructor(address factory_, address wethLike_) {
+    constructor(
+        address factory_,
+        bytes32 initCodeHash_,
+        address wethLike_
+    ) {
         factory = factory_;
+        initCodeHash = initCodeHash_;
         wethLike = wethLike_;
     }
 
@@ -53,7 +59,7 @@ contract UniswapV2LikeExchange is IExchange, Governable {
      * library functions, hence wrapped library call in this function so that it can be used in try/catch
      */
     function getAmountsIn(uint256 amountOut_, address[] memory path_) public view returns (uint256 _amountIn) {
-        _amountIn = UniswapV2Library.getAmountsIn(factory, amountOut_, path_)[0];
+        _amountIn = UniswapV2Library.getAmountsIn(factory, initCodeHash, amountOut_, path_)[0];
     }
 
     /**
@@ -61,7 +67,7 @@ contract UniswapV2LikeExchange is IExchange, Governable {
      * library functions, hence wrapped library call in this function so that it can be used in try/catch
      */
     function getAmountsOut(uint256 amountIn_, address[] memory path_) public view returns (uint256 _amountOut) {
-        _amountOut = UniswapV2Library.getAmountsOut(factory, amountIn_, path_)[path_.length - 1];
+        _amountOut = UniswapV2Library.getAmountsOut(factory, initCodeHash, amountIn_, path_)[path_.length - 1];
     }
 
     /// @inheritdoc IExchange
@@ -141,7 +147,7 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         IERC20 _tokenIn = IERC20(_path[0]);
         IERC20 _tokenOut = IERC20(_path[_path.length - 1]);
 
-        _tokenIn.safeTransfer(UniswapV2Library.pairFor(factory, _path[0], _path[1]), amountIn_);
+        _tokenIn.safeTransfer(UniswapV2Library.pairFor(factory, initCodeHash, _path[0], _path[1]), amountIn_);
         uint256 balanceBefore = _tokenOut.balanceOf(outReceiver_);
         _swap(_path, outReceiver_);
         _amountOut = _tokenOut.balanceOf(outReceiver_) - balanceBefore;
@@ -159,10 +165,10 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         address[] memory _path = _decodePath(path_);
         IERC20 _tokenIn = IERC20(_path[0]);
 
-        _amountIn = UniswapV2Library.getAmountsIn(factory, amountOut_, _path)[0];
+        _amountIn = UniswapV2Library.getAmountsIn(factory, initCodeHash, amountOut_, _path)[0];
         require(_amountIn <= amountInMax_, "Too much requested");
 
-        _tokenIn.safeTransfer(UniswapV2Library.pairFor(factory, _path[0], _path[1]), _amountIn);
+        _tokenIn.safeTransfer(UniswapV2Library.pairFor(factory, initCodeHash, _path[0], _path[1]), _amountIn);
         _swap(_path, outRecipient_);
 
         // If swap end up costly less than _amountInMax then return remaining
@@ -210,7 +216,7 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         for (uint256 i; i < path.length - 1; i++) {
             (address input, address output) = (path[i], path[i + 1]);
             (address token0, ) = UniswapV2Library.sortTokens(input, output);
-            IUniswapV2Pair pair = IUniswapV2Pair(UniswapV2Library.pairFor(factory, input, output));
+            IUniswapV2Pair pair = IUniswapV2Pair(UniswapV2Library.pairFor(factory, initCodeHash, input, output));
             uint256 amountInput;
             uint256 amountOutput;
             // scope to avoid stack too deep errors
@@ -225,7 +231,9 @@ contract UniswapV2LikeExchange is IExchange, Governable {
             (uint256 amount0Out, uint256 amount1Out) = input == token0
                 ? (uint256(0), amountOutput)
                 : (amountOutput, uint256(0));
-            address to = i < path.length - 2 ? UniswapV2Library.pairFor(factory, output, path[i + 2]) : _to;
+            address to = i < path.length - 2
+                ? UniswapV2Library.pairFor(factory, initCodeHash, output, path[i + 2])
+                : _to;
             pair.swap(amount0Out, amount1Out, to, new bytes(0));
         }
     }

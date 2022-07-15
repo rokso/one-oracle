@@ -11,6 +11,7 @@ import {
   IERC20,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
+import {InitCodeHash} from '../../helpers/index'
 import {parseEther, min, max, parseUnits} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
 
@@ -27,6 +28,8 @@ describe('UniswapV2LikeExchange', function () {
       UNISWAP_V2_ROUTER_ADDRESS,
       UNISWAP_V2_FACTORY_ADDRESS,
     } = Address.mainnet
+    const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
+
     let snapshotId: string
     let deployer: SignerWithAddress
     let invalidToken: SignerWithAddress
@@ -45,7 +48,7 @@ describe('UniswapV2LikeExchange', function () {
       router = IUniswapV2Router02__factory.connect(UNISWAP_V2_ROUTER_ADDRESS, deployer)
 
       const dexFactory = new UniswapV2LikeExchange__factory(deployer)
-      dex = await dexFactory.deploy(UNISWAP_V2_FACTORY_ADDRESS, WETH_ADDRESS)
+      dex = await dexFactory.deploy(UNISWAP_V2_FACTORY_ADDRESS, UNISWAP_INIT_CODE_HASH, WETH_ADDRESS)
       await dex.deployed()
 
       weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
@@ -183,7 +186,7 @@ describe('UniswapV2LikeExchange', function () {
         const stethAfter = await steth.balanceOf(deployer.address)
         const daiAfter = await dai.balanceOf(deployer.address)
         // stETH will transfer 1 wei less, meaning there is 1 more wei after the swap
-        expect(stethAfter).eq(stethBefore.sub(amountIn).add('1'))
+        expect(stethAfter).closeTo(stethBefore.sub(amountIn), '1')
         expect(daiAfter).eq(daiBefore.add(actualAmountOut))
       })
     })
@@ -253,6 +256,7 @@ describe('UniswapV2LikeExchange', function () {
   describe('UniswapV2LikeExchange @avalanche', function () {
     const {WAVAX_ADDRESS, DAI_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS, PANGOLIN_ROUTER_ADDRESS, PANGOLIN_FACTORY_ADDRESS} =
       Address.avalanche
+    const PANGOLIN_INIT_CODE_HASH = InitCodeHash[PANGOLIN_FACTORY_ADDRESS]
     let snapshotId: string
     let deployer: SignerWithAddress
     let invalidToken: SignerWithAddress
@@ -270,7 +274,7 @@ describe('UniswapV2LikeExchange', function () {
       router = IUniswapV2Router02__factory.connect(PANGOLIN_ROUTER_ADDRESS, deployer)
 
       const dexFactory = new UniswapV2LikeExchange__factory(deployer)
-      dex = await dexFactory.deploy(PANGOLIN_FACTORY_ADDRESS, WAVAX_ADDRESS)
+      dex = await dexFactory.deploy(PANGOLIN_FACTORY_ADDRESS, PANGOLIN_INIT_CODE_HASH, WAVAX_ADDRESS)
       await dex.deployed()
 
       wavax = IERC20__factory.connect(WAVAX_ADDRESS, deployer)
