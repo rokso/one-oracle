@@ -127,8 +127,15 @@ contract RoutedSwapper is IRoutedSwapper, Governable {
         );
 
         IExchange _exchange = IExchange(addressOf[_exchangeType]);
+        uint256 _balanceBefore = IERC20(tokenIn_).balanceOf(address(_exchange));
         IERC20(tokenIn_).safeTransferFrom(msg.sender, address(_exchange), amountIn_);
-        _amountOut = _exchange.swapExactInput(_path, amountIn_, amountOutMin_, receiver_);
+        _amountOut = _exchange.swapExactInput(
+            _path,
+            // amountIn will be balanceNow - balanceBefore for fee-on-transfer tokens
+            IERC20(tokenIn_).balanceOf(address(_exchange)) - _balanceBefore,
+            amountOutMin_,
+            receiver_
+        );
         emit SwapExactInput(_exchange, _path, tokenIn_, tokenOut_, amountIn_, _amountOut);
     }
 
