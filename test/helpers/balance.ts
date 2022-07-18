@@ -1,7 +1,6 @@
 import Address from '../../helpers/address'
-import hre from 'hardhat'
+import {ethers} from 'hardhat'
 import {BigNumber} from 'ethers'
-const ethers = hre.ethers
 const {hexlify, solidityKeccak256, zeroPad, getAddress, hexStripZeros} = ethers.utils
 
 // Slot number mapping for a token. Prepared using utility https://github.com/kendricktan/slot20
@@ -50,14 +49,11 @@ async function getBalanceFromWhale(token: string, targetAddress: string, balance
   if (whaleBalance.lt(balance)) {
     throw new Error('Whale has less token balance than requested')
   }
-  await hre.network.provider.request({
-    method: 'hardhat_impersonateAccount',
-    params: [whale],
-  })
-  await hre.network.provider.request({
-    method: 'hardhat_setBalance',
-    params: [whale, ethers.utils.hexStripZeros(ethers.utils.parseEther('10').toHexString())],
-  })
+  await ethers.provider.send('hardhat_impersonateAccount', [whale])
+  await ethers.provider.send('hardhat_setBalance', [
+    whale,
+    ethers.utils.hexStripZeros(ethers.utils.parseEther('10').toHexString()),
+  ])
   const whaleSigner = await ethers.getSigner(whale)
   await tokenObj.connect(whaleSigner).transfer(targetAddress, balance)
   return tokenObj.balanceOf(targetAddress)
