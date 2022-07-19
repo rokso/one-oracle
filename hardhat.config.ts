@@ -32,7 +32,7 @@ const config: HardhatUserConfig = {
       chainId: 1,
       gas: 6700000,
       verify: {etherscan: {apiKey: process.env.MAINNET_ETHERSCAN_API_KEY}},
-      deploy: 'deploy/mainnet',
+      deploy: ['deploy/mainnet'],
       accounts,
     },
     polygon: {
@@ -40,7 +40,7 @@ const config: HardhatUserConfig = {
       chainId: 137,
       gas: 11700000,
       verify: {etherscan: {apiKey: process.env.POLYGON_ETHERSCAN_API_KEY}},
-      deploy: 'deploy/polygon',
+      deploy: ['deploy/polygon'],
       accounts,
     },
     avalanche: {
@@ -48,7 +48,7 @@ const config: HardhatUserConfig = {
       chainId: 43114,
       gas: 8000000,
       verify: {etherscan: {apiKey: process.env.AVALANCHE_ETHERSCAN_API_KEY}},
-      deploy: 'deploy/avalanche',
+      deploy: ['deploy/avalanche'],
       accounts,
     },
   },

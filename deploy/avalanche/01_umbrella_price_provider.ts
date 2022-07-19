@@ -19,4 +19,4 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 }
 
 export default func
-func.tags = ['avalanche', UmbrellaPriceProvider]
+func.tags = [UmbrellaPriceProvider]
