@@ -4,7 +4,7 @@ pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
+import "../dependencies/uniswap/libraries/UniswapV2Library.sol";
 import "../access/Governable.sol";
 import "../interfaces/swapper/IExchange.sol";
 
@@ -23,36 +23,51 @@ contract UniswapV2LikeExchange is IExchange, Governable {
     address public wethLike;
 
     /**
-     * @notice The UniswapV2-Like router contract
+     * @notice The UniswapV2-Like factory contract
      */
-    IUniswapV2Router02 public immutable router;
+    address public immutable factory;
 
+    bytes32 internal immutable initCodeHash;
     /// @notice Emitted when wethLike token is updated
     event WethLikeTokenUpdated(address oldWethLike, address newWethLike);
 
     /**
      * @dev Doesn't consider router.WETH() as `wethLike` because isn't guaranteed that it's the most liquid token.
      */
-    constructor(IUniswapV2Router02 router_, address wethLike_) {
-        router = router_;
+    constructor(
+        address factory_,
+        bytes32 initCodeHash_,
+        address wethLike_
+    ) {
+        factory = factory_;
+        initCodeHash = initCodeHash_;
         wethLike = wethLike_;
     }
 
-    /**
-     * @notice Wraps `router.getAmountsIn()` function
-     */
-    function getAmountsIn(uint256 _amountOut, bytes memory path_) external view override returns (uint256 _amountIn) {
-        uint256[] memory _amounts = router.getAmountsIn(_amountOut, _decodePath(path_));
-        _amountIn = _amounts[0];
+    /// @inheritdoc IExchange
+    function getAmountsIn(uint256 amountOut_, bytes memory path_) external view override returns (uint256 _amountIn) {
+        _amountIn = getAmountsIn(amountOut_, _decodePath(path_));
+    }
+
+    /// @inheritdoc IExchange
+    function getAmountsOut(uint256 amountIn_, bytes memory path_) external view override returns (uint256 _amountOut) {
+        _amountOut = getAmountsOut(amountIn_, _decodePath(path_));
     }
 
     /**
-     * @notice Wraps `router.getAmountsOut()` function
+     * @dev getBestAmountIn require a try/catch version of getAmountsIn and try/catch do not work with internal
+     * library functions, hence wrapped library call in this function so that it can be used in try/catch
      */
-    function getAmountsOut(uint256 amountIn_, bytes memory path_) external view override returns (uint256 _amountOut) {
-        address[] memory _path = _decodePath(path_);
-        uint256[] memory _amounts = router.getAmountsOut(amountIn_, _path);
-        _amountOut = _amounts[_path.length - 1];
+    function getAmountsIn(uint256 amountOut_, address[] memory path_) public view returns (uint256 _amountIn) {
+        _amountIn = UniswapV2Library.getAmountsIn(factory, initCodeHash, amountOut_, path_)[0];
+    }
+
+    /**
+     * @dev getBestAmountOut require a try/catch version of getAmountsOut and try/catch do not work with internal
+     * library functions, hence wrapped library call in this function so that it can be used in try/catch
+     */
+    function getAmountsOut(uint256 amountIn_, address[] memory path_) public view returns (uint256 _amountOut) {
+        _amountOut = UniswapV2Library.getAmountsOut(factory, initCodeHash, amountIn_, path_)[path_.length - 1];
     }
 
     /// @inheritdoc IExchange
@@ -130,13 +145,13 @@ contract UniswapV2LikeExchange is IExchange, Governable {
     ) external returns (uint256 _amountOut) {
         address[] memory _path = _decodePath(path_);
         IERC20 _tokenIn = IERC20(_path[0]);
-        if (_tokenIn.allowance(address(this), address(router)) < amountIn_) {
-            _tokenIn.approve(address(router), type(uint256).max);
-        }
+        IERC20 _tokenOut = IERC20(_path[_path.length - 1]);
 
-        _amountOut = router.swapExactTokensForTokens(amountIn_, amountOutMin_, _path, outReceiver_, block.timestamp)[
-            _path.length - 1
-        ];
+        _tokenIn.safeTransfer(UniswapV2Library.pairFor(factory, initCodeHash, _path[0], _path[1]), amountIn_);
+        uint256 balanceBefore = _tokenOut.balanceOf(outReceiver_);
+        _swap(_path, outReceiver_);
+        _amountOut = _tokenOut.balanceOf(outReceiver_) - balanceBefore;
+        require(_amountOut >= amountOutMin_, "Too little received");
     }
 
     /// @inheritdoc IExchange
@@ -149,11 +164,13 @@ contract UniswapV2LikeExchange is IExchange, Governable {
     ) external returns (uint256 _amountIn) {
         address[] memory _path = _decodePath(path_);
         IERC20 _tokenIn = IERC20(_path[0]);
-        if (_tokenIn.allowance(address(this), address(router)) < amountInMax_) {
-            _tokenIn.approve(address(router), type(uint256).max);
-        }
 
-        _amountIn = router.swapTokensForExactTokens(amountOut_, amountInMax_, _path, outRecipient_, block.timestamp)[0];
+        _amountIn = UniswapV2Library.getAmountsIn(factory, initCodeHash, amountOut_, _path)[0];
+        require(_amountIn <= amountInMax_, "Too much requested");
+
+        _tokenIn.safeTransfer(UniswapV2Library.pairFor(factory, initCodeHash, _path[0], _path[1]), _amountIn);
+        _swap(_path, outRecipient_);
+
         // If swap end up costly less than _amountInMax then return remaining
         uint256 _remainingAmountIn = amountInMax_ - _amountIn;
         if (_remainingAmountIn > 0) {
@@ -161,23 +178,17 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         }
     }
 
-    /**
-     * @notice Wraps `router.getAmountsOut()` function
-     * @dev Returns `0` if reverts
-     */
-    function _getAmountsOut(uint256 amountIn_, address[] memory path_) internal view returns (uint256 _amountOut) {
-        try router.getAmountsOut(amountIn_, path_) returns (uint256[] memory amounts) {
-            _amountOut = amounts[path_.length - 1];
+    /// @dev Returns `0` if reverts
+    function _getAmountsIn(uint256 _amountOut, address[] memory _path) internal view returns (uint256 _amountIn) {
+        try this.getAmountsIn(_amountOut, _path) returns (uint256 amountIn) {
+            _amountIn = amountIn;
         } catch {}
     }
 
-    /**
-     * @notice Wraps `router.getAmountsIn()` function
-     * @dev Returns `0` if reverts
-     */
-    function _getAmountsIn(uint256 _amountOut, address[] memory _path) internal view returns (uint256 _amountIn) {
-        try router.getAmountsIn(_amountOut, _path) returns (uint256[] memory amounts) {
-            _amountIn = amounts[0];
+    /// @dev Returns `0` if reverts
+    function _getAmountsOut(uint256 amountIn_, address[] memory path_) internal view returns (uint256 _amountOut) {
+        try this.getAmountsOut(amountIn_, path_) returns (uint256 amountOut) {
+            _amountOut = amountOut;
         } catch {}
     }
 
@@ -193,6 +204,38 @@ contract UniswapV2LikeExchange is IExchange, Governable {
      */
     function _decodePath(bytes memory path_) private pure returns (address[] memory _path) {
         return abi.decode(path_, (address[]));
+    }
+
+    /**
+     * NOTICE:: This function is being used as is from Uniswap's V2SwapRouter.sol deployed
+     * at 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45 and licensed under GPL-2.0-or-later.
+     * - It does supports fee-on-transfer tokens
+     * - It does requires the initial amount to have already been sent to the first pair
+     */
+    function _swap(address[] memory path, address _to) private {
+        for (uint256 i; i < path.length - 1; i++) {
+            (address input, address output) = (path[i], path[i + 1]);
+            (address token0, ) = UniswapV2Library.sortTokens(input, output);
+            IUniswapV2Pair pair = IUniswapV2Pair(UniswapV2Library.pairFor(factory, initCodeHash, input, output));
+            uint256 amountInput;
+            uint256 amountOutput;
+            // scope to avoid stack too deep errors
+            {
+                (uint256 reserve0, uint256 reserve1, ) = pair.getReserves();
+                (uint256 reserveInput, uint256 reserveOutput) = input == token0
+                    ? (reserve0, reserve1)
+                    : (reserve1, reserve0);
+                amountInput = IERC20(input).balanceOf(address(pair)) - reserveInput;
+                amountOutput = UniswapV2Library.getAmountOut(amountInput, reserveInput, reserveOutput);
+            }
+            (uint256 amount0Out, uint256 amount1Out) = input == token0
+                ? (uint256(0), amountOutput)
+                : (amountOutput, uint256(0));
+            address to = i < path.length - 2
+                ? UniswapV2Library.pairFor(factory, initCodeHash, output, path[i + 2])
+                : _to;
+            pair.swap(amount0Out, amount1Out, to, new bytes(0));
+        }
     }
 
     /**

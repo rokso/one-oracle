@@ -12,7 +12,7 @@ import {
   UniswapV2LikeExchange__factory,
   UniswapV3Exchange__factory,
 } from '../../../typechain-types'
-import {Address, ExchangeType, SwapType} from '../../../helpers'
+import {Address, ExchangeType, SwapType, InitCodeHash} from '../../../helpers'
 import {parseEther, parseUnits} from '../../helpers'
 import {adjustBalance} from '../../helpers/balance'
 
@@ -22,8 +22,10 @@ const {
   WBTC_ADDRESS,
   USDC_ADDRESS,
   NOT_ON_CHAINLINK_TOKEN: BTT_ADDRESS,
-  UNISWAP_V2_ROUTER_ADDRESS,
+  UNISWAP_V2_FACTORY_ADDRESS,
 } = Address.mainnet
+
+const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
 describe('GasUsage:RoutedSwapper @mainnet', function () {
   let snapshotId: string
@@ -39,7 +41,14 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
   let btt: IERC20
 
   beforeEach(async function () {
-    snapshotId = await ethers.provider.send('evm_snapshot', [])
+    // Essentially we are making sure we execute setup once only
+    // Check whether we ever created snapshot before.
+    if (snapshotId) {
+      // Recreate snapshot and return.
+      snapshotId = await ethers.provider.send('evm_snapshot', [])
+      return
+    }
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer] = await ethers.getSigners()
 
     weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
@@ -56,7 +65,11 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
 
     const uniswapV2LikeExchangeFactory = new UniswapV2LikeExchange__factory(deployer)
 
-    uniswapV2Exchange = await uniswapV2LikeExchangeFactory.deploy(UNISWAP_V2_ROUTER_ADDRESS, WETH_ADDRESS)
+    uniswapV2Exchange = await uniswapV2LikeExchangeFactory.deploy(
+      UNISWAP_V2_FACTORY_ADDRESS,
+      UNISWAP_INIT_CODE_HASH,
+      WETH_ADDRESS
+    )
     await uniswapV2Exchange.deployed()
 
     const uniswapV3ExchangeFactory = new UniswapV3Exchange__factory(deployer)
@@ -73,9 +86,12 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
 
     await swapper.setExchange(ExchangeType.UNISWAP_V2, uniswapV2Exchange.address)
     await swapper.setExchange(ExchangeType.UNISWAP_V3, uniswapV3Exchange.address)
+    // Take snapshot of setup
+    snapshotId = await ethers.provider.send('evm_snapshot', [])
   })
 
   afterEach(async function () {
+    // Revert to snapshot point
     await ethers.provider.send('evm_revert', [snapshotId])
   })
 
@@ -108,7 +124,7 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
         const amountIn = parseUnits('0.001', 8)
         const tx = await swapper.getAmountOut(WBTC_ADDRESS, BTT_ADDRESS, amountIn)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('191950')
+        expect(receipt.gasUsed).lte('191950')
       })
 
       it('swapExactInput', async function () {
@@ -122,14 +138,15 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
         const tx2 = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, 0, deployer.address)
 
         // then
-        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([238264, 217859])
+        expect((await tx1.wait()).gasUsed).lte('240974')
+        expect((await tx2.wait()).gasUsed).lte('220569')
       })
 
       it('getBestAmountIn', async function () {
         const amountOut = parseUnits('0.001', 8)
         const tx = await swapper.getAmountIn(BTT_ADDRESS, WBTC_ADDRESS, amountOut)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).eq('197808')
+        expect(receipt.gasUsed).lte('197808')
       })
 
       it('swapExactOutput', async function () {
@@ -145,7 +162,8 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
         const tx2 = await swapper.swapExactOutput(BTT_ADDRESS, WBTC_ADDRESS, amountOut, amountInMax, deployer.address)
 
         // then
-        expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([241423, 221114])
+        expect((await tx1.wait()).gasUsed).lte('241423')
+        expect((await tx2.wait()).gasUsed).lte('221114')
       })
     })
   })
@@ -176,7 +194,7 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
       const amountIn = parseUnits('0.001', 8)
       const tx = await swapper.getAmountOut(WBTC_ADDRESS, WETH_ADDRESS, amountIn)
       const receipt = await tx.wait()
-      expect(receipt.gasUsed).eq('61832')
+      expect(receipt.gasUsed).lte('58245')
     })
 
     it('swapExactInput', async function () {
@@ -190,14 +208,15 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
       const tx2 = await swapper.swapExactInput(WBTC_ADDRESS, WETH_ADDRESS, amountIn, 0, deployer.address)
 
       // then
-      expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([171220, 150851])
+      expect((await tx1.wait()).gasUsed).lte('144831')
+      expect((await tx2.wait()).gasUsed).lte('144831')
     })
 
     it('getBestAmountIn', async function () {
       const amountOut = parseUnits('0.001', 8)
       const tx = await swapper.getAmountIn(WETH_ADDRESS, WBTC_ADDRESS, amountOut)
       const receipt = await tx.wait()
-      expect(receipt.gasUsed).eq('61795')
+      expect(receipt.gasUsed).lte('58287')
     })
 
     it('swapExactOutput', async function () {
@@ -213,7 +232,8 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
       const tx2 = await swapper.swapExactOutput(WETH_ADDRESS, WBTC_ADDRESS, amountOut, amountInMax, deployer.address)
 
       // then
-      expect([(await tx1.wait()).gasUsed.toNumber(), (await tx2.wait()).gasUsed.toNumber()]).deep.eq([174491, 151627])
+      expect((await tx1.wait()).gasUsed).lte('148801')
+      expect((await tx2.wait()).gasUsed).lte('148801')
     })
   })
 })

@@ -13,12 +13,16 @@ import {
   IERC20__factory,
 } from '../../typechain-types'
 import {parseEther, parseUnits} from '../helpers'
-import {Address, ExchangeType, SwapType} from '../../helpers'
+import {Address, ExchangeType, SwapType, InitCodeHash} from '../../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {adjustBalance} from '../helpers/balance'
 
-const {WETH_ADDRESS, DAI_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS, UNISWAP_V2_ROUTER_ADDRESS, SUSHISWAP_ROUTER_ADDRESS} =
+const {WETH_ADDRESS, DAI_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS, UNISWAP_V2_FACTORY_ADDRESS, SUSHISWAP_FACTORY_ADDRESS} =
   Address.mainnet
+
+const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
+const SUSHISWAP_INIT_CODE_HASH = InitCodeHash[SUSHISWAP_FACTORY_ADDRESS]
+
 const MAX_SLIPPAGE = parseEther('0.2')
 
 describe('Swapper @mainnet', function () {
@@ -37,15 +41,30 @@ describe('Swapper @mainnet', function () {
   let usdc: IERC20
 
   beforeEach(async function () {
-    snapshotId = await ethers.provider.send('evm_snapshot', [])
+    // Essentially we are making sure we execute setup once only
+    // Check whether we ever created snapshot before.
+    if (snapshotId) {
+      // Recreate snapshot and return.
+      snapshotId = await ethers.provider.send('evm_snapshot', [])
+      return
+    }
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer, user, invalidToken] = await ethers.getSigners()
 
     const uniswapV2LikeExchangeFactory = new UniswapV2LikeExchange__factory(deployer)
 
-    uniswapV2Exchange = await uniswapV2LikeExchangeFactory.deploy(UNISWAP_V2_ROUTER_ADDRESS, WETH_ADDRESS)
+    uniswapV2Exchange = await uniswapV2LikeExchangeFactory.deploy(
+      UNISWAP_V2_FACTORY_ADDRESS,
+      UNISWAP_INIT_CODE_HASH,
+      WETH_ADDRESS
+    )
     await uniswapV2Exchange.deployed()
 
-    sushiswapExchange = await uniswapV2LikeExchangeFactory.deploy(SUSHISWAP_ROUTER_ADDRESS, WETH_ADDRESS)
+    sushiswapExchange = await uniswapV2LikeExchangeFactory.deploy(
+      SUSHISWAP_FACTORY_ADDRESS,
+      SUSHISWAP_INIT_CODE_HASH,
+      WETH_ADDRESS
+    )
     await sushiswapExchange.deployed()
 
     const uniswapV3ExchangeFactory = new UniswapV3Exchange__factory(deployer)
@@ -71,9 +90,12 @@ describe('Swapper @mainnet', function () {
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(wbtc.address, deployer.address, parseUnits('1,000,000', 8))
     await adjustBalance(usdc.address, deployer.address, parseUnits('1,000,000', 6))
+    // Take snapshot of setup
+    snapshotId = await ethers.provider.send('evm_snapshot', [])
   })
 
   afterEach(async function () {
+    // Revert to snapshot point
     await ethers.provider.send('evm_revert', [snapshotId])
   })
 
@@ -198,6 +220,8 @@ describe('Swapper @mainnet', function () {
 
       // then
       await expect(tx).revertedWith('no-routing-found')
+      // snapshot won't revert mock changes, so reset manually
+      chainlinkAndFallbacksOracleFake.quote.returns(() => '0')
     })
 
     it('should get best amountOut for WETH->DAI', async function () {
@@ -294,6 +318,9 @@ describe('Swapper @mainnet', function () {
 
       // then
       await expect(tx).reverted
+
+      // snapshot won't revert mock changes, so reset manually
+      chainlinkAndFallbacksOracleFake.quote.returns(() => 0)
     })
 
     it('should perform an exact input swap', async function () {

@@ -1,8 +1,9 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address} from '../../helpers/index'
+import {Address, InitCodeHash} from '../../helpers/index'
 
-const {UNISWAP_V2_ROUTER_ADDRESS, WETH_ADDRESS} = Address.mainnet
+const {UNISWAP_V2_FACTORY_ADDRESS, WETH_ADDRESS} = Address.mainnet
+const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
 const UniswapV2LikeExchange = 'UniswapV2LikeExchange'
 const UniswapV2Exchange = 'UniswapV2Exchange'
@@ -16,7 +17,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     contract: UniswapV2LikeExchange,
     from: deployer,
     log: true,
-    args: [UNISWAP_V2_ROUTER_ADDRESS, WETH_ADDRESS],
+    args: [UNISWAP_V2_FACTORY_ADDRESS, UNISWAP_INIT_CODE_HASH, WETH_ADDRESS],
   })
 }
 
