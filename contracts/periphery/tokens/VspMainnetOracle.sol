@@ -23,6 +23,7 @@ contract VspMainnetOracle is
 {
     uint256 public constant ONE_VSP = 1e18;
     address public constant VSP_ADDRESS = 0x1b40183EFB4Dd766f11bDa7A7c3AD8982e998421;
+    address public constant WETH_ADDRESS = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
     constructor(
         IPriceProvidersAggregator providersAggregator_,
@@ -44,18 +45,14 @@ contract VspMainnetOracle is
         uint256 _lastUpdatedAt;
         IPriceProvidersAggregator _aggregator = providersAggregator;
 
-        address _stableCoin = stableCoinProvider.getStableCoinIfPegged();
-
-        (_priceInUsd, _lastUpdatedAt) = _aggregator.quote(
+        (_priceInUsd, _lastUpdatedAt) = _aggregator.quoteTokenToUsd(
             DataTypes.Provider.UNISWAP_V2,
             VSP_ADDRESS,
-            _stableCoin,
             ONE_VSP
         );
-        (uint256 _priceInUsd1, uint256 _lastUpdatedAt1) = _aggregator.quote(
+        (uint256 _priceInUsd1, uint256 _lastUpdatedAt1) = _aggregator.quoteTokenToUsd(
             DataTypes.Provider.SUSHISWAP,
             VSP_ADDRESS,
-            _stableCoin,
             ONE_VSP
         );
 
@@ -71,13 +68,17 @@ contract VspMainnetOracle is
     function update() external {
         IPriceProvidersAggregator _aggregator = providersAggregator;
         address _stableCoin = stableCoinProvider.getStableCoinIfPegged();
-        IUniswapV2LikePriceProvider(address(_aggregator.priceProviders(DataTypes.Provider.UNISWAP_V2))).updateOrAdd(
-            VSP_ADDRESS,
-            _stableCoin
+
+        IUniswapV2LikePriceProvider _uniswapV2PriceProvider = IUniswapV2LikePriceProvider(
+            address(_aggregator.priceProviders(DataTypes.Provider.UNISWAP_V2))
         );
-        IUniswapV2LikePriceProvider(address(_aggregator.priceProviders(DataTypes.Provider.SUSHISWAP))).updateOrAdd(
-            VSP_ADDRESS,
-            _stableCoin
+        IUniswapV2LikePriceProvider _sushiswapPriceProvider = IUniswapV2LikePriceProvider(
+            address(_aggregator.priceProviders(DataTypes.Provider.SUSHISWAP))
         );
+
+        _uniswapV2PriceProvider.updateOrAdd(VSP_ADDRESS, WETH_ADDRESS);
+        _uniswapV2PriceProvider.updateOrAdd(WETH_ADDRESS, _stableCoin);
+        _sushiswapPriceProvider.updateOrAdd(VSP_ADDRESS, WETH_ADDRESS);
+        _sushiswapPriceProvider.updateOrAdd(WETH_ADDRESS, _stableCoin);
     }
 }

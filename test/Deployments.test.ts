@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
-import {deployments, ethers} from 'hardhat'
+import hre, {deployments, ethers} from 'hardhat'
 import {
   ChainlinkAvalanchePriceProvider__factory,
   PriceProvidersAggregator__factory,
@@ -19,9 +19,11 @@ import {
   RoutedSwapper__factory,
   UniswapV2LikeExchange__factory,
   UniswapV3Exchange__factory,
+  VspMainnetOracle__factory,
+  VspMainnetOracle,
 } from '../typechain-types'
 import {Address, SwapType, Provider, ExchangeType} from '../helpers'
-import {parseEther, toUSD} from './helpers'
+import {increaseTime, parseEther, toUSD} from './helpers'
 import {IERC20} from '../typechain-types/@openzeppelin/contracts/token/ERC20'
 import {IERC20__factory} from '../typechain-types/factories/@openzeppelin/contracts/token/ERC20'
 import {adjustBalance} from './helpers/balance'
@@ -49,9 +51,13 @@ describe('Deployments ', function () {
     const {WETH_ADDRESS} = Address.avalanche
 
     beforeEach(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/avalanche']
+
       // eslint-disable-next-line no-shadow
       const {ChainlinkAvalanchePriceProvider, UmbrellaPriceProvider, PriceProvidersAggregator, SynthOracle} =
-        await deployments.fixture(['avalanche'])
+        await deployments.fixture()
+
       chainlinkAvalanchePriceProvider = ChainlinkAvalanchePriceProvider__factory.connect(
         ChainlinkAvalanchePriceProvider.address,
         deployer
@@ -104,14 +110,17 @@ describe('Deployments ', function () {
     let routedSwapper: RoutedSwapper
     let weth: IERC20
     let dai: IERC20
+    let vspOracle: VspMainnetOracle
 
-    const {WETH_ADDRESS, DAI_ADDRESS} = Address.mainnet
+    const {WETH_ADDRESS, DAI_ADDRESS, VSP_ADDRESS} = Address.mainnet
 
     beforeEach(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/mainnet']
+
       // eslint-disable-next-line no-shadow
-      const {UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange, RoutedSwapper} = await deployments.fixture([
-        'mainnet',
-      ])
+      const {UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange, RoutedSwapper, VspOracle} =
+        await deployments.fixture()
 
       uniswapV2Exchange = UniswapV2LikeExchange__factory.connect(UniswapV2Exchange.address, deployer)
       sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiswapExchange.address, deployer)
@@ -119,6 +128,7 @@ describe('Deployments ', function () {
       routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
       weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
       dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
+      vspOracle = VspMainnetOracle__factory.connect(VspOracle.address, deployer)
 
       await adjustBalance(WETH_ADDRESS, deployer.address, parseEther('1000'))
     })
@@ -150,7 +160,7 @@ describe('Deployments ', function () {
       expect(_amountOut).closeTo(parseEther('3,227'), parseEther('1'))
     })
 
-    it('Swapper', async function () {
+    it('RoutedSwapper', async function () {
       // given
       const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[WETH_ADDRESS, DAI_ADDRESS]])
       await routedSwapper.setDefaultRouting(
@@ -168,6 +178,18 @@ describe('Deployments ', function () {
 
       // then
       await expect(tx).changeTokenBalance(dai, deployer, '3222760582677952358944') // ~3,227 DAI
+    })
+
+    it('VspMainnetOracle', async function () {
+      // given
+      await increaseTime(ethers.BigNumber.from(60 * 60 * 3))
+      await vspOracle.update()
+
+      // when
+      const price = await vspOracle.getPriceInUsd(VSP_ADDRESS)
+
+      // then
+      expect(price).closeTo(parseEther('1.88'), parseEther('0.01'))
     })
   })
 })

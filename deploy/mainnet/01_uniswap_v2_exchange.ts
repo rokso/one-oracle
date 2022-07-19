@@ -22,4 +22,4 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 }
 
 export default func
-func.tags = ['mainnet', UniswapV2Exchange]
+func.tags = [UniswapV2Exchange]
