@@ -112,5 +112,5 @@ Setup the deployment related env vars properly (See `.env.template` file)
 
 ```sh
 npm run deploy -- --gasprice <gas price in wei> --network <network>
-npm run verify
+npm run verify -- --network <network>
 ```
