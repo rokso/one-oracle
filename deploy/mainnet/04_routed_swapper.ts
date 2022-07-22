@@ -47,5 +47,5 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 }
 
 export default func
-func.dependencies = ['UniswapV2Exchange', 'SushiswapExchange', 'UniswapV3Exchange']
+func.dependencies = [UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange]
 func.tags = [RoutedSwapper]

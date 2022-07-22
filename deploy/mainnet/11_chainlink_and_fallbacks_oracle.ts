@@ -1,10 +1,9 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
 import {parseEther} from '@ethersproject/units'
+import {Provider} from '../../helpers'
 
-const VspMainnetOracle = 'VspMainnetOracle'
-const VspOracle = 'VspOracle'
-const StableCoinProvider = 'StableCoinProvider'
+const ChainlinkAndFallbacksOracle = 'ChainlinkAndFallbacksOracle'
 const PriceProvidersAggregator = 'PriceProvidersAggregator'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
@@ -12,20 +11,18 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {deploy, get} = deployments
   const {deployer} = await getNamedAccounts()
 
-  const stalePeriod = 60 * 60 * 2 // 2 hours
-  const maxDeviation = parseEther('0.05') // 5%
+  const stalePeriod = 60 * 60 * 4 // 4 hours
+  const maxFallbacksDeviation = parseEther('0.05') // 5%
 
   const {address: aggregatorAddress} = await get(PriceProvidersAggregator)
-  const {address: stableCoinProviderAddress} = await get(StableCoinProvider)
 
-  await deploy(VspOracle, {
-    contract: VspMainnetOracle,
+  await deploy(ChainlinkAndFallbacksOracle, {
     from: deployer,
     log: true,
-    args: [aggregatorAddress, stableCoinProviderAddress, maxDeviation, stalePeriod],
+    args: [aggregatorAddress, maxFallbacksDeviation, stalePeriod, Provider.UNISWAP_V2, Provider.SUSHISWAP],
   })
 }
 
 export default func
-func.dependencies = [PriceProvidersAggregator, StableCoinProvider]
-func.tags = [VspOracle]
+func.dependencies = [PriceProvidersAggregator]
+func.tags = [ChainlinkAndFallbacksOracle]

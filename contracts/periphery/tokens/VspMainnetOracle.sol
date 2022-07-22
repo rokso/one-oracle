@@ -7,15 +7,14 @@ import "../../features/UsingProvidersAggregator.sol";
 import "../../features/UsingMaxDeviation.sol";
 import "../../features/UsingStableCoinProvider.sol";
 import "../../features/UsingStalePeriod.sol";
-import "../../interfaces/periphery/IVspOracle.sol";
+import "../../interfaces/periphery/IUpdatableOracle.sol";
 import "../../interfaces/core/IUniswapV2LikePriceProvider.sol";
 
 /**
- * @title Main oracle
- * @dev Reuses `PriceProvidersAggregator` and add support to USD quotes
+ * @title VSP oracle (mainnet)
  */
 contract VspMainnetOracle is
-    IVspOracle,
+    IUpdatableOracle,
     UsingProvidersAggregator,
     UsingMaxDeviation,
     UsingStableCoinProvider,
@@ -61,11 +60,10 @@ contract VspMainnetOracle is
             "one-or-both-prices-invalid"
         );
         require(_isDeviationOK(_priceInUsd, _priceInUsd1), "prices-deviation-too-high");
-        _lastUpdatedAt = Math.min(_lastUpdatedAt, _lastUpdatedAt1);
     }
 
-    /// @inheritdoc IVspOracle
-    function update() external {
+    /// @inheritdoc IUpdatableOracle
+    function update() external override {
         IPriceProvidersAggregator _aggregator = providersAggregator;
         address _stableCoin = stableCoinProvider.getStableCoinIfPegged();
 

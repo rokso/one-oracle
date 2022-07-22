@@ -41,4 +41,5 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 }
 
 export default func
+func.dependencies = [PriceProvidersAggregator]
 func.tags = [StableCoinProvider]
