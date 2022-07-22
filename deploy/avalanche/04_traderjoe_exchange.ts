@@ -1,0 +1,25 @@
+import {HardhatRuntimeEnvironment} from 'hardhat/types'
+import {DeployFunction} from 'hardhat-deploy/types'
+import {Address, InitCodeHash} from '../../helpers/index'
+
+const {TRADERJOE_FACTORY_ADDRESS, WAVAX_ADDRESS} = Address.avalanche
+const TRADER_JOE_INIT_CODE_HASH = InitCodeHash[TRADERJOE_FACTORY_ADDRESS]
+
+const UniswapV2LikeExchange = 'UniswapV2LikeExchange'
+const TraderJoeExchange = 'TraderJoeExchange'
+
+const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
+  const {getNamedAccounts, deployments} = hre
+  const {deploy} = deployments
+  const {deployer} = await getNamedAccounts()
+
+  await deploy(TraderJoeExchange, {
+    contract: UniswapV2LikeExchange,
+    from: deployer,
+    log: true,
+    args: [TRADERJOE_FACTORY_ADDRESS, TRADER_JOE_INIT_CODE_HASH, WAVAX_ADDRESS],
+  })
+}
+
+export default func
+func.tags = [TraderJoeExchange]
