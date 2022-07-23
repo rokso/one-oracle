@@ -27,7 +27,8 @@
     "test:all": "./scripts/test-all-chains.sh",
     "verify": "hardhat etherscan-verify",
     "size-contract": "hardhat size-contracts",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "release": "hardhat create-release"
   },
   "devDependencies": {
     "@chainlink/contracts": "^0.4.1",
@@ -53,6 +54,7 @@
     "@uniswap/v3-periphery": "^1.4.1",
     "chai": "^4.3.6",
     "chai-almost": "^1.0.1",
+    "compare-versions": "^4.1.3",
     "dotenv": "^16.0.1",
     "eslint": "^8.16.0",
     "eslint-config-bloq": "^3.1.0",

@@ -10,6 +10,7 @@ import '@typechain/hardhat'
 import 'hardhat-spdx-license-identifier'
 import '@nomiclabs/hardhat-etherscan'
 import dotenv from 'dotenv'
+import './tasks/create-release'
 
 dotenv.config()
 
