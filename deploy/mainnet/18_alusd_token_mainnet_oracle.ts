@@ -1,31 +1,27 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {parseEther} from '@ethersproject/units'
 
-const VspMainnetOracle = 'VspMainnetOracle'
-const VspOracle = 'VspOracle'
-const StableCoinProvider = 'StableCoinProvider'
+const AlusdTokenMainnetOracle = 'AlusdTokenMainnetOracle'
 const PriceProvidersAggregator = 'PriceProvidersAggregator'
+const StableCoinProvider = 'StableCoinProvider'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy, get} = deployments
   const {deployer} = await getNamedAccounts()
 
-  const stalePeriod = 60 * 60 * 2 // 2 hours
-  const maxDeviation = parseEther('0.05') // 5%
-
   const {address: aggregatorAddress} = await get(PriceProvidersAggregator)
   const {address: stableCoinProviderAddress} = await get(StableCoinProvider)
 
-  await deploy(VspOracle, {
-    contract: VspMainnetOracle,
+  const stalePeriod = 4 * 60 * 60 // 4h
+
+  await deploy(AlusdTokenMainnetOracle, {
     from: deployer,
     log: true,
-    args: [aggregatorAddress, stableCoinProviderAddress, maxDeviation, stalePeriod],
+    args: [aggregatorAddress, stableCoinProviderAddress, stalePeriod],
   })
 }
 
 export default func
 func.dependencies = [PriceProvidersAggregator, StableCoinProvider]
-func.tags = [VspOracle]
+func.tags = [AlusdTokenMainnetOracle]
