@@ -83,28 +83,28 @@ describe('MasterOracle @mainnet', function () {
 
       // 3Crv (DAI+USDC+USDT)
       await curveLpTokenOracle.registerPool(TRICRV_ADDRESS)
-      await masterOracle.setOracle(TRICRV_ADDRESS, curveLpTokenOracle.address)
+      await masterOracle.updateTokenOracle(TRICRV_ADDRESS, curveLpTokenOracle.address)
 
       // MIM+3Crv
       await curveLpTokenOracle.registerPool(CURVE_MIM_3CRV_LP)
-      await masterOracle.setOracle(CURVE_MIM_3CRV_LP, curveLpTokenOracle.address)
+      await masterOracle.updateTokenOracle(CURVE_MIM_3CRV_LP, curveLpTokenOracle.address)
 
       // FRAX+3Crv
       await curveLpTokenOracle.registerPool(CURVE_FRAX_3CRV_LP)
-      await masterOracle.setOracle(CURVE_FRAX_3CRV_LP, curveLpTokenOracle.address)
+      await masterOracle.updateTokenOracle(CURVE_FRAX_3CRV_LP, curveLpTokenOracle.address)
 
       // sUSD+DAI+USDC+USDT
       await curveLpTokenOracle.registerPool(CURVE_SUSD_LP)
-      await masterOracle.setOracle(CURVE_SUSD_LP, curveLpTokenOracle.address)
+      await masterOracle.updateTokenOracle(CURVE_SUSD_LP, curveLpTokenOracle.address)
 
       // mUSD+DAI+USDC+USDT
       const mStableTokenOracleFactory = new MStableTokenOracle__factory(deployer)
       const mStableTokenOracle = await mStableTokenOracleFactory.deploy()
       await mStableTokenOracle.deployed()
 
-      await masterOracle.setOracle(MUSD_ADDRESS, mStableTokenOracle.address)
+      await masterOracle.updateTokenOracle(MUSD_ADDRESS, mStableTokenOracle.address)
       await curveLpTokenOracle.registerPool(CURVE_MUSD_LP)
-      await masterOracle.setOracle(CURVE_MUSD_LP, curveLpTokenOracle.address)
+      await masterOracle.updateTokenOracle(CURVE_MUSD_LP, curveLpTokenOracle.address)
 
       // SBTC (WBTC+renBTC+sBTC)
       const bTCPeggedTokenOracleFactory = new BTCPeggedTokenOracle__factory(deployer)
@@ -113,20 +113,20 @@ describe('MasterOracle @mainnet', function () {
 
       // MakerDAO uses BTC/USD Chainlink feed for renBTC
       // See: https://forum.makerdao.com/t/renbtc-mip6-collateral-application/2971
-      await masterOracle.setOracle(RENBTC_ADDRESS, bTCPeggedTokenOracle.address)
+      await masterOracle.updateTokenOracle(RENBTC_ADDRESS, bTCPeggedTokenOracle.address)
       // Synthetix uses BTC/USD Chainlink feed for sBTC
-      await masterOracle.setOracle(SBTC_ADDRESS, bTCPeggedTokenOracle.address)
+      await masterOracle.updateTokenOracle(SBTC_ADDRESS, bTCPeggedTokenOracle.address)
       await curveLpTokenOracle.registerPool(CURVE_SBTC_LP)
-      await masterOracle.setOracle(CURVE_SBTC_LP, curveLpTokenOracle.address)
+      await masterOracle.updateTokenOracle(CURVE_SBTC_LP, curveLpTokenOracle.address)
 
       // wibBTC+SBTC
       const IbBtcTokenOracleFactory = new IbBtcTokenOracle__factory(deployer)
       const IbBtcTokenOracle = await IbBtcTokenOracleFactory.deploy(bTCPeggedTokenOracle.address)
       await IbBtcTokenOracle.deployed()
 
-      await masterOracle.setOracle(WIBBTC_ADDRESS, IbBtcTokenOracle.address)
+      await masterOracle.updateTokenOracle(WIBBTC_ADDRESS, IbBtcTokenOracle.address)
       await curveLpFactoryTokenOracle.registerPool(CURVE_IBBTC_SBTC_LP)
-      await masterOracle.setOracle(CURVE_IBBTC_SBTC_LP, curveLpFactoryTokenOracle.address)
+      await masterOracle.updateTokenOracle(CURVE_IBBTC_SBTC_LP, curveLpFactoryTokenOracle.address)
 
       // D3 (FRAX+FEI+alUSD)
       const aggregator = await smock.fake('PriceProvidersAggregator')
@@ -146,9 +146,9 @@ describe('MasterOracle @mainnet', function () {
       )
       await alUsdMainnetOracle.deployed()
 
-      await masterOracle.setOracle(ALUSD_ADDRESS, alUsdMainnetOracle.address)
+      await masterOracle.updateTokenOracle(ALUSD_ADDRESS, alUsdMainnetOracle.address)
       await curveLpFactoryTokenOracle.registerPool(CURVE_D3_LP)
-      await masterOracle.setOracle(CURVE_D3_LP, curveLpFactoryTokenOracle.address)
+      await masterOracle.updateTokenOracle(CURVE_D3_LP, curveLpFactoryTokenOracle.address)
     })
 
     it('should get price for 3CRV', async function () {

@@ -2,9 +2,10 @@
 
 pragma solidity 0.8.9;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./MassetStructs.sol";
 
-interface IMasset is MassetStructs {
+interface IMasset is IERC20, MassetStructs {
     // Mint
     function mint(
         address _input,

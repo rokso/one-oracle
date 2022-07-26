@@ -12,6 +12,8 @@ import "../../interfaces/periphery/ITokenOracle.sol";
  * @title mStable's tokens oracle
  */
 contract MStableTokenOracle is ITokenOracle {
+    uint256 private constant RATIO_DENOMINATOR = 1e8;
+
     IMasset public constant MUSD = IMasset(0xe2f2a5C287993345a840Db3B0845fbC70f5935a5);
     ISavingsContractV2 public constant IMUSD = ISavingsContractV2(0x30647a72Dc82d7Fbb1123EA74716aB8A317Eac19);
     IMasset public constant MBTC = IMasset(0x945Facb997494CC2570096c74b5F66A3507330a1);
@@ -35,10 +37,11 @@ contract MStableTokenOracle is ITokenOracle {
         uint256 _len = bAssetData.length;
         for (uint256 i; i < _len; i++) {
             _totalValue +=
-                ((uint256(bAssetData[i].vaultBalance * bAssetData[i].ratio)) / 1e8) *
+                ((uint256(bAssetData[i].vaultBalance * bAssetData[i].ratio)) / RATIO_DENOMINATOR) *
+                // Note: `msg.sender` is the `MasterOracle` contract
                 IOracle(msg.sender).getPriceInUsd(bAssetPersonal[i].addr);
         }
 
-        return _totalValue / IERC20(address(mAsset_)).totalSupply();
+        return _totalValue / mAsset_.totalSupply();
     }
 }

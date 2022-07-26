@@ -22,14 +22,13 @@ contract IbBtcTokenOracle is ITokenOracle {
 
     /// @inheritdoc ITokenOracle
     function getPriceInUsd(address token_) external view override returns (uint256 _priceInUsd) {
-        if (token_ == address(IBBTC)) return _ibBtcPrice();
-        else if (token_ == address(WIBBTC)) {
-            return (_ibBtcPrice() * 1e18) / WIBBTC.pricePerShare();
+        if (token_ == address(IBBTC)) {
+            return (btcOracle.getPriceInUsd(address(0)) * IBBTC.pricePerShare()) / 1e18;
         }
-    }
+        if (token_ == address(WIBBTC)) {
+            return (btcOracle.getPriceInUsd(address(0)) * IBBTC.pricePerShare()) / WIBBTC.pricePerShare();
+        }
 
-    /// @notice Get BTC price
-    function _ibBtcPrice() private view returns (uint256) {
-        return (btcOracle.getPriceInUsd(address(0)) * IBBTC.pricePerShare()) / 1e18;
+        revert("invalid-ibbtc-related-token");
     }
 }

@@ -30,6 +30,7 @@ contract CurveLpTokenOracle is ITokenOracle {
     }
 
     /// @inheritdoc ITokenOracle
+    /// @dev This function is supposed to be called from `MasterOracle` only
     function getPriceInUsd(address lpToken_) public view override returns (uint256 _priceInUsd) {
         address _pool = poolOf[lpToken_];
         require(_pool != address(0), "lp-is-not-registered");
@@ -38,6 +39,7 @@ contract CurveLpTokenOracle is ITokenOracle {
         uint256 _n = _tokens.length;
 
         for (uint256 i; i < _n; i++) {
+            // Note: `msg.sender` is the `MasterOracle` contract
             uint256 _price = IOracle(msg.sender).getPriceInUsd(_tokens[i]);
             if (_price < _min) _min = _price;
         }

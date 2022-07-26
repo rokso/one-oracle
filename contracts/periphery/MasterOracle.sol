@@ -22,19 +22,25 @@ contract MasterOracle is IOracle, Governable {
      */
     mapping(address => IOracle) public oracles;
 
+    /// @notice Emitted when a token's oracle is set
+    event TokenOracleUpdated(address indexed token, IOracle indexed oracle);
+
+    /// @notice Emitted when the default oracle is updated
+    event DefaultOracleUpdated(IOracle indexed defaultOracle);
+
     constructor(IOracle defaultOracle_) {
         defaultOracle = defaultOracle_;
     }
 
     /// @inheritdoc IOracle
-    function getPriceInUsd(address asset_) public view override returns (uint256 _priceInUsd) {
-        IOracle _oracle = oracles[asset_];
+    function getPriceInUsd(address token_) public view override returns (uint256 _priceInUsd) {
+        IOracle _oracle = oracles[token_];
 
         if (address(_oracle) == address(0)) {
-            return defaultOracle.getPriceInUsd(asset_);
+            return defaultOracle.getPriceInUsd(token_);
         }
 
-        return _oracle.getPriceInUsd(asset_);
+        return _oracle.getPriceInUsd(token_);
     }
 
     /// @inheritdoc IOracle
@@ -59,13 +65,15 @@ contract MasterOracle is IOracle, Governable {
         _amountOut = (amountIn_ * 10**IERC20Metadata(token_).decimals()) / _price;
     }
 
-    /// @notice Set custom oracle for a token
-    function setOracle(address asset_, IOracle oracle_) external onlyGovernor {
-        oracles[asset_] = oracle_;
+    /// @notice Set custom oracle for a token_
+    function updateTokenOracle(address token_, IOracle oracle_) external onlyGovernor {
+        oracles[token_] = oracle_;
+        emit TokenOracleUpdated(token_, oracle_);
     }
 
     /// @notice Update the default oracle
     function updateDefaultOracle(IOracle defaultOracle_) external onlyGovernor {
         defaultOracle = defaultOracle_;
+        emit DefaultOracleUpdated(defaultOracle_);
     }
 }
