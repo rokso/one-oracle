@@ -23,6 +23,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const sushiswapExchange = await get(SushiswapExchange)
   const uniswapV3Exchange = await get(UniswapV3Exchange)
 
+  // TODO: Update only if is needed
   await execute(
     RoutedSwapper,
     {from: deployer, log: true},

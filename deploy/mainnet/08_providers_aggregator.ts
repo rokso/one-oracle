@@ -25,6 +25,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {address: uniswapV2Address} = await get(UniswapV2PriceProvider)
   const {address: sushiswapAddress} = await get(SushiswapPriceProvider)
 
+  // TODO: Update only if is needed
   await execute(PriceProvidersAggregator, {from: deployer, log: true}, 'setPriceProvider', CHAINLINK, chainlinkAddress)
   await execute(PriceProvidersAggregator, {from: deployer, log: true}, 'setPriceProvider', UNISWAP_V2, uniswapV2Address)
   await execute(PriceProvidersAggregator, {from: deployer, log: true}, 'setPriceProvider', SUSHISWAP, sushiswapAddress)

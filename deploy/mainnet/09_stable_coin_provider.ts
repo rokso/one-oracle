@@ -26,6 +26,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     args: [USDC_ADDRESS, DAI_ADDRESS, aggregatorAddress, stalePeriod, maxDeviation],
   })
 
+  // TODO: Update only if is needed
   await execute(
     UniswapV2PriceProvider,
     {from: deployer, log: true},
