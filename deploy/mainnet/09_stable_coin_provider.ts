@@ -27,18 +27,18 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   })
 
   // TODO: Update only if is needed
-  await execute(
-    UniswapV2PriceProvider,
-    {from: deployer, log: true},
-    'updateStableCoinProvider',
-    stableCoinProviderAddress
-  )
-  await execute(
-    SushiswapPriceProvider,
-    {from: deployer, log: true},
-    'updateStableCoinProvider',
-    stableCoinProviderAddress
-  )
+  // await execute(
+  //   UniswapV2PriceProvider,
+  //   {from: deployer, log: true},
+  //   'updateStableCoinProvider',
+  //   stableCoinProviderAddress
+  // )
+  // await execute(
+  //   SushiswapPriceProvider,
+  //   {from: deployer, log: true},
+  //   'updateStableCoinProvider',
+  //   stableCoinProviderAddress
+  // )
 }
 
 export default func

@@ -24,27 +24,27 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const uniswapV3Exchange = await get(UniswapV3Exchange)
 
   // TODO: Update only if is needed
-  await execute(
-    RoutedSwapper,
-    {from: deployer, log: true},
-    'setExchange',
-    ExchangeType.UNISWAP_V2,
-    uniswapV2Exchange.address
-  )
-  await execute(
-    RoutedSwapper,
-    {from: deployer, log: true},
-    'setExchange',
-    ExchangeType.SUSHISWAP,
-    sushiswapExchange.address
-  )
-  await execute(
-    RoutedSwapper,
-    {from: deployer, log: true},
-    'setExchange',
-    ExchangeType.UNISWAP_V3,
-    uniswapV3Exchange.address
-  )
+  // await execute(
+  //   RoutedSwapper,
+  //   {from: deployer, log: true},
+  //   'setExchange',
+  //   ExchangeType.UNISWAP_V2,
+  //   uniswapV2Exchange.address
+  // )
+  // await execute(
+  //   RoutedSwapper,
+  //   {from: deployer, log: true},
+  //   'setExchange',
+  //   ExchangeType.SUSHISWAP,
+  //   sushiswapExchange.address
+  // )
+  // await execute(
+  //   RoutedSwapper,
+  //   {from: deployer, log: true},
+  //   'setExchange',
+  //   ExchangeType.UNISWAP_V3,
+  //   uniswapV3Exchange.address
+  // )
 }
 
 export default func
