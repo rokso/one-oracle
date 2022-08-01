@@ -12,7 +12,7 @@ const SushiswapPriceProvider = 'SushiswapPriceProvider'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
-  const {deploy, execute, get} = deployments
+  const {deploy, execute, get, read} = deployments
   const {deployer} = await getNamedAccounts()
 
   await deploy(PriceProvidersAggregator, {
@@ -25,10 +25,35 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {address: uniswapV2Address} = await get(UniswapV2PriceProvider)
   const {address: sushiswapAddress} = await get(SushiswapPriceProvider)
 
-  // TODO: Update only if is needed
-  // await execute(PriceProvidersAggregator, {from: deployer, log: true}, 'setPriceProvider', CHAINLINK, chainlinkAddress)
-  // await execute(PriceProvidersAggregator, {from: deployer, log: true}, 'setPriceProvider', UNISWAP_V2, uniswapV2Address)
-  // await execute(PriceProvidersAggregator, {from: deployer, log: true}, 'setPriceProvider', SUSHISWAP, sushiswapAddress)
+  if ((await read(PriceProvidersAggregator, 'priceProviders', [CHAINLINK])) !== chainlinkAddress) {
+    await execute(
+      PriceProvidersAggregator,
+      {from: deployer, log: true},
+      'setPriceProvider',
+      CHAINLINK,
+      chainlinkAddress
+    )
+  }
+
+  if ((await read(PriceProvidersAggregator, 'priceProviders', [UNISWAP_V2])) !== uniswapV2Address) {
+    await execute(
+      PriceProvidersAggregator,
+      {from: deployer, log: true},
+      'setPriceProvider',
+      UNISWAP_V2,
+      uniswapV2Address
+    )
+  }
+
+  if ((await read(PriceProvidersAggregator, 'priceProviders', [SUSHISWAP])) !== sushiswapAddress) {
+    await execute(
+      PriceProvidersAggregator,
+      {from: deployer, log: true},
+      'setPriceProvider',
+      SUSHISWAP,
+      sushiswapAddress
+    )
+  }
 }
 
 export default func
