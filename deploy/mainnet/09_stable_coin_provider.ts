@@ -12,7 +12,7 @@ const SushiswapPriceProvider = 'SushiswapPriceProvider'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
-  const {deploy, get, execute} = deployments
+  const {deploy, get, execute, read} = deployments
   const {deployer} = await getNamedAccounts()
 
   const stalePeriod = 60 * 60 * 24 // 24h (USDC has 24h and DAI has 1h heartbeat)
@@ -26,19 +26,23 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     args: [USDC_ADDRESS, DAI_ADDRESS, aggregatorAddress, stalePeriod, maxDeviation],
   })
 
-  // TODO: Update only if is needed
-  await execute(
-    UniswapV2PriceProvider,
-    {from: deployer, log: true},
-    'updateStableCoinProvider',
-    stableCoinProviderAddress
-  )
-  await execute(
-    SushiswapPriceProvider,
-    {from: deployer, log: true},
-    'updateStableCoinProvider',
-    stableCoinProviderAddress
-  )
+  if ((await read(UniswapV2PriceProvider, 'stableCoinProvider')) !== stableCoinProviderAddress) {
+    await execute(
+      UniswapV2PriceProvider,
+      {from: deployer, log: true},
+      'updateStableCoinProvider',
+      stableCoinProviderAddress
+    )
+  }
+
+  if ((await read(SushiswapPriceProvider, 'stableCoinProvider')) !== stableCoinProviderAddress) {
+    await execute(
+      SushiswapPriceProvider,
+      {from: deployer, log: true},
+      'updateStableCoinProvider',
+      stableCoinProviderAddress
+    )
+  }
 }
 
 export default func

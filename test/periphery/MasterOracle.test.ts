@@ -17,6 +17,7 @@ import {
   BTCPeggedTokenOracle__factory,
   IbBtcTokenOracle__factory,
   AlusdTokenMainnetOracle__factory,
+  ATokenOracle__factory,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, timestampFromLatestBlock, toUSD} from '../helpers'
@@ -38,6 +39,10 @@ const {
   CURVE_FRAX_3CRV_LP,
   CURVE_IBBTC_SBTC_LP,
   CURVE_MUSD_LP,
+  ADAI_ADDRESS,
+  AUSDC_ADDRESS,
+  AUSDT_ADDRESS,
+  CURVE_AAVE_LP,
 } = Address.mainnet
 
 describe('MasterOracle @mainnet', function () {
@@ -130,10 +135,8 @@ describe('MasterOracle @mainnet', function () {
 
       // D3 (FRAX+FEI+alUSD)
       const aggregator = await smock.fake('PriceProvidersAggregator')
-      // const sushiswapPriceProvider = await smock.fake('UniswapV2LikePriceProvider')
       const lastUpdatedAt = await timestampFromLatestBlock()
       aggregator['quoteTokenToUsd(uint8,address,uint256)'].returns(() => [parseEther('0.99'), lastUpdatedAt])
-      // aggregator['priceProviders(uint8)'].returns(() => sushiswapPriceProvider.address)
 
       const stableCoinProvider = await smock.fake('StableCoinProvider')
       stableCoinProvider.getStableCoinIfPegged.returns(DAI_ADDRESS)
@@ -149,6 +152,17 @@ describe('MasterOracle @mainnet', function () {
       await masterOracle.updateTokenOracle(ALUSD_ADDRESS, alUsdMainnetOracle.address)
       await curveLpFactoryTokenOracle.registerPool(CURVE_D3_LP)
       await masterOracle.updateTokenOracle(CURVE_D3_LP, curveLpFactoryTokenOracle.address)
+
+      // Aave (aDAI+aUSDC+aUSDT)
+      const aTokenOracleFactory = new ATokenOracle__factory(deployer)
+      const aTokenOracle = await aTokenOracleFactory.deploy()
+      await aTokenOracle.deployed()
+
+      await curveLpTokenOracle.registerPool(CURVE_AAVE_LP)
+      await masterOracle.updateTokenOracle(CURVE_AAVE_LP, curveLpTokenOracle.address)
+      await masterOracle.updateTokenOracle(ADAI_ADDRESS, aTokenOracle.address)
+      await masterOracle.updateTokenOracle(AUSDC_ADDRESS, aTokenOracle.address)
+      await masterOracle.updateTokenOracle(AUSDT_ADDRESS, aTokenOracle.address)
     })
 
     it('should get price for 3CRV', async function () {
@@ -213,6 +227,14 @@ describe('MasterOracle @mainnet', function () {
 
       // then
       expect(price).closeTo(toUSD('1.015'), toUSD('0.001'))
+    })
+
+    it('should get price for aAve Pool', async function () {
+      // when
+      const price = await masterOracle.getPriceInUsd(CURVE_AAVE_LP)
+
+      // then
+      expect(price).closeTo(toUSD('1.087'), toUSD('0.001'))
     })
   })
 })
