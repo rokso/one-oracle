@@ -21,6 +21,7 @@ contract AlusdTokenMainnetOracle is
 {
     uint256 public constant ONE_ALUSD = 1e18;
     address public constant ALUSD_ADDRESS = 0xBC6DA0FE9aD5f3b0d58160288917AA56653660E9;
+    address public constant WETH_ADDRESS = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
     constructor(
         IPriceProvidersAggregator providersAggregator_,
@@ -50,7 +51,10 @@ contract AlusdTokenMainnetOracle is
 
     /// @inheritdoc IUpdatableOracle
     function update() external override {
-        IUniswapV2LikePriceProvider(address(providersAggregator.priceProviders(DataTypes.Provider.SUSHISWAP)))
-            .updateOrAdd(ALUSD_ADDRESS, stableCoinProvider.getStableCoinIfPegged());
+        IUniswapV2LikePriceProvider _sushiswap = IUniswapV2LikePriceProvider(
+            address(providersAggregator.priceProviders(DataTypes.Provider.SUSHISWAP))
+        );
+        _sushiswap.updateOrAdd(ALUSD_ADDRESS, WETH_ADDRESS);
+        _sushiswap.updateOrAdd(WETH_ADDRESS, stableCoinProvider.getStableCoinIfPegged());
     }
 }
