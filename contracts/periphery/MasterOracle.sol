@@ -40,7 +40,9 @@ contract MasterOracle is IOracle, Governable {
             return defaultOracle.getPriceInUsd(token_);
         }
 
-        return _oracle.getPriceInUsd(token_);
+        _priceInUsd = _oracle.getPriceInUsd(token_);
+        // Note: Assuming that the default oracle already do this check
+        require(_priceInUsd > 0, "invalid-token-price");
     }
 
     /// @inheritdoc IOracle
@@ -49,20 +51,17 @@ contract MasterOracle is IOracle, Governable {
         address tokenOut_,
         uint256 amountIn_
     ) external view virtual override returns (uint256 _amountOut) {
-        uint256 _amountInUsd = quoteTokenToUsd(tokenIn_, amountIn_);
-        _amountOut = quoteUsdToToken(tokenOut_, _amountInUsd);
+        _amountOut = quoteUsdToToken(tokenOut_, quoteTokenToUsd(tokenIn_, amountIn_));
     }
 
     /// @inheritdoc IOracle
     function quoteTokenToUsd(address token_, uint256 amountIn_) public view override returns (uint256 _amountOut) {
-        uint256 _price = getPriceInUsd(token_);
-        _amountOut = (amountIn_ * _price) / 10**IERC20Metadata(token_).decimals();
+        _amountOut = (amountIn_ * getPriceInUsd(token_)) / 10**IERC20Metadata(token_).decimals();
     }
 
     /// @inheritdoc IOracle
     function quoteUsdToToken(address token_, uint256 amountIn_) public view override returns (uint256 _amountOut) {
-        uint256 _price = getPriceInUsd(token_);
-        _amountOut = (amountIn_ * 10**IERC20Metadata(token_).decimals()) / _price;
+        _amountOut = (amountIn_ * 10**IERC20Metadata(token_).decimals()) / getPriceInUsd(token_);
     }
 
     /// @notice Set custom oracle for a token_

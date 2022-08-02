@@ -12,20 +12,14 @@ import "../../interfaces/periphery/ITokenOracle.sol";
  */
 contract CTokenOracle is ITokenOracle {
     uint256 public constant ONE_CTOKEN = 1e8;
-    /**
-     * @notice The oracle that resolves the price of underlying token
-     */
-    IOracle public immutable underlyingOracle;
 
     /**
      * @notice The address of the `CEther` underlying (Usually WETH)
      */
     address public immutable wethLike;
 
-    constructor(IOracle _underlyingOracle, address _wethLike) {
-        require(address(_underlyingOracle) != address(0), "underlying-oracle-null");
+    constructor(address _wethLike) {
         require(_wethLike != address(0), "weth-like-null");
-        underlyingOracle = _underlyingOracle;
         wethLike = _wethLike;
     }
 
@@ -40,7 +34,7 @@ contract CTokenOracle is ITokenOracle {
         if (_underlyingAddress == address(0)) {
             _underlyingAddress = wethLike;
         }
-        uint256 _underlyingPriceInUsd = underlyingOracle.getPriceInUsd(_underlyingAddress);
+        uint256 _underlyingPriceInUsd = IOracle(msg.sender).getPriceInUsd(_underlyingAddress);
         uint256 _underlyingAmount = (ONE_CTOKEN * ICToken(_asset).exchangeRateStored()) / 1e18;
         _priceInUsd = (_underlyingPriceInUsd * _underlyingAmount) / 10**IERC20Metadata(_underlyingAddress).decimals();
     }

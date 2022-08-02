@@ -18,6 +18,7 @@ import {
   IbBtcTokenOracle__factory,
   AlusdTokenMainnetOracle__factory,
   ATokenOracle__factory,
+  CTokenOracle__factory,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, timestampFromLatestBlock, toUSD} from '../helpers'
@@ -43,6 +44,10 @@ const {
   AUSDC_ADDRESS,
   AUSDT_ADDRESS,
   CURVE_AAVE_LP,
+  CDAI_ADDRESS,
+  CUSDC_ADDRESS,
+  CETH_ADDRESS,
+  WETH_ADDRESS,
 } = Address.mainnet
 
 describe('MasterOracle @mainnet', function () {
@@ -71,6 +76,18 @@ describe('MasterOracle @mainnet', function () {
 
   afterEach(async function () {
     await ethers.provider.send('evm_revert', [snapshotId])
+  })
+
+  describe('getPriceInUsd', function () {
+    it('should revert if token oracle returns 0', async function () {
+      // given
+      const daiFakeOracle = await smock.fake('ITokenOracle')
+      daiFakeOracle.getPriceInUsd.returns(0)
+      await masterOracle.updateTokenOracle(DAI_ADDRESS, daiFakeOracle.address)
+
+      // when-then
+      expect(masterOracle.getPriceInUsd(DAI_ADDRESS)).to.revertedWith('invalid-token-price')
+    })
   })
 
   describe('Curve LP Tokens', function () {
@@ -235,6 +252,36 @@ describe('MasterOracle @mainnet', function () {
 
       // then
       expect(price).closeTo(toUSD('1.087'), toUSD('0.001'))
+    })
+  })
+
+  describe('CTokens', function () {
+    beforeEach(async function () {
+      snapshotId = await ethers.provider.send('evm_snapshot', [])
+      ;[deployer] = await ethers.getSigners()
+
+      const cTokenOracleFactory = new CTokenOracle__factory(deployer)
+      const cTokenOracle = await cTokenOracleFactory.deploy(WETH_ADDRESS)
+      await cTokenOracle.deployed()
+
+      await masterOracle.updateTokenOracle(CDAI_ADDRESS, cTokenOracle.address)
+      await masterOracle.updateTokenOracle(CUSDC_ADDRESS, cTokenOracle.address)
+      await masterOracle.updateTokenOracle(CETH_ADDRESS, cTokenOracle.address)
+    })
+
+    it('getPriceInUsd (18 decimals underlying)', async function () {
+      const price = await masterOracle.getPriceInUsd(CDAI_ADDRESS)
+      expect(price).closeTo(toUSD('0.021'), toUSD('0.001')) // 1 cDAI ~= $0.021
+    })
+
+    it('getPriceInUsd (6 decimals underlying)', async function () {
+      const price = await masterOracle.getPriceInUsd(CUSDC_ADDRESS)
+      expect(price).closeTo(toUSD('0.022'), toUSD('0.001')) // 1 cUSDC ~= $0.022
+    })
+
+    it('getPriceInUsd (ETH - 0x00..00 underlying)', async function () {
+      const price = await masterOracle.getPriceInUsd(CETH_ADDRESS)
+      expect(price).closeTo(toUSD('64.92'), toUSD('0.1')) // 1 cETH ~= $64.92
     })
   })
 })
