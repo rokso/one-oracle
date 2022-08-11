@@ -1,0 +1,58 @@
+/* eslint-disable camelcase */
+import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
+import {expect} from 'chai'
+import {ethers} from 'hardhat'
+import {FakeContract, smock} from '@defi-wonderland/smock'
+import {ChainlinkOracle, ChainlinkOracle__factory} from '../../typechain-types'
+import Address from '../../helpers/address'
+import {parseEther, parseUnits} from '../helpers'
+
+const STALE_PERIOD = ethers.constants.MaxUint256
+
+const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.mainnet
+
+describe('ChainlinkOracle @mainnet', function () {
+  let snapshotId: string
+  let deployer: SignerWithAddress
+  let aggregator: FakeContract
+  let oracle: ChainlinkOracle
+
+  beforeEach(async function () {
+    snapshotId = await ethers.provider.send('evm_snapshot', [])
+    ;[deployer] = await ethers.getSigners()
+
+    aggregator = await smock.fake('PriceProvidersAggregator')
+
+    const oracleProvider = new ChainlinkOracle__factory(deployer)
+    oracle = await oracleProvider.deploy(aggregator.address, STALE_PERIOD)
+    await oracle.deployed()
+  })
+
+  afterEach(async function () {
+    await ethers.provider.send('evm_revert', [snapshotId])
+  })
+
+  it('getPriceInUsd', async function () {
+    const price = parseEther('1.02')
+    aggregator.getPriceInUsd.returns(() => [price, 0])
+    expect(await oracle.getPriceInUsd(DAI_ADDRESS)).eq(price)
+  })
+
+  it('quote', async function () {
+    const amountOut = parseEther('24,510.58')
+    aggregator['quote(uint8,address,address,uint256)'].returns(() => [amountOut, 0])
+    expect(await oracle.quote(WBTC_ADDRESS, DAI_ADDRESS, parseEther('1'))).eq(amountOut)
+  })
+
+  it('quoteTokenToUsd', async function () {
+    const amountOut = parseEther('24,500.12')
+    aggregator.quoteTokenToUsd.returns(() => [amountOut, 0])
+    expect(await oracle.quoteTokenToUsd(WBTC_ADDRESS, parseEther('1'))).eq(amountOut)
+  })
+
+  it('quoteUsdToToken', async function () {
+    const amountOut = parseEther('0.0005260')
+    aggregator.quoteUsdToToken.returns(() => [amountOut, 0])
+    expect(await oracle.quoteUsdToToken(WETH_ADDRESS, parseEther('1'))).eq(amountOut)
+  })
+})
