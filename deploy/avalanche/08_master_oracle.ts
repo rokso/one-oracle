@@ -1,22 +1,23 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address} from '../../helpers'
 
-const {UMBRELLA_REGISTRY} = Address.avalanche
-
-const UmbrellaPriceProvider = 'UmbrellaPriceProvider'
+const MasterOracle = 'MasterOracle'
+const ChainlinkOracle = 'ChainlinkOracle'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
-  const {deploy} = deployments
+  const {deploy, get} = deployments
   const {deployer} = await getNamedAccounts()
 
-  await deploy(UmbrellaPriceProvider, {
+  const {address: defaultOracleAddress} = await get(ChainlinkOracle)
+
+  await deploy(MasterOracle, {
     from: deployer,
     log: true,
-    args: [UMBRELLA_REGISTRY],
+    args: [defaultOracleAddress],
   })
 }
 
 export default func
-func.tags = [UmbrellaPriceProvider]
+func.dependencies = [ChainlinkOracle]
+func.tags = [MasterOracle]

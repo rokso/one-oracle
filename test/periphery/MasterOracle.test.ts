@@ -8,7 +8,6 @@ import {
   CurveFactoryLpTokenOracle,
   CurveFactoryLpTokenOracle__factory,
   ChainlinkMainnetPriceProvider__factory,
-  ChainlinkMainnetPriceProvider,
   ChainlinkOracleMock,
   ChainlinkOracleMock__factory,
   MasterOracle,
@@ -347,16 +346,11 @@ describe('MasterOracle', function () {
 
     describe('Curve LP Tokens', function () {
       let curveLpTokenOracle: CurveLpTokenOracle
-      let curveLpFactoryTokenOracle: CurveFactoryLpTokenOracle
 
       beforeEach(async function () {
         const curveLpTokenOracleFactory = new CurveLpTokenOracle__factory(deployer)
         curveLpTokenOracle = await curveLpTokenOracleFactory.deploy()
         await curveLpTokenOracle.deployed()
-
-        const curveLpFactoryTokenOracleFactory = new CurveFactoryLpTokenOracle__factory(deployer)
-        curveLpFactoryTokenOracle = await curveLpFactoryTokenOracleFactory.deploy()
-        await curveLpFactoryTokenOracle.deployed()
 
         const aTokenOracleFactory = new ATokenOracle__factory(deployer)
         const aTokenOracle = await aTokenOracleFactory.deploy()
@@ -431,16 +425,11 @@ describe('MasterOracle', function () {
 
     describe('Curve LP Tokens', function () {
       let curveLpTokenOracle: CurveLpTokenOracle
-      let curveLpFactoryTokenOracle: CurveFactoryLpTokenOracle
 
       beforeEach(async function () {
         const curveLpTokenOracleFactory = new CurveLpTokenOracle__factory(deployer)
         curveLpTokenOracle = await curveLpTokenOracleFactory.deploy()
         await curveLpTokenOracle.deployed()
-
-        const curveLpFactoryTokenOracleFactory = new CurveFactoryLpTokenOracle__factory(deployer)
-        curveLpFactoryTokenOracle = await curveLpFactoryTokenOracleFactory.deploy()
-        await curveLpFactoryTokenOracle.deployed()
 
         // 2pool (USDC + USDT)
         await curveLpTokenOracle.registerPool(CURVE_2POOL_LP)

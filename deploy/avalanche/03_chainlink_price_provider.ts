@@ -11,6 +11,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy(ChainlinkAvalanchePriceProvider, {
     from: deployer,
     log: true,
+    args: [],
   })
 }
 

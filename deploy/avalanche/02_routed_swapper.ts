@@ -8,7 +8,7 @@ const RoutedSwapper = 'RoutedSwapper'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
-  const {deploy, get, execute} = deployments
+  const {deploy, get, read, execute} = deployments
   const {deployer} = await getNamedAccounts()
 
   await deploy(RoutedSwapper, {
@@ -17,15 +17,17 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     args: [],
   })
 
-  const traderJoeExchange = await get(TraderJoeExchange)
+  const {address: traderJoeExchangeAddress} = await get(TraderJoeExchange)
 
-  await execute(
-    RoutedSwapper,
-    {from: deployer, log: true},
-    'setExchange',
-    ExchangeType.TRADERJOE,
-    traderJoeExchange.address
-  )
+  if ((await read(RoutedSwapper, 'addressOf', [ExchangeType.TRADERJOE])) !== traderJoeExchangeAddress) {
+    await execute(
+      RoutedSwapper,
+      {from: deployer, log: true},
+      'setExchange',
+      ExchangeType.TRADERJOE,
+      traderJoeExchangeAddress
+    )
+  }
 }
 
 export default func
