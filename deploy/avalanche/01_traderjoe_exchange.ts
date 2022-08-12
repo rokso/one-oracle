@@ -1,6 +1,6 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address, InitCodeHash} from '../../helpers/index'
+import {Address, InitCodeHash} from '../../helpers'
 
 const {TRADERJOE_FACTORY_ADDRESS, WAVAX_ADDRESS} = Address.avalanche
 const TRADER_JOE_INIT_CODE_HASH = InitCodeHash[TRADERJOE_FACTORY_ADDRESS]
