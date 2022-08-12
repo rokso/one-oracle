@@ -2,6 +2,13 @@
   "version": "1.0.0",
   "networks": {
     "avalanche": {
+      "ATokenOracle": "0x482841410B613b46752C67bc42c51BaF043EFa05",
+      "BTCPeggedTokenOracle": "0x8ffC95039a037Dd3D597125339a8B96c08d6DC81",
+      "ChainlinkAvalanchePriceProvider": "0xc542A4bCDbD814F0073fed2A99C32aa2777866f0",
+      "ChainlinkOracle": "0x10061d0593441Ff74536158592e1Be3F4C7B180C",
+      "CurveLpTokenOracle": "0x757d531F2Eb1148f003853b51e3F6971e260BE72",
+      "MasterOracle": "0x831146fc805dc460fF074A8926B9a5d4D52d5b47",
+      "PriceProvidersAggregator": "0xd71Bb8e10b2d200Dd935a6c95699E18de2bBE013",
       "RoutedSwapper": "0xC85831dED6fCB15A288dfF49D256CBBC2B58388f",
       "TraderJoeExchange": "0x1CC8Ba8f1C4698549cd4BAB39c99412982684Cab"
     },
