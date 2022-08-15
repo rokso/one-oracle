@@ -124,7 +124,7 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
         const amountIn = parseUnits('0.001', 8)
         const tx = await swapper.getAmountOut(WBTC_ADDRESS, BTT_ADDRESS, amountIn)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).lte('191950')
+        expect(receipt.gasUsed).lte('194335')
       })
 
       it('swapExactInput', async function () {
@@ -146,7 +146,7 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
         const amountOut = parseUnits('0.001', 8)
         const tx = await swapper.getAmountIn(BTT_ADDRESS, WBTC_ADDRESS, amountOut)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).lte('197808')
+        expect(receipt.gasUsed).lte('200231')
       })
 
       it('swapExactOutput', async function () {
