@@ -5,46 +5,35 @@ import {parseEther} from '@ethersproject/units'
 
 const {DAI_ADDRESS, USDC_ADDRESS} = Address.mainnet
 
+const AddressProvider = 'AddressProvider'
 const StableCoinProvider = 'StableCoinProvider'
 const PriceProvidersAggregator = 'PriceProvidersAggregator'
-const UniswapV2PriceProvider = 'UniswapV2PriceProvider'
-const SushiswapPriceProvider = 'SushiswapPriceProvider'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
-  const {deploy, get, execute, read} = deployments
-  const {deployer} = await getNamedAccounts()
+  const {deploy, execute, read, get} = deployments
+  const {deployer: from} = await getNamedAccounts()
 
   const stalePeriod = 60 * 60 * 24 // 24h (USDC has 24h and DAI has 1h heartbeat)
   const maxDeviation = parseEther('0.01') // 1%
 
-  const {address: aggregatorAddress} = await get(PriceProvidersAggregator)
-
   const {address: stableCoinProviderAddress} = await deploy(StableCoinProvider, {
-    from: deployer,
+    from,
     log: true,
-    args: [USDC_ADDRESS, DAI_ADDRESS, aggregatorAddress, stalePeriod, maxDeviation],
+    args: [USDC_ADDRESS, DAI_ADDRESS, stalePeriod, maxDeviation],
   })
 
-  if ((await read(UniswapV2PriceProvider, 'stableCoinProvider')) !== stableCoinProviderAddress) {
-    await execute(
-      UniswapV2PriceProvider,
-      {from: deployer, log: true},
-      'updateStableCoinProvider',
-      stableCoinProviderAddress
-    )
+  const {address: addressProviderAddress} = await get(AddressProvider)
+
+  if ((await read(StableCoinProvider, 'addressProvider')) !== addressProviderAddress) {
+    await execute(StableCoinProvider, {from, log: true}, 'updateAddressProvider', addressProviderAddress)
   }
 
-  if ((await read(SushiswapPriceProvider, 'stableCoinProvider')) !== stableCoinProviderAddress) {
-    await execute(
-      SushiswapPriceProvider,
-      {from: deployer, log: true},
-      'updateStableCoinProvider',
-      stableCoinProviderAddress
-    )
+  if ((await read(AddressProvider, 'stableCoinProvider')) !== stableCoinProviderAddress) {
+    await execute(AddressProvider, {from, log: true}, 'updateStableCoinProvider', stableCoinProviderAddress)
   }
 }
 
-export default func
-func.dependencies = [PriceProvidersAggregator]
+func.dependencies = [AddressProvider, PriceProvidersAggregator]
 func.tags = [StableCoinProvider]
+export default func

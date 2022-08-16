@@ -26,7 +26,7 @@ import {
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, timestampFromLatestBlock, toUSD} from '../helpers'
-import {smock} from '@defi-wonderland/smock'
+import {FakeContract, smock} from '@defi-wonderland/smock'
 import {Provider} from '../../helpers'
 
 const STALE_PERIOD = ethers.constants.MaxUint256
@@ -35,10 +35,13 @@ describe('MasterOracle', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
   let masterOracle: MasterOracle
+  let addressProvider: FakeContract
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer] = await ethers.getSigners()
+
+    addressProvider = await smock.fake('AddressProvider')
   })
 
   afterEach(async function () {
@@ -168,13 +171,15 @@ describe('MasterOracle', function () {
         const stableCoinProvider = await smock.fake('StableCoinProvider')
         stableCoinProvider.getStableCoinIfPegged.returns(DAI_ADDRESS)
 
+        addressProvider.providersAggregator.returns(aggregator.address)
+        addressProvider.stableCoinProvider.returns(stableCoinProvider.address)
+
         const alUsdMainnetOracleFactory = new AlusdTokenMainnetOracle__factory(deployer)
         const alUsdMainnetOracle = await alUsdMainnetOracleFactory.deploy(
-          aggregator.address,
-          stableCoinProvider.address,
           ethers.constants.MaxUint256 // stalePeriod
         )
         await alUsdMainnetOracle.deployed()
+        await alUsdMainnetOracle.updateAddressProvider(addressProvider.address)
 
         await masterOracle.updateTokenOracle(ALUSD_ADDRESS, alUsdMainnetOracle.address)
         await curveLpFactoryTokenOracle.registerPool(CURVE_D3_LP)
@@ -320,12 +325,13 @@ describe('MasterOracle', function () {
       const aggregatorProviderFactory = new PriceProvidersAggregator__factory(deployer)
       const aggregator = await aggregatorProviderFactory.deploy(WETH_ADDRESS)
       await aggregator.deployed()
-
       await aggregator.setPriceProvider(Provider.CHAINLINK, chainlinkPriceProvider.address)
+      addressProvider.providersAggregator.returns(aggregator.address)
 
       const chainlinkOracleFactory = new ChainlinkOracle__factory(deployer)
-      chainlinkOracle = await chainlinkOracleFactory.deploy(aggregator.address, STALE_PERIOD)
+      chainlinkOracle = await chainlinkOracleFactory.deploy(STALE_PERIOD)
       await chainlinkOracle.deployed()
+      await chainlinkOracle.updateAddressProvider(addressProvider.address)
 
       const masterOracleFactory = new MasterOracle__factory(deployer)
       masterOracle = await masterOracleFactory.deploy(chainlinkOracle.address)

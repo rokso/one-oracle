@@ -12,22 +12,20 @@ const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS, CDAI_ADDRESS, UMB_ADDRESS, UMBRE
 describe('UmbrellaPriceProvider @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
-  let governor: SignerWithAddress
+  let alice: SignerWithAddress
   let priceProvider: UmbrellaPriceProvider
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer, governor] = await ethers.getSigners()
+    ;[deployer, alice] = await ethers.getSigners()
 
     const priceProviderFactory = new UmbrellaPriceProvider__factory(deployer)
     priceProvider = await priceProviderFactory.deploy(UMBRELLA_REGISTRY)
     await priceProvider.deployed()
-    await priceProvider.transferGovernorship(governor.address)
-    await priceProvider.connect(governor).acceptGovernorship()
 
-    await priceProvider.connect(governor).updateKeyOfToken(WETH_ADDRESS, 'ETH-USD')
-    await priceProvider.connect(governor).updateKeyOfToken(WBTC_ADDRESS, 'BTC-USD')
-    await priceProvider.connect(governor).updateKeyOfToken(DAI_ADDRESS, 'DAI-USD')
+    await priceProvider.updateKeyOfToken(WETH_ADDRESS, 'ETH-USD')
+    await priceProvider.updateKeyOfToken(WBTC_ADDRESS, 'BTC-USD')
+    await priceProvider.updateKeyOfToken(DAI_ADDRESS, 'DAI-USD')
   })
 
   afterEach(async function () {
@@ -58,12 +56,12 @@ describe('UmbrellaPriceProvider @mainnet', function () {
 
   describe('updateKeyOfToken', function () {
     it('should revert if not governor', async function () {
-      const tx = priceProvider.updateKeyOfToken(WBTC_ADDRESS, 'BTC-USD')
+      const tx = priceProvider.connect(alice).updateKeyOfToken(WBTC_ADDRESS, 'BTC-USD')
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should revert if token is null', async function () {
-      const tx = priceProvider.connect(governor).updateKeyOfToken(ethers.constants.AddressZero, 'BTC-USD')
+      const tx = priceProvider.updateKeyOfToken(ethers.constants.AddressZero, 'BTC-USD')
       await expect(tx).revertedWith('address-is-null')
     })
 
@@ -73,7 +71,7 @@ describe('UmbrellaPriceProvider @mainnet', function () {
       expect(before).eq(ethers.utils.formatBytes32String(''))
 
       // when
-      await priceProvider.connect(governor).updateKeyOfToken(UMB_ADDRESS, 'UMB-USD')
+      await priceProvider.updateKeyOfToken(UMB_ADDRESS, 'UMB-USD')
 
       // then
       const after = await priceProvider.keyOfToken(UMB_ADDRESS)

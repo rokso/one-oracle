@@ -2,26 +2,28 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
 
 const AlusdTokenMainnetOracle = 'AlusdTokenMainnetOracle'
-const PriceProvidersAggregator = 'PriceProvidersAggregator'
-const StableCoinProvider = 'StableCoinProvider'
+const AddressProvider = 'AddressProvider'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
-  const {deploy, get} = deployments
-  const {deployer} = await getNamedAccounts()
-
-  const {address: aggregatorAddress} = await get(PriceProvidersAggregator)
-  const {address: stableCoinProviderAddress} = await get(StableCoinProvider)
+  const {deploy, get, read, execute} = deployments
+  const {deployer: from} = await getNamedAccounts()
 
   const stalePeriod = 4 * 60 * 60 // 4h
 
   await deploy(AlusdTokenMainnetOracle, {
-    from: deployer,
+    from,
     log: true,
-    args: [aggregatorAddress, stableCoinProviderAddress, stalePeriod],
+    args: [stalePeriod],
   })
+
+  const {address: addressProviderAddress} = await get(AddressProvider)
+
+  if ((await read(AlusdTokenMainnetOracle, 'addressProvider')) !== addressProviderAddress) {
+    await execute(AlusdTokenMainnetOracle, {from, log: true}, 'updateAddressProvider', addressProviderAddress)
+  }
 }
 
-export default func
-func.dependencies = [PriceProvidersAggregator, StableCoinProvider]
+func.dependencies = [AddressProvider]
 func.tags = [AlusdTokenMainnetOracle]
+export default func

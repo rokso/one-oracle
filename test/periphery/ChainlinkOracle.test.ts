@@ -24,8 +24,12 @@ describe('ChainlinkOracle @mainnet', function () {
     aggregator = await smock.fake('PriceProvidersAggregator')
 
     const oracleProvider = new ChainlinkOracle__factory(deployer)
-    oracle = await oracleProvider.deploy(aggregator.address, STALE_PERIOD)
+    oracle = await oracleProvider.deploy(STALE_PERIOD)
     await oracle.deployed()
+
+    const addressProvider = await smock.fake('AddressProvider')
+    addressProvider.providersAggregator.returns(aggregator.address)
+    await oracle.updateAddressProvider(addressProvider.address)
   })
 
   afterEach(async function () {

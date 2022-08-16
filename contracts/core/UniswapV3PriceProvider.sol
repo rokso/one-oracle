@@ -3,12 +3,12 @@
 pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import "../features/UsingStableCoinProvider.sol";
+import "../access/Governable.sol";
 import "../interfaces/utils/IUniswapV3CrossPoolOracle.sol";
 import "../interfaces/core/IUniswapV3PriceProvider.sol";
 import "./PriceProvider.sol";
 
-contract UniswapV3PriceProvider is IUniswapV3PriceProvider, PriceProvider, UsingStableCoinProvider {
+contract UniswapV3PriceProvider is IUniswapV3PriceProvider, Governable, PriceProvider {
     /**
      * @notice The UniswapV3CrossPoolOracle contract
      * @dev This contract encapsulates UniswapV3 oracle logic
@@ -36,9 +36,8 @@ contract UniswapV3PriceProvider is IUniswapV3PriceProvider, PriceProvider, Using
     constructor(
         IUniswapV3CrossPoolOracle crossPoolOracle_,
         uint32 defaultTwapPeriod_,
-        uint24 defaultFee_,
-        IStableCoinProvider stableCoinProvider_
-    ) UsingStableCoinProvider(stableCoinProvider_) {
+        uint24 defaultFee_
+    ) {
         require(address(crossPoolOracle_) != address(0), "cross-pool-is-null");
         crossPoolOracle = crossPoolOracle_;
         defaultTwapPeriod = defaultTwapPeriod_;
@@ -81,19 +80,19 @@ contract UniswapV3PriceProvider is IUniswapV3PriceProvider, PriceProvider, Using
         uint24 poolFee_,
         uint32 twapPeriod_
     ) public view override returns (uint256 _priceInUsd, uint256 _lastUpdatedAt) {
+        IStableCoinProvider _stableCoinProvider = addressProvider.stableCoinProvider();
+        require(address(_stableCoinProvider) != address(0), "stable-coin-not-supported");
+
         uint256 _stableCoinAmount;
-
-        require(address(stableCoinProvider) != address(0), "stable-coin-not-supported");
-
         (_stableCoinAmount, _lastUpdatedAt) = quote(
             token_,
-            stableCoinProvider.getStableCoinIfPegged(),
+            _stableCoinProvider.getStableCoinIfPegged(),
             poolFee_,
             twapPeriod_,
             10**IERC20Metadata(token_).decimals() // ONE
         );
 
-        _priceInUsd = stableCoinProvider.toUsdRepresentation(_stableCoinAmount);
+        _priceInUsd = _stableCoinProvider.toUsdRepresentation(_stableCoinAmount);
     }
 
     /// @inheritdoc IPriceProvider

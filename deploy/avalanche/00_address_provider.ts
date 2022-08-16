@@ -1,22 +1,27 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address} from '../../helpers/index'
 
-const {WETH_ADDRESS} = Address.mainnet
-
-const UniswapV3Exchange = 'UniswapV3Exchange'
+const AddressProvider = 'AddressProvider'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy} = deployments
   const {deployer: from} = await getNamedAccounts()
 
-  await deploy(UniswapV3Exchange, {
+  await deploy(AddressProvider, {
     from,
     log: true,
-    args: [WETH_ADDRESS],
+    proxy: {
+      proxyContract: 'OpenZeppelinTransparentProxy',
+      execute: {
+        init: {
+          methodName: 'initialize',
+          args: [],
+        },
+      },
+    },
   })
 }
 
-func.tags = [UniswapV3Exchange]
+func.tags = [AddressProvider]
 export default func

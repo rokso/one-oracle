@@ -2,24 +2,22 @@
 
 pragma solidity 0.8.9;
 
-import "../interfaces/core/IPriceProvidersAggregator.sol";
 import "../interfaces/periphery/IOracle.sol";
-import "../features/UsingProvidersAggregator.sol";
 import "../features/UsingStalePeriod.sol";
 
 /**
  * @title Chainlink oracle
  */
-contract ChainlinkOracle is IOracle, UsingProvidersAggregator, UsingStalePeriod {
-    constructor(IPriceProvidersAggregator providersAggregator_, uint256 stalePeriod_)
-        UsingProvidersAggregator(providersAggregator_)
-        UsingStalePeriod(stalePeriod_)
-    {}
+contract ChainlinkOracle is IOracle, UsingStalePeriod {
+    constructor(uint256 stalePeriod_) UsingStalePeriod(stalePeriod_) {}
 
     /// @inheritdoc IOracle
     function getPriceInUsd(address token_) public view virtual returns (uint256 _priceInUsd) {
         uint256 _lastUpdatedAt;
-        (_priceInUsd, _lastUpdatedAt) = providersAggregator.getPriceInUsd(DataTypes.Provider.CHAINLINK, token_);
+        (_priceInUsd, _lastUpdatedAt) = addressProvider.providersAggregator().getPriceInUsd(
+            DataTypes.Provider.CHAINLINK,
+            token_
+        );
         require(_priceInUsd > 0 && !_priceIsStale(_lastUpdatedAt), "price-invalid");
     }
 
@@ -30,7 +28,7 @@ contract ChainlinkOracle is IOracle, UsingProvidersAggregator, UsingStalePeriod 
         uint256 amountIn_
     ) public view virtual returns (uint256 _amountOut) {
         uint256 _lastUpdatedAt;
-        (_amountOut, _lastUpdatedAt) = providersAggregator.quote(
+        (_amountOut, _lastUpdatedAt) = addressProvider.providersAggregator().quote(
             DataTypes.Provider.CHAINLINK,
             tokenIn_,
             tokenOut_,
@@ -42,7 +40,7 @@ contract ChainlinkOracle is IOracle, UsingProvidersAggregator, UsingStalePeriod 
     /// @inheritdoc IOracle
     function quoteTokenToUsd(address token_, uint256 amountIn_) public view virtual returns (uint256 _amountOut) {
         uint256 _lastUpdatedAt;
-        (_amountOut, _lastUpdatedAt) = providersAggregator.quoteTokenToUsd(
+        (_amountOut, _lastUpdatedAt) = addressProvider.providersAggregator().quoteTokenToUsd(
             DataTypes.Provider.CHAINLINK,
             token_,
             amountIn_
@@ -53,7 +51,7 @@ contract ChainlinkOracle is IOracle, UsingProvidersAggregator, UsingStalePeriod 
     /// @inheritdoc IOracle
     function quoteUsdToToken(address token_, uint256 amountIn_) public view virtual returns (uint256 _amountOut) {
         uint256 _lastUpdatedAt;
-        (_amountOut, _lastUpdatedAt) = providersAggregator.quoteUsdToToken(
+        (_amountOut, _lastUpdatedAt) = addressProvider.providersAggregator().quoteUsdToToken(
             DataTypes.Provider.CHAINLINK,
             token_,
             amountIn_

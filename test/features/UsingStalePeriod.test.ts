@@ -10,18 +10,16 @@ const STALE_PERIOD = HOUR
 describe('UsingStalePeriod @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
-  let governor: SignerWithAddress
+  let alice: SignerWithAddress
   let usingStalePeriod: UsingStalePeriodMock
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer, governor] = await ethers.getSigners()
+    ;[deployer, alice] = await ethers.getSigners()
 
     const usingStalePeriodFactory = new UsingStalePeriodMock__factory(deployer)
     usingStalePeriod = await usingStalePeriodFactory.deploy(STALE_PERIOD)
     await usingStalePeriod.deployed()
-    await usingStalePeriod.transferGovernorship(governor.address)
-    await usingStalePeriod.connect(governor).acceptGovernorship()
   })
 
   afterEach(async function () {
@@ -30,7 +28,7 @@ describe('UsingStalePeriod @mainnet', function () {
 
   describe('updateStalePeriod', function () {
     it('should revert if not governor', async function () {
-      const tx = usingStalePeriod.updateStalePeriod(60)
+      const tx = usingStalePeriod.connect(alice).updateStalePeriod(60)
       await expect(tx).revertedWith('not-governor')
     })
 
@@ -40,7 +38,7 @@ describe('UsingStalePeriod @mainnet', function () {
       expect(before).eq(STALE_PERIOD)
 
       // when
-      await usingStalePeriod.connect(governor).updateStalePeriod(1)
+      await usingStalePeriod.updateStalePeriod(1)
 
       // then
       const after = await usingStalePeriod.stalePeriod()

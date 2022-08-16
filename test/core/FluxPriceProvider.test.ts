@@ -26,22 +26,20 @@ const MAX_DEVIATION = parseEther('0.01') // 1%
 describe('FluxPriceProvider @mumbai', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
-  let governor: SignerWithAddress
+  let alice: SignerWithAddress
   let priceProvider: FluxPriceProvider
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer, governor] = await ethers.getSigners()
+    ;[deployer, alice] = await ethers.getSigners()
 
     const priceProviderFactory = new FluxPriceProvider__factory(deployer)
     priceProvider = await priceProviderFactory.deploy(MAX_DEVIATION)
     await priceProvider.deployed()
-    await priceProvider.transferGovernorship(governor.address)
-    await priceProvider.connect(governor).acceptGovernorship()
 
-    await priceProvider.connect(governor).addAggregator(USDC_ADDRESS, FLUX_USDC_USD_AGGREGATOR)
-    await priceProvider.connect(governor).addAggregator(WETH_ADDRESS, FLUX_ETH_USD_AGGREGATOR)
-    await priceProvider.connect(governor).addAggregator(WMATIC_ADDRESS, FLUX_MATIC_USD_AGGREGATOR)
+    await priceProvider.addAggregator(USDC_ADDRESS, FLUX_USDC_USD_AGGREGATOR)
+    await priceProvider.addAggregator(WETH_ADDRESS, FLUX_ETH_USD_AGGREGATOR)
+    await priceProvider.addAggregator(WMATIC_ADDRESS, FLUX_MATIC_USD_AGGREGATOR)
   })
 
   afterEach(async function () {
@@ -72,7 +70,7 @@ describe('FluxPriceProvider @mumbai', function () {
         firstAggregator = AggregatorV3Interface__factory.connect(FLUX_ETH_USD_AGGREGATOR, deployer)
         secondAggregator = await smock.fake('AggregatorV3Interface')
         secondAggregator.decimals.returns(() => 8)
-        await priceProvider.connect(governor).addAggregator(WETH_ADDRESS, secondAggregator.address)
+        await priceProvider.addAggregator(WETH_ADDRESS, secondAggregator.address)
       })
 
       it('should get the most recent price when deviation is low', async function () {
@@ -115,22 +113,22 @@ describe('FluxPriceProvider @mumbai', function () {
     })
 
     it('should revert if not governor', async function () {
-      const tx = priceProvider.addAggregator(WETH_ADDRESS, someAggregator.address)
+      const tx = priceProvider.connect(alice).addAggregator(WETH_ADDRESS, someAggregator.address)
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should revert if token is null', async function () {
-      const tx = priceProvider.connect(governor).addAggregator(ethers.constants.AddressZero, someAggregator.address)
+      const tx = priceProvider.addAggregator(ethers.constants.AddressZero, someAggregator.address)
       await expect(tx).revertedWith('token-is-null')
     })
 
     it('should revert if aggregator is null', async function () {
-      const tx = priceProvider.connect(governor).addAggregator(WETH_ADDRESS, ethers.constants.AddressZero)
+      const tx = priceProvider.addAggregator(WETH_ADDRESS, ethers.constants.AddressZero)
       await expect(tx).revertedWith('aggregator-is-null')
     })
 
     it('should revert if aggregator already added', async function () {
-      const tx = priceProvider.connect(governor).addAggregator(WETH_ADDRESS, FLUX_ETH_USD_AGGREGATOR)
+      const tx = priceProvider.addAggregator(WETH_ADDRESS, FLUX_ETH_USD_AGGREGATOR)
       await expect(tx).revertedWith('aggregator-exists')
     })
 
@@ -140,7 +138,7 @@ describe('FluxPriceProvider @mumbai', function () {
       expect(before.length).eq(1)
 
       // when
-      await priceProvider.connect(governor).addAggregator(WETH_ADDRESS, someAggregator.address)
+      await priceProvider.addAggregator(WETH_ADDRESS, someAggregator.address)
 
       // then
       const after = await priceProvider.getAggregatorsOf(WETH_ADDRESS)
@@ -150,22 +148,22 @@ describe('FluxPriceProvider @mumbai', function () {
 
   describe('removeAggregator', function () {
     it('should revert if not governor', async function () {
-      const tx = priceProvider.removeAggregator(WETH_ADDRESS, FLUX_ETH_USD_AGGREGATOR)
+      const tx = priceProvider.connect(alice).removeAggregator(WETH_ADDRESS, FLUX_ETH_USD_AGGREGATOR)
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should revert if token is null', async function () {
-      const tx = priceProvider.connect(governor).removeAggregator(ethers.constants.AddressZero, FLUX_ETH_USD_AGGREGATOR)
+      const tx = priceProvider.removeAggregator(ethers.constants.AddressZero, FLUX_ETH_USD_AGGREGATOR)
       await expect(tx).revertedWith('token-is-null')
     })
 
     it('should revert if aggregator is null', async function () {
-      const tx = priceProvider.connect(governor).removeAggregator(WETH_ADDRESS, ethers.constants.AddressZero)
+      const tx = priceProvider.removeAggregator(WETH_ADDRESS, ethers.constants.AddressZero)
       await expect(tx).revertedWith('aggregator-is-null')
     })
 
     it('should revert if aggregator does not exist', async function () {
-      const tx = priceProvider.connect(governor).removeAggregator(WETH_ADDRESS, FLUX_USDC_USD_AGGREGATOR)
+      const tx = priceProvider.removeAggregator(WETH_ADDRESS, FLUX_USDC_USD_AGGREGATOR)
       await expect(tx).revertedWith('aggregator-doesnt-exist')
     })
 
@@ -175,7 +173,7 @@ describe('FluxPriceProvider @mumbai', function () {
       expect(before.length).eq(1)
 
       // when
-      await priceProvider.connect(governor).removeAggregator(WETH_ADDRESS, FLUX_ETH_USD_AGGREGATOR)
+      await priceProvider.removeAggregator(WETH_ADDRESS, FLUX_ETH_USD_AGGREGATOR)
 
       // then
       const after = await priceProvider.getAggregatorsOf(WETH_ADDRESS)

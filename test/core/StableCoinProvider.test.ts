@@ -16,14 +16,14 @@ const MAX_DEVIATION = parseEther('0.05') // 5%
 describe('StableCoinProvider @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
-  let governor: SignerWithAddress
+  let alice: SignerWithAddress
   let stableCoinProvider: StableCoinProvider
   let providersAggregator: FakeContract
   let priceProvider: FakeContract
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer, governor] = await ethers.getSigners()
+    ;[deployer, alice] = await ethers.getSigners()
 
     providersAggregator = await smock.fake('PriceProvidersAggregator')
     priceProvider = await smock.fake('ChainlinkPriceProvider')
@@ -31,16 +31,13 @@ describe('StableCoinProvider @mainnet', function () {
     providersAggregator.priceProviders.returns(() => priceProvider.address)
 
     const stableCoinProviderFactory = new StableCoinProvider__factory(deployer)
-    stableCoinProvider = await stableCoinProviderFactory.deploy(
-      DAI_ADDRESS,
-      USDC_ADDRESS,
-      providersAggregator.address,
-      STALE_PERIOD,
-      MAX_DEVIATION
-    )
+    stableCoinProvider = await stableCoinProviderFactory.deploy(DAI_ADDRESS, USDC_ADDRESS, STALE_PERIOD, MAX_DEVIATION)
     await stableCoinProvider.deployed()
-    await stableCoinProvider.transferGovernorship(governor.address)
-    await stableCoinProvider.connect(governor).acceptGovernorship()
+
+    const addressProvider = await smock.fake('AddressProvider')
+    addressProvider.governor.returns(deployer.address)
+    addressProvider.providersAggregator.returns(providersAggregator.address)
+    await stableCoinProvider.updateAddressProvider(addressProvider.address)
   })
 
   afterEach(async function () {
@@ -49,7 +46,7 @@ describe('StableCoinProvider @mainnet', function () {
 
   describe('updateStableCoins', function () {
     it('should revert if not governor', async function () {
-      const tx = stableCoinProvider.updateStableCoins(USDC_ADDRESS, DAI_ADDRESS)
+      const tx = stableCoinProvider.connect(alice).updateStableCoins(USDC_ADDRESS, DAI_ADDRESS)
       await expect(tx).revertedWith('not-governor')
     })
 
@@ -59,7 +56,7 @@ describe('StableCoinProvider @mainnet', function () {
       expect(await stableCoinProvider.secondaryStableCoin()).eq(USDC_ADDRESS)
 
       // when
-      await stableCoinProvider.connect(governor).updateStableCoins(USDT_ADDRESS, DAI_ADDRESS)
+      await stableCoinProvider.updateStableCoins(USDT_ADDRESS, DAI_ADDRESS)
 
       // then
       expect(await stableCoinProvider.primaryStableCoin()).eq(USDT_ADDRESS)
@@ -72,7 +69,7 @@ describe('StableCoinProvider @mainnet', function () {
       expect(await stableCoinProvider.secondaryStableCoin()).eq(USDC_ADDRESS)
 
       // when
-      const tx = stableCoinProvider.connect(governor).updateStableCoins(AddressZero, AddressZero)
+      const tx = stableCoinProvider.updateStableCoins(AddressZero, AddressZero)
 
       // then
       await expect(tx).revertedWith('stable-coins-are-null')
@@ -80,7 +77,7 @@ describe('StableCoinProvider @mainnet', function () {
 
     it('should revert if setting stable coins are the same', async function () {
       // when
-      const tx = stableCoinProvider.connect(governor).updateStableCoins(DAI_ADDRESS, DAI_ADDRESS)
+      const tx = stableCoinProvider.updateStableCoins(DAI_ADDRESS, DAI_ADDRESS)
 
       // then
       await expect(tx).revertedWith('stable-coins-are-the-same')
@@ -162,7 +159,7 @@ describe('StableCoinProvider @mainnet', function () {
   describe('toUsdRepresentation', function () {
     it('should get correct USD representation (from 6-decimals)', async function () {
       // given
-      await stableCoinProvider.connect(governor).updateStableCoins(USDC_ADDRESS, USDT_ADDRESS)
+      await stableCoinProvider.updateStableCoins(USDC_ADDRESS, USDT_ADDRESS)
 
       // when
       const usdcAmount = parseUnits('1', 6)
@@ -174,7 +171,7 @@ describe('StableCoinProvider @mainnet', function () {
 
     it('should get correct USD representation (from 18-decimals)', async function () {
       // given
-      await stableCoinProvider.connect(governor).updateStableCoins(DAI_ADDRESS, USDT_ADDRESS)
+      await stableCoinProvider.updateStableCoins(DAI_ADDRESS, USDT_ADDRESS)
 
       // when
       const daiAmount = parseEther('1')

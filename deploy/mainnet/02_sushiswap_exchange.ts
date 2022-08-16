@@ -5,21 +5,29 @@ import {Address, InitCodeHash} from '../../helpers/index'
 const {SUSHISWAP_FACTORY_ADDRESS, WETH_ADDRESS} = Address.mainnet
 const SUSHISWAP_INIT_CODE_HASH = InitCodeHash[SUSHISWAP_FACTORY_ADDRESS]
 
+const AddressProvider = 'AddressProvider'
 const UniswapV2LikeExchange = 'UniswapV2LikeExchange'
 const SushiswapExchange = 'SushiswapExchange'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
-  const {deploy} = deployments
-  const {deployer} = await getNamedAccounts()
+  const {deploy, read, get, execute} = deployments
+  const {deployer: from} = await getNamedAccounts()
 
   await deploy(SushiswapExchange, {
     contract: UniswapV2LikeExchange,
-    from: deployer,
+    from,
     log: true,
     args: [SUSHISWAP_FACTORY_ADDRESS, SUSHISWAP_INIT_CODE_HASH, WETH_ADDRESS],
   })
+
+  const {address: addressProviderAddress} = await get(AddressProvider)
+
+  if ((await read(SushiswapExchange, 'addressProvider')) !== addressProviderAddress) {
+    await execute(SushiswapExchange, {from, log: true}, 'updateAddressProvider', addressProviderAddress)
+  }
 }
 
-export default func
+func.dependencies = [AddressProvider]
 func.tags = [SushiswapExchange]
+export default func

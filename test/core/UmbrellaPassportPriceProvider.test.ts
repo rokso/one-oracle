@@ -25,7 +25,7 @@ const DEVIATION_THRESHOLD = parseEther('0.01') // 1%
 describe('UmbrellaPassportPriceProvider @bsc', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
-  let governor: SignerWithAddress
+  let alice: SignerWithAddress
   let funder: SignerWithAddress
   let priceProvider: UmbrellaPassportPriceProvider
   let datumRegistry: Contract
@@ -37,7 +37,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer, governor, funder] = await ethers.getSigners()
+    ;[deployer, alice, funder] = await ethers.getSigners()
 
     umb = IERC20__factory.connect(UMB_ADDRESS, funder)
     await adjustBalance(UMB_ADDRESS, funder.address, parseEther('1,000,000'))
@@ -45,8 +45,6 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
     const datumReceiverFactory = new UmbrellaPassportPriceProvider__factory(deployer)
     priceProvider = await datumReceiverFactory.deploy(UMBRELLA_REGISTRY, HEARTBEAT_TIMESTAMP, DEVIATION_THRESHOLD)
     await priceProvider.deployed()
-    await priceProvider.transferGovernorship(governor.address)
-    await priceProvider.connect(governor).acceptGovernorship()
 
     const umbrellaRegistry = IRegistry__factory.connect(UMBRELLA_REGISTRY, deployer)
     const datumRegistryAddress = await umbrellaRegistry.getAddressByString('DatumRegistry')
@@ -105,7 +103,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
     let lastUpdatedAt: number
 
     beforeEach(async function () {
-      await priceProvider.connect(governor).updateHeartbeatTimestamp(heartbeat)
+      await priceProvider.updateHeartbeatTimestamp(heartbeat)
 
       const blockId = (await chain.getLatestBlockId()) - 5 // ~5 min before the latest block
       const block = await chain.blocks(blockId)
@@ -234,7 +232,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
   describe('updateHeartbeatTimestamp', function () {
     it('should revert if sender is not governor', async function () {
       // when
-      const tx = priceProvider.updateHeartbeatTimestamp(123)
+      const tx = priceProvider.connect(alice).updateHeartbeatTimestamp(123)
 
       // then
       await expect(tx).revertedWith('not-governor')
@@ -247,7 +245,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
       // when
       const after = before.mul('2')
       expect(after).not.eq(before)
-      await priceProvider.connect(governor).updateHeartbeatTimestamp(after)
+      await priceProvider.updateHeartbeatTimestamp(after)
 
       // then
       const {heartbeatTimestamp} = await priceProvider.updatePolicy()
@@ -258,7 +256,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
   describe('updateDeviationThreshold', function () {
     it('should revert if sender is not governor', async function () {
       // when
-      const tx = priceProvider.updateDeviationThreshold(123)
+      const tx = priceProvider.connect(alice).updateDeviationThreshold(123)
 
       // then
       await expect(tx).revertedWith('not-governor')
@@ -271,7 +269,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
       // when
       const after = before.mul('2')
       expect(after).not.eq(before)
-      await priceProvider.connect(governor).updateDeviationThreshold(after)
+      await priceProvider.updateDeviationThreshold(after)
 
       // then
       const {deviationThreshold} = await priceProvider.updatePolicy()
@@ -281,7 +279,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
 
   describe('getPriceInUsd', function () {
     beforeEach(async function () {
-      await priceProvider.connect(governor).updateKeyOfToken(WETH_ADDRESS, 'ETH-USD')
+      await priceProvider.updateKeyOfToken(WETH_ADDRESS, 'ETH-USD')
     })
 
     it('should get price from Chain if it is the latest ', async function () {

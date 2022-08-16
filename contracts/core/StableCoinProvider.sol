@@ -7,13 +7,12 @@ import "../libraries/OracleHelpers.sol";
 import "../interfaces/core/IStableCoinProvider.sol";
 import "../features/UsingStalePeriod.sol";
 import "../features/UsingMaxDeviation.sol";
-import "../features/UsingProvidersAggregator.sol";
 
 /**
  * @title Provide pegged stable coin, useful for getting USD prices reference from DEXes
  * @dev This contract mitigates a de-peg scenario by checking price against two stable coins that should be around 1
  */
-contract StableCoinProvider is IStableCoinProvider, UsingStalePeriod, UsingMaxDeviation, UsingProvidersAggregator {
+contract StableCoinProvider is IStableCoinProvider, UsingStalePeriod, UsingMaxDeviation {
     using OracleHelpers for uint256;
 
     uint256 public constant USD_DECIMALS = 18;
@@ -44,17 +43,16 @@ contract StableCoinProvider is IStableCoinProvider, UsingStalePeriod, UsingMaxDe
     constructor(
         address primaryStableCoin_,
         address secondaryStableCoin_,
-        IPriceProvidersAggregator providersAggregator_,
         uint256 stalePeriod_,
         uint256 maxDeviation_
-    ) UsingProvidersAggregator(providersAggregator_) UsingStalePeriod(stalePeriod_) UsingMaxDeviation(maxDeviation_) {
+    ) UsingStalePeriod(stalePeriod_) UsingMaxDeviation(maxDeviation_) {
         _updateStableCoins(primaryStableCoin_, secondaryStableCoin_);
     }
 
     /// @inheritdoc IStableCoinProvider
     function getStableCoinIfPegged() external view returns (address _stableCoin) {
         // Note: Chainlink supports DAI/USDC/USDT on all chains that we're using
-        IPriceProvider _chainlink = providersAggregator.priceProviders(DataTypes.Provider.CHAINLINK);
+        IPriceProvider _chainlink = addressProvider.providersAggregator().priceProviders(DataTypes.Provider.CHAINLINK);
 
         (uint256 _priceInUsd, uint256 _lastUpdatedAt) = _chainlink.getPriceInUsd(primaryStableCoin);
 

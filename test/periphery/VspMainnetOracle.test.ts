@@ -16,7 +16,6 @@ const {DAI_ADDRESS, VSP_ADDRESS} = Address.mainnet
 describe('VspMainnetOracle @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
-  let governor: SignerWithAddress
   let aggregator: FakeContract
   let uniswapV2PriceProvider: FakeContract
   let vspOracle: VspMainnetOracle
@@ -25,7 +24,7 @@ describe('VspMainnetOracle @mainnet', function () {
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer, governor] = await ethers.getSigners()
+    ;[deployer] = await ethers.getSigners()
     lastUpdatedAt = await timestampFromLatestBlock()
 
     aggregator = await smock.fake('PriceProvidersAggregator')
@@ -41,15 +40,13 @@ describe('VspMainnetOracle @mainnet', function () {
     stableCoinProvider.getStableCoinIfPegged.returns(DAI_ADDRESS)
 
     const vspMainnetOracleFactory = new VspMainnetOracle__factory(deployer)
-    vspOracle = await vspMainnetOracleFactory.deploy(
-      aggregator.address,
-      stableCoinProvider.address,
-      MAX_DEVIATION,
-      STALE_PERIOD
-    )
+    vspOracle = await vspMainnetOracleFactory.deploy(MAX_DEVIATION, STALE_PERIOD)
     await vspOracle.deployed()
-    await vspOracle.transferGovernorship(governor.address)
-    await vspOracle.connect(governor).acceptGovernorship()
+
+    const addressProvider = await smock.fake('AddressProvider')
+    addressProvider.stableCoinProvider.returns(stableCoinProvider.address)
+    addressProvider.providersAggregator.returns(aggregator.address)
+    await vspOracle.updateAddressProvider(addressProvider.address)
   })
 
   afterEach(async function () {

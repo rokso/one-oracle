@@ -34,20 +34,11 @@ contract SynthOracle is ChainlinkAndFallbacksOracle {
     event AssetUpdated(address indexed asset, address underlyingAsset, bool isUsd);
 
     constructor(
-        IPriceProvidersAggregator providersAggregator_,
         uint256 maxDeviation_,
         uint256 stalePeriod_,
         DataTypes.Provider fallbackProviderA_,
         DataTypes.Provider fallbackProviderB_
-    )
-        ChainlinkAndFallbacksOracle(
-            providersAggregator_,
-            maxDeviation_,
-            stalePeriod_,
-            fallbackProviderA_,
-            fallbackProviderB_
-        )
-    {}
+    ) ChainlinkAndFallbacksOracle(maxDeviation_, stalePeriod_, fallbackProviderA_, fallbackProviderB_) {}
 
     /**
      * @notice Store an asset

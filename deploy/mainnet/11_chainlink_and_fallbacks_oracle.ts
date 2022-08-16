@@ -3,26 +3,30 @@ import {DeployFunction} from 'hardhat-deploy/types'
 import {parseEther} from '@ethersproject/units'
 import {Provider} from '../../helpers'
 
+const AddressProvider = 'AddressProvider'
 const ChainlinkAndFallbacksOracle = 'ChainlinkAndFallbacksOracle'
-const PriceProvidersAggregator = 'PriceProvidersAggregator'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
-  const {deploy, get} = deployments
-  const {deployer} = await getNamedAccounts()
+  const {deploy, get, read, execute} = deployments
+  const {deployer: from} = await getNamedAccounts()
 
   const stalePeriod = 60 * 60 * 4 // 4 hours
   const maxFallbacksDeviation = parseEther('0.05') // 5%
 
-  const {address: aggregatorAddress} = await get(PriceProvidersAggregator)
-
   await deploy(ChainlinkAndFallbacksOracle, {
-    from: deployer,
+    from,
     log: true,
-    args: [aggregatorAddress, maxFallbacksDeviation, stalePeriod, Provider.UNISWAP_V2, Provider.SUSHISWAP],
+    args: [maxFallbacksDeviation, stalePeriod, Provider.UNISWAP_V2, Provider.SUSHISWAP],
   })
+
+  const {address: addressProviderAddress} = await get(AddressProvider)
+
+  if ((await read(ChainlinkAndFallbacksOracle, 'addressProvider')) !== addressProviderAddress) {
+    await execute(ChainlinkAndFallbacksOracle, {from, log: true}, 'updateAddressProvider', addressProviderAddress)
+  }
 }
 
-export default func
-func.dependencies = [PriceProvidersAggregator]
+func.dependencies = [AddressProvider]
 func.tags = [ChainlinkAndFallbacksOracle]
+export default func

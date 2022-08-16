@@ -14,6 +14,7 @@ import {
 } from '../../typechain-types'
 import {Address, Provider} from '../../helpers'
 import {toUSD, HOUR, parseEther, parseUnits} from '../helpers'
+import {smock} from '@defi-wonderland/smock'
 
 const STALE_PERIOD = HOUR
 const MAX_DEVIATION = parseEther('0.1') // 10%
@@ -23,7 +24,7 @@ const {WETH_ADDRESS, WBTC_ADDRESS, DAI_ADDRESS} = Address.avalanche
 describe('SynthOracle @avalanche', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
-  let governor: SignerWithAddress
+  let alice: SignerWithAddress
   let vsBTC: ERC20Mock
   let vsUSD: ERC20Mock
   let vsETH: ERC20Mock
@@ -33,7 +34,7 @@ describe('SynthOracle @avalanche', function () {
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer, governor] = await ethers.getSigners()
+    ;[deployer, alice] = await ethers.getSigners()
 
     const erc20MockFactory = new ERC20Mock__factory(deployer)
 
@@ -56,15 +57,17 @@ describe('SynthOracle @avalanche', function () {
 
     const synthDefaultOracleFactory = new SynthOracle__factory(deployer)
     oracle = await synthDefaultOracleFactory.deploy(
-      aggregator.address,
       MAX_DEVIATION,
       STALE_PERIOD,
       Provider.UMBRELLA_PASSPORT,
       Provider.FLUX
     )
     await oracle.deployed()
-    await oracle.transferGovernorship(governor.address)
-    await oracle.connect(governor).acceptGovernorship()
+
+    const addressProvider = await smock.fake('AddressProvider')
+    addressProvider.providersAggregator.returns(aggregator.address)
+    addressProvider.governor.returns(deployer.address)
+    await oracle.updateAddressProvider(addressProvider.address)
   })
 
   afterEach(async function () {
@@ -73,7 +76,7 @@ describe('SynthOracle @avalanche', function () {
 
   describe('addOrUpdateAsset', function () {
     it('should revert if not governor', async function () {
-      const tx = oracle.addOrUpdateAsset(vsBTC.address, WBTC_ADDRESS)
+      const tx = oracle.connect(alice).addOrUpdateAsset(vsBTC.address, WBTC_ADDRESS)
       await expect(tx).revertedWith('not-governor')
     })
 
@@ -84,7 +87,7 @@ describe('SynthOracle @avalanche', function () {
 
       // when
       const underlyingAsset = WBTC_ADDRESS
-      await oracle.connect(governor).addOrUpdateAsset(vsBTC.address, underlyingAsset)
+      await oracle.addOrUpdateAsset(vsBTC.address, underlyingAsset)
 
       // then
       const after = await oracle.assets(vsBTC.address)
@@ -94,7 +97,7 @@ describe('SynthOracle @avalanche', function () {
 
   describe('addOrUpdateUsdAsset', function () {
     it('should revert if not governor', async function () {
-      const tx = oracle.addOrUpdateUsdAsset(vsUSD.address)
+      const tx = oracle.connect(alice).addOrUpdateUsdAsset(vsUSD.address)
       await expect(tx).revertedWith('not-governor')
     })
 
@@ -104,7 +107,7 @@ describe('SynthOracle @avalanche', function () {
       expect(before).deep.eq([ethers.constants.AddressZero, false])
 
       // when
-      await oracle.connect(governor).addOrUpdateUsdAsset(vsUSD.address)
+      await oracle.addOrUpdateUsdAsset(vsUSD.address)
 
       // then
       const after = await oracle.assets(vsUSD.address)
@@ -114,9 +117,9 @@ describe('SynthOracle @avalanche', function () {
 
   describe('when have assets setup', function () {
     beforeEach(async function () {
-      await oracle.connect(governor).addOrUpdateAsset(vsBTC.address, WBTC_ADDRESS)
-      await oracle.connect(governor).addOrUpdateAsset(vsETH.address, WETH_ADDRESS)
-      await oracle.connect(governor).addOrUpdateUsdAsset(vsUSD.address)
+      await oracle.addOrUpdateAsset(vsBTC.address, WBTC_ADDRESS)
+      await oracle.addOrUpdateAsset(vsETH.address, WETH_ADDRESS)
+      await oracle.addOrUpdateUsdAsset(vsUSD.address)
     })
 
     describe('getPriceInUsd', function () {
