@@ -19,15 +19,10 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     args: [WAVAX_ADDRESS],
   })
 
-  const {address: addressProviderAddress} = await get(AddressProvider)
   const {address: chainlinkAddress} = await get(ChainlinkAvalanchePriceProvider)
 
   if ((await read(PriceProvidersAggregator, 'priceProviders', [Provider.CHAINLINK])) !== chainlinkAddress) {
     await execute(PriceProvidersAggregator, {from, log: true}, 'setPriceProvider', Provider.CHAINLINK, chainlinkAddress)
-  }
-
-  if ((await read(PriceProvidersAggregator, 'addressProvider')) !== addressProviderAddress) {
-    await execute(PriceProvidersAggregator, {from, log: true}, 'updateAddressProvider', addressProviderAddress)
   }
 
   if ((await read(AddressProvider, 'providersAggregator')) !== priceProviderAggregatorAddress) {

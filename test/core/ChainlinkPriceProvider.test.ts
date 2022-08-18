@@ -5,6 +5,7 @@ import {ethers} from 'hardhat'
 import {ChainlinkPriceProvider, ChainlinkPriceProvider__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther} from '../helpers'
+import {smock} from '@defi-wonderland/smock'
 
 const {
   DAI_ADDRESS,
@@ -24,6 +25,9 @@ describe('ChainlinkPriceProvider @mainnet', function () {
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
+
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
 
     const priceProviderFactory = new ChainlinkPriceProvider__factory(deployer)
     priceProvider = await priceProviderFactory.deploy()

@@ -41,7 +41,8 @@ describe('MasterOracle', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer] = await ethers.getSigners()
 
-    addressProvider = await smock.fake('AddressProvider')
+    addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
   })
 
   afterEach(async function () {
@@ -179,7 +180,6 @@ describe('MasterOracle', function () {
           ethers.constants.MaxUint256 // stalePeriod
         )
         await alUsdMainnetOracle.deployed()
-        await alUsdMainnetOracle.updateAddressProvider(addressProvider.address)
 
         await masterOracle.updateTokenOracle(ALUSD_ADDRESS, alUsdMainnetOracle.address)
         await curveLpFactoryTokenOracle.registerPool(CURVE_D3_LP)
@@ -331,7 +331,6 @@ describe('MasterOracle', function () {
       const chainlinkOracleFactory = new ChainlinkOracle__factory(deployer)
       chainlinkOracle = await chainlinkOracleFactory.deploy(STALE_PERIOD)
       await chainlinkOracle.deployed()
-      await chainlinkOracle.updateAddressProvider(addressProvider.address)
 
       const masterOracleFactory = new MasterOracle__factory(deployer)
       masterOracle = await masterOracleFactory.deploy(chainlinkOracle.address)

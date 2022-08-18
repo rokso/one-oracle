@@ -23,12 +23,6 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     args: [USDC_ADDRESS, DAI_ADDRESS, stalePeriod, maxDeviation],
   })
 
-  const {address: addressProviderAddress} = await get(AddressProvider)
-
-  if ((await read(StableCoinProvider, 'addressProvider')) !== addressProviderAddress) {
-    await execute(StableCoinProvider, {from, log: true}, 'updateAddressProvider', addressProviderAddress)
-  }
-
   if ((await read(AddressProvider, 'stableCoinProvider')) !== stableCoinProviderAddress) {
     await execute(AddressProvider, {from, log: true}, 'updateStableCoinProvider', stableCoinProviderAddress)
   }

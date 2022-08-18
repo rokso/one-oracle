@@ -8,8 +8,6 @@ import {
   UniswapV3PriceProvider__factory,
   IERC20,
   IERC20__factory,
-  AddressProvider,
-  AddressProvider__factory,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, parseUnits, HOUR} from '../helpers'
@@ -27,16 +25,14 @@ describe('UniswapV3PriceProvider', function () {
   let weth: IERC20
   let wbtc: IERC20
   let priceProvider: UniswapV3PriceProvider
-  let addressProvider: AddressProvider
+  let addressProvider: FakeContract
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
 
-    const addressProviderFactory = new AddressProvider__factory(deployer)
-    addressProvider = await addressProviderFactory.deploy()
-    await addressProvider.deployed()
-    await addressProvider.initialize()
+    addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
   })
 
   afterEach(async function () {
@@ -58,7 +54,6 @@ describe('UniswapV3PriceProvider', function () {
       const priceProviderFactory = new UniswapV3PriceProvider__factory(deployer)
       priceProvider = await priceProviderFactory.deploy(crossPoolOracle.address, DEFAULT_TWAP_PERIOD, DEFAULT_POOLS_FEE)
       await priceProvider.deployed()
-      await priceProvider.updateAddressProvider(addressProvider.address)
     })
 
     describe('updateDefaultTwapPeriod', function () {
@@ -156,7 +151,8 @@ describe('UniswapV3PriceProvider', function () {
             const [stableCoinAmount_] = args
             return stableCoinAmount_.mul(parseUnits('1', 12)) // USDC amount to 18 decimals
           })
-          await addressProvider.updateStableCoinProvider(stableCoinProvider.address)
+
+          addressProvider.stableCoinProvider.returns(stableCoinProvider.address)
         })
 
         it('should WETH price', async function () {
@@ -261,7 +257,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseUnits('1', 8)
         )
-        expect(_amountOut).closeTo(parseUnits('40,601', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(parseUnits('40,597', 6), parseUnits('1', 6))
       })
     })
   })

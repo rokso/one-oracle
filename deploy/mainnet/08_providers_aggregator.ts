@@ -22,7 +22,6 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     args: [WETH_ADDRESS],
   })
 
-  const {address: addressProviderAddress} = await get(AddressProvider)
   const {address: chainlinkAddress} = await get(ChainlinkPriceProvider)
   const {address: uniswapV2Address} = await get(UniswapV2PriceProvider)
   const {address: sushiswapAddress} = await get(SushiswapPriceProvider)
@@ -37,10 +36,6 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 
   if ((await read(PriceProvidersAggregator, 'priceProviders', [SUSHISWAP])) !== sushiswapAddress) {
     await execute(PriceProvidersAggregator, {from, log: true}, 'setPriceProvider', SUSHISWAP, sushiswapAddress)
-  }
-
-  if ((await read(PriceProvidersAggregator, 'addressProvider')) !== addressProviderAddress) {
-    await execute(PriceProvidersAggregator, {from, log: true}, 'updateAddressProvider', addressProviderAddress)
   }
 
   if ((await read(AddressProvider, 'providersAggregator')) !== priceProviderAggregatorAddress) {

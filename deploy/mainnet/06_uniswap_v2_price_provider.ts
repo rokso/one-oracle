@@ -4,7 +4,6 @@ import {Address} from '../../helpers'
 
 const {UNISWAP_V2_FACTORY_ADDRESS, WETH_ADDRESS} = Address.mainnet
 
-const AddressProvider = 'AddressProvider'
 const UniswapV2LikePriceProvider = 'UniswapV2LikePriceProvider'
 const UniswapV2PriceProvider = 'UniswapV2PriceProvider'
 
@@ -21,14 +20,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     log: true,
     args: [UNISWAP_V2_FACTORY_ADDRESS, twapPeriod, WETH_ADDRESS],
   })
-
-  const {address: addressProviderAddress} = await get(AddressProvider)
-
-  if ((await read(UniswapV2PriceProvider, 'addressProvider')) !== addressProviderAddress) {
-    await execute(UniswapV2PriceProvider, {from, log: true}, 'updateAddressProvider', addressProviderAddress)
-  }
 }
 
-func.dependencies = [AddressProvider]
 func.tags = [UniswapV2PriceProvider]
 export default func

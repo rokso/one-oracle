@@ -19,9 +19,7 @@ describe('AddressProvider @mainnet', function () {
     const addressProviderFactory = new AddressProvider__factory(deployer)
     addressProvider = await addressProviderFactory.deploy()
     await addressProvider.deployed()
-    await addressProvider.initialize()
-    await addressProvider.transferGovernorship(governor.address)
-    await addressProvider.connect(governor).acceptGovernorship()
+    await addressProvider.initialize(governor.address)
   })
 
   afterEach(async function () {

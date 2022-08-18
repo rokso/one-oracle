@@ -2,7 +2,6 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
 import {ExchangeType} from '../../helpers'
 
-const AddressProvider = 'AddressProvider'
 const UniswapV2Exchange = 'UniswapV2Exchange'
 const SushiswapExchange = 'SushiswapExchange'
 const UniswapV3Exchange = 'UniswapV3Exchange'
@@ -19,14 +18,9 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     args: [],
   })
 
-  const {address: addressProviderAddress} = await get(AddressProvider)
   const {address: uniswapV2ExchangeAddress} = await get(UniswapV2Exchange)
   const {address: sushiswapExchangeAddress} = await get(SushiswapExchange)
   const {address: uniswapV3ExchangeAddress} = await get(UniswapV3Exchange)
-
-  if ((await read(RoutedSwapper, 'addressProvider')) !== addressProviderAddress) {
-    await execute(RoutedSwapper, {from, log: true}, 'updateAddressProvider', addressProviderAddress)
-  }
 
   if ((await read(RoutedSwapper, 'addressOf', [ExchangeType.UNISWAP_V2])) !== sushiswapExchangeAddress) {
     await execute(RoutedSwapper, {from, log: true}, 'setExchange', ExchangeType.UNISWAP_V2, uniswapV2ExchangeAddress)
@@ -41,6 +35,6 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 }
 
-func.dependencies = [AddressProvider, UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange]
+func.dependencies = [UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange]
 func.tags = [RoutedSwapper]
 export default func

@@ -1,7 +1,9 @@
 /* eslint-disable camelcase */
+import {smock} from '@defi-wonderland/smock'
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
+import {Address} from '../../helpers'
 import {UsingStalePeriodMock, UsingStalePeriodMock__factory} from '../../typechain-types'
 import {HOUR, timestampFromLatestBlock} from '../helpers'
 
@@ -16,6 +18,9 @@ describe('UsingStalePeriod @mainnet', function () {
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
+
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
 
     const usingStalePeriodFactory = new UsingStalePeriodMock__factory(deployer)
     usingStalePeriod = await usingStalePeriodFactory.deploy(STALE_PERIOD)

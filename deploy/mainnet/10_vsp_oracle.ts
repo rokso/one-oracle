@@ -8,7 +8,7 @@ const AddressProvider = 'AddressProvider'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
-  const {deploy, get, read, execute} = deployments
+  const {deploy} = deployments
   const {deployer: from} = await getNamedAccounts()
 
   const stalePeriod = 60 * 60 * 2 // 2 hours
@@ -20,12 +20,6 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     log: true,
     args: [maxDeviation, stalePeriod],
   })
-
-  const {address: addressProviderAddress} = await get(AddressProvider)
-
-  if ((await read(VspOracle, 'addressProvider')) !== addressProviderAddress) {
-    await execute(VspOracle, {from, log: true}, 'updateAddressProvider', addressProviderAddress)
-  }
 }
 
 func.dependencies = [AddressProvider]

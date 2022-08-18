@@ -39,3 +39,18 @@ export const timestampFromLatestBlock = async (): Promise<number> =>
 export const min = (a: BigNumber, b: BigNumber) => (a.lt(b) ? a : b)
 
 export const max = (a: BigNumber, b: BigNumber) => (a.gte(b) ? a : b)
+
+export const resetFork = async (): Promise<void> => {
+  await network.provider.request({
+    method: 'hardhat_reset',
+    params: [
+      {
+        forking: {
+          jsonRpcUrl: process.env.FORK_NODE_URL,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          blockNumber: parseInt(process.env.FORK_BLOCK_NUMBER!),
+        },
+      },
+    ],
+  })
+}

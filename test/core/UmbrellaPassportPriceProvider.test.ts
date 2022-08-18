@@ -15,6 +15,7 @@ import {adjustBalance} from '../helpers/balance'
 import {ABI} from '@umb-network/toolbox'
 import {Contract} from 'ethers'
 import {encodeKeys, encodeKey, encodeValue} from '../helpers/umbrella'
+import {smock} from '@defi-wonderland/smock'
 
 const {UMBRELLA_REGISTRY, UMB_ADDRESS, WETH_ADDRESS, USDC_ADDRESS} = Address.bsc
 
@@ -38,6 +39,9 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice, funder] = await ethers.getSigners()
+
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
 
     umb = IERC20__factory.connect(UMB_ADDRESS, funder)
     await adjustBalance(UMB_ADDRESS, funder.address, parseEther('1,000,000'))

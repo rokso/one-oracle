@@ -36,6 +36,9 @@ describe('SynthOracle @avalanche', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
 
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
+
     const erc20MockFactory = new ERC20Mock__factory(deployer)
 
     vsBTC = await erc20MockFactory.deploy('vsBTC', 'vsBTC')
@@ -55,6 +58,8 @@ describe('SynthOracle @avalanche', function () {
 
     await aggregator.setPriceProvider(Provider.CHAINLINK, chainlinkProvider.address)
 
+    addressProvider.providersAggregator.returns(aggregator.address)
+
     const synthDefaultOracleFactory = new SynthOracle__factory(deployer)
     oracle = await synthDefaultOracleFactory.deploy(
       MAX_DEVIATION,
@@ -63,11 +68,6 @@ describe('SynthOracle @avalanche', function () {
       Provider.FLUX
     )
     await oracle.deployed()
-
-    const addressProvider = await smock.fake('AddressProvider')
-    addressProvider.providersAggregator.returns(aggregator.address)
-    addressProvider.governor.returns(deployer.address)
-    await oracle.updateAddressProvider(addressProvider.address)
   })
 
   afterEach(async function () {

@@ -7,8 +7,6 @@ import {
   UniswapV2LikePriceProvider__factory,
   IERC20,
   IERC20__factory,
-  AddressProvider,
-  AddressProvider__factory,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, parseUnits, HOUR, increaseTime} from '../helpers'
@@ -25,16 +23,14 @@ describe('UniswapV2LikePriceProvider', function () {
   let nativeToken: IERC20
   let wbtc: IERC20
   let stableCoinProvider: FakeContract
-  let addressProvider: AddressProvider
+  let addressProvider: FakeContract
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
 
-    const addressProviderFactory = new AddressProvider__factory(deployer)
-    addressProvider = await addressProviderFactory.deploy()
-    await addressProvider.deployed()
-    await addressProvider.initialize()
+    addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
   })
 
   afterEach(async function () {
@@ -79,8 +75,6 @@ describe('UniswapV2LikePriceProvider', function () {
         stableCoinProvider = await smock.fake('StableCoinProvider')
         stableCoinProvider.getStableCoinIfPegged.returns(DAI_ADDRESS)
         stableCoinProvider.toUsdRepresentation.returns((amount: string) => amount)
-
-        await priceProvider.updateAddressProvider(addressProvider.address)
       })
 
       describe('updateDefaultTwapPeriod', function () {
@@ -187,7 +181,7 @@ describe('UniswapV2LikePriceProvider', function () {
 
         describe('when stable coin provider is set', function () {
           beforeEach(async function () {
-            await addressProvider.updateStableCoinProvider(stableCoinProvider.address)
+            addressProvider.stableCoinProvider.returns(stableCoinProvider.address)
           })
 
           it('should WETH price', async function () {

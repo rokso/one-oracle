@@ -41,9 +41,9 @@ contract AddressProvider is IAddressProvider, Initializable {
         _;
     }
 
-    function initialize() external initializer {
-        governor = msg.sender;
-        emit UpdatedGovernor(address(0), msg.sender);
+    function initialize(address governor_) external initializer {
+        governor = governor_;
+        emit UpdatedGovernor(address(0), governor_);
     }
 
     /**

@@ -43,10 +43,9 @@ describe('VspMainnetOracle @mainnet', function () {
     vspOracle = await vspMainnetOracleFactory.deploy(MAX_DEVIATION, STALE_PERIOD)
     await vspOracle.deployed()
 
-    const addressProvider = await smock.fake('AddressProvider')
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
     addressProvider.stableCoinProvider.returns(stableCoinProvider.address)
     addressProvider.providersAggregator.returns(aggregator.address)
-    await vspOracle.updateAddressProvider(addressProvider.address)
   })
 
   afterEach(async function () {

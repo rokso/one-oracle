@@ -36,10 +36,9 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
     )
     await chainlinkAndFallbacksOracle.deployed()
 
-    const addressProvider = await smock.fake('AddressProvider')
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
     addressProvider.providersAggregator.returns(aggregator.address)
-    await chainlinkAndFallbacksOracle.updateAddressProvider(addressProvider.address)
   })
 
   afterEach(async function () {

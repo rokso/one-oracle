@@ -15,6 +15,7 @@ import {
 } from '../../typechain-types'
 import {Address, Provider} from '../../helpers'
 import {parseEther, parseUnits, HOUR} from '../helpers'
+import {smock} from '@defi-wonderland/smock'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
@@ -39,6 +40,9 @@ describe('PriceProvidersAggregator @mainnet', function () {
     weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
     wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
     usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
+
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
 
     const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
     const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)

@@ -6,6 +6,7 @@ import {UmbrellaPriceProvider, UmbrellaPriceProvider__factory} from '../../typec
 import Address from '../../helpers/address'
 import {parseEther} from '../helpers'
 import {encodeKey} from '../helpers/umbrella'
+import {smock} from '@defi-wonderland/smock'
 
 const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS, CDAI_ADDRESS, UMB_ADDRESS, UMBRELLA_REGISTRY} = Address.mainnet
 
@@ -18,6 +19,9 @@ describe('UmbrellaPriceProvider @mainnet', function () {
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
+
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
 
     const priceProviderFactory = new UmbrellaPriceProvider__factory(deployer)
     priceProvider = await priceProviderFactory.deploy(UMBRELLA_REGISTRY)

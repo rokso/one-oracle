@@ -4,12 +4,11 @@ import {Address} from '../../helpers'
 
 const {CHAINLINK_BTC_USD_AGGREGATOR} = Address.mainnet
 
-const AddressProvider = 'AddressProvider'
 const BTCPeggedTokenOracle = 'BTCPeggedTokenOracle'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
-  const {deploy, get, read, execute} = deployments
+  const {deploy, get} = deployments
   const {deployer: from} = await getNamedAccounts()
 
   const stalePeriod = 60 * 60 // 1h
@@ -19,14 +18,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     log: true,
     args: [CHAINLINK_BTC_USD_AGGREGATOR, stalePeriod],
   })
-
-  const {address: addressProviderAddress} = await get(AddressProvider)
-
-  if ((await read(BTCPeggedTokenOracle, 'addressProvider')) !== addressProviderAddress) {
-    await execute(BTCPeggedTokenOracle, {from, log: true}, 'updateAddressProvider', addressProviderAddress)
-  }
 }
 
-func.dependencies = [AddressProvider]
 func.tags = [BTCPeggedTokenOracle]
 export default func

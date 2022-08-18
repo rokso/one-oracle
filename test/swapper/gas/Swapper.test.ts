@@ -26,12 +26,11 @@ import {
   PriceProviderMock__factory,
   StableCoinProvider__factory,
   StableCoinProvider,
-  AddressProvider,
-  AddressProvider__factory,
 } from '../../../typechain-types'
 import {Address, ExchangeType, Provider, SwapType, InitCodeHash} from '../../../helpers'
 import {HOUR, increaseTime, parseEther, parseUnits} from '../../helpers'
 import {adjustBalance} from '../../helpers/balance'
+import {FakeContract, smock} from '@defi-wonderland/smock'
 
 const {
   WETH_ADDRESS,
@@ -71,7 +70,7 @@ describe('GasUsage:Swapper @mainnet', function () {
   let aggregator: PriceProvidersAggregator
   let chainlinkAndFallbacksOracle: ChainlinkAndFallbacksOracle
   let stableCoinProvider: StableCoinProvider
-  let addressProvider: AddressProvider
+  let addressProvider: FakeContract
 
   beforeEach(async function () {
     // Essentially we are making sure we execute setup once only
@@ -83,6 +82,9 @@ describe('GasUsage:Swapper @mainnet', function () {
     }
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer] = await ethers.getSigners()
+
+    addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
 
     weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
     dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
@@ -158,11 +160,6 @@ describe('GasUsage:Swapper @mainnet', function () {
     await aggregator.setPriceProvider(Provider.UNISWAP_V3, uniswapV3Provider.address)
     await aggregator.setPriceProvider(Provider.CHAINLINK, chainlinkProvider.address)
 
-    const addressProviderFactory = new AddressProvider__factory(deployer)
-    addressProvider = await addressProviderFactory.deploy()
-    await addressProvider._deployed()
-    await addressProvider.initialize()
-
     const chainlinkAndFallbacksOracleFactory = new ChainlinkAndFallbacksOracle__factory(deployer)
     chainlinkAndFallbacksOracle = await chainlinkAndFallbacksOracleFactory.deploy(
       MAX_DEVIATION,
@@ -175,12 +172,8 @@ describe('GasUsage:Swapper @mainnet', function () {
     stableCoinProvider = await stableCoinProviderFactory.deploy(USDC_ADDRESS, DAI_ADDRESS, STALE_PERIOD, MAX_DEVIATION)
     await stableCoinProvider.deployed()
 
-    await addressProvider.updateStableCoinProvider(stableCoinProvider.address)
-    await addressProvider.updateProvidersAggregator(aggregator.address)
-    await uniswapV2Provider.updateAddressProvider(addressProvider.address)
-    await uniswapV3Provider.updateAddressProvider(addressProvider.address)
-    await chainlinkAndFallbacksOracle.updateAddressProvider(addressProvider.address)
-    await stableCoinProvider.updateAddressProvider(addressProvider.address)
+    addressProvider.stableCoinProvider.returns(stableCoinProvider.address)
+    addressProvider.providersAggregator.returns(aggregator.address)
 
     //
     // Swapper Setup
@@ -586,8 +579,8 @@ describe('GasUsage:Swapper @mainnet', function () {
         const tx2 = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, deployer.address)
 
         // then
-        expect((await tx1.wait()).gasUsed).lte('551867')
-        expect((await tx2.wait()).gasUsed).lte('531462')
+        expect((await tx1.wait()).gasUsed).lte('545959')
+        expect((await tx2.wait()).gasUsed).lte('525554')
       })
 
       it('getBestAmountIn', async function () {

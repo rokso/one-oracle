@@ -15,6 +15,7 @@ import {
 import {Address, ExchangeType, SwapType, InitCodeHash} from '../../../helpers'
 import {parseEther, parseUnits} from '../../helpers'
 import {adjustBalance} from '../../helpers/balance'
+import {smock} from '@defi-wonderland/smock'
 
 const {
   WETH_ADDRESS,
@@ -50,6 +51,9 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
     }
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer] = await ethers.getSigners()
+
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
 
     weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
     dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
