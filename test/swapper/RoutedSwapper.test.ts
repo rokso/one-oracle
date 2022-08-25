@@ -15,6 +15,7 @@ import {
 import {parseEther, parseUnits} from '../helpers'
 import {Address, ExchangeType, SwapType, InitCodeHash} from '../../helpers'
 import {adjustBalance} from '../helpers/balance'
+import {smock} from '@defi-wonderland/smock'
 
 const {WETH_ADDRESS, DAI_ADDRESS, WBTC_ADDRESS, STETH_ADDRESS, UNISWAP_V2_FACTORY_ADDRESS} = Address.mainnet
 const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
@@ -41,6 +42,9 @@ describe('RoutedSwapper @mainnet', function () {
     }
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer, user, invalidToken] = await ethers.getSigners()
+
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
 
     const uniswapV2LikeExchangeFactory = new UniswapV2LikeExchange__factory(deployer)
 

@@ -51,6 +51,9 @@ describe('Swapper @mainnet', function () {
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer, user, invalidToken] = await ethers.getSigners()
 
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
+
     const uniswapV2LikeExchangeFactory = new UniswapV2LikeExchange__factory(deployer)
 
     uniswapV2Exchange = await uniswapV2LikeExchangeFactory.deploy(

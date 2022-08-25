@@ -11,15 +11,15 @@ const SushiswapExchange = 'SushiswapExchange'
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy} = deployments
-  const {deployer} = await getNamedAccounts()
+  const {deployer: from} = await getNamedAccounts()
 
   await deploy(SushiswapExchange, {
     contract: UniswapV2LikeExchange,
-    from: deployer,
+    from,
     log: true,
     args: [SUSHISWAP_FACTORY_ADDRESS, SUSHISWAP_INIT_CODE_HASH, WETH_ADDRESS],
   })
 }
 
-export default func
 func.tags = [SushiswapExchange]
+export default func

@@ -15,6 +15,7 @@ import {
 import {Address, ExchangeType, SwapType, InitCodeHash} from '../../../helpers'
 import {parseEther, parseUnits} from '../../helpers'
 import {adjustBalance} from '../../helpers/balance'
+import {smock} from '@defi-wonderland/smock'
 
 const {
   WETH_ADDRESS,
@@ -50,6 +51,9 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
     }
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer] = await ethers.getSigners()
+
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
 
     weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
     dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
@@ -124,7 +128,7 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
         const amountIn = parseUnits('0.001', 8)
         const tx = await swapper.getAmountOut(WBTC_ADDRESS, BTT_ADDRESS, amountIn)
         const receipt = await tx.wait()
-        expect(receipt.gasUsed).lte('194335')
+        expect(receipt.gasUsed).lte('194349')
       })
 
       it('swapExactInput', async function () {
@@ -138,8 +142,8 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
         const tx2 = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, 0, deployer.address)
 
         // then
-        expect((await tx1.wait()).gasUsed).lte('240974')
-        expect((await tx2.wait()).gasUsed).lte('220569')
+        expect((await tx1.wait()).gasUsed).lte('240983')
+        expect((await tx2.wait()).gasUsed).lte('220578')
       })
 
       it('getBestAmountIn', async function () {
@@ -194,7 +198,7 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
       const amountIn = parseUnits('0.001', 8)
       const tx = await swapper.getAmountOut(WBTC_ADDRESS, WETH_ADDRESS, amountIn)
       const receipt = await tx.wait()
-      expect(receipt.gasUsed).lte('58245')
+      expect(receipt.gasUsed).lte('58259')
     })
 
     it('swapExactInput', async function () {
@@ -208,8 +212,8 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
       const tx2 = await swapper.swapExactInput(WBTC_ADDRESS, WETH_ADDRESS, amountIn, 0, deployer.address)
 
       // then
-      expect((await tx1.wait()).gasUsed).lte('144831')
-      expect((await tx2.wait()).gasUsed).lte('144831')
+      expect((await tx1.wait()).gasUsed).lte('144840')
+      expect((await tx2.wait()).gasUsed).lte('144840')
     })
 
     it('getBestAmountIn', async function () {

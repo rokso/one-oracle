@@ -5,7 +5,7 @@ import {ethers} from 'hardhat'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {ChainlinkOracle, ChainlinkOracle__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
-import {parseEther, parseUnits} from '../helpers'
+import {parseEther} from '../helpers'
 
 const STALE_PERIOD = ethers.constants.MaxUint256
 
@@ -24,8 +24,12 @@ describe('ChainlinkOracle @mainnet', function () {
     aggregator = await smock.fake('PriceProvidersAggregator')
 
     const oracleProvider = new ChainlinkOracle__factory(deployer)
-    oracle = await oracleProvider.deploy(aggregator.address, STALE_PERIOD)
+    oracle = await oracleProvider.deploy(STALE_PERIOD)
     await oracle.deployed()
+
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    // addressProvider.governor.returns(deployer.address)
+    addressProvider.providersAggregator.returns(aggregator.address)
   })
 
   afterEach(async function () {

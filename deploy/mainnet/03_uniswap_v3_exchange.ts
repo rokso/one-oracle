@@ -9,14 +9,14 @@ const UniswapV3Exchange = 'UniswapV3Exchange'
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy} = deployments
-  const {deployer} = await getNamedAccounts()
+  const {deployer: from} = await getNamedAccounts()
 
   await deploy(UniswapV3Exchange, {
-    from: deployer,
+    from,
     log: true,
     args: [WETH_ADDRESS],
   })
 }
 
-export default func
 func.tags = [UniswapV3Exchange]
+export default func

@@ -4,7 +4,6 @@ pragma solidity 0.8.9;
 
 import "../interfaces/core/IPriceProvidersAggregator.sol";
 import "../interfaces/periphery/IOracle.sol";
-import "../features/UsingProvidersAggregator.sol";
 import "../features/UsingMaxDeviation.sol";
 import "../features/UsingStalePeriod.sol";
 
@@ -12,7 +11,7 @@ import "../features/UsingStalePeriod.sol";
  * @title Chainlink and Fallbacks oracle
  * @dev Uses chainlink as primary oracle, if it doesn't support the asset(s), get price from fallback providers
  */
-contract ChainlinkAndFallbacksOracle is IOracle, UsingProvidersAggregator, UsingMaxDeviation, UsingStalePeriod {
+contract ChainlinkAndFallbacksOracle is IOracle, UsingMaxDeviation, UsingStalePeriod {
     /// @notice The fallback provider A. It's used when Chainlink isn't available
     DataTypes.Provider public fallbackProviderA;
 
@@ -29,12 +28,11 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingProvidersAggregator, Using
     );
 
     constructor(
-        IPriceProvidersAggregator providersAggregator_,
         uint256 maxDeviation_,
         uint256 stalePeriod_,
         DataTypes.Provider fallbackProviderA_,
         DataTypes.Provider fallbackProviderB_
-    ) UsingProvidersAggregator(providersAggregator_) UsingMaxDeviation(maxDeviation_) UsingStalePeriod(stalePeriod_) {
+    ) UsingMaxDeviation(maxDeviation_) UsingStalePeriod(stalePeriod_) {
         require(fallbackProviderA_ != DataTypes.Provider.NONE, "fallback-provider-not-set");
         fallbackProviderA = fallbackProviderA_;
         fallbackProviderB = fallbackProviderB_;
@@ -213,7 +211,7 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingProvidersAggregator, Using
         view
         returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
     {
-        try providersAggregator.getPriceInUsd(provider_, token_) returns (
+        try addressProvider.providersAggregator().getPriceInUsd(provider_, token_) returns (
             uint256 __priceInUsd,
             uint256 __lastUpdatedAt
         ) {
@@ -232,7 +230,7 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingProvidersAggregator, Using
         address tokenOut_,
         uint256 amountIn_
     ) private view returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
-        try providersAggregator.quote(provider_, tokenIn_, tokenOut_, amountIn_) returns (
+        try addressProvider.providersAggregator().quote(provider_, tokenIn_, tokenOut_, amountIn_) returns (
             uint256 __amountOut,
             uint256 __lastUpdatedAt
         ) {
@@ -250,7 +248,7 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingProvidersAggregator, Using
         address token_,
         uint256 amountIn_
     ) private view returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
-        try providersAggregator.quoteTokenToUsd(provider_, token_, amountIn_) returns (
+        try addressProvider.providersAggregator().quoteTokenToUsd(provider_, token_, amountIn_) returns (
             uint256 __amountOut,
             uint256 __lastUpdatedAt
         ) {
@@ -268,7 +266,7 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingProvidersAggregator, Using
         address token_,
         uint256 amountIn_
     ) private view returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
-        try providersAggregator.quoteUsdToToken(provider_, token_, amountIn_) returns (
+        try addressProvider.providersAggregator().quoteUsdToToken(provider_, token_, amountIn_) returns (
             uint256 __amountOut,
             uint256 __lastUpdatedAt
         ) {

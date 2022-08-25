@@ -17,27 +17,28 @@ const {WETH_ADDRESS, DAI_ADDRESS} = Address.mainnet
 describe('ChainlinkAndFallbacksOracle @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
-  let governor: SignerWithAddress
+  let alice: SignerWithAddress
   let aggregator: FakeContract
   let chainlinkAndFallbacksOracle: ChainlinkAndFallbacksOracle
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer, governor] = await ethers.getSigners()
+    ;[deployer, alice] = await ethers.getSigners()
 
     aggregator = await smock.fake('PriceProvidersAggregator')
 
     const chainlinkAndFallbacksOracleFactory = new ChainlinkAndFallbacksOracle__factory(deployer)
     chainlinkAndFallbacksOracle = await chainlinkAndFallbacksOracleFactory.deploy(
-      aggregator.address,
       MAX_DEVIATION,
       STALE_PERIOD,
       Provider.UNISWAP_V3,
       Provider.UNISWAP_V2
     )
     await chainlinkAndFallbacksOracle.deployed()
-    await chainlinkAndFallbacksOracle.transferGovernorship(governor.address)
-    await chainlinkAndFallbacksOracle.connect(governor).acceptGovernorship()
+
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
+    addressProvider.providersAggregator.returns(aggregator.address)
   })
 
   afterEach(async function () {
@@ -46,14 +47,14 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
 
   describe('updateFallbackProviders', function () {
     it('should revert if not governor', async function () {
-      const tx = chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V3, Provider.UNISWAP_V2)
+      const tx = chainlinkAndFallbacksOracle
+        .connect(alice)
+        .updateFallbackProviders(Provider.UNISWAP_V3, Provider.UNISWAP_V2)
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should revert if setting fallback provider A as null', async function () {
-      const tx = chainlinkAndFallbacksOracle
-        .connect(governor)
-        .updateFallbackProviders(Provider.NONE, Provider.UNISWAP_V2)
+      const tx = chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.NONE, Provider.UNISWAP_V2)
       await expect(tx).revertedWith('fallback-a-is-null')
     })
 
@@ -66,9 +67,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
       expect(before).deep.eq([Provider.UNISWAP_V3, Provider.UNISWAP_V2])
 
       // when
-      await chainlinkAndFallbacksOracle
-        .connect(governor)
-        .updateFallbackProviders(Provider.UNISWAP_V2, Provider.UNISWAP_V3)
+      await chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V2, Provider.UNISWAP_V3)
 
       // then
       const after = await Promise.all([
@@ -87,7 +86,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
       expect(before).deep.eq([Provider.UNISWAP_V3, Provider.UNISWAP_V2])
 
       // when
-      await chainlinkAndFallbacksOracle.connect(governor).updateFallbackProviders(Provider.UNISWAP_V2, Provider.NONE)
+      await chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V2, Provider.NONE)
 
       // then
       const after = await Promise.all([
@@ -127,9 +126,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         describe('when fallback B is not set', function () {
           it('should get price from fallback A', async function () {
             // given
-            await chainlinkAndFallbacksOracle
-              .connect(governor)
-              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            await chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
             const v3PriceInUsd = parseEther('3,000')
             aggregator['getPriceInUsd(uint8,address)'].returns((args: [number, string]) => {
               const [provider] = args
@@ -210,9 +207,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         describe('when fallback B is not set', function () {
           it('should revert', async function () {
             // given
-            await chainlinkAndFallbacksOracle
-              .connect(governor)
-              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            await chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
             aggregator['getPriceInUsd(uint8,address)'].returns((args: [number, string]) => {
               const [provider] = args
               if (provider === Provider.CHAINLINK) return [0, 0]
@@ -296,9 +291,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         describe('when fallback B is not set', function () {
           it('should get price from fallback A', async function () {
             // given
-            await chainlinkAndFallbacksOracle
-              .connect(governor)
-              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            await chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
             const v3AmountOut = parseEther('3,000')
             aggregator['quote(uint8,address,address,uint256)'].returns((args: [number, string, string, BigNumber]) => {
               const [provider] = args
@@ -383,9 +376,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         describe('when fallback B is not set', function () {
           it('should revert', async function () {
             // given
-            await chainlinkAndFallbacksOracle
-              .connect(governor)
-              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            await chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
             aggregator['quote(uint8,address,address,uint256)'].returns((args: [number, string, string, BigNumber]) => {
               const [provider] = args
               if (provider === Provider.CHAINLINK) return [0, 0]
@@ -469,9 +460,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         describe('when fallback B is not set', function () {
           it('should get price from fallback A', async function () {
             // given
-            await chainlinkAndFallbacksOracle
-              .connect(governor)
-              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            await chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
             const v3AmountOut = parseEther('3,000')
             aggregator['quoteTokenToUsd(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
               const [provider] = args
@@ -552,9 +541,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         describe('when fallback B is not set', function () {
           it('should revert', async function () {
             // given
-            await chainlinkAndFallbacksOracle
-              .connect(governor)
-              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            await chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
             aggregator['quoteTokenToUsd(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
               const [provider] = args
               if (provider === Provider.CHAINLINK) return [0, 0]
@@ -638,9 +625,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         describe('when fallback B is not set', function () {
           it('should get price from fallback A', async function () {
             // given
-            await chainlinkAndFallbacksOracle
-              .connect(governor)
-              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            await chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
             const v3AmountOut = parseEther('1')
             aggregator['quoteUsdToToken(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
               const [provider] = args
@@ -721,9 +706,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         describe('when fallback B is not set', function () {
           it('should revert', async function () {
             // given
-            await chainlinkAndFallbacksOracle
-              .connect(governor)
-              .updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
+            await chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
             aggregator['quoteUsdToToken(uint8,address,uint256)'].returns((args: [number, string, BigNumber]) => {
               const [provider] = args
               if (provider === Provider.CHAINLINK) return [0, 0]

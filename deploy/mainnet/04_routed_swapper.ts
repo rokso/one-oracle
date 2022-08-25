@@ -1,21 +1,19 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
 import {ExchangeType} from '../../helpers'
-import {ethers} from 'hardhat'
 
 const UniswapV2Exchange = 'UniswapV2Exchange'
 const SushiswapExchange = 'SushiswapExchange'
 const UniswapV3Exchange = 'UniswapV3Exchange'
-
 const RoutedSwapper = 'RoutedSwapper'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy, get, read, execute} = deployments
-  const {deployer} = await getNamedAccounts()
+  const {deployer: from} = await getNamedAccounts()
 
   await deploy(RoutedSwapper, {
-    from: deployer,
+    from,
     log: true,
     args: [],
   })
@@ -25,36 +23,18 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {address: uniswapV3ExchangeAddress} = await get(UniswapV3Exchange)
 
   if ((await read(RoutedSwapper, 'addressOf', [ExchangeType.UNISWAP_V2])) !== sushiswapExchangeAddress) {
-    await execute(
-      RoutedSwapper,
-      {from: deployer, log: true},
-      'setExchange',
-      ExchangeType.UNISWAP_V2,
-      uniswapV2ExchangeAddress
-    )
+    await execute(RoutedSwapper, {from, log: true}, 'setExchange', ExchangeType.UNISWAP_V2, uniswapV2ExchangeAddress)
   }
 
   if ((await read(RoutedSwapper, 'addressOf', [ExchangeType.SUSHISWAP])) !== sushiswapExchangeAddress) {
-    await execute(
-      RoutedSwapper,
-      {from: deployer, log: true},
-      'setExchange',
-      ExchangeType.SUSHISWAP,
-      sushiswapExchangeAddress
-    )
+    await execute(RoutedSwapper, {from, log: true}, 'setExchange', ExchangeType.SUSHISWAP, sushiswapExchangeAddress)
   }
 
   if ((await read(RoutedSwapper, 'addressOf', [ExchangeType.UNISWAP_V3])) !== uniswapV3ExchangeAddress) {
-    await execute(
-      RoutedSwapper,
-      {from: deployer, log: true},
-      'setExchange',
-      ExchangeType.UNISWAP_V3,
-      uniswapV3ExchangeAddress
-    )
+    await execute(RoutedSwapper, {from, log: true}, 'setExchange', ExchangeType.UNISWAP_V3, uniswapV3ExchangeAddress)
   }
 }
 
-export default func
 func.dependencies = [UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange]
 func.tags = [RoutedSwapper]
+export default func

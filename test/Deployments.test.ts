@@ -17,9 +17,11 @@ import {
   VspMainnetOracle,
   ChainlinkOracle__factory,
   ChainlinkOracle,
+  AddressProvider__factory,
+  AddressProvider,
 } from '../typechain-types'
 import {Address, SwapType, Provider, ExchangeType} from '../helpers'
-import {increaseTime, parseEther, toUSD} from './helpers'
+import {impersonateAccount, increaseTime, parseEther, resetFork, toUSD} from './helpers'
 import {IERC20} from '../typechain-types/@openzeppelin/contracts/token/ERC20'
 import {IERC20__factory} from '../typechain-types/factories/@openzeppelin/contracts/token/ERC20'
 import {adjustBalance} from './helpers/balance'
@@ -28,9 +30,14 @@ describe('Deployments ', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
 
+  before(async function () {
+    // Reset fork to clean up fake `AddressProvider` contract from other test suites
+    await resetFork()
+  })
+
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer] = await ethers.getSigners()
+    deployer = await impersonateAccount(Address.DEPLOYER)
   })
 
   afterEach(async function () {
@@ -38,6 +45,7 @@ describe('Deployments ', function () {
   })
 
   describe('@avalanche', function () {
+    let addressProvider: AddressProvider
     let chainlinkAvalanchePriceProvider: ChainlinkAvalanchePriceProvider
     let priceProvidersAggregator: PriceProvidersAggregator
     let chainlinkOracle: ChainlinkOracle
@@ -49,15 +57,21 @@ describe('Deployments ', function () {
       hre.network.deploy = ['deploy/avalanche']
 
       // eslint-disable-next-line no-shadow
-      const {ChainlinkAvalanchePriceProvider, PriceProvidersAggregator, ChainlinkOracle} = await deployments.fixture()
+      const {AddressProvider, ChainlinkAvalanchePriceProvider, PriceProvidersAggregator, ChainlinkOracle} =
+        await deployments.fixture()
 
+      addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
       chainlinkAvalanchePriceProvider = ChainlinkAvalanchePriceProvider__factory.connect(
         ChainlinkAvalanchePriceProvider.address,
         deployer
       )
-
       priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
       chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
+    })
+
+    it('AddressProvider', async function () {
+      expect(addressProvider.address).eq(Address.ADDRESS_PROVIDER)
+      expect(await addressProvider.governor()).eq(deployer.address)
     })
 
     it('ChainlinkAvalanchePriceProvider', async function () {
@@ -77,6 +91,7 @@ describe('Deployments ', function () {
   })
 
   describe('@mainnet', function () {
+    let addressProvider: AddressProvider
     let uniswapV2Exchange: UniswapV2LikeExchange
     let sushiswapExchange: UniswapV2LikeExchange
     let uniswapV3Exchange: UniswapV3Exchange
@@ -92,9 +107,10 @@ describe('Deployments ', function () {
       hre.network.deploy = ['deploy/mainnet']
 
       // eslint-disable-next-line no-shadow
-      const {UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange, RoutedSwapper, VspOracle} =
+      const {AddressProvider, UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange, RoutedSwapper, VspOracle} =
         await deployments.fixture()
 
+      addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
       uniswapV2Exchange = UniswapV2LikeExchange__factory.connect(UniswapV2Exchange.address, deployer)
       sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiswapExchange.address, deployer)
       uniswapV3Exchange = UniswapV3Exchange__factory.connect(UniswapV3Exchange.address, deployer)
@@ -104,6 +120,11 @@ describe('Deployments ', function () {
       vspOracle = VspMainnetOracle__factory.connect(VspOracle.address, deployer)
 
       await adjustBalance(WETH_ADDRESS, deployer.address, parseEther('1000'))
+    })
+
+    it('AddressProvider', async function () {
+      expect(addressProvider.address).eq(Address.ADDRESS_PROVIDER)
+      expect(await addressProvider.governor()).eq(deployer.address)
     })
 
     it('UniswapV2Exchange', async function () {
@@ -163,6 +184,44 @@ describe('Deployments ', function () {
 
       // then
       expect(price).closeTo(parseEther('1.88'), parseEther('0.01'))
+    })
+  })
+
+  describe('@arbitrum', function () {
+    let addressProvider: AddressProvider
+
+    beforeEach(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/arbitrum']
+
+      // eslint-disable-next-line no-shadow
+      const {AddressProvider} = await deployments.fixture()
+
+      addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
+    })
+
+    it('AddressProvider', async function () {
+      expect(addressProvider.address).eq(Address.ADDRESS_PROVIDER)
+      expect(await addressProvider.governor()).eq(deployer.address)
+    })
+  })
+
+  describe('@polygon', function () {
+    let addressProvider: AddressProvider
+
+    beforeEach(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/polygon']
+
+      // eslint-disable-next-line no-shadow
+      const {AddressProvider} = await deployments.fixture()
+
+      addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
+    })
+
+    it('AddressProvider', async function () {
+      expect(addressProvider.address).eq(Address.ADDRESS_PROVIDER)
+      expect(await addressProvider.governor()).eq(deployer.address)
     })
   })
 })

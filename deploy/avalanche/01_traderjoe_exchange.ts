@@ -11,15 +11,15 @@ const TraderJoeExchange = 'TraderJoeExchange'
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy} = deployments
-  const {deployer} = await getNamedAccounts()
+  const {deployer: from} = await getNamedAccounts()
 
   await deploy(TraderJoeExchange, {
     contract: UniswapV2LikeExchange,
-    from: deployer,
+    from,
     log: true,
     args: [TRADERJOE_FACTORY_ADDRESS, TRADER_JOE_INIT_CODE_HASH, WAVAX_ADDRESS],
   })
 }
 
-export default func
 func.tags = [TraderJoeExchange]
+export default func

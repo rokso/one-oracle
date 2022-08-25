@@ -1,7 +1,9 @@
 /* eslint-disable camelcase */
+import {smock} from '@defi-wonderland/smock'
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
+import {Address} from '../../helpers'
 import {UsingMaxDeviationMock, UsingMaxDeviationMock__factory} from '../../typechain-types'
 
 import {parseEther} from '../helpers'
@@ -11,18 +13,19 @@ const MAX_DEVIATION = parseEther('0.01') // 1%
 describe('UsingMaxDeviation @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
-  let governor: SignerWithAddress
+  let alice: SignerWithAddress
   let usingMaxDeviation: UsingMaxDeviationMock
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer, governor] = await ethers.getSigners()
+    ;[deployer, alice] = await ethers.getSigners()
+
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
 
     const usingMaxDeviationFactory = new UsingMaxDeviationMock__factory(deployer)
     usingMaxDeviation = await usingMaxDeviationFactory.deploy(MAX_DEVIATION)
     await usingMaxDeviation.deployed()
-    await usingMaxDeviation.transferGovernorship(governor.address)
-    await usingMaxDeviation.connect(governor).acceptGovernorship()
   })
 
   afterEach(async function () {
@@ -31,7 +34,7 @@ describe('UsingMaxDeviation @mainnet', function () {
 
   describe('updateMaxDeviation', function () {
     it('should revert if not governor', async function () {
-      const tx = usingMaxDeviation.updateMaxDeviation(0)
+      const tx = usingMaxDeviation.connect(alice).updateMaxDeviation(0)
       await expect(tx).revertedWith('not-governor')
     })
 
@@ -42,7 +45,7 @@ describe('UsingMaxDeviation @mainnet', function () {
 
       // when
       const maxDeviation = MAX_DEVIATION.mul(2)
-      await usingMaxDeviation.connect(governor).updateMaxDeviation(maxDeviation)
+      await usingMaxDeviation.updateMaxDeviation(maxDeviation)
 
       // then
       const after = await usingMaxDeviation.maxDeviation()

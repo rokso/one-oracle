@@ -15,6 +15,7 @@ import {
 } from '../../typechain-types'
 import {Address, Provider} from '../../helpers'
 import {parseEther, parseUnits, HOUR} from '../helpers'
+import {smock} from '@defi-wonderland/smock'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
@@ -25,7 +26,7 @@ const {WETH_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS} = Address.mainnet
 describe('PriceProvidersAggregator @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
-  let governor: SignerWithAddress
+  let alice: SignerWithAddress
   let usdc: IERC20
   let weth: IERC20
   let wbtc: IERC20
@@ -35,10 +36,13 @@ describe('PriceProvidersAggregator @mainnet', function () {
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer, governor] = await ethers.getSigners()
+    ;[deployer, alice] = await ethers.getSigners()
     weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
     wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
     usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
+
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
 
     const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
     const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
@@ -48,12 +52,9 @@ describe('PriceProvidersAggregator @mainnet', function () {
     uniswapV3Provider = await uniswapV3ProviderFactory.deploy(
       crossPoolOracle.address,
       DEFAULT_TWAP_PERIOD,
-      DEFAULT_POOLS_FEE,
-      ethers.constants.AddressZero // stableCoinProvider
+      DEFAULT_POOLS_FEE
     )
     await uniswapV3Provider.deployed()
-    await uniswapV3Provider.transferGovernorship(governor.address)
-    await uniswapV3Provider.connect(governor).acceptGovernorship()
 
     const chainlinkProviderFactory = new ChainlinkMainnetPriceProvider__factory(deployer)
     chainlinkProvider = await chainlinkProviderFactory.deploy()
@@ -65,9 +66,6 @@ describe('PriceProvidersAggregator @mainnet', function () {
 
     await aggregator.setPriceProvider(Provider.UNISWAP_V3, uniswapV3Provider.address)
     await aggregator.setPriceProvider(Provider.CHAINLINK, chainlinkProvider.address)
-
-    await aggregator.transferGovernorship(governor.address)
-    await aggregator.connect(governor).acceptGovernorship()
   })
 
   afterEach(async function () {
@@ -76,7 +74,7 @@ describe('PriceProvidersAggregator @mainnet', function () {
 
   describe('setPriceProvider', function () {
     it('should revert if not governor', async function () {
-      const tx = aggregator.setPriceProvider(Provider.UNISWAP_V3, uniswapV3Provider.address)
+      const tx = aggregator.connect(alice).setPriceProvider(Provider.UNISWAP_V3, uniswapV3Provider.address)
       await expect(tx).revertedWith('not-governor')
     })
 
@@ -86,11 +84,11 @@ describe('PriceProvidersAggregator @mainnet', function () {
       expect(before).eq(uniswapV3Provider.address)
 
       // when
-      await aggregator.connect(governor).setPriceProvider(Provider.UNISWAP_V3, governor.address)
+      await aggregator.setPriceProvider(Provider.UNISWAP_V3, alice.address)
 
       // then
       const after = await aggregator.priceProviders(Provider.UNISWAP_V3)
-      expect(after).eq(governor.address)
+      expect(after).eq(alice.address)
     })
   })
 
