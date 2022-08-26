@@ -1,0 +1,33 @@
+{
+  "version": "1.0.1",
+  "networks": {
+    "avalanche": {
+      "ATokenOracle": "0x482841410B613b46752C67bc42c51BaF043EFa05",
+      "AddressProvider": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
+      "AddressProvider_Implementation": "0x7B970C578B354F0F816Ec0fEf3b236096C11E156",
+      "AddressProvider_Proxy": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
+      "BTCPeggedTokenOracle": "0x47A584a5C10A3BC39b61977411f976f5787663d4",
+      "ChainlinkAvalanchePriceProvider": "0xf51aCe69A082eE132c54aBd6eb4b304E20383e93",
+      "ChainlinkOracle": "0xA607D7aD77df51E57A8A991538116Dd6D555db38",
+      "CurveLpTokenOracle": "0x757d531F2Eb1148f003853b51e3F6971e260BE72",
+      "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf",
+      "MasterOracle": "0x1791c62Df7683c11E73b5989487646C7Cf64467d",
+      "PriceProvidersAggregator": "0x13f1E9BfBf9E9E640813721D54113AFa5eb2d0CC",
+      "RoutedSwapper": "0xA2Fd3Fe1E89c64bC5be11ae8Bc7Dff88D19B65e9",
+      "TraderJoeExchange": "0xB9Aafc7A5dEEd4C705Ce622dB91db30366C010ec"
+    },
+    "mainnet": {
+      "ChainlinkPriceProvider": "0x4661407fC224E5432D7f528a20EF8906E453A8f3",
+      "PriceProvidersAggregator": "0x32a21eC8ee93971D4b4093C0895FD841c7169a23",
+      "RoutedSwapper": "0x8f156189A3CD28dFc8FB7BbbAce58F98F09c0bB3",
+      "StableCoinProvider": "0xE55744eBb196D0E4dDeA70204142eaF517EF005A",
+      "SushiswapExchange": "0x04Db2DA16318e616d28f0DA7AA59EEb12AcEc72c",
+      "SushiswapPriceProvider": "0x790E5f103Ab69122FC5D9A3d5216Fad11FE36ACb",
+      "Swapper": "0xC9c4bfB5Fe595Ab59B21fD13eA328C332CBf2fe4",
+      "UniswapV2Exchange": "0x951F5d2593e0A678C1192fAB4fA3DBBF867D2C1D",
+      "UniswapV2PriceProvider": "0x6e3ac56a1df60ada3b5563c3a609222045245365",
+      "UniswapV3Exchange": "0xF34F29E4693703b5BeCfb6B69F2A15cEcC4F76fF",
+      "VspOracle": "0xc9FfA23308D02DC9CfFE955FccE5ffD117A03B46"
+    }
+  }
+}
