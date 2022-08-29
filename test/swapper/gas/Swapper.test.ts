@@ -579,8 +579,8 @@ describe('GasUsage:Swapper @mainnet', function () {
         const tx2 = await swapper.swapExactInput(WBTC_ADDRESS, BTT_ADDRESS, amountIn, deployer.address)
 
         // then
-        expect((await tx1.wait()).gasUsed).lte('545959')
-        expect((await tx2.wait()).gasUsed).lte('525554')
+        expect((await tx1.wait()).gasUsed).lte('548616')
+        expect((await tx2.wait()).gasUsed).lte('528211')
       })
 
       it('getBestAmountIn', async function () {

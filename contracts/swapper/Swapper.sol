@@ -324,8 +324,15 @@ contract Swapper is ISwapper, Governable {
         IExchange _exchange,
         bytes memory _path
     ) private returns (uint256 _amountOut) {
+        uint256 _balanceBefore = IERC20(tokenIn_).balanceOf(address(_exchange));
         IERC20(tokenIn_).safeTransferFrom(msg.sender, address(_exchange), amountIn_);
-        _amountOut = _exchange.swapExactInput(_path, amountIn_, _amountOutMin, receiver_);
+        _amountOut = _exchange.swapExactInput(
+            _path,
+            // amountIn will be balanceNow - balanceBefore for fee-on-transfer tokens
+            IERC20(tokenIn_).balanceOf(address(_exchange)) - _balanceBefore,
+            _amountOutMin,
+            receiver_
+        );
         emit SwapExactInput(_exchange, _path, tokenIn_, tokenOut_, amountIn_, _amountOut);
     }
 
