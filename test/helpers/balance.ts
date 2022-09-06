@@ -16,6 +16,7 @@ const slots = {
   [Address.avalanche.USDC_ADDRESS]: 0,
   [Address.avalanche.WBTC_ADDRESS]: 0,
   [Address.bsc.UMB_ADDRESS]: 1,
+  [Address.polygon.WMATIC_ADDRESS]: 3,
 }
 
 // Some tokens, specially rebase tokens, uses dynamic storage or multi storage hence
