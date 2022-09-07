@@ -11,9 +11,10 @@
       "ChainlinkOracle": "0xA607D7aD77df51E57A8A991538116Dd6D555db38",
       "CurveLpTokenOracle": "0x757d531F2Eb1148f003853b51e3F6971e260BE72",
       "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf",
-      "MasterOracle": "0x1791c62Df7683c11E73b5989487646C7Cf64467d",
+      "MasterOracle": "0xe42e893353448143f36B59E0122fA8F58346611A",
       "PriceProvidersAggregator": "0x13f1E9BfBf9E9E640813721D54113AFa5eb2d0CC",
       "RoutedSwapper": "0xA2Fd3Fe1E89c64bC5be11ae8Bc7Dff88D19B65e9",
+      "SynthUsdTokenOracle": "0x5Db1C3B4E0D31B277a6a292B0365162A1100D527",
       "TraderJoeExchange": "0xB9Aafc7A5dEEd4C705Ce622dB91db30366C010ec"
     },
     "mainnet": {
