@@ -23,6 +23,8 @@ import {
   ChainlinkOracle__factory,
   ChainlinkOracle,
   PriceProvidersAggregator__factory,
+  SynthUsdTokenOracle__factory,
+  ChainlinkAvalanchePriceProvider,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, timestampFromLatestBlock, toUSD} from '../helpers'
@@ -302,6 +304,7 @@ describe('MasterOracle', function () {
   })
 
   describe('MasterOracle @avalanche', function () {
+    let chainlinkPriceProvider: ChainlinkAvalanchePriceProvider
     let chainlinkOracle: ChainlinkOracle
 
     const {
@@ -319,7 +322,7 @@ describe('MasterOracle', function () {
 
     beforeEach(async function () {
       const chainlinkPriceProviderFactory = new ChainlinkAvalanchePriceProvider__factory(deployer)
-      const chainlinkPriceProvider = await chainlinkPriceProviderFactory.deploy()
+      chainlinkPriceProvider = await chainlinkPriceProviderFactory.deploy()
       await chainlinkPriceProvider.deployed()
 
       const aggregatorProviderFactory = new PriceProvidersAggregator__factory(deployer)
@@ -350,11 +353,9 @@ describe('MasterOracle', function () {
     })
 
     describe('Curve LP Tokens', function () {
-      let curveLpTokenOracle: CurveLpTokenOracle
-
       beforeEach(async function () {
         const curveLpTokenOracleFactory = new CurveLpTokenOracle__factory(deployer)
-        curveLpTokenOracle = await curveLpTokenOracleFactory.deploy()
+        const curveLpTokenOracle = await curveLpTokenOracleFactory.deploy()
         await curveLpTokenOracle.deployed()
 
         const aTokenOracleFactory = new ATokenOracle__factory(deployer)
@@ -393,6 +394,127 @@ describe('MasterOracle', function () {
 
         // then
         expect(price).closeTo(toUSD('1.016'), toUSD('0.001'))
+      })
+    })
+
+    describe('Synth Tokens', function () {
+      const {
+        CHAINLINK_USDC_USD_AGGREGATOR,
+        CHAINLINK_AVAX_USD_AGGREGATOR,
+        CHAINLINK_ETH_USD_AGGREGATOR,
+        CHAINLINK_DAI_USD_AGGREGATOR,
+        CHAINLINK_USDT_USD_AGGREGATOR,
+        CHAINLINK_UNI_USD_AGGREGATOR,
+        CHAINLINK_CRV_USD_AGGREGATOR,
+        CHAINLINK_AAVE_USD_AGGREGATOR,
+        MSD_USDC,
+        MSD_WAVAX,
+        MSD_WETH,
+        MSD_DAI,
+        MSD_USDT,
+        MS_BTC,
+        MS_USD,
+        MS_UNI,
+        MS_CRV,
+        MS_AAVE,
+      } = Address.avalanche
+
+      beforeEach(async function () {
+        const msUsdTokenOracleFactory = new SynthUsdTokenOracle__factory(deployer)
+        const msUsdTokenOracle = await msUsdTokenOracleFactory.deploy()
+        await msUsdTokenOracle.deployed()
+
+        await chainlinkPriceProvider.updateAggregator(MSD_USDC, CHAINLINK_USDC_USD_AGGREGATOR)
+        await chainlinkPriceProvider.updateAggregator(MSD_WAVAX, CHAINLINK_AVAX_USD_AGGREGATOR)
+        await chainlinkPriceProvider.updateAggregator(MSD_WETH, CHAINLINK_ETH_USD_AGGREGATOR)
+        await chainlinkPriceProvider.updateAggregator(MSD_DAI, CHAINLINK_DAI_USD_AGGREGATOR)
+        await chainlinkPriceProvider.updateAggregator(MSD_USDT, CHAINLINK_USDT_USD_AGGREGATOR)
+        await chainlinkPriceProvider.updateAggregator(MS_BTC, CHAINLINK_BTC_USD_AGGREGATOR)
+        await chainlinkPriceProvider.updateAggregator(MS_UNI, CHAINLINK_UNI_USD_AGGREGATOR)
+        await chainlinkPriceProvider.updateAggregator(MS_CRV, CHAINLINK_CRV_USD_AGGREGATOR)
+        await chainlinkPriceProvider.updateAggregator(MS_AAVE, CHAINLINK_AAVE_USD_AGGREGATOR)
+
+        await masterOracle.updateTokenOracle(MS_USD, msUsdTokenOracle.address)
+      })
+
+      it('should get price for msdUSDC', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(MSD_USDC)
+
+        // then
+        expect(price).closeTo(toUSD('1'), toUSD('0.01'))
+      })
+
+      it('should get price for msdWAVAX', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(MSD_WAVAX)
+
+        // then
+        expect(price).closeTo(toUSD('86.37'), toUSD('0.01'))
+      })
+
+      it('should get price for msdWETH', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(MSD_WETH)
+
+        // then
+        expect(price).closeTo(toUSD('3,251.60'), toUSD('0.01'))
+      })
+
+      it('should get price for msdDAI', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(MSD_DAI)
+
+        // then
+        expect(price).closeTo(toUSD('1'), toUSD('0.001'))
+      })
+
+      it('should get price for msdUSDT', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(MSD_USDT)
+
+        // then
+        expect(price).closeTo(toUSD('1'), toUSD('0.001'))
+      })
+
+      it('should get price for msBTC', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(MS_BTC)
+
+        // then
+        expect(price).closeTo(toUSD('42,794.64'), toUSD('0.01'))
+      })
+
+      it('should get price for msUSD', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(MS_USD)
+
+        // then
+        expect(price).eq(toUSD('1'))
+      })
+
+      it('should get price for msUNI', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(MS_UNI)
+
+        // then
+        expect(price).closeTo(toUSD('9.89'), toUSD('0.01'))
+      })
+
+      it('should get price for msCRV', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(MS_CRV)
+
+        // then
+        expect(price).closeTo(toUSD('2.41'), toUSD('0.01'))
+      })
+
+      it('should get price for msAAVE', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(MS_AAVE)
+
+        // then
+        expect(price).closeTo(toUSD('190.75'), toUSD('0.01'))
       })
     })
   })

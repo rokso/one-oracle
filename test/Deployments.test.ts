@@ -19,6 +19,8 @@ import {
   ChainlinkOracle,
   AddressProvider__factory,
   AddressProvider,
+  SynthUsdTokenOracle__factory,
+  SynthUsdTokenOracle,
 } from '../typechain-types'
 import {Address, SwapType, Provider, ExchangeType} from '../helpers'
 import {impersonateAccount, increaseTime, parseEther, resetFork, toUSD} from './helpers'
@@ -49,6 +51,7 @@ describe('Deployments ', function () {
     let chainlinkAvalanchePriceProvider: ChainlinkAvalanchePriceProvider
     let priceProvidersAggregator: PriceProvidersAggregator
     let chainlinkOracle: ChainlinkOracle
+    let msUsdOracle: SynthUsdTokenOracle
 
     const {WETH_ADDRESS} = Address.avalanche
 
@@ -57,8 +60,13 @@ describe('Deployments ', function () {
       hre.network.deploy = ['deploy/avalanche']
 
       // eslint-disable-next-line no-shadow
-      const {AddressProvider, ChainlinkAvalanchePriceProvider, PriceProvidersAggregator, ChainlinkOracle} =
-        await deployments.fixture()
+      const {
+        AddressProvider,
+        ChainlinkAvalanchePriceProvider,
+        PriceProvidersAggregator,
+        ChainlinkOracle,
+        SynthUsdTokenOracle,
+      } = await deployments.fixture()
 
       addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
       chainlinkAvalanchePriceProvider = ChainlinkAvalanchePriceProvider__factory.connect(
@@ -67,6 +75,7 @@ describe('Deployments ', function () {
       )
       priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
       chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
+      msUsdOracle = SynthUsdTokenOracle__factory.connect(SynthUsdTokenOracle.address, deployer)
     })
 
     it('AddressProvider', async function () {
@@ -87,6 +96,12 @@ describe('Deployments ', function () {
     it('ChainlinkOracle', async function () {
       const priceInUsd = await chainlinkOracle.getPriceInUsd(WETH_ADDRESS)
       expect(priceInUsd).eq(toUSD('3,251.6014'))
+    })
+
+    it('SynthUsdTokenOracle', async function () {
+      // Should always return 1 USD no matter the address given
+      const priceInUsd = await msUsdOracle.getPriceInUsd(ethers.constants.AddressZero)
+      expect(priceInUsd).eq(toUSD('1'))
     })
   })
 

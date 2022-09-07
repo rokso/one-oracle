@@ -36,12 +36,14 @@ contract MasterOracle is IOracle, Governable {
     function getPriceInUsd(address token_) public view override returns (uint256 _priceInUsd) {
         IOracle _oracle = oracles[token_];
 
-        if (address(_oracle) == address(0)) {
-            return defaultOracle.getPriceInUsd(token_);
+        if (address(_oracle) != address(0)) {
+            _priceInUsd = _oracle.getPriceInUsd(token_);
+        } else if (address(defaultOracle) != address(0)) {
+            _priceInUsd = defaultOracle.getPriceInUsd(token_);
+        } else {
+            revert("token-without-oracle");
         }
 
-        _priceInUsd = _oracle.getPriceInUsd(token_);
-        // Note: Assuming that the default oracle already do this check
         require(_priceInUsd > 0, "invalid-token-price");
     }
 
@@ -64,8 +66,8 @@ contract MasterOracle is IOracle, Governable {
         _amountOut = (amountIn_ * 10**IERC20Metadata(token_).decimals()) / getPriceInUsd(token_);
     }
 
-    /// @notice Set custom oracle for a token_
-    function updateTokenOracle(address token_, IOracle oracle_) external onlyGovernor {
+    /// @notice Set custom oracle for a token
+    function _updateTokenOracle(address token_, IOracle oracle_) private {
         oracles[token_] = oracle_;
         emit TokenOracleUpdated(token_, oracle_);
     }
@@ -74,5 +76,25 @@ contract MasterOracle is IOracle, Governable {
     function updateDefaultOracle(IOracle defaultOracle_) external onlyGovernor {
         defaultOracle = defaultOracle_;
         emit DefaultOracleUpdated(defaultOracle_);
+    }
+
+    /// @notice Set custom oracle for a token
+    function updateTokenOracle(address token_, IOracle oracle_) external onlyGovernor {
+        _updateTokenOracle(token_, oracle_);
+    }
+
+    /**
+     * @notice Set custom oracles for a set of tokens
+     * @dev We allow null address inside of the `oracles_` array in order to turn off oracle for a given asset
+     */
+    function updateTokenOracles(address[] calldata tokens_, IOracle[] calldata oracles_) external onlyGovernor {
+        uint256 _tokensLength = tokens_.length;
+        require(_tokensLength > 0 && _tokensLength == oracles_.length, "invalid-arrays-length");
+
+        for (uint256 i; i < _tokensLength; ++i) {
+            address _token = tokens_[i];
+            require(_token != address(0), "a-token-has-null-address");
+            _updateTokenOracle(_token, oracles_[i]);
+        }
     }
 }
