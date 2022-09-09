@@ -1,0 +1,75 @@
+{
+  "address": "0x5Db1C3B4E0D31B277a6a292B0365162A1100D527",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "getPriceInUsd",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_priceInUsd",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xda92bef6ee50e670c3f78d4ea8d7fdb23f82db6efb7674ae0832e59ae6aad78f",
+  "receipt": {
+    "to": null,
+    "from": "0x76d266DFD3754f090488ae12F6Bd115cD7E77eBD",
+    "contractAddress": "0x5Db1C3B4E0D31B277a6a292B0365162A1100D527",
+    "transactionIndex": 0,
+    "gasUsed": "96609",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x134904fdec1b298f1e1e5adcf59872d6cbd37d60eb7aab364a61e85dc3c3dcdb",
+    "transactionHash": "0xda92bef6ee50e670c3f78d4ea8d7fdb23f82db6efb7674ae0832e59ae6aad78f",
+    "logs": [],
+    "blockNumber": 19646827,
+    "cumulativeGasUsed": "96609",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "091746a64f98f13bd1b6d470f6cd637e",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.9+commit.e5eed63a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"getPriceInUsd\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_priceInUsd\",\"type\":\"uint256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"This oracle shouldn't be used for stable coins! Its purpose is for a specific use case that's the Synth USD token.\",\"kind\":\"dev\",\"methods\":{\"getPriceInUsd(address)\":{\"params\":{\"token_\":\"The address of asset\"},\"returns\":{\"_priceInUsd\":\"The USD price\"}}},\"title\":\"Oracle for USD hard pegged token\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"getPriceInUsd(address)\":{\"notice\":\"Get USD (or equivalent) price of an asset\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/periphery/tokens/SynthUsdTokenOracle.sol\":\"SynthUsdTokenOracle\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":5000},\"remappings\":[]},\"sources\":{\"contracts/interfaces/periphery/ITokenOracle.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface ITokenOracle {\\n    /**\\n     * @notice Get USD (or equivalent) price of an asset\\n     * @param token_ The address of asset\\n     * @return _priceInUsd The USD price\\n     */\\n    function getPriceInUsd(address token_) external view returns (uint256 _priceInUsd);\\n}\\n\",\"keccak256\":\"0x0a458745d97e56d125d348a597133af8572f34a7830c17d91b82cf8229c1492f\",\"license\":\"MIT\"},\"contracts/periphery/tokens/SynthUsdTokenOracle.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"../../interfaces/periphery/ITokenOracle.sol\\\";\\n\\n/**\\n * @title Oracle for USD hard pegged token\\n * @dev This oracle shouldn't be used for stable coins! Its purpose is for a specific use case that's the Synth USD token.\\n */\\ncontract SynthUsdTokenOracle is ITokenOracle {\\n    /// @inheritdoc ITokenOracle\\n    function getPriceInUsd(address) external pure override returns (uint256 _priceInUsd) {\\n        return 1e18;\\n    }\\n}\\n\",\"keccak256\":\"0x5a77151f71e1fa7d72da1ad26d8646e6b62bb8cd72138cf8bbd0746f260c2ee3\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5060c88061001f6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c806307ee40bf14602d575b600080fd5b604560383660046057565b50670de0b6b3a764000090565b60405190815260200160405180910390f35b600060208284031215606857600080fd5b813573ffffffffffffffffffffffffffffffffffffffff81168114608b57600080fd5b939250505056fea26469706673582212206a91e2b3140ada9c40c6ebfccc976c096b8f333ef756b0aeace7dd3ffa76a2c164736f6c63430008090033",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c806307ee40bf14602d575b600080fd5b604560383660046057565b50670de0b6b3a764000090565b60405190815260200160405180910390f35b600060208284031215606857600080fd5b813573ffffffffffffffffffffffffffffffffffffffff81168114608b57600080fd5b939250505056fea26469706673582212206a91e2b3140ada9c40c6ebfccc976c096b8f333ef756b0aeace7dd3ffa76a2c164736f6c63430008090033",
+  "devdoc": {
+    "details": "This oracle shouldn't be used for stable coins! Its purpose is for a specific use case that's the Synth USD token.",
+    "kind": "dev",
+    "methods": {
+      "getPriceInUsd(address)": {
+        "params": {
+          "token_": "The address of asset"
+        },
+        "returns": {
+          "_priceInUsd": "The USD price"
+        }
+      }
+    },
+    "title": "Oracle for USD hard pegged token",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "getPriceInUsd(address)": {
+        "notice": "Get USD (or equivalent) price of an asset"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}
