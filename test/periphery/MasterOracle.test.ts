@@ -25,6 +25,7 @@ import {
   PriceProvidersAggregator__factory,
   SynthUsdTokenOracle__factory,
   ChainlinkAvalanchePriceProvider,
+  YEarnTokenOracle__factory,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, timestampFromLatestBlock, toUSD} from '../helpers'
@@ -78,12 +79,26 @@ describe('MasterOracle', function () {
       CUSDC_ADDRESS,
       CETH_ADDRESS,
       WETH_ADDRESS,
+      BUSD_ADDRESS,
+      USDP_ADDRESS,
+      CHAINLINK_BUSD_USD_AGGREGATOR,
+      CHAINLINK_USDP_USD_AGGREGATOR,
+      CURVE_BUSD_LP,
+      CURVE_BUSD_POOL,
+      CURVE_PAX_LP,
+      CURVE_PAX_POOL,
+      CURVE_Y_LP,
+      CURVE_Y_POOL,
+      CURVE_COMPOUND_LP,
+      CURVE_USDT_LP,
     } = Address.mainnet
 
     beforeEach(async function () {
       const chainlinkPriceProviderFactory = new ChainlinkMainnetPriceProvider__factory(deployer)
       const chainlinkPriceProvider = await chainlinkPriceProviderFactory.deploy()
       await chainlinkPriceProvider.deployed()
+      await chainlinkPriceProvider.updateAggregator(BUSD_ADDRESS, CHAINLINK_BUSD_USD_AGGREGATOR)
+      await chainlinkPriceProvider.updateAggregator(USDP_ADDRESS, CHAINLINK_USDP_USD_AGGREGATOR)
 
       const chainlinkOracleMockFactory = new ChainlinkOracleMock__factory(deployer)
       chainlinkOracle = await chainlinkOracleMockFactory.deploy(chainlinkPriceProvider.address)
@@ -92,6 +107,14 @@ describe('MasterOracle', function () {
       const masterOracleFactory = new MasterOracle__factory(deployer)
       masterOracle = await masterOracleFactory.deploy(chainlinkOracle.address)
       await masterOracle.deployed()
+
+      const cTokenOracleFactory = new CTokenOracle__factory(deployer)
+      const cTokenOracle = await cTokenOracleFactory.deploy(WETH_ADDRESS)
+      await cTokenOracle.deployed()
+
+      await masterOracle.updateTokenOracle(CDAI_ADDRESS, cTokenOracle.address)
+      await masterOracle.updateTokenOracle(CUSDC_ADDRESS, cTokenOracle.address)
+      await masterOracle.updateTokenOracle(CETH_ADDRESS, cTokenOracle.address)
     })
 
     describe('getPriceInUsd', function () {
@@ -197,6 +220,51 @@ describe('MasterOracle', function () {
         await masterOracle.updateTokenOracle(ADAI_ADDRESS, aTokenOracle.address)
         await masterOracle.updateTokenOracle(AUSDC_ADDRESS, aTokenOracle.address)
         await masterOracle.updateTokenOracle(AUSDT_ADDRESS, aTokenOracle.address)
+
+        //
+        // yEarn lending pools
+        //
+        const yEarnTokenOracleFactory = new YEarnTokenOracle__factory(deployer)
+        const yEarnTokenOracle = await yEarnTokenOracleFactory.deploy()
+        await yEarnTokenOracle.deployed()
+
+        // compound (cDAI+cUSDC)
+        await curveLpTokenOracle.registerPool(CURVE_COMPOUND_LP)
+        await masterOracle.updateTokenOracle(CURVE_COMPOUND_LP, curveLpTokenOracle.address)
+
+        // usdt (cDAI+cUSDC+USDT)
+        await curveLpTokenOracle.registerPool(CURVE_USDT_LP)
+        await masterOracle.updateTokenOracle(CURVE_USDT_LP, curveLpTokenOracle.address)
+
+        // busd (yDAI+yUSDC+yUSDT+yBUSD)
+        const busdPool = new ethers.Contract(
+          CURVE_BUSD_POOL,
+          ['function coins(int128) view returns(address)'],
+          deployer
+        )
+        await curveLpTokenOracle.registerPool(CURVE_BUSD_LP)
+        await masterOracle.updateTokenOracle(CURVE_BUSD_LP, curveLpTokenOracle.address)
+        await masterOracle.updateTokenOracle(await busdPool.coins(0), yEarnTokenOracle.address)
+        await masterOracle.updateTokenOracle(await busdPool.coins(1), yEarnTokenOracle.address)
+        await masterOracle.updateTokenOracle(await busdPool.coins(2), yEarnTokenOracle.address)
+        await masterOracle.updateTokenOracle(await busdPool.coins(3), yEarnTokenOracle.address)
+
+        // pax (ycDAI+ycUSDC+ycUSDT+USDP)
+        const paxPool = new ethers.Contract(CURVE_PAX_POOL, ['function coins(int128) view returns(address)'], deployer)
+        await curveLpTokenOracle.registerPool(CURVE_PAX_LP)
+        await masterOracle.updateTokenOracle(CURVE_PAX_LP, curveLpTokenOracle.address)
+        await masterOracle.updateTokenOracle(await paxPool.coins(0), yEarnTokenOracle.address)
+        await masterOracle.updateTokenOracle(await paxPool.coins(1), yEarnTokenOracle.address)
+        await masterOracle.updateTokenOracle(await paxPool.coins(2), yEarnTokenOracle.address)
+
+        // y (yDAI+yUSDC+yYSDT+yTUSD)
+        const yPool = new ethers.Contract(CURVE_Y_POOL, ['function coins(int128) view returns(address)'], deployer)
+        await curveLpTokenOracle.registerPool(CURVE_Y_LP)
+        await masterOracle.updateTokenOracle(CURVE_Y_LP, curveLpTokenOracle.address)
+        await masterOracle.updateTokenOracle(await yPool.coins(0), yEarnTokenOracle.address)
+        await masterOracle.updateTokenOracle(await yPool.coins(1), yEarnTokenOracle.address)
+        await masterOracle.updateTokenOracle(await yPool.coins(2), yEarnTokenOracle.address)
+        await masterOracle.updateTokenOracle(await yPool.coins(3), yEarnTokenOracle.address)
       })
 
       it('should get price for 3CRV', async function () {
@@ -270,22 +338,49 @@ describe('MasterOracle', function () {
         // then
         expect(price).closeTo(toUSD('1.087'), toUSD('0.001'))
       })
+
+      it('should get price for compound Pool', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(CURVE_COMPOUND_LP)
+
+        // then
+        expect(price).closeTo(toUSD('0.024'), toUSD('0.01'))
+      })
+
+      it('should get price for usdt Pool', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(CURVE_USDT_LP)
+
+        // then
+        expect(price).closeTo(toUSD('0.024'), toUSD('0.01'))
+      })
+
+      it('should get price for busd Pool', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(CURVE_BUSD_LP)
+
+        // then
+        expect(price).closeTo(toUSD('1.21'), toUSD('0.01'))
+      })
+
+      it('should get price for pax Pool', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(CURVE_PAX_LP)
+
+        // then
+        expect(price).closeTo(toUSD('1.04'), toUSD('0.01'))
+      })
+
+      it('should get price for y Pool', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(CURVE_Y_LP)
+
+        // then
+        expect(price).closeTo(toUSD('1.24'), toUSD('0.01'))
+      })
     })
 
     describe('CTokens', function () {
-      beforeEach(async function () {
-        snapshotId = await ethers.provider.send('evm_snapshot', [])
-        ;[deployer] = await ethers.getSigners()
-
-        const cTokenOracleFactory = new CTokenOracle__factory(deployer)
-        const cTokenOracle = await cTokenOracleFactory.deploy(WETH_ADDRESS)
-        await cTokenOracle.deployed()
-
-        await masterOracle.updateTokenOracle(CDAI_ADDRESS, cTokenOracle.address)
-        await masterOracle.updateTokenOracle(CUSDC_ADDRESS, cTokenOracle.address)
-        await masterOracle.updateTokenOracle(CETH_ADDRESS, cTokenOracle.address)
-      })
-
       it('getPriceInUsd (18 decimals underlying)', async function () {
         const price = await masterOracle.getPriceInUsd(CDAI_ADDRESS)
         expect(price).closeTo(toUSD('0.021'), toUSD('0.001')) // 1 cDAI ~= $0.021
