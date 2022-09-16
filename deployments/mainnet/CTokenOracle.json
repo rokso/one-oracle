@@ -1,0 +1,116 @@
+{
+  "address": "0x7C3085721aa6F36081ee5E00583Da5526d57a87e",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_wethLike",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "ONE_CTOKEN",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_asset",
+          "type": "address"
+        }
+      ],
+      "name": "getPriceInUsd",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_priceInUsd",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "wethLike",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xbcb7283d3173a7a18c0daa1e7b5c0b1066cff23f9a5be18cea092ee090266ff9",
+  "receipt": {
+    "to": null,
+    "from": "0x76d266DFD3754f090488ae12F6Bd115cD7E77eBD",
+    "contractAddress": "0x7C3085721aa6F36081ee5E00583Da5526d57a87e",
+    "transactionIndex": 19,
+    "gasUsed": "380831",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xb4fb2412cbd96c25baeafd0560febd65a2b324304fd48b6f594e9b3b13fce8e8",
+    "transactionHash": "0xbcb7283d3173a7a18c0daa1e7b5c0b1066cff23f9a5be18cea092ee090266ff9",
+    "logs": [],
+    "blockNumber": 15546249,
+    "cumulativeGasUsed": "1053934",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "8b654c506c10a4071125075f82070c93",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.9+commit.e5eed63a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_wethLike\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"ONE_CTOKEN\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_asset\",\"type\":\"address\"}],\"name\":\"getPriceInUsd\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_priceInUsd\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"wethLike\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getPriceInUsd(address)\":{\"params\":{\"token_\":\"The address of asset\"},\"returns\":{\"_priceInUsd\":\"The USD price\"}}},\"title\":\"Oracle for `CTokens`\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"getPriceInUsd(address)\":{\"notice\":\"Get USD (or equivalent) price of an asset\"},\"wethLike()\":{\"notice\":\"The address of the `CEther` underlying (Usually WETH)\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/periphery/tokens/CTokenOracle.sol\":\"CTokenOracle\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":5000},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.6.0) (token/ERC20/IERC20.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Interface of the ERC20 standard as defined in the EIP.\\n */\\ninterface IERC20 {\\n    /**\\n     * @dev Emitted when `value` tokens are moved from one account (`from`) to\\n     * another (`to`).\\n     *\\n     * Note that `value` may be zero.\\n     */\\n    event Transfer(address indexed from, address indexed to, uint256 value);\\n\\n    /**\\n     * @dev Emitted when the allowance of a `spender` for an `owner` is set by\\n     * a call to {approve}. `value` is the new allowance.\\n     */\\n    event Approval(address indexed owner, address indexed spender, uint256 value);\\n\\n    /**\\n     * @dev Returns the amount of tokens in existence.\\n     */\\n    function totalSupply() external view returns (uint256);\\n\\n    /**\\n     * @dev Returns the amount of tokens owned by `account`.\\n     */\\n    function balanceOf(address account) external view returns (uint256);\\n\\n    /**\\n     * @dev Moves `amount` tokens from the caller's account to `to`.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transfer(address to, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Returns the remaining number of tokens that `spender` will be\\n     * allowed to spend on behalf of `owner` through {transferFrom}. This is\\n     * zero by default.\\n     *\\n     * This value changes when {approve} or {transferFrom} are called.\\n     */\\n    function allowance(address owner, address spender) external view returns (uint256);\\n\\n    /**\\n     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * IMPORTANT: Beware that changing an allowance with this method brings the risk\\n     * that someone may use both the old and the new allowance by unfortunate\\n     * transaction ordering. One possible solution to mitigate this race\\n     * condition is to first reduce the spender's allowance to 0 and set the\\n     * desired value afterwards:\\n     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\\n     *\\n     * Emits an {Approval} event.\\n     */\\n    function approve(address spender, uint256 amount) external returns (bool);\\n\\n    /**\\n     * @dev Moves `amount` tokens from `from` to `to` using the\\n     * allowance mechanism. `amount` is then deducted from the caller's\\n     * allowance.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transferFrom(\\n        address from,\\n        address to,\\n        uint256 amount\\n    ) external returns (bool);\\n}\\n\",\"keccak256\":\"0x9750c6b834f7b43000631af5cc30001c5f547b3ceb3635488f140f60e897ea6b\",\"license\":\"MIT\"},\"@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts v4.4.1 (token/ERC20/extensions/IERC20Metadata.sol)\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"../IERC20.sol\\\";\\n\\n/**\\n * @dev Interface for the optional metadata functions from the ERC20 standard.\\n *\\n * _Available since v4.1._\\n */\\ninterface IERC20Metadata is IERC20 {\\n    /**\\n     * @dev Returns the name of the token.\\n     */\\n    function name() external view returns (string memory);\\n\\n    /**\\n     * @dev Returns the symbol of the token.\\n     */\\n    function symbol() external view returns (string memory);\\n\\n    /**\\n     * @dev Returns the decimals places of the token.\\n     */\\n    function decimals() external view returns (uint8);\\n}\\n\",\"keccak256\":\"0x8de418a5503946cabe331f35fe242d3201a73f67f77aaeb7110acb1f30423aca\",\"license\":\"MIT\"},\"contracts/interfaces/external/compound/ICToken.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface ICToken {\\n    function exchangeRateStored() external view returns (uint256);\\n\\n    function underlying() external view returns (address);\\n}\\n\",\"keccak256\":\"0x931bc2397fd3b23f4fec65e1186fa5b60634110cc10f55479d47ee5da34a7d45\",\"license\":\"MIT\"},\"contracts/interfaces/periphery/IOracle.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface IOracle {\\n    /**\\n     * @notice Get USD (or equivalent) price of an asset\\n     * @param token_ The address of asset\\n     * @return _priceInUsd The USD price\\n     */\\n    function getPriceInUsd(address token_) external view returns (uint256 _priceInUsd);\\n\\n    /**\\n     * @notice Get quote\\n     * @param tokenIn_ The address of assetIn\\n     * @param tokenOut_ The address of assetOut\\n     * @param amountIn_ Amount of input token\\n     * @return _amountOut Amount out\\n     */\\n    function quote(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    ) external view returns (uint256 _amountOut);\\n\\n    /**\\n     * @notice Get quote in USD (or equivalent) amount\\n     * @param token_ The address of assetIn\\n     * @param amountIn_ Amount of input token.\\n     * @return amountOut_ Amount in USD\\n     */\\n    function quoteTokenToUsd(address token_, uint256 amountIn_) external view returns (uint256 amountOut_);\\n\\n    /**\\n     * @notice Get quote from USD (or equivalent) amount to amount of token\\n     * @param token_ The address of assetOut\\n     * @param amountIn_ Input amount in USD\\n     * @return _amountOut Output amount of token\\n     */\\n    function quoteUsdToToken(address token_, uint256 amountIn_) external view returns (uint256 _amountOut);\\n}\\n\",\"keccak256\":\"0xb48d57d83e75abecacbd065d3df55ee50eef4998fad94560cb1dbb0644049caa\",\"license\":\"MIT\"},\"contracts/interfaces/periphery/ITokenOracle.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface ITokenOracle {\\n    /**\\n     * @notice Get USD (or equivalent) price of an asset\\n     * @param token_ The address of asset\\n     * @return _priceInUsd The USD price\\n     */\\n    function getPriceInUsd(address token_) external view returns (uint256 _priceInUsd);\\n}\\n\",\"keccak256\":\"0x0a458745d97e56d125d348a597133af8572f34a7830c17d91b82cf8229c1492f\",\"license\":\"MIT\"},\"contracts/periphery/tokens/CTokenOracle.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol\\\";\\nimport \\\"../../interfaces/external/compound/ICToken.sol\\\";\\nimport \\\"../../interfaces/periphery/IOracle.sol\\\";\\nimport \\\"../../interfaces/periphery/ITokenOracle.sol\\\";\\n\\n/**\\n * @title Oracle for `CTokens`\\n */\\ncontract CTokenOracle is ITokenOracle {\\n    uint256 public constant ONE_CTOKEN = 1e8;\\n\\n    /**\\n     * @notice The address of the `CEther` underlying (Usually WETH)\\n     */\\n    address public immutable wethLike;\\n\\n    constructor(address _wethLike) {\\n        require(_wethLike != address(0), \\\"weth-like-null\\\");\\n        wethLike = _wethLike;\\n    }\\n\\n    /// @inheritdoc ITokenOracle\\n    function getPriceInUsd(address _asset) external view returns (uint256 _priceInUsd) {\\n        address _underlyingAddress;\\n        // Note: Compound's `CEther` hasn't the `underlying()` function, forks may return `address(0)` (e.g. RariFuse)\\n        try ICToken(_asset).underlying() returns (address _underlying) {\\n            _underlyingAddress = _underlying;\\n        } catch {}\\n\\n        if (_underlyingAddress == address(0)) {\\n            _underlyingAddress = wethLike;\\n        }\\n        uint256 _underlyingPriceInUsd = IOracle(msg.sender).getPriceInUsd(_underlyingAddress);\\n        uint256 _underlyingAmount = (ONE_CTOKEN * ICToken(_asset).exchangeRateStored()) / 1e18;\\n        _priceInUsd = (_underlyingPriceInUsd * _underlyingAmount) / 10**IERC20Metadata(_underlyingAddress).decimals();\\n    }\\n}\\n\",\"keccak256\":\"0x7c319bd6a57ca80008dc29860724a0c39ea2cf0153af59abe339f29edb8493df\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x60a060405234801561001057600080fd5b506040516106c13803806106c183398101604081905261002f9161008b565b6001600160a01b03811661007a5760405162461bcd60e51b815260206004820152600e60248201526d1dd95d1a0b5b1a5ad94b5b9d5b1b60921b604482015260640160405180910390fd5b6001600160a01b03166080526100bb565b60006020828403121561009d57600080fd5b81516001600160a01b03811681146100b457600080fd5b9392505050565b6080516105e56100dc600039600081816071015261018401526105e56000f3fe608060405234801561001057600080fd5b50600436106100415760003560e01c806307ee40bf1461004657806329dbd9441461006c578063f944737a146100b8575b600080fd5b6100596100543660046103b4565b6100c3565b6040519081526020015b60405180910390f35b6100937f000000000000000000000000000000000000000000000000000000000000000081565b60405173ffffffffffffffffffffffffffffffffffffffff9091168152602001610063565b6100596305f5e10081565b6000808273ffffffffffffffffffffffffffffffffffffffff16636f307dc36040518163ffffffff1660e01b815260040160206040518083038186803b15801561010c57600080fd5b505afa92505050801561015a575060408051601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0168201909252610157918101906103d8565b60015b61016357610166565b90505b73ffffffffffffffffffffffffffffffffffffffff81166101a457507f00000000000000000000000000000000000000000000000000000000000000005b6040517f07ee40bf00000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff8216600482015260009033906307ee40bf9060240160206040518083038186803b15801561020c57600080fd5b505afa158015610220573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061024491906103f5565b90506000670de0b6b3a76400008573ffffffffffffffffffffffffffffffffffffffff1663182df0f56040518163ffffffff1660e01b815260040160206040518083038186803b15801561029757600080fd5b505afa1580156102ab573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906102cf91906103f5565b6102dd906305f5e10061043d565b6102e7919061045c565b90508273ffffffffffffffffffffffffffffffffffffffff1663313ce5676040518163ffffffff1660e01b815260040160206040518083038186803b15801561032f57600080fd5b505afa158015610343573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906103679190610497565b61037290600a6105a0565b61037c828461043d565b610386919061045c565b95945050505050565b73ffffffffffffffffffffffffffffffffffffffff811681146103b157600080fd5b50565b6000602082840312156103c657600080fd5b81356103d18161038f565b9392505050565b6000602082840312156103ea57600080fd5b81516103d18161038f565b60006020828403121561040757600080fd5b5051919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b60008160001904831182151516156104575761045761040e565b500290565b600082610492577f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b500490565b6000602082840312156104a957600080fd5b815160ff811681146103d157600080fd5b600181815b808511156104f55781600019048211156104db576104db61040e565b808516156104e857918102915b93841c93908002906104bf565b509250929050565b60008261050c5750600161059a565b816105195750600061059a565b816001811461052f576002811461053957610555565b600191505061059a565b60ff84111561054a5761054a61040e565b50506001821b61059a565b5060208310610133831016604e8410600b8410161715610578575081810a61059a565b61058283836104ba565b80600019048211156105965761059661040e565b0290505b92915050565b60006103d160ff8416836104fd56fea2646970667358221220c59ff14a0367cefb16992a30dac43660334dfa58e59a4ce20f4dc16a95d2d5db64736f6c63430008090033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100415760003560e01c806307ee40bf1461004657806329dbd9441461006c578063f944737a146100b8575b600080fd5b6100596100543660046103b4565b6100c3565b6040519081526020015b60405180910390f35b6100937f000000000000000000000000000000000000000000000000000000000000000081565b60405173ffffffffffffffffffffffffffffffffffffffff9091168152602001610063565b6100596305f5e10081565b6000808273ffffffffffffffffffffffffffffffffffffffff16636f307dc36040518163ffffffff1660e01b815260040160206040518083038186803b15801561010c57600080fd5b505afa92505050801561015a575060408051601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0168201909252610157918101906103d8565b60015b61016357610166565b90505b73ffffffffffffffffffffffffffffffffffffffff81166101a457507f00000000000000000000000000000000000000000000000000000000000000005b6040517f07ee40bf00000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff8216600482015260009033906307ee40bf9060240160206040518083038186803b15801561020c57600080fd5b505afa158015610220573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061024491906103f5565b90506000670de0b6b3a76400008573ffffffffffffffffffffffffffffffffffffffff1663182df0f56040518163ffffffff1660e01b815260040160206040518083038186803b15801561029757600080fd5b505afa1580156102ab573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906102cf91906103f5565b6102dd906305f5e10061043d565b6102e7919061045c565b90508273ffffffffffffffffffffffffffffffffffffffff1663313ce5676040518163ffffffff1660e01b815260040160206040518083038186803b15801561032f57600080fd5b505afa158015610343573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906103679190610497565b61037290600a6105a0565b61037c828461043d565b610386919061045c565b95945050505050565b73ffffffffffffffffffffffffffffffffffffffff811681146103b157600080fd5b50565b6000602082840312156103c657600080fd5b81356103d18161038f565b9392505050565b6000602082840312156103ea57600080fd5b81516103d18161038f565b60006020828403121561040757600080fd5b5051919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b60008160001904831182151516156104575761045761040e565b500290565b600082610492577f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b500490565b6000602082840312156104a957600080fd5b815160ff811681146103d157600080fd5b600181815b808511156104f55781600019048211156104db576104db61040e565b808516156104e857918102915b93841c93908002906104bf565b509250929050565b60008261050c5750600161059a565b816105195750600061059a565b816001811461052f576002811461053957610555565b600191505061059a565b60ff84111561054a5761054a61040e565b50506001821b61059a565b5060208310610133831016604e8410600b8410161715610578575081810a61059a565b61058283836104ba565b80600019048211156105965761059661040e565b0290505b92915050565b60006103d160ff8416836104fd56fea2646970667358221220c59ff14a0367cefb16992a30dac43660334dfa58e59a4ce20f4dc16a95d2d5db64736f6c63430008090033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "getPriceInUsd(address)": {
+        "params": {
+          "token_": "The address of asset"
+        },
+        "returns": {
+          "_priceInUsd": "The USD price"
+        }
+      }
+    },
+    "title": "Oracle for `CTokens`",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "getPriceInUsd(address)": {
+        "notice": "Get USD (or equivalent) price of an asset"
+      },
+      "wethLike()": {
+        "notice": "The address of the `CEther` underlying (Usually WETH)"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}
