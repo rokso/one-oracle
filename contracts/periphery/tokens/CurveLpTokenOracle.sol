@@ -7,13 +7,16 @@ import "../../interfaces/external/curve/ICurveAddressProvider.sol";
 import "../../interfaces/external/curve/ICurveRegistry.sol";
 import "../../interfaces/external/curve/ICurvePool.sol";
 import "../../interfaces/periphery/IOracle.sol";
+import "../../access/Governable.sol";
 
 /**
  * @title Oracle for Curve LP tokens
  */
-contract CurveLpTokenOracle is ITokenOracle {
+contract CurveLpTokenOracle is ITokenOracle, Governable {
+    address private constant SBTC_POOL = 0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714;
+
     /// @dev Same address for all chains
-    ICurveAddressProvider public constant addressProvider =
+    ICurveAddressProvider public constant curveAddressProvider =
         ICurveAddressProvider(0x0000000022D53366457F9d5E68Ec105046FC4383);
 
     /// @notice Registry contract
@@ -25,8 +28,11 @@ contract CurveLpTokenOracle is ITokenOracle {
     /// @notice LP token => pool
     mapping(address => address) public poolOf;
 
+    /// @notice Emitted when a token is registered
+    event LpRegistered(address indexed lpToken, bool isLending);
+
     constructor() {
-        registry = ICurveRegistry(addressProvider.get_registry());
+        registry = ICurveRegistry(curveAddressProvider.get_registry());
     }
 
     /// @inheritdoc ITokenOracle
@@ -51,19 +57,38 @@ contract CurveLpTokenOracle is ITokenOracle {
     }
 
     /// @notice Register LP token data
-    function registerPool(address lpToken_) external {
-        address _pool = poolOf[lpToken_];
-        require(_pool == address(0), "lp-already-registered");
+    function registerLp(address lpToken_) external onlyGovernor {
+        _registerLp(lpToken_, false);
+    }
 
-        _pool = registry.get_pool_from_lp_token(lpToken_);
+    /// @notice Register LP token data
+    function registerLendingLp(address lpToken_) external onlyGovernor {
+        _registerLp(lpToken_, true);
+    }
+
+    /// @notice Register LP token data
+    function _registerLp(address lpToken_, bool isLending_) private {
+        address _pool = registry.get_pool_from_lp_token(lpToken_);
         require(_pool != address(0), "invalid-non-factory-lp");
+
+        address[8] memory _tokens;
+        if (isLending_) {
+            _tokens = registry.get_underlying_coins(_pool);
+        } else {
+            _tokens = registry.get_coins(_pool);
+        }
 
         poolOf[lpToken_] = _pool;
 
-        uint256 _n = registry.get_n_coins(_pool);
-        address[8] memory tokens = registry.get_coins(_pool);
-        for (uint256 i; i < _n; i++) {
-            underlyingTokens[lpToken_].push(tokens[i]);
+        if (poolOf[lpToken_] != address(0)) {
+            delete underlyingTokens[lpToken_];
         }
+
+        uint256 _n = registry.get_n_coins(_pool);
+        for (uint256 i; i < _n; i++) {
+            underlyingTokens[lpToken_].push(_tokens[i]);
+        }
+
+        emit LpRegistered(lpToken_, isLending_);
     }
 }

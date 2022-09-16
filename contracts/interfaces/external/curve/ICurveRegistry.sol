@@ -7,5 +7,9 @@ interface ICurveRegistry {
 
     function get_coins(address pool) external view returns (address[8] memory);
 
+    function get_underlying_coins(address pool) external view returns (address[8] memory);
+
     function get_pool_from_lp_token(address lp) external view returns (address);
+
+    function is_meta(address pool) external view returns (bool);
 }

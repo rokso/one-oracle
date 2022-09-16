@@ -19,7 +19,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const {
-  TRICRV_ADDRESS,
+  CURVE_3CRV_LP,
   CURVE_SUSD_LP,
   CURVE_IBBTC_SBTC_LP,
   WIBBTC_ADDRESS,
@@ -48,51 +48,51 @@ const main = async () => {
   const curveLpFactoryTokenOracle = CurveFactoryLpTokenOracle__factory.connect(CURVE_FACTORY_LP_ORACLE_ADDRESS, wallet)
 
   // 3Pool
-  // await curveLpTokenOracle.registerPool(TRICRV_ADDRESS)
-  // await masterOracle.updateTokenOracle(TRICRV_ADDRESS, CURVE_LP_ORACLE_ADDRESS)
+  // await curveLpTokenOracle.registerLp(CURVE_3CRV_LP)
+  // await masterOracle.updateTokenOracle(CURVE_3CRV_LP, CURVE_LP_ORACLE_ADDRESS)
 
   // MIM+3Crv
-  // await curveLpTokenOracle.registerPool(CURVE_MIM_3CRV_LP)
+  // await curveLpTokenOracle.registerLp(CURVE_MIM_3CRV_LP)
   // await masterOracle.updateTokenOracle(CURVE_MIM_3CRV_LP, CURVE_LP_ORACLE_ADDRESS)
 
   // FRAX+3Crv
-  // await curveLpTokenOracle.registerPool(CURVE_FRAX_3CRV_LP)
+  // await curveLpTokenOracle.registerLp(CURVE_FRAX_3CRV_LP)
   // await masterOracle.updateTokenOracle(CURVE_FRAX_3CRV_LP, CURVE_LP_ORACLE_ADDRESS)
 
   // SUSD
-  // await curveLpTokenOracle.registerPool(CURVE_SUSD_LP)
+  // await curveLpTokenOracle.registerLp(CURVE_SUSD_LP)
   // await masterOracle.updateTokenOracle(CURVE_SUSD_LP, CURVE_LP_ORACLE_ADDRESS)
 
   // MUSD
-  // await curveLpTokenOracle.registerPool(CURVE_MUSD_LP)
+  // await curveLpTokenOracle.registerLp(CURVE_MUSD_LP)
   // await masterOracle.updateTokenOracle(CURVE_MUSD_LP, CURVE_LP_ORACLE_ADDRESS)
   // await masterOracle.updateTokenOracle(MUSD_ADDRESS, MSTABLE_TOKEN_ORACLE_ADDRESS)
 
   // ibbBTC
-  // await curveLpFactoryTokenOracle.registerPool(CURVE_IBBTC_SBTC_LP)
+  // await curveLpFactoryTokenOracle.registerLp(CURVE_IBBTC_SBTC_LP)
   // await masterOracle.updateTokenOracle(CURVE_IBBTC_SBTC_LP, CURVE_FACTORY_LP_ORACLE_ADDRESS)
   // await masterOracle.updateTokenOracle(WIBBTC_ADDRESS, IBBTC_TOKEN_ORACLE_ADDRESS)
 
   // SBTC
-  // await curveLpTokenOracle.registerPool(CURVE_SBTC_LP)
+  // await curveLpTokenOracle.registerLp(CURVE_SBTC_LP)
   // await masterOracle.updateTokenOracle(CURVE_SBTC_LP, CURVE_LP_ORACLE_ADDRESS)
   // await masterOracle.updateTokenOracle(RENBTC_ADDRESS, BTC_PEGGED_ORACLE_ADDRESS)
   // await masterOracle.updateTokenOracle(SBTC_ADDRESS, BTC_PEGGED_ORACLE_ADDRESS)
 
   // D3
-  // await curveLpFactoryTokenOracle.registerPool(CURVE_D3_LP)
+  // await curveLpFactoryTokenOracle.registerLp(CURVE_D3_LP)
   // await masterOracle.updateTokenOracle(CURVE_D3_LP, curveLpFactoryTokenOracle.address)
   // await masterOracle.updateTokenOracle(ALUSD_ADDRESS, ALUSD_ORACLE_ADDRESS)
 
   // Aave (aDAI+aUSDC+aUSDT)
-  // await curveLpTokenOracle.registerPool(CURVE_AAVE_LP)
+  // await curveLpTokenOracle.registerLp(CURVE_AAVE_LP)
   // await masterOracle.updateTokenOracle(CURVE_AAVE_LP, curveLpTokenOracle.address)
   // await masterOracle.updateTokenOracle(ADAI_ADDRESS, ATOKEN_ORACLE_ADDRESS)
   // await masterOracle.updateTokenOracle(AUSDC_ADDRESS, ATOKEN_ORACLE_ADDRESS)
   // await masterOracle.updateTokenOracle(AUSDT_ADDRESS, ATOKEN_ORACLE_ADDRESS)
 
   // GUSD
-  // await curveLpTokenOracle.registerPool(CURVE_GUSD_LP)
+  // await curveLpTokenOracle.registerLp(CURVE_GUSD_LP)
   // await masterOracle.updateTokenOracle(CURVE_GUSD_LP, curveLpTokenOracle.address)
 }
 

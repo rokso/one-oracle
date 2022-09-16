@@ -60,7 +60,7 @@ describe('MasterOracle', function () {
       CHAINLINK_BTC_USD_AGGREGATOR,
       RENBTC_ADDRESS,
       SBTC_ADDRESS,
-      TRICRV_ADDRESS,
+      CURVE_3CRV_LP,
       ALUSD_ADDRESS,
       WIBBTC_ADDRESS,
       MUSD_ADDRESS,
@@ -143,19 +143,19 @@ describe('MasterOracle', function () {
         await curveLpFactoryTokenOracle.deployed()
 
         // 3Crv (DAI+USDC+USDT)
-        await curveLpTokenOracle.registerPool(TRICRV_ADDRESS)
-        await masterOracle.updateTokenOracle(TRICRV_ADDRESS, curveLpTokenOracle.address)
+        await curveLpTokenOracle.registerLp(CURVE_3CRV_LP)
+        await masterOracle.updateTokenOracle(CURVE_3CRV_LP, curveLpTokenOracle.address)
 
         // MIM+3Crv
-        await curveLpTokenOracle.registerPool(CURVE_MIM_3CRV_LP)
+        await curveLpTokenOracle.registerLp(CURVE_MIM_3CRV_LP)
         await masterOracle.updateTokenOracle(CURVE_MIM_3CRV_LP, curveLpTokenOracle.address)
 
         // FRAX+3Crv
-        await curveLpTokenOracle.registerPool(CURVE_FRAX_3CRV_LP)
+        await curveLpTokenOracle.registerLp(CURVE_FRAX_3CRV_LP)
         await masterOracle.updateTokenOracle(CURVE_FRAX_3CRV_LP, curveLpTokenOracle.address)
 
         // sUSD+DAI+USDC+USDT
-        await curveLpTokenOracle.registerPool(CURVE_SUSD_LP)
+        await curveLpTokenOracle.registerLp(CURVE_SUSD_LP)
         await masterOracle.updateTokenOracle(CURVE_SUSD_LP, curveLpTokenOracle.address)
 
         // mUSD+DAI+USDC+USDT
@@ -164,7 +164,7 @@ describe('MasterOracle', function () {
         await mStableTokenOracle.deployed()
 
         await masterOracle.updateTokenOracle(MUSD_ADDRESS, mStableTokenOracle.address)
-        await curveLpTokenOracle.registerPool(CURVE_MUSD_LP)
+        await curveLpTokenOracle.registerLp(CURVE_MUSD_LP)
         await masterOracle.updateTokenOracle(CURVE_MUSD_LP, curveLpTokenOracle.address)
 
         // SBTC (WBTC+renBTC+sBTC)
@@ -177,7 +177,7 @@ describe('MasterOracle', function () {
         await masterOracle.updateTokenOracle(RENBTC_ADDRESS, bTCPeggedTokenOracle.address)
         // Synthetix uses BTC/USD Chainlink feed for sBTC
         await masterOracle.updateTokenOracle(SBTC_ADDRESS, bTCPeggedTokenOracle.address)
-        await curveLpTokenOracle.registerPool(CURVE_SBTC_LP)
+        await curveLpTokenOracle.registerLp(CURVE_SBTC_LP)
         await masterOracle.updateTokenOracle(CURVE_SBTC_LP, curveLpTokenOracle.address)
 
         // wibBTC+SBTC
@@ -186,7 +186,7 @@ describe('MasterOracle', function () {
         await IbBtcTokenOracle.deployed()
 
         await masterOracle.updateTokenOracle(WIBBTC_ADDRESS, IbBtcTokenOracle.address)
-        await curveLpFactoryTokenOracle.registerPool(CURVE_IBBTC_SBTC_LP)
+        await curveLpFactoryTokenOracle.registerLp(CURVE_IBBTC_SBTC_LP)
         await masterOracle.updateTokenOracle(CURVE_IBBTC_SBTC_LP, curveLpFactoryTokenOracle.address)
 
         // D3 (FRAX+FEI+alUSD)
@@ -207,7 +207,7 @@ describe('MasterOracle', function () {
         await alUsdMainnetOracle.deployed()
 
         await masterOracle.updateTokenOracle(ALUSD_ADDRESS, alUsdMainnetOracle.address)
-        await curveLpFactoryTokenOracle.registerPool(CURVE_D3_LP)
+        await curveLpFactoryTokenOracle.registerLp(CURVE_D3_LP)
         await masterOracle.updateTokenOracle(CURVE_D3_LP, curveLpFactoryTokenOracle.address)
 
         // Aave (aDAI+aUSDC+aUSDT)
@@ -215,7 +215,7 @@ describe('MasterOracle', function () {
         const aTokenOracle = await aTokenOracleFactory.deploy()
         await aTokenOracle.deployed()
 
-        await curveLpTokenOracle.registerPool(CURVE_AAVE_LP)
+        await curveLpTokenOracle.registerLp(CURVE_AAVE_LP)
         await masterOracle.updateTokenOracle(CURVE_AAVE_LP, curveLpTokenOracle.address)
         await masterOracle.updateTokenOracle(ADAI_ADDRESS, aTokenOracle.address)
         await masterOracle.updateTokenOracle(AUSDC_ADDRESS, aTokenOracle.address)
@@ -229,11 +229,11 @@ describe('MasterOracle', function () {
         await yEarnTokenOracle.deployed()
 
         // compound (cDAI+cUSDC)
-        await curveLpTokenOracle.registerPool(CURVE_COMPOUND_LP)
+        await curveLpTokenOracle.registerLendingLp(CURVE_COMPOUND_LP)
         await masterOracle.updateTokenOracle(CURVE_COMPOUND_LP, curveLpTokenOracle.address)
 
         // usdt (cDAI+cUSDC+USDT)
-        await curveLpTokenOracle.registerPool(CURVE_USDT_LP)
+        await curveLpTokenOracle.registerLendingLp(CURVE_USDT_LP)
         await masterOracle.updateTokenOracle(CURVE_USDT_LP, curveLpTokenOracle.address)
 
         // busd (yDAI+yUSDC+yUSDT+yBUSD)
@@ -242,7 +242,7 @@ describe('MasterOracle', function () {
           ['function coins(int128) view returns(address)'],
           deployer
         )
-        await curveLpTokenOracle.registerPool(CURVE_BUSD_LP)
+        await curveLpTokenOracle.registerLendingLp(CURVE_BUSD_LP)
         await masterOracle.updateTokenOracle(CURVE_BUSD_LP, curveLpTokenOracle.address)
         await masterOracle.updateTokenOracle(await busdPool.coins(0), yEarnTokenOracle.address)
         await masterOracle.updateTokenOracle(await busdPool.coins(1), yEarnTokenOracle.address)
@@ -251,7 +251,7 @@ describe('MasterOracle', function () {
 
         // pax (ycDAI+ycUSDC+ycUSDT+USDP)
         const paxPool = new ethers.Contract(CURVE_PAX_POOL, ['function coins(int128) view returns(address)'], deployer)
-        await curveLpTokenOracle.registerPool(CURVE_PAX_LP)
+        await curveLpTokenOracle.registerLendingLp(CURVE_PAX_LP)
         await masterOracle.updateTokenOracle(CURVE_PAX_LP, curveLpTokenOracle.address)
         await masterOracle.updateTokenOracle(await paxPool.coins(0), yEarnTokenOracle.address)
         await masterOracle.updateTokenOracle(await paxPool.coins(1), yEarnTokenOracle.address)
@@ -259,7 +259,7 @@ describe('MasterOracle', function () {
 
         // y (yDAI+yUSDC+yYSDT+yTUSD)
         const yPool = new ethers.Contract(CURVE_Y_POOL, ['function coins(int128) view returns(address)'], deployer)
-        await curveLpTokenOracle.registerPool(CURVE_Y_LP)
+        await curveLpTokenOracle.registerLendingLp(CURVE_Y_LP)
         await masterOracle.updateTokenOracle(CURVE_Y_LP, curveLpTokenOracle.address)
         await masterOracle.updateTokenOracle(await yPool.coins(0), yEarnTokenOracle.address)
         await masterOracle.updateTokenOracle(await yPool.coins(1), yEarnTokenOracle.address)
@@ -269,7 +269,7 @@ describe('MasterOracle', function () {
 
       it('should get price for 3CRV', async function () {
         // when
-        const price = await masterOracle.getPriceInUsd(TRICRV_ADDRESS)
+        const price = await masterOracle.getPriceInUsd(CURVE_3CRV_LP)
 
         // then
         expect(price).closeTo(toUSD('1.02'), toUSD('0.001'))
@@ -344,7 +344,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(CURVE_COMPOUND_LP)
 
         // then
-        expect(price).closeTo(toUSD('0.024'), toUSD('0.01'))
+        expect(price).closeTo(toUSD('1.103'), toUSD('0.01'))
       })
 
       it('should get price for usdt Pool', async function () {
@@ -352,7 +352,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(CURVE_USDT_LP)
 
         // then
-        expect(price).closeTo(toUSD('0.024'), toUSD('0.01'))
+        expect(price).closeTo(toUSD('1.104'), toUSD('0.01'))
       })
 
       it('should get price for busd Pool', async function () {
@@ -360,7 +360,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(CURVE_BUSD_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.21'), toUSD('0.01'))
+        expect(price).closeTo(toUSD('1.133'), toUSD('0.01'))
       })
 
       it('should get price for pax Pool', async function () {
@@ -376,7 +376,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(CURVE_Y_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.24'), toUSD('0.01'))
+        expect(price).closeTo(toUSD('1.138'), toUSD('0.01'))
       })
     })
 
@@ -462,13 +462,13 @@ describe('MasterOracle', function () {
         const bTCPeggedTokenOracle = await bTCPeggedTokenOracleFactory.deploy(CHAINLINK_BTC_USD_AGGREGATOR, 60 * 60)
         await bTCPeggedTokenOracle.deployed()
 
-        await curveLpTokenOracle.registerPool(CURVE_REN_LP)
+        await curveLpTokenOracle.registerLp(CURVE_REN_LP)
         await masterOracle.updateTokenOracle(CURVE_REN_LP, curveLpTokenOracle.address)
         await masterOracle.updateTokenOracle(RENBTCe_ADDRESS, bTCPeggedTokenOracle.address)
         await masterOracle.updateTokenOracle(avWBTC_ADDRESS, aTokenOracle.address)
 
         // Aave (aDAI.e + aUSDC.e + aUSDT.e)
-        await curveLpTokenOracle.registerPool(CURVE_AAVE_LP)
+        await curveLpTokenOracle.registerLp(CURVE_AAVE_LP)
         await masterOracle.updateTokenOracle(CURVE_AAVE_LP, curveLpTokenOracle.address)
         await masterOracle.updateTokenOracle(avDAI_ADDRESS, aTokenOracle.address)
         await masterOracle.updateTokenOracle(avUSDC_ADDRESS, aTokenOracle.address)
@@ -654,7 +654,7 @@ describe('MasterOracle', function () {
         await curveLpTokenOracle.deployed()
 
         // 2pool (USDC + USDT)
-        await curveLpTokenOracle.registerPool(CURVE_2POOL_LP)
+        await curveLpTokenOracle.registerLp(CURVE_2POOL_LP)
         await masterOracle.updateTokenOracle(CURVE_2POOL_LP, curveLpTokenOracle.address)
       })
 

@@ -22,6 +22,9 @@ contract CurveFactoryLpTokenOracle is ITokenOracle {
     /// @notice LP token => coins mapping
     mapping(address => address[]) public underlyingTokens;
 
+    /// @notice Emitted when a token is registered
+    event LpRegistered(address indexed lpToken);
+
     constructor() {
         registry = ICurveFactoryRegistry(addressProvider.get_address(3));
     }
@@ -46,16 +49,18 @@ contract CurveFactoryLpTokenOracle is ITokenOracle {
 
     /// @notice Register LP token data
     /// @dev For factory pools, the LP and pool addresses are the same
-    function registerPool(address pool_) external {
-        require(underlyingTokens[pool_].length == 0, "lp-already-registered");
+    function registerLp(address lpToken_) external {
+        require(underlyingTokens[lpToken_].length == 0, "lp-already-registered");
 
-        uint256 _n = registry.get_n_coins(pool_);
-        if (_n == 0) (_n, ) = registry.get_meta_n_coins(pool_);
+        uint256 _n = registry.get_n_coins(lpToken_);
+        if (_n == 0) (_n, ) = registry.get_meta_n_coins(lpToken_);
         require(_n > 0, "invalid-pool");
 
-        address[4] memory _tokens = registry.get_coins(pool_);
+        address[4] memory _tokens = registry.get_coins(lpToken_);
         for (uint256 i; i < _n; i++) {
-            underlyingTokens[pool_].push(_tokens[i]);
+            underlyingTokens[lpToken_].push(_tokens[i]);
         }
+
+        emit LpRegistered(lpToken_);
     }
 }
