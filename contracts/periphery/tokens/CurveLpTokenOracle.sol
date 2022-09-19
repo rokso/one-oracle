@@ -78,11 +78,12 @@ contract CurveLpTokenOracle is ITokenOracle, Governable {
             _tokens = registry.get_coins(_pool);
         }
 
-        poolOf[lpToken_] = _pool;
-
         if (poolOf[lpToken_] != address(0)) {
+            // Clean current tokens if LP exists
             delete underlyingTokens[lpToken_];
         }
+
+        poolOf[lpToken_] = _pool;
 
         uint256 _n = registry.get_n_coins(_pool);
         for (uint256 i; i < _n; i++) {

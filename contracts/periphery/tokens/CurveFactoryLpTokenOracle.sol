@@ -54,7 +54,7 @@ contract CurveFactoryLpTokenOracle is ITokenOracle {
 
         uint256 _n = registry.get_n_coins(lpToken_);
         if (_n == 0) (_n, ) = registry.get_meta_n_coins(lpToken_);
-        require(_n > 0, "invalid-pool");
+        require(_n > 0, "invalid-factory-lp-token");
 
         address[4] memory _tokens = registry.get_coins(lpToken_);
         for (uint256 i; i < _n; i++) {
