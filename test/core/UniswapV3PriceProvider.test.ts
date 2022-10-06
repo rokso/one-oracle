@@ -40,12 +40,12 @@ describe('UniswapV3PriceProvider', function () {
   })
 
   describe('UniswapV3PriceProvider @mainnet', function () {
-    const {USDC_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.mainnet
+    const {USDC, WETH, WBTC} = Address.mainnet
 
     beforeEach(async function () {
-      usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
-      weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-      wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
+      usdc = IERC20__factory.connect(USDC, deployer)
+      weth = IERC20__factory.connect(WETH, deployer)
+      wbtc = IERC20__factory.connect(WBTC, deployer)
 
       const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
       const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
@@ -137,7 +137,7 @@ describe('UniswapV3PriceProvider', function () {
 
     describe('getPriceInUsd', function () {
       it('should revert if stable coin provider is null', async function () {
-        const tx = priceProvider['getPriceInUsd(address)'](WETH_ADDRESS)
+        const tx = priceProvider['getPriceInUsd(address)'](WETH)
         await expect(tx).revertedWith('stable-coin-not-supported')
       })
 
@@ -146,7 +146,7 @@ describe('UniswapV3PriceProvider', function () {
 
         beforeEach(async function () {
           stableCoinProvider = await smock.fake('StableCoinProvider')
-          stableCoinProvider.getStableCoinIfPegged.returns(USDC_ADDRESS)
+          stableCoinProvider.getStableCoinIfPegged.returns(USDC)
           stableCoinProvider.toUsdRepresentation.returns((args: BigNumber[]) => {
             const [stableCoinAmount_] = args
             return stableCoinAmount_.mul(parseUnits('1', 12)) // USDC amount to 18 decimals
@@ -156,17 +156,17 @@ describe('UniswapV3PriceProvider', function () {
         })
 
         it('should WETH price', async function () {
-          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WETH_ADDRESS)
+          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WETH)
           expect(_priceInUsd).closeTo(parseEther('3,230'), parseEther('1'))
         })
 
         it('should WBTC price', async function () {
-          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WBTC_ADDRESS)
+          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WBTC)
           expect(_priceInUsd).closeTo(parseEther('43,711'), parseEther('1'))
         })
 
         it('should DAI price', async function () {
-          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](USDC_ADDRESS)
+          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](USDC)
           expect(_priceInUsd).closeTo(parseEther('1'), parseEther('0.1'))
         })
       })
@@ -174,12 +174,12 @@ describe('UniswapV3PriceProvider', function () {
   })
 
   describe('UniswapV3PriceProvider @arbitrum', function () {
-    const {USDC_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.arbitrum
+    const {USDC, WETH, WBTC} = Address.arbitrum
 
     beforeEach(async function () {
-      usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
-      weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-      wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
+      usdc = IERC20__factory.connect(USDC, deployer)
+      weth = IERC20__factory.connect(WETH, deployer)
+      wbtc = IERC20__factory.connect(WBTC, deployer)
 
       const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
       const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
@@ -218,13 +218,13 @@ describe('UniswapV3PriceProvider', function () {
   })
 
   describe('UniswapV3PriceProvider @polygon', function () {
-    const {USDC_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.polygon
+    const {USDC, WETH, WBTC} = Address.polygon
 
     beforeEach(async function () {
-      usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
+      usdc = IERC20__factory.connect(USDC, deployer)
       // WETH has more liquid pools than WMATIC
-      weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-      wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
+      weth = IERC20__factory.connect(WETH, deployer)
+      wbtc = IERC20__factory.connect(WBTC, deployer)
 
       const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
       const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)

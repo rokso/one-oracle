@@ -8,12 +8,10 @@ import {parseEther} from '../helpers'
 import {smock} from '@defi-wonderland/smock'
 
 const {
-  DAI_ADDRESS,
-  WETH_ADDRESS,
-  WBTC_ADDRESS,
-  CHAINLINK_DAI_USD_AGGREGATOR,
-  CHAINLINK_ETH_USD_AGGREGATOR,
-  CHAINLINK_BTC_USD_AGGREGATOR,
+  DAI,
+  WETH,
+  WBTC,
+  Chainlink: {CHAINLINK_DAI_USD_AGGREGATOR, CHAINLINK_ETH_USD_AGGREGATOR, CHAINLINK_BTC_USD_AGGREGATOR},
 } = Address.mainnet
 
 describe('ChainlinkPriceProvider @mainnet', function () {
@@ -33,9 +31,9 @@ describe('ChainlinkPriceProvider @mainnet', function () {
     priceProvider = await priceProviderFactory.deploy()
     await priceProvider.deployed()
 
-    await priceProvider.updateAggregator(DAI_ADDRESS, CHAINLINK_DAI_USD_AGGREGATOR)
-    await priceProvider.updateAggregator(WETH_ADDRESS, CHAINLINK_ETH_USD_AGGREGATOR)
-    await priceProvider.updateAggregator(WBTC_ADDRESS, CHAINLINK_BTC_USD_AGGREGATOR)
+    await priceProvider.updateAggregator(DAI, CHAINLINK_DAI_USD_AGGREGATOR)
+    await priceProvider.updateAggregator(WETH, CHAINLINK_ETH_USD_AGGREGATOR)
+    await priceProvider.updateAggregator(WBTC, CHAINLINK_BTC_USD_AGGREGATOR)
   })
 
   afterEach(async function () {
@@ -44,24 +42,24 @@ describe('ChainlinkPriceProvider @mainnet', function () {
 
   describe('getPriceInUsd', function () {
     it('should WETH price', async function () {
-      const {_priceInUsd} = await priceProvider.getPriceInUsd(WETH_ADDRESS)
+      const {_priceInUsd} = await priceProvider.getPriceInUsd(WETH)
       expect(_priceInUsd).closeTo(parseEther('3,236'), parseEther('1'))
     })
 
     it('should WBTC price', async function () {
-      const {_priceInUsd} = await priceProvider.getPriceInUsd(WBTC_ADDRESS)
+      const {_priceInUsd} = await priceProvider.getPriceInUsd(WBTC)
       expect(_priceInUsd).closeTo(parseEther('43,675'), parseEther('1'))
     })
 
     it('should DAI price', async function () {
-      const {_priceInUsd} = await priceProvider.getPriceInUsd(DAI_ADDRESS)
+      const {_priceInUsd} = await priceProvider.getPriceInUsd(DAI)
       expect(_priceInUsd).closeTo(parseEther('1'), parseEther('0.1'))
     })
   })
 
   describe('updateAggregator', function () {
     it('should revert if not governor', async function () {
-      const tx = priceProvider.connect(alice).updateAggregator(WETH_ADDRESS, CHAINLINK_ETH_USD_AGGREGATOR)
+      const tx = priceProvider.connect(alice).updateAggregator(WETH, CHAINLINK_ETH_USD_AGGREGATOR)
       await expect(tx).revertedWith('not-governor')
     })
 
@@ -71,23 +69,23 @@ describe('ChainlinkPriceProvider @mainnet', function () {
     })
 
     it('should revert if using same aggregator as current', async function () {
-      const tx = priceProvider.updateAggregator(WETH_ADDRESS, CHAINLINK_ETH_USD_AGGREGATOR)
+      const tx = priceProvider.updateAggregator(WETH, CHAINLINK_ETH_USD_AGGREGATOR)
       await expect(tx).revertedWith('same-as-current')
     })
 
     it('should update aggregator', async function () {
-      const before = await priceProvider.aggregators(WETH_ADDRESS)
+      const before = await priceProvider.aggregators(WETH)
       expect(before).not.eq(ethers.constants.AddressZero)
-      await priceProvider.updateAggregator(WETH_ADDRESS, CHAINLINK_BTC_USD_AGGREGATOR)
-      const after = await priceProvider.aggregators(WETH_ADDRESS)
+      await priceProvider.updateAggregator(WETH, CHAINLINK_BTC_USD_AGGREGATOR)
+      const after = await priceProvider.aggregators(WETH)
       expect(after).eq(CHAINLINK_BTC_USD_AGGREGATOR).not.eq(before)
     })
 
     it('should set aggregator to null', async function () {
-      const before = await priceProvider.aggregators(WETH_ADDRESS)
+      const before = await priceProvider.aggregators(WETH)
       expect(before).not.eq(ethers.constants.AddressZero)
-      await priceProvider.updateAggregator(WETH_ADDRESS, ethers.constants.AddressZero)
-      const after = await priceProvider.aggregators(WETH_ADDRESS)
+      await priceProvider.updateAggregator(WETH, ethers.constants.AddressZero)
+      const after = await priceProvider.aggregators(WETH)
       expect(after).eq(ethers.constants.AddressZero)
     })
   })

@@ -2,7 +2,7 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
 import {Address} from '../../helpers'
 
-const {SUSHISWAP_FACTORY_ADDRESS, WETH_ADDRESS} = Address.mainnet
+const {SUSHISWAP_FACTORY_ADDRESS, WETH} = Address.mainnet
 
 const UniswapV2LikePriceProvider = 'UniswapV2LikePriceProvider'
 const SushiswapPriceProvider = 'SushiswapPriceProvider'
@@ -18,7 +18,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     contract: UniswapV2LikePriceProvider,
     from,
     log: true,
-    args: [SUSHISWAP_FACTORY_ADDRESS, twapPeriod, WETH_ADDRESS],
+    args: [SUSHISWAP_FACTORY_ADDRESS, twapPeriod, WETH],
   })
 }
 

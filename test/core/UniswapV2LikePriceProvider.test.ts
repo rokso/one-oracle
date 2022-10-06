@@ -38,20 +38,13 @@ describe('UniswapV2LikePriceProvider', function () {
   })
 
   describe('UniswapV2LikePriceProvider @mainnet', function () {
-    const {
-      DAI_ADDRESS,
-      WETH_ADDRESS,
-      WBTC_ADDRESS,
-      USDC_ADDRESS,
-      UNISWAP_V2_FACTORY_ADDRESS,
-      SUSHISWAP_FACTORY_ADDRESS,
-    } = Address.mainnet
+    const {DAI, WETH, WBTC, USDC, UNISWAP_V2_FACTORY_ADDRESS, SUSHISWAP_FACTORY_ADDRESS} = Address.mainnet
 
     beforeEach(async function () {
-      dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
-      nativeToken = IERC20__factory.connect(WETH_ADDRESS, deployer)
-      wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
-      usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
+      dai = IERC20__factory.connect(DAI, deployer)
+      nativeToken = IERC20__factory.connect(WETH, deployer)
+      wbtc = IERC20__factory.connect(WBTC, deployer)
+      usdc = IERC20__factory.connect(USDC, deployer)
     })
 
     describe('UniswapV2', function () {
@@ -59,21 +52,21 @@ describe('UniswapV2LikePriceProvider', function () {
 
       beforeEach(async function () {
         const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
-        priceProvider = await priceProviderFactory.deploy(UNISWAP_V2_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WETH_ADDRESS)
+        priceProvider = await priceProviderFactory.deploy(UNISWAP_V2_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WETH)
         await priceProvider.deployed()
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](USDC_ADDRESS, WETH_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WETH)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WETH)
+        await priceProvider['updateOrAdd(address,address)'](USDC, WETH)
 
         await increaseTime(DEFAULT_TWAP_PERIOD)
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](USDC_ADDRESS, WETH_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WETH)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WETH)
+        await priceProvider['updateOrAdd(address,address)'](USDC, WETH)
 
         stableCoinProvider = await smock.fake('StableCoinProvider')
-        stableCoinProvider.getStableCoinIfPegged.returns(DAI_ADDRESS)
+        stableCoinProvider.getStableCoinIfPegged.returns(DAI)
         stableCoinProvider.toUsdRepresentation.returns((amount: string) => amount)
       })
 
@@ -101,11 +94,11 @@ describe('UniswapV2LikePriceProvider', function () {
       describe('updateOrAdd', function () {
         it('should create oracle if does not exist', async function () {
           // given
-          const pair = await priceProvider.pairFor(DAI_ADDRESS, WBTC_ADDRESS)
+          const pair = await priceProvider.pairFor(DAI, WBTC)
           expect(await priceProvider['hasOracle(address)'](pair)).false
 
           // when
-          await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WBTC_ADDRESS)
+          await priceProvider['updateOrAdd(address,address)'](DAI, WBTC)
 
           // then
           expect(await priceProvider['hasOracle(address)'](pair)).true
@@ -113,15 +106,15 @@ describe('UniswapV2LikePriceProvider', function () {
 
         it('should create oracle for the same pair with different TWAP periods', async function () {
           // given
-          const pair = await priceProvider.pairFor(DAI_ADDRESS, WBTC_ADDRESS)
+          const pair = await priceProvider.pairFor(DAI, WBTC)
           const twapPeriod0 = HOUR
           const twapPeriod1 = HOUR.div('2')
           expect(await priceProvider['hasOracle(address,uint256)'](pair, twapPeriod0)).false
           expect(await priceProvider['hasOracle(address,uint256)'](pair, twapPeriod1)).false
 
           // when
-          await priceProvider['updateOrAdd(address,address,uint256)'](DAI_ADDRESS, WBTC_ADDRESS, twapPeriod0)
-          await priceProvider['updateOrAdd(address,address,uint256)'](DAI_ADDRESS, WBTC_ADDRESS, twapPeriod1)
+          await priceProvider['updateOrAdd(address,address,uint256)'](DAI, WBTC, twapPeriod0)
+          await priceProvider['updateOrAdd(address,address,uint256)'](DAI, WBTC, twapPeriod1)
 
           // then
           expect(await priceProvider['hasOracle(address,uint256)'](pair, twapPeriod0)).true
@@ -130,12 +123,12 @@ describe('UniswapV2LikePriceProvider', function () {
 
         it('should update oracle if it exists', async function () {
           // given
-          const pair = await priceProvider.pairFor(DAI_ADDRESS, WETH_ADDRESS)
+          const pair = await priceProvider.pairFor(DAI, WETH)
           const {blockTimestampLast: before} = await priceProvider.oracles(pair, DEFAULT_TWAP_PERIOD)
 
           // when
           await increaseTime(HOUR.mul('10'))
-          await priceProvider['updateOrAdd(address,address,uint256)'](DAI_ADDRESS, WETH_ADDRESS, DEFAULT_TWAP_PERIOD)
+          await priceProvider['updateOrAdd(address,address,uint256)'](DAI, WETH, DEFAULT_TWAP_PERIOD)
 
           // then
           const {blockTimestampLast: after} = await priceProvider.oracles(pair, DEFAULT_TWAP_PERIOD)
@@ -175,7 +168,7 @@ describe('UniswapV2LikePriceProvider', function () {
 
       describe('getPriceInUsd', function () {
         it('should revert if stable coin provider is null', async function () {
-          const tx = priceProvider['getPriceInUsd(address)'](WETH_ADDRESS)
+          const tx = priceProvider['getPriceInUsd(address)'](WETH)
           await expect(tx).revertedWith('stable-coin-not-supported')
         })
 
@@ -185,17 +178,17 @@ describe('UniswapV2LikePriceProvider', function () {
           })
 
           it('should WETH price', async function () {
-            const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WETH_ADDRESS)
+            const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WETH)
             expect(_priceInUsd).closeTo(parseEther('3,233'), parseEther('1'))
           })
 
           it('should WBTC price', async function () {
-            const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WBTC_ADDRESS)
+            const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WBTC)
             expect(_priceInUsd).closeTo(parseEther('43,733'), parseEther('1'))
           })
 
           it('should DAI price', async function () {
-            const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](DAI_ADDRESS)
+            const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](DAI)
             expect(_priceInUsd).closeTo(parseEther('1'), parseEther('0.1'))
           })
         })
@@ -207,16 +200,16 @@ describe('UniswapV2LikePriceProvider', function () {
 
       beforeEach(async function () {
         const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
-        priceProvider = await priceProviderFactory.deploy(SUSHISWAP_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WETH_ADDRESS)
+        priceProvider = await priceProviderFactory.deploy(SUSHISWAP_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WETH)
         await priceProvider.deployed()
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WETH)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WETH)
 
         await increaseTime(DEFAULT_TWAP_PERIOD)
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WETH)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WETH)
       })
 
       describe('quote', function () {
@@ -252,13 +245,12 @@ describe('UniswapV2LikePriceProvider', function () {
   })
 
   describe('UniswapV2LikePriceProvider @avalanche', function () {
-    const {DAI_ADDRESS, WAVAX_ADDRESS, WBTC_ADDRESS, TRADERJOE_FACTORY_ADDRESS, PANGOLIN_FACTORY_ADDRESS} =
-      Address.avalanche
+    const {DAI, WAVAX, WBTC, TRADERJOE_FACTORY_ADDRESS, PANGOLIN_FACTORY_ADDRESS} = Address.avalanche
 
     beforeEach(async function () {
-      dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
-      nativeToken = IERC20__factory.connect(WAVAX_ADDRESS, deployer)
-      wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
+      dai = IERC20__factory.connect(DAI, deployer)
+      nativeToken = IERC20__factory.connect(WAVAX, deployer)
+      wbtc = IERC20__factory.connect(WBTC, deployer)
     })
 
     describe('TraderJoe', function () {
@@ -266,16 +258,16 @@ describe('UniswapV2LikePriceProvider', function () {
 
       beforeEach(async function () {
         const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
-        priceProvider = await priceProviderFactory.deploy(TRADERJOE_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WAVAX_ADDRESS)
+        priceProvider = await priceProviderFactory.deploy(TRADERJOE_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WAVAX)
         await priceProvider.deployed()
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WAVAX_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WAVAX_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WAVAX)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WAVAX)
 
         await increaseTime(DEFAULT_TWAP_PERIOD)
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WAVAX_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WAVAX_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WAVAX)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WAVAX)
       })
 
       describe('quote', function () {
@@ -314,16 +306,16 @@ describe('UniswapV2LikePriceProvider', function () {
 
       beforeEach(async function () {
         const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
-        priceProvider = await priceProviderFactory.deploy(PANGOLIN_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WAVAX_ADDRESS)
+        priceProvider = await priceProviderFactory.deploy(PANGOLIN_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WAVAX)
         await priceProvider.deployed()
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WAVAX_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WAVAX_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WAVAX)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WAVAX)
 
         await increaseTime(DEFAULT_TWAP_PERIOD)
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WAVAX_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WAVAX_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WAVAX)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WAVAX)
       })
 
       describe('quote', function () {
@@ -359,12 +351,12 @@ describe('UniswapV2LikePriceProvider', function () {
   })
 
   describe('UniswapV2LikePriceProvider @arbitrum', function () {
-    const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS, SUSHISWAP_FACTORY_ADDRESS} = Address.arbitrum
+    const {DAI, WETH, WBTC, SUSHISWAP_FACTORY_ADDRESS} = Address.arbitrum
 
     beforeEach(async function () {
-      dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
-      nativeToken = IERC20__factory.connect(WETH_ADDRESS, deployer)
-      wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
+      dai = IERC20__factory.connect(DAI, deployer)
+      nativeToken = IERC20__factory.connect(WETH, deployer)
+      wbtc = IERC20__factory.connect(WBTC, deployer)
     })
 
     describe('Sushiswap', function () {
@@ -372,16 +364,16 @@ describe('UniswapV2LikePriceProvider', function () {
 
       beforeEach(async function () {
         const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
-        priceProvider = await priceProviderFactory.deploy(SUSHISWAP_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WETH_ADDRESS)
+        priceProvider = await priceProviderFactory.deploy(SUSHISWAP_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WETH)
         await priceProvider.deployed()
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WETH)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WETH)
 
         await increaseTime(DEFAULT_TWAP_PERIOD)
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WETH_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WETH_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WETH)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WETH)
       })
 
       describe('quote', function () {
@@ -417,13 +409,12 @@ describe('UniswapV2LikePriceProvider', function () {
   })
 
   describe('UniswapV2LikePriceProvider @polygon', function () {
-    const {DAI_ADDRESS, WMATIC_ADDRESS, WBTC_ADDRESS, SUSHISWAP_FACTORY_ADDRESS, QUICKSWAP_FACTORY_ADDRESS} =
-      Address.polygon
+    const {DAI, WMATIC, WBTC, SUSHISWAP_FACTORY_ADDRESS, QUICKSWAP_FACTORY_ADDRESS} = Address.polygon
 
     beforeEach(async function () {
-      dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
-      nativeToken = IERC20__factory.connect(WMATIC_ADDRESS, deployer)
-      wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
+      dai = IERC20__factory.connect(DAI, deployer)
+      nativeToken = IERC20__factory.connect(WMATIC, deployer)
+      wbtc = IERC20__factory.connect(WBTC, deployer)
     })
 
     describe('Sushiswap', function () {
@@ -431,20 +422,16 @@ describe('UniswapV2LikePriceProvider', function () {
 
       beforeEach(async function () {
         const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
-        priceProvider = await priceProviderFactory.deploy(
-          SUSHISWAP_FACTORY_ADDRESS,
-          DEFAULT_TWAP_PERIOD,
-          WMATIC_ADDRESS
-        )
+        priceProvider = await priceProviderFactory.deploy(SUSHISWAP_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WMATIC)
         await priceProvider.deployed()
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WMATIC_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WMATIC_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WMATIC)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WMATIC)
 
         await increaseTime(DEFAULT_TWAP_PERIOD)
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WMATIC_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WMATIC_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WMATIC)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WMATIC)
       })
 
       describe('quote', function () {
@@ -483,20 +470,16 @@ describe('UniswapV2LikePriceProvider', function () {
 
       beforeEach(async function () {
         const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
-        priceProvider = await priceProviderFactory.deploy(
-          QUICKSWAP_FACTORY_ADDRESS,
-          DEFAULT_TWAP_PERIOD,
-          WMATIC_ADDRESS
-        )
+        priceProvider = await priceProviderFactory.deploy(QUICKSWAP_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WMATIC)
         await priceProvider.deployed()
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WMATIC_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WMATIC_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WMATIC)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WMATIC)
 
         await increaseTime(DEFAULT_TWAP_PERIOD)
 
-        await priceProvider['updateOrAdd(address,address)'](DAI_ADDRESS, WMATIC_ADDRESS)
-        await priceProvider['updateOrAdd(address,address)'](WBTC_ADDRESS, WMATIC_ADDRESS)
+        await priceProvider['updateOrAdd(address,address)'](DAI, WMATIC)
+        await priceProvider['updateOrAdd(address,address)'](WBTC, WMATIC)
       })
 
       describe('quote', function () {

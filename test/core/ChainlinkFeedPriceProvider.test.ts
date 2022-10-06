@@ -11,7 +11,7 @@ import {
 import Address from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 
-const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.mainnet
+const {DAI, WETH, WBTC} = Address.mainnet
 
 describe('ChainlinkFeedPriceProvider @mainnet', function () {
   let snapshotId: string
@@ -25,9 +25,9 @@ describe('ChainlinkFeedPriceProvider @mainnet', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer] = await ethers.getSigners()
 
-    dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
-    weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-    wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
+    dai = IERC20__factory.connect(DAI, deployer)
+    weth = IERC20__factory.connect(WETH, deployer)
+    wbtc = IERC20__factory.connect(WBTC, deployer)
 
     const priceProviderFactory = new ChainlinkFeedPriceProvider__factory(deployer)
     priceProvider = await priceProviderFactory.deploy()

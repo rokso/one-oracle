@@ -20,7 +20,7 @@ import {smock} from '@defi-wonderland/smock'
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
 
-const {WETH_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS} = Address.mainnet
+const {WETH, WBTC, USDC} = Address.mainnet
 
 // Note: No need to cover all chains on this test
 describe('PriceProvidersAggregator @mainnet', function () {
@@ -37,9 +37,9 @@ describe('PriceProvidersAggregator @mainnet', function () {
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
-    weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-    wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
-    usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
+    weth = IERC20__factory.connect(WETH, deployer)
+    wbtc = IERC20__factory.connect(WBTC, deployer)
+    usdc = IERC20__factory.connect(USDC, deployer)
 
     const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
@@ -61,7 +61,7 @@ describe('PriceProvidersAggregator @mainnet', function () {
     await chainlinkProvider.deployed()
 
     const aggregatorProviderFactory = new PriceProvidersAggregator__factory(deployer)
-    aggregator = await aggregatorProviderFactory.deploy(WETH_ADDRESS)
+    aggregator = await aggregatorProviderFactory.deploy(WETH)
     await aggregator.deployed()
 
     await aggregator.setPriceProvider(Provider.UNISWAP_V3, uniswapV3Provider.address)

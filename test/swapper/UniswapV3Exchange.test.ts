@@ -7,7 +7,7 @@ import Address from '../../helpers/address'
 import {parseEther, max, parseUnits} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
 
-const {WETH_ADDRESS, DAI_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS} = Address.mainnet
+const {WETH, DAI, WBTC, USDC} = Address.mainnet
 
 describe('UniswapV3Exchange @mainnet', function () {
   let snapshotId: string
@@ -32,14 +32,14 @@ describe('UniswapV3Exchange @mainnet', function () {
     ;[deployer, invalidToken] = await ethers.getSigners()
 
     const dexFactory = new UniswapV3Exchange__factory(deployer)
-    dex = await dexFactory.deploy(WETH_ADDRESS)
+    dex = await dexFactory.deploy(WETH)
     await dex.deployed()
     defaultPoolFee = await dex.defaultPoolFee()
 
-    weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-    dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
-    wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
-    usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
+    weth = IERC20__factory.connect(WETH, deployer)
+    dai = IERC20__factory.connect(DAI, deployer)
+    wbtc = IERC20__factory.connect(WBTC, deployer)
+    usdc = IERC20__factory.connect(USDC, deployer)
 
     await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
@@ -57,8 +57,8 @@ describe('UniswapV3Exchange @mainnet', function () {
   describe('getBestAmountIn', function () {
     it('should revert if swap is impossible', async function () {
       const amountOut = parseEther('1,000')
-      const call0 = dex.callStatic.getBestAmountIn(WETH_ADDRESS, invalidToken.address, amountOut)
-      const call1 = dex.callStatic.getBestAmountIn(DAI_ADDRESS, invalidToken.address, amountOut)
+      const call0 = dex.callStatic.getBestAmountIn(WETH, invalidToken.address, amountOut)
+      const call1 = dex.callStatic.getBestAmountIn(DAI, invalidToken.address, amountOut)
       await expect(call0).revertedWith('no-path-found')
       await expect(call1).revertedWith('no-path-found')
     })
@@ -66,15 +66,12 @@ describe('UniswapV3Exchange @mainnet', function () {
     it('should get best amountIn for WETH->DAI', async function () {
       // given
       const amountOut = parseEther('3,222')
-      const path = ethers.utils.solidityPack(
-        ['address', 'uint24', 'address'],
-        [DAI_ADDRESS, defaultPoolFee, WETH_ADDRESS]
-      )
+      const path = ethers.utils.solidityPack(['address', 'uint24', 'address'], [DAI, defaultPoolFee, WETH])
       const bestAmountIn = await dex.callStatic.getAmountsIn(amountOut, path)
       expect(bestAmountIn).closeTo(parseEther('1'), parseEther('0.1'))
 
       // when
-      const {_amountIn} = await dex.callStatic.getBestAmountIn(WETH_ADDRESS, DAI_ADDRESS, amountOut)
+      const {_amountIn} = await dex.callStatic.getBestAmountIn(WETH, DAI, amountOut)
 
       // then
       expect(_amountIn).eq(bestAmountIn)
@@ -85,13 +82,13 @@ describe('UniswapV3Exchange @mainnet', function () {
       const amountOut = parseEther('100')
       const path = ethers.utils.solidityPack(
         ['address', 'uint24', 'address', 'uint24', 'address'],
-        [DAI_ADDRESS, defaultPoolFee, WETH_ADDRESS, defaultPoolFee, USDC_ADDRESS]
+        [DAI, defaultPoolFee, WETH, defaultPoolFee, USDC]
       )
       const bestAmountIn = await dex.callStatic.getAmountsIn(amountOut, path)
       expect(bestAmountIn).closeTo(parseUnits('100', 6), parseUnits('1', 6))
 
       // when
-      const {_amountIn} = await dex.callStatic.getBestAmountIn(USDC_ADDRESS, DAI_ADDRESS, amountOut)
+      const {_amountIn} = await dex.callStatic.getBestAmountIn(USDC, DAI, amountOut)
 
       // then
       expect(_amountIn).eq(bestAmountIn)
@@ -102,14 +99,14 @@ describe('UniswapV3Exchange @mainnet', function () {
       const amountOut = parseEther('43,221')
       const path = ethers.utils.solidityPack(
         ['address', 'uint24', 'address', 'uint24', 'address'],
-        [DAI_ADDRESS, defaultPoolFee, WETH_ADDRESS, defaultPoolFee, WBTC_ADDRESS]
+        [DAI, defaultPoolFee, WETH, defaultPoolFee, WBTC]
       )
       const amountInB = await dex.callStatic.getAmountsIn(amountOut, path)
       const bestAmountIn = amountInB
       expect(bestAmountIn).closeTo(parseUnits('1', 8), parseUnits('0.1', 8))
 
       // when
-      const {_amountIn} = await dex.callStatic.getBestAmountIn(WBTC_ADDRESS, DAI_ADDRESS, amountOut)
+      const {_amountIn} = await dex.callStatic.getBestAmountIn(WBTC, DAI, amountOut)
 
       // then
       expect(_amountIn).eq(bestAmountIn)
@@ -119,8 +116,8 @@ describe('UniswapV3Exchange @mainnet', function () {
   describe('getBestAmountOut', function () {
     it('should revert if swap is impossible', async function () {
       const amountIn = parseEther('1,000')
-      const call0 = dex.callStatic.getBestAmountOut(WETH_ADDRESS, invalidToken.address, amountIn)
-      const call1 = dex.callStatic.getBestAmountOut(DAI_ADDRESS, invalidToken.address, amountIn)
+      const call0 = dex.callStatic.getBestAmountOut(WETH, invalidToken.address, amountIn)
+      const call1 = dex.callStatic.getBestAmountOut(DAI, invalidToken.address, amountIn)
       await expect(call0).revertedWith('no-path-found')
       await expect(call1).revertedWith('no-path-found')
     })
@@ -128,15 +125,12 @@ describe('UniswapV3Exchange @mainnet', function () {
     it('should get best amountOut for WETH->DAI', async function () {
       // given
       const amountIn = parseEther('1')
-      const path = ethers.utils.solidityPack(
-        ['address', 'uint24', 'address'],
-        [WETH_ADDRESS, defaultPoolFee, DAI_ADDRESS]
-      )
+      const path = ethers.utils.solidityPack(['address', 'uint24', 'address'], [WETH, defaultPoolFee, DAI])
       const bestAmountOut = await dex.callStatic.getAmountsOut(amountIn, path)
       expect(bestAmountOut).closeTo(parseEther('3,227'), parseEther('1'))
 
       // when
-      const {_amountOut} = await dex.callStatic.getBestAmountOut(WETH_ADDRESS, DAI_ADDRESS, amountIn)
+      const {_amountOut} = await dex.callStatic.getBestAmountOut(WETH, DAI, amountIn)
 
       // then
       expect(_amountOut).eq(bestAmountOut)
@@ -147,13 +141,13 @@ describe('UniswapV3Exchange @mainnet', function () {
       const amountIn = parseUnits('1,000', 6)
       const path = ethers.utils.solidityPack(
         ['address', 'uint24', 'address', 'uint24', 'address'],
-        [USDC_ADDRESS, defaultPoolFee, WETH_ADDRESS, defaultPoolFee, DAI_ADDRESS]
+        [USDC, defaultPoolFee, WETH, defaultPoolFee, DAI]
       )
       const bestAmountOut = await dex.callStatic.getAmountsOut(amountIn, path)
       expect(bestAmountOut).closeTo(parseEther('1000'), parseEther('6'))
 
       // when
-      const {_amountOut} = await dex.callStatic.getBestAmountOut(USDC_ADDRESS, DAI_ADDRESS, amountIn)
+      const {_amountOut} = await dex.callStatic.getBestAmountOut(USDC, DAI, amountIn)
 
       // then
       expect(_amountOut).eq(bestAmountOut)
@@ -162,21 +156,18 @@ describe('UniswapV3Exchange @mainnet', function () {
     it('should get best amountOut for WBTC->DAI', async function () {
       // given
       const amountIn = parseUnits('1', 8)
-      const pathA = ethers.utils.solidityPack(
-        ['address', 'uint24', 'address'],
-        [WBTC_ADDRESS, defaultPoolFee, DAI_ADDRESS]
-      )
+      const pathA = ethers.utils.solidityPack(['address', 'uint24', 'address'], [WBTC, defaultPoolFee, DAI])
       const amountOutA = await dex.callStatic.getAmountsOut(amountIn, pathA)
       const pathB = ethers.utils.solidityPack(
         ['address', 'uint24', 'address', 'uint24', 'address'],
-        [WBTC_ADDRESS, defaultPoolFee, WETH_ADDRESS, defaultPoolFee, DAI_ADDRESS]
+        [WBTC, defaultPoolFee, WETH, defaultPoolFee, DAI]
       )
       const amountOutB = await dex.callStatic.getAmountsOut(amountIn, pathB)
       const bestAmountOut = max(amountOutA, amountOutB)
       expect(bestAmountOut).closeTo(parseEther('43,515'), parseEther('1'))
 
       // when
-      const {_amountOut} = await dex.callStatic.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
+      const {_amountOut} = await dex.callStatic.getBestAmountOut(WBTC, DAI, amountIn)
 
       // then
       expect(_amountOut).eq(bestAmountOut)
@@ -187,10 +178,8 @@ describe('UniswapV3Exchange @mainnet', function () {
     it('should swap WETH->DAI', async function () {
       // given
       const amountIn = parseEther('1')
-      const {_amountOut, _path} = await dex.callStatic.getBestAmountOut(WETH_ADDRESS, DAI_ADDRESS, amountIn)
-      expect(_path).eq(
-        ethers.utils.solidityPack(['address', 'uint24', 'address'], [WETH_ADDRESS, defaultPoolFee, DAI_ADDRESS])
-      )
+      const {_amountOut, _path} = await dex.callStatic.getBestAmountOut(WETH, DAI, amountIn)
+      expect(_path).eq(ethers.utils.solidityPack(['address', 'uint24', 'address'], [WETH, defaultPoolFee, DAI]))
       const wethBefore = await weth.balanceOf(deployer.address)
       const daiBefore = await dai.balanceOf(deployer.address)
 
@@ -211,11 +200,11 @@ describe('UniswapV3Exchange @mainnet', function () {
     it('should swap WBTC->WETH->DAI', async function () {
       // given
       const amountIn = parseUnits('1', 8)
-      const {_amountOut, _path} = await dex.callStatic.getBestAmountOut(WBTC_ADDRESS, DAI_ADDRESS, amountIn)
+      const {_amountOut, _path} = await dex.callStatic.getBestAmountOut(WBTC, DAI, amountIn)
       expect(_path).eq(
         ethers.utils.solidityPack(
           ['address', 'uint24', 'address', 'uint24', 'address'],
-          [WBTC_ADDRESS, defaultPoolFee, WETH_ADDRESS, defaultPoolFee, DAI_ADDRESS]
+          [WBTC, defaultPoolFee, WETH, defaultPoolFee, DAI]
         )
       )
       const wbtcBefore = await wbtc.balanceOf(deployer.address)
@@ -240,7 +229,7 @@ describe('UniswapV3Exchange @mainnet', function () {
     it('should swap DAI->WETH', async function () {
       // given
       const amountOut = parseEther('1')
-      const {_amountIn, _path} = await dex.callStatic.getBestAmountIn(DAI_ADDRESS, WETH_ADDRESS, amountOut)
+      const {_amountIn, _path} = await dex.callStatic.getBestAmountIn(DAI, WETH, amountOut)
       const daiBefore = await dai.balanceOf(deployer.address)
       const wethBefore = await weth.balanceOf(deployer.address)
 
@@ -261,7 +250,7 @@ describe('UniswapV3Exchange @mainnet', function () {
     it('should swap DAI->WETH->WBTC', async function () {
       // given
       const amountOut = parseUnits('0.1', 8)
-      const {_amountIn, _path} = await dex.callStatic.getBestAmountIn(DAI_ADDRESS, WBTC_ADDRESS, amountOut)
+      const {_amountIn, _path} = await dex.callStatic.getBestAmountIn(DAI, WBTC, amountOut)
 
       const daiBefore = await dai.balanceOf(deployer.address)
       const wbtcBefore = await wbtc.balanceOf(deployer.address)

@@ -3,7 +3,7 @@ import {DeployFunction} from 'hardhat-deploy/types'
 import {Address} from '../../helpers'
 import {parseEther} from '@ethersproject/units'
 
-const {DAI_ADDRESS, USDC_ADDRESS} = Address.mainnet
+const {DAI, USDC} = Address.mainnet
 
 const AddressProvider = 'AddressProvider'
 const StableCoinProvider = 'StableCoinProvider'
@@ -20,7 +20,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {address: stableCoinProviderAddress} = await deploy(StableCoinProvider, {
     from,
     log: true,
-    args: [USDC_ADDRESS, DAI_ADDRESS, stalePeriod, maxDeviation],
+    args: [USDC, DAI, stalePeriod, maxDeviation],
   })
 
   if ((await read(AddressProvider, 'stableCoinProvider')) !== stableCoinProviderAddress) {

@@ -23,7 +23,7 @@ const UNISWAP_V2_WETH_WBTC_PAIR = '0xBb2b8038a1640196FbE3e38816F3e67Cba72D940'
 const UNISWAP_V2_WBTC_USDC_PAIR = '0x004375dff511095cc5a197a54140a24efef3a416'
 const DAI_HOLDER = '0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8'
 
-const {UNISWAP_V2_ROUTER_ADDRESS, WETH_ADDRESS, DAI_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS} = Address.mainnet
+const {UNISWAP_V2_ROUTER_ADDRESS, WETH, DAI, WBTC, USDC} = Address.mainnet
 
 describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
   let snapshotId: string
@@ -55,10 +55,10 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
     ethDaiPair = IUniswapV2Pair__factory.connect(UNISWAP_V2_WETH_DAI_PAIR, deployer)
     ethWbtcPair = IUniswapV2Pair__factory.connect(UNISWAP_V2_WETH_WBTC_PAIR, deployer)
     wbtcUsdcPair = IUniswapV2Pair__factory.connect(UNISWAP_V2_WBTC_USDC_PAIR, deployer)
-    weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-    dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
-    wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
-    usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
+    weth = IERC20__factory.connect(WETH, deployer)
+    dai = IERC20__factory.connect(DAI, deployer)
+    wbtc = IERC20__factory.connect(WBTC, deployer)
+    usdc = IERC20__factory.connect(USDC, deployer)
   })
 
   afterEach(async function () {

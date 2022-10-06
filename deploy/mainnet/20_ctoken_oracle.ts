@@ -2,7 +2,7 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
 import {Address} from '../../helpers'
 
-const {WETH_ADDRESS} = Address.mainnet
+const {WETH} = Address.mainnet
 
 const CTokenOracle = 'CTokenOracle'
 
@@ -14,7 +14,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy(CTokenOracle, {
     from: deployer,
     log: true,
-    args: [WETH_ADDRESS],
+    args: [WETH],
   })
 }
 

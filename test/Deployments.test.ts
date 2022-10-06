@@ -53,7 +53,7 @@ describe('Deployments ', function () {
     let chainlinkOracle: ChainlinkOracle
     let msUsdOracle: SynthUsdTokenOracle
 
-    const {WETH_ADDRESS} = Address.avalanche
+    const {WETH} = Address.avalanche
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -84,17 +84,17 @@ describe('Deployments ', function () {
     })
 
     it('ChainlinkAvalanchePriceProvider', async function () {
-      const {_priceInUsd: price} = await chainlinkAvalanchePriceProvider.getPriceInUsd(WETH_ADDRESS)
+      const {_priceInUsd: price} = await chainlinkAvalanchePriceProvider.getPriceInUsd(WETH)
       expect(price).eq(toUSD('3,251.6014'))
     })
 
     it('PriceProvidersAggregator', async function () {
-      const {_priceInUsd: priceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, WETH_ADDRESS)
+      const {_priceInUsd: priceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, WETH)
       expect(priceInUsd).eq(toUSD('3,251.6014'))
     })
 
     it('ChainlinkOracle', async function () {
-      const priceInUsd = await chainlinkOracle.getPriceInUsd(WETH_ADDRESS)
+      const priceInUsd = await chainlinkOracle.getPriceInUsd(WETH)
       expect(priceInUsd).eq(toUSD('3,251.6014'))
     })
 
@@ -115,7 +115,7 @@ describe('Deployments ', function () {
     let dai: IERC20
     let vspOracle: VspMainnetOracle
 
-    const {WETH_ADDRESS, DAI_ADDRESS, VSP_ADDRESS} = Address.mainnet
+    const {WETH, DAI, VSP} = Address.mainnet
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -130,11 +130,11 @@ describe('Deployments ', function () {
       sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiswapExchange.address, deployer)
       uniswapV3Exchange = UniswapV3Exchange__factory.connect(UniswapV3Exchange.address, deployer)
       routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
-      weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-      dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
+      weth = IERC20__factory.connect(WETH, deployer)
+      dai = IERC20__factory.connect(DAI, deployer)
       vspOracle = VspMainnetOracle__factory.connect(VspOracle.address, deployer)
 
-      await adjustBalance(WETH_ADDRESS, deployer.address, parseEther('1000'))
+      await adjustBalance(WETH, deployer.address, parseEther('1000'))
     })
 
     it('AddressProvider', async function () {
@@ -143,47 +143,29 @@ describe('Deployments ', function () {
     })
 
     it('UniswapV2Exchange', async function () {
-      const {_amountOut} = await uniswapV2Exchange.callStatic.getBestAmountOut(
-        WETH_ADDRESS,
-        DAI_ADDRESS,
-        parseEther('1')
-      )
+      const {_amountOut} = await uniswapV2Exchange.callStatic.getBestAmountOut(WETH, DAI, parseEther('1'))
       expect(_amountOut).closeTo(parseEther('3,222'), parseEther('1'))
     })
 
     it('SushiswapExchange', async function () {
-      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(
-        WETH_ADDRESS,
-        DAI_ADDRESS,
-        parseEther('1')
-      )
+      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(WETH, DAI, parseEther('1'))
       expect(_amountOut).closeTo(parseEther('3,228'), parseEther('1'))
     })
 
     it('UniswapV3Exchange', async function () {
-      const {_amountOut} = await uniswapV3Exchange.callStatic.getBestAmountOut(
-        WETH_ADDRESS,
-        DAI_ADDRESS,
-        parseEther('1')
-      )
+      const {_amountOut} = await uniswapV3Exchange.callStatic.getBestAmountOut(WETH, DAI, parseEther('1'))
       expect(_amountOut).closeTo(parseEther('3,227'), parseEther('1'))
     })
 
     it('RoutedSwapper', async function () {
       // given
-      const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[WETH_ADDRESS, DAI_ADDRESS]])
-      await routedSwapper.setDefaultRouting(
-        SwapType.EXACT_INPUT,
-        WETH_ADDRESS,
-        DAI_ADDRESS,
-        ExchangeType.UNISWAP_V2,
-        path
-      )
+      const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[WETH, DAI]])
+      await routedSwapper.setDefaultRouting(SwapType.EXACT_INPUT, WETH, DAI, ExchangeType.UNISWAP_V2, path)
       await weth.approve(routedSwapper.address, ethers.constants.MaxUint256)
 
       // when
       const amountIn = parseEther('1')
-      const tx = () => routedSwapper.swapExactInput(WETH_ADDRESS, DAI_ADDRESS, amountIn, 0, deployer.address)
+      const tx = () => routedSwapper.swapExactInput(WETH, DAI, amountIn, 0, deployer.address)
 
       // then
       await expect(tx).changeTokenBalance(dai, deployer, '3222760582677952358944') // ~3,227 DAI
@@ -195,7 +177,7 @@ describe('Deployments ', function () {
       await vspOracle.update()
 
       // when
-      const price = await vspOracle.getPriceInUsd(VSP_ADDRESS)
+      const price = await vspOracle.getPriceInUsd(VSP)
 
       // then
       expect(price).closeTo(parseEther('1.88'), parseEther('0.01'))
@@ -229,7 +211,7 @@ describe('Deployments ', function () {
     let wmatic: IERC20
     let dai: IERC20
 
-    const {WMATIC_ADDRESS, DAI_ADDRESS} = Address.polygon
+    const {WMATIC, DAI} = Address.polygon
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -242,10 +224,10 @@ describe('Deployments ', function () {
       quickswapExchange = UniswapV2LikeExchange__factory.connect(QuickSwapExchange.address, deployer)
       sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiSwapExchange.address, deployer)
       routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
-      wmatic = IERC20__factory.connect(WMATIC_ADDRESS, deployer)
-      dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
+      wmatic = IERC20__factory.connect(WMATIC, deployer)
+      dai = IERC20__factory.connect(DAI, deployer)
 
-      await adjustBalance(WMATIC_ADDRESS, deployer.address, parseEther('1000'))
+      await adjustBalance(WMATIC, deployer.address, parseEther('1000'))
     })
 
     it('AddressProvider', async function () {
@@ -254,38 +236,24 @@ describe('Deployments ', function () {
     })
 
     it('QuickSwapExchange', async function () {
-      const {_amountOut} = await quickswapExchange.callStatic.getBestAmountOut(
-        WMATIC_ADDRESS,
-        DAI_ADDRESS,
-        parseEther('1')
-      )
+      const {_amountOut} = await quickswapExchange.callStatic.getBestAmountOut(WMATIC, DAI, parseEther('1'))
       expect(_amountOut).closeTo(parseEther('1.39'), parseEther('1'))
     })
 
     it('SushiswapExchange', async function () {
-      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(
-        WMATIC_ADDRESS,
-        DAI_ADDRESS,
-        parseEther('1')
-      )
+      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(WMATIC, DAI, parseEther('1'))
       expect(_amountOut).closeTo(parseEther('1.39'), parseEther('1'))
     })
 
     it('RoutedSwapper', async function () {
       // given
-      const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[WMATIC_ADDRESS, DAI_ADDRESS]])
-      await routedSwapper.setDefaultRouting(
-        SwapType.EXACT_INPUT,
-        WMATIC_ADDRESS,
-        DAI_ADDRESS,
-        ExchangeType.SUSHISWAP,
-        path
-      )
+      const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[WMATIC, DAI]])
+      await routedSwapper.setDefaultRouting(SwapType.EXACT_INPUT, WMATIC, DAI, ExchangeType.SUSHISWAP, path)
       await wmatic.approve(routedSwapper.address, ethers.constants.MaxUint256)
 
       // when
       const amountIn = parseEther('1')
-      const tx = () => routedSwapper.swapExactInput(WMATIC_ADDRESS, DAI_ADDRESS, amountIn, 0, deployer.address)
+      const tx = () => routedSwapper.swapExactInput(WMATIC, DAI, amountIn, 0, deployer.address)
 
       // then
       await expect(tx).changeTokenBalance(dai, deployer, '1393185276882594922') // ~1.39 DAI

@@ -11,7 +11,7 @@ import {BigNumber} from 'ethers'
 const STALE_PERIOD = ethers.constants.MaxUint256
 const MAX_DEVIATION = parseEther('0.1') // 10%
 
-const {WETH_ADDRESS, DAI_ADDRESS} = Address.mainnet
+const {WETH, DAI} = Address.mainnet
 
 // Note: No need to cover all chains on this test
 describe('ChainlinkAndFallbacksOracle @mainnet', function () {
@@ -114,7 +114,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         })
 
         // when
-        const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+        const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH)
 
         // then
         expect(priceInUsd).eq(chainlinkPriceInUsd)
@@ -135,7 +135,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+            const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH)
 
             // then
             expect(priceInUsd).eq(v3PriceInUsd)
@@ -156,7 +156,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
               })
 
               // when
-              const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+              const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH)
 
               // then
               expect(priceInUsd).eq(v3PriceInUsd)
@@ -175,7 +175,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
               })
 
               // when
-              const call = chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+              const call = chainlinkAndFallbacksOracle.getPriceInUsd(WETH)
 
               // then
               await expect(call).revertedWith('prices-deviation-too-high')
@@ -195,7 +195,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+            const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH)
 
             // then
             expect(priceInUsd).eq(v3PriceInUsd)
@@ -215,7 +215,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const call = chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+            const call = chainlinkAndFallbacksOracle.getPriceInUsd(WETH)
 
             // then
             await expect(call).revertedWith('fallback-a-failed')
@@ -234,7 +234,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+            const priceInUsd = await chainlinkAndFallbacksOracle.getPriceInUsd(WETH)
 
             // then
             expect(priceInUsd).eq(v2PriceInUsd)
@@ -252,7 +252,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const call = chainlinkAndFallbacksOracle.getPriceInUsd(WETH_ADDRESS)
+            const call = chainlinkAndFallbacksOracle.getPriceInUsd(WETH)
 
             // then
             await expect(call).revertedWith('fallbacks-failed')
@@ -279,7 +279,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         })
 
         // when
-        const amountOut = await chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+        const amountOut = await chainlinkAndFallbacksOracle.quote(WETH, DAI, parseEther('1'))
 
         // then
         expect(amountOut).eq(chainlinkAmounOut)
@@ -300,7 +300,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const amountOut = await chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+            const amountOut = await chainlinkAndFallbacksOracle.quote(WETH, DAI, parseEther('1'))
 
             // then
             expect(amountOut).eq(v3AmountOut)
@@ -323,7 +323,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
               )
 
               // when
-              const amountOut = await chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+              const amountOut = await chainlinkAndFallbacksOracle.quote(WETH, DAI, parseEther('1'))
 
               // then
               expect(amountOut).eq(v3AmountOut)
@@ -344,7 +344,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
               )
 
               // when
-              const call = chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+              const call = chainlinkAndFallbacksOracle.quote(WETH, DAI, parseEther('1'))
 
               // then
               await expect(call).revertedWith('prices-deviation-too-high')
@@ -364,7 +364,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const amountOut = await chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+            const amountOut = await chainlinkAndFallbacksOracle.quote(WETH, DAI, parseEther('1'))
 
             // then
             expect(amountOut).eq(v3AmountOut)
@@ -384,7 +384,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const call = chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+            const call = chainlinkAndFallbacksOracle.quote(WETH, DAI, parseEther('1'))
 
             // then
             await expect(call).revertedWith('fallback-a-failed')
@@ -403,7 +403,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const amountOut = await chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+            const amountOut = await chainlinkAndFallbacksOracle.quote(WETH, DAI, parseEther('1'))
 
             // then
             expect(amountOut).eq(v2AmountOut)
@@ -421,7 +421,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const call = chainlinkAndFallbacksOracle.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+            const call = chainlinkAndFallbacksOracle.quote(WETH, DAI, parseEther('1'))
 
             // then
             await expect(call).revertedWith('fallbacks-failed')
@@ -448,7 +448,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         })
 
         // when
-        const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+        const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH, parseEther('1'))
 
         // then
         expect(amountOut).eq(chainlinkAmounOut)
@@ -469,7 +469,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+            const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH, parseEther('1'))
 
             // then
             expect(amountOut).eq(v3AmountOut)
@@ -490,7 +490,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
               })
 
               // when
-              const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+              const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH, parseEther('1'))
 
               // then
               expect(amountOut).eq(v3AmountOut)
@@ -509,7 +509,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
               })
 
               // when
-              const call = chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+              const call = chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH, parseEther('1'))
 
               // then
               await expect(call).revertedWith('prices-deviation-too-high')
@@ -529,7 +529,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+            const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH, parseEther('1'))
 
             // then
             expect(amountOut).eq(v3AmountOut)
@@ -549,7 +549,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const call = chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+            const call = chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH, parseEther('1'))
 
             // then
             await expect(call).revertedWith('fallback-a-failed')
@@ -568,7 +568,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+            const amountOut = await chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH, parseEther('1'))
 
             // then
             expect(amountOut).eq(v2AmountOut)
@@ -586,7 +586,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const call = chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH_ADDRESS, parseEther('1'))
+            const call = chainlinkAndFallbacksOracle.quoteTokenToUsd(WETH, parseEther('1'))
 
             // then
             await expect(call).revertedWith('fallbacks-failed')
@@ -613,7 +613,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         })
 
         // when
-        const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+        const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH, parseEther('3,000'))
 
         // then
         expect(amountOut).eq(chainlinkAmounOut)
@@ -634,7 +634,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+            const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH, parseEther('3,000'))
 
             // then
             expect(amountOut).eq(v3AmountOut)
@@ -655,7 +655,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
               })
 
               // when
-              const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+              const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH, parseEther('3,000'))
 
               // then
               expect(amountOut).eq(v3AmountOut)
@@ -674,7 +674,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
               })
 
               // when
-              const call = chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+              const call = chainlinkAndFallbacksOracle.quoteUsdToToken(WETH, parseEther('3,000'))
 
               // then
               await expect(call).revertedWith('prices-deviation-too-high')
@@ -694,7 +694,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+            const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH, parseEther('3,000'))
 
             // then
             expect(amountOut).eq(v3AmountOut)
@@ -714,7 +714,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const call = chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+            const call = chainlinkAndFallbacksOracle.quoteUsdToToken(WETH, parseEther('3,000'))
 
             // then
             await expect(call).revertedWith('fallback-a-failed')
@@ -733,7 +733,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('3,000'))
+            const amountOut = await chainlinkAndFallbacksOracle.quoteUsdToToken(WETH, parseEther('3,000'))
 
             // then
             expect(amountOut).eq(v2AmountOut)
@@ -751,7 +751,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             })
 
             // when
-            const call = chainlinkAndFallbacksOracle.quoteUsdToToken(WETH_ADDRESS, parseEther('1'))
+            const call = chainlinkAndFallbacksOracle.quoteUsdToToken(WETH, parseEther('1'))
 
             // then
             await expect(call).revertedWith('fallbacks-failed')

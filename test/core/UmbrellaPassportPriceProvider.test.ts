@@ -17,7 +17,11 @@ import {Contract} from 'ethers'
 import {encodeKeys, encodeKey, encodeValue} from '../helpers/umbrella'
 import {smock} from '@defi-wonderland/smock'
 
-const {UMBRELLA_REGISTRY, UMB_ADDRESS, WETH_ADDRESS, USDC_ADDRESS} = Address.bsc
+const {
+  Umbrella: {UMBRELLA_REGISTRY, UMB},
+  WETH,
+  USDC,
+} = Address.bsc
 
 const HEARTBEAT_TIMESTAMP = HOUR.mul(24)
 const DEVIATION_THRESHOLD = parseEther('0.01') // 1%
@@ -43,8 +47,8 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
     const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    umb = IERC20__factory.connect(UMB_ADDRESS, funder)
-    await adjustBalance(UMB_ADDRESS, funder.address, parseEther('1,000,000'))
+    umb = IERC20__factory.connect(UMB, funder)
+    await adjustBalance(UMB, funder.address, parseEther('1,000,000'))
 
     const datumReceiverFactory = new UmbrellaPassportPriceProvider__factory(deployer)
     priceProvider = await datumReceiverFactory.deploy(UMBRELLA_REGISTRY, HEARTBEAT_TIMESTAMP, DEVIATION_THRESHOLD)
@@ -283,7 +287,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
 
   describe('getPriceInUsd', function () {
     beforeEach(async function () {
-      await priceProvider.updateKeyOfToken(WETH_ADDRESS, 'ETH-USD')
+      await priceProvider.updateKeyOfToken(WETH, 'ETH-USD')
     })
 
     it('should get price from Chain if it is the latest ', async function () {
@@ -294,7 +298,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
       expect(priceInUsd0).eq(0)
 
       // then
-      const {_priceInUsd: priceInUsd1, _lastUpdatedAt: lastUpdatedAt1} = await priceProvider.getPriceInUsd(WETH_ADDRESS)
+      const {_priceInUsd: priceInUsd1, _lastUpdatedAt: lastUpdatedAt1} = await priceProvider.getPriceInUsd(WETH)
 
       // then
       expect(lastUpdatedAt1).gt(0)
@@ -303,7 +307,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
 
     it('should get price from Passport if it is the latest ', async function () {
       // given
-      const {_lastUpdatedAt: lastUpdatedAtFromChain} = await priceProvider.getPriceInUsd(WETH_ADDRESS)
+      const {_lastUpdatedAt: lastUpdatedAtFromChain} = await priceProvider.getPriceInUsd(WETH)
       const key = encodeKey('ETH-USD')
       const blockId = await chain.getLatestBlockId()
       const latestBlock = await chain.blocks(blockId)
@@ -314,7 +318,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
       expect(lastUpdatedAtFromPassport).gte(lastUpdatedAtFromChain)
 
       // then
-      const {_priceInUsd: priceInUsd, _lastUpdatedAt: lastUpdatedAt} = await priceProvider.getPriceInUsd(WETH_ADDRESS)
+      const {_priceInUsd: priceInUsd, _lastUpdatedAt: lastUpdatedAt} = await priceProvider.getPriceInUsd(WETH)
 
       // then
       expect(lastUpdatedAt).eq(latestBlock.dataTimestamp)
@@ -329,7 +333,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
       expect(priceInUsd0).eq(0)
 
       // then
-      const tx = priceProvider.getPriceInUsd(USDC_ADDRESS)
+      const tx = priceProvider.getPriceInUsd(USDC)
 
       // then
       await expect(tx).revertedWith('invalid-quote')

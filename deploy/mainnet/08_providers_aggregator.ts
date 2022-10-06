@@ -2,7 +2,7 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
 import {Address, Provider} from '../../helpers'
 
-const {WETH_ADDRESS} = Address.mainnet
+const {WETH} = Address.mainnet
 const {CHAINLINK, UNISWAP_V2, SUSHISWAP} = Provider
 
 const AddressProvider = 'AddressProvider'
@@ -19,7 +19,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {address: priceProviderAggregatorAddress} = await deploy(PriceProvidersAggregator, {
     from,
     log: true,
-    args: [WETH_ADDRESS],
+    args: [WETH],
   })
 
   const {address: chainlinkAddress} = await get(ChainlinkPriceProvider)

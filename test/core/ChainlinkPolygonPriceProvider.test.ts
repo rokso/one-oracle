@@ -6,7 +6,7 @@ import {ChainlinkPolygonPriceProvider, ChainlinkPolygonPriceProvider__factory} f
 import Address from '../../helpers/address'
 import {parseEther} from '../helpers'
 
-const {DAI_ADDRESS, WETH_ADDRESS} = Address.polygon
+const {DAI, WETH} = Address.polygon
 
 describe('ChainlinkPolygonPriceProvider @polygon', function () {
   let snapshotId: string
@@ -28,7 +28,7 @@ describe('ChainlinkPolygonPriceProvider @polygon', function () {
 
   describe('quote', function () {
     it('should quote WETH to DAI', async function () {
-      const {_amountOut} = await priceProvider.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
+      const {_amountOut} = await priceProvider.quote(WETH, DAI, parseEther('1'))
       expect(_amountOut).closeTo(parseEther('3,013'), parseEther('1'))
     })
   })
