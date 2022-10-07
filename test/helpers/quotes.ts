@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {parseEther} from '.'
 
 /**
@@ -45,6 +46,13 @@ const Quote = {
     UNIV2_ETH_DAI_LP_USD: parseEther('129'),
     UNIV2_WBTC_USDC_LP_USD: parseEther('37,068,436,574,606'),
     UNIV2_ETH_WBTC_LP_USD: parseEther('1,281,940,794'),
+    vaUSDC_USD: parseEther('1.03'),
+    vaDAI_USD: parseEther('1.07'),
+    vaFRAX_USD: parseEther('1.03'),
+    vaETH_USD: parseEther('1,388'),
+    vastETH_USD: parseEther('1,360'),
+    vaWBTC_USD: parseEther('20,328.67'),
+    vaLINK_USD: parseEther('7.87'),
   },
   polygon: {
     MATIC_USD: parseEther('0.84'),

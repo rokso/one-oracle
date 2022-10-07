@@ -32,6 +32,7 @@ import {parseEther, timestampFromLatestBlock, toUSD} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {Provider} from '../../helpers'
 import Quote from '../helpers/quotes'
+import {VPoolTokenOracle__factory} from '../../typechain-types/factories/contracts/periphery/tokens'
 
 const STALE_PERIOD = ethers.constants.MaxUint256
 
@@ -68,7 +69,13 @@ describe('MasterOracle', function () {
       WETH,
       BUSD,
       USDP,
-      Chainlink: {CHAINLINK_BTC_USD_AGGREGATOR, CHAINLINK_BUSD_USD_AGGREGATOR, CHAINLINK_USDP_USD_AGGREGATOR},
+      stETH,
+      Chainlink: {
+        CHAINLINK_BTC_USD_AGGREGATOR,
+        CHAINLINK_BUSD_USD_AGGREGATOR,
+        CHAINLINK_USDP_USD_AGGREGATOR,
+        CHAINLINK_STETH_USD_AGGREGATOR,
+      },
       Curve: {
         TRIPOOL_LP,
         SBTC_LP,
@@ -88,6 +95,7 @@ describe('MasterOracle', function () {
         COMPOUND_LP,
         USDT_LP,
       },
+      Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK},
     } = Address.mainnet
 
     beforeEach(async function () {
@@ -96,6 +104,7 @@ describe('MasterOracle', function () {
       await chainlinkPriceProvider.deployed()
       await chainlinkPriceProvider.updateAggregator(BUSD, CHAINLINK_BUSD_USD_AGGREGATOR)
       await chainlinkPriceProvider.updateAggregator(USDP, CHAINLINK_USDP_USD_AGGREGATOR)
+      await chainlinkPriceProvider.updateAggregator(stETH, CHAINLINK_STETH_USD_AGGREGATOR)
 
       const chainlinkOracleMockFactory = new ChainlinkOracleMock__factory(deployer)
       chainlinkOracle = await chainlinkOracleMockFactory.deploy(chainlinkPriceProvider.address)
@@ -387,6 +396,57 @@ describe('MasterOracle', function () {
       it('getPriceInUsd (ETH - 0x00..00 underlying)', async function () {
         const price = await masterOracle.getPriceInUsd(CETH)
         expect(price).closeTo(Quote.mainnet.CETH_USD, toUSD('1'))
+      })
+    })
+
+    describe('VPool tokens', function () {
+      beforeEach(async function () {
+        const vPoolTokenOracleFactory = new VPoolTokenOracle__factory(deployer)
+        const vPoolTokenOracle = await vPoolTokenOracleFactory.deploy()
+        await vPoolTokenOracle.deployed()
+
+        await masterOracle.updateTokenOracle(vaUSDC, vPoolTokenOracle.address)
+        await masterOracle.updateTokenOracle(vaDAI, vPoolTokenOracle.address)
+        await masterOracle.updateTokenOracle(vaFRAX, vPoolTokenOracle.address)
+        await masterOracle.updateTokenOracle(vaETH, vPoolTokenOracle.address)
+        await masterOracle.updateTokenOracle(vastETH, vPoolTokenOracle.address)
+        await masterOracle.updateTokenOracle(vaWBTC, vPoolTokenOracle.address)
+        await masterOracle.updateTokenOracle(vaLINK, vPoolTokenOracle.address)
+      })
+
+      it('should get price for vaUSDC', async function () {
+        const price = await masterOracle.getPriceInUsd(vaUSDC)
+        expect(price).closeTo(Quote.mainnet.vaUSDC_USD, toUSD('0.01'))
+      })
+
+      it('should get price for vaDAI', async function () {
+        const price = await masterOracle.getPriceInUsd(vaDAI)
+        expect(price).closeTo(Quote.mainnet.vaDAI_USD, toUSD('0.01'))
+      })
+
+      it('should get price for vaFRAX', async function () {
+        const price = await masterOracle.getPriceInUsd(vaFRAX)
+        expect(price).closeTo(Quote.mainnet.vaFRAX_USD, toUSD('0.01'))
+      })
+
+      it('should get price for vaETH', async function () {
+        const price = await masterOracle.getPriceInUsd(vaETH)
+        expect(price).closeTo(Quote.mainnet.vaETH_USD, toUSD('1'))
+      })
+
+      it('should get price for vastETH', async function () {
+        const price = await masterOracle.getPriceInUsd(vastETH)
+        expect(price).closeTo(Quote.mainnet.vastETH_USD, toUSD('1'))
+      })
+
+      it('should get price for vaWBTC', async function () {
+        const price = await masterOracle.getPriceInUsd(vaWBTC)
+        expect(price).closeTo(Quote.mainnet.vaWBTC_USD, toUSD('1'))
+      })
+
+      it('should get price for vaLINK', async function () {
+        const price = await masterOracle.getPriceInUsd(vaLINK)
+        expect(price).closeTo(Quote.mainnet.vaLINK_USD, toUSD('0.1'))
       })
     })
   })
