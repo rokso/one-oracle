@@ -5,6 +5,7 @@ import {ethers} from 'hardhat'
 import {ChainlinkPolygonPriceProvider, ChainlinkPolygonPriceProvider__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther} from '../helpers'
+import Quote from '../helpers/quotes'
 
 const {DAI, WETH} = Address.polygon
 
@@ -29,7 +30,7 @@ describe('ChainlinkPolygonPriceProvider @polygon', function () {
   describe('quote', function () {
     it('should quote WETH to DAI', async function () {
       const {_amountOut} = await priceProvider.quote(WETH, DAI, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('3,013'), parseEther('1'))
+      expect(_amountOut).closeTo(Quote.polygon.ETH_USD, parseEther('1'))
     })
   })
 })

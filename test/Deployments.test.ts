@@ -27,6 +27,7 @@ import {impersonateAccount, increaseTime, parseEther, resetFork, toUSD} from './
 import {IERC20} from '../typechain-types/@openzeppelin/contracts/token/ERC20'
 import {IERC20__factory} from '../typechain-types/factories/@openzeppelin/contracts/token/ERC20'
 import {adjustBalance} from './helpers/balance'
+import Quote from './helpers/quotes'
 
 describe('Deployments ', function () {
   let snapshotId: string
@@ -79,23 +80,22 @@ describe('Deployments ', function () {
     })
 
     it('AddressProvider', async function () {
-      expect(addressProvider.address).eq(Address.ADDRESS_PROVIDER)
       expect(await addressProvider.governor()).eq(deployer.address)
     })
 
     it('ChainlinkAvalanchePriceProvider', async function () {
       const {_priceInUsd: price} = await chainlinkAvalanchePriceProvider.getPriceInUsd(WETH)
-      expect(price).eq(toUSD('3,251.6014'))
+      expect(price).closeTo(Quote.avalanche.ETH_USD, toUSD('1'))
     })
 
     it('PriceProvidersAggregator', async function () {
       const {_priceInUsd: priceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, WETH)
-      expect(priceInUsd).eq(toUSD('3,251.6014'))
+      expect(priceInUsd).closeTo(Quote.avalanche.ETH_USD, toUSD('1'))
     })
 
     it('ChainlinkOracle', async function () {
       const priceInUsd = await chainlinkOracle.getPriceInUsd(WETH)
-      expect(priceInUsd).eq(toUSD('3,251.6014'))
+      expect(priceInUsd).closeTo(Quote.avalanche.ETH_USD, toUSD('1'))
     })
 
     it('SynthUsdTokenOracle', async function () {
@@ -138,23 +138,22 @@ describe('Deployments ', function () {
     })
 
     it('AddressProvider', async function () {
-      expect(addressProvider.address).eq(Address.ADDRESS_PROVIDER)
       expect(await addressProvider.governor()).eq(deployer.address)
     })
 
     it('UniswapV2Exchange', async function () {
       const {_amountOut} = await uniswapV2Exchange.callStatic.getBestAmountOut(WETH, DAI, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('3,222'), parseEther('1'))
+      expect(_amountOut).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
     })
 
     it('SushiswapExchange', async function () {
       const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(WETH, DAI, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('3,228'), parseEther('1'))
+      expect(_amountOut).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
     })
 
     it('UniswapV3Exchange', async function () {
       const {_amountOut} = await uniswapV3Exchange.callStatic.getBestAmountOut(WETH, DAI, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('3,227'), parseEther('1'))
+      expect(_amountOut).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
     })
 
     it('RoutedSwapper', async function () {
@@ -165,10 +164,12 @@ describe('Deployments ', function () {
 
       // when
       const amountIn = parseEther('1')
-      const tx = () => routedSwapper.swapExactInput(WETH, DAI, amountIn, 0, deployer.address)
+      const before = await dai.balanceOf(deployer.address)
+      await routedSwapper.swapExactInput(WETH, DAI, amountIn, 0, deployer.address)
+      const after = await dai.balanceOf(deployer.address)
 
       // then
-      await expect(tx).changeTokenBalance(dai, deployer, '3222760582677952358944') // ~3,227 DAI
+      expect(after.sub(before)).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
     })
 
     it('VspMainnetOracle', async function () {
@@ -180,7 +181,7 @@ describe('Deployments ', function () {
       const price = await vspOracle.getPriceInUsd(VSP)
 
       // then
-      expect(price).closeTo(parseEther('1.88'), parseEther('0.01'))
+      expect(price).closeTo(Quote.mainnet.VSP_USD, parseEther('0.01'))
     })
   })
 
@@ -198,7 +199,6 @@ describe('Deployments ', function () {
     })
 
     it('AddressProvider', async function () {
-      expect(addressProvider.address).eq(Address.ADDRESS_PROVIDER)
       expect(await addressProvider.governor()).eq(deployer.address)
     })
   })
@@ -209,7 +209,6 @@ describe('Deployments ', function () {
     let sushiswapExchange: UniswapV2LikeExchange
     let routedSwapper: RoutedSwapper
     let wmatic: IERC20
-    let dai: IERC20
 
     const {WMATIC, DAI} = Address.polygon
 
@@ -225,13 +224,11 @@ describe('Deployments ', function () {
       sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiSwapExchange.address, deployer)
       routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
       wmatic = IERC20__factory.connect(WMATIC, deployer)
-      dai = IERC20__factory.connect(DAI, deployer)
 
       await adjustBalance(WMATIC, deployer.address, parseEther('1000'))
     })
 
     it('AddressProvider', async function () {
-      expect(addressProvider.address).eq(Address.ADDRESS_PROVIDER)
       expect(await addressProvider.governor()).eq(deployer.address)
     })
 
@@ -253,10 +250,12 @@ describe('Deployments ', function () {
 
       // when
       const amountIn = parseEther('1')
-      const tx = () => routedSwapper.swapExactInput(WMATIC, DAI, amountIn, 0, deployer.address)
+      const before = await wmatic.balanceOf(deployer.address)
+      await routedSwapper.swapExactInput(WMATIC, DAI, amountIn, 0, deployer.address)
+      const after = await wmatic.balanceOf(deployer.address)
 
       // then
-      await expect(tx).changeTokenBalance(dai, deployer, '1393185276882594922') // ~1.39 DAI
+      expect(after.sub(before)).closeTo(Quote.polygon.MATIC_USD, parseEther('10'))
     })
   })
 })

@@ -1,6 +1,7 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {expect} from 'chai'
 import Address from './address'
+import {network} from 'hardhat'
 
 const AddressProvider = 'AddressProvider'
 
@@ -12,6 +13,27 @@ const deployAddressProvider = async (hre: HardhatRuntimeEnvironment) => {
   if (deployer !== Address.DEPLOYER) {
     console.log(`The AddressProvider must be deployed by '${Address.DEPLOYER}'`)
     console.log('Skipping AddressProvider deployment...')
+  }
+
+  // Tests don't read from `deployments` config files, because of that deployment with deterministic address
+  // will fail in fork chains when the contract already exist:
+  // Error: already deployed on same deterministic address: 0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A
+  if (network.name === 'hardhat') {
+    await deployments.deploy(AddressProvider, {
+      contract: AddressProvider,
+      from: deployer,
+      log: true,
+      proxy: {
+        proxyContract: 'OpenZeppelinTransparentProxy',
+        execute: {
+          init: {
+            methodName: 'initialize',
+            args: [deployer],
+          },
+        },
+      },
+    })
+    return
   }
 
   // Both 'OpenZeppelinTransparentProxy' and 'AddressProvider' codes must always be the same when deploying

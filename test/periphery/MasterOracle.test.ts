@@ -31,6 +31,7 @@ import Address from '../../helpers/address'
 import {parseEther, timestampFromLatestBlock, toUSD} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {Provider} from '../../helpers'
+import Quote from '../helpers/quotes'
 
 const STALE_PERIOD = ethers.constants.MaxUint256
 
@@ -264,7 +265,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(TRIPOOL_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.02'), toUSD('0.001'))
+        expect(price).closeTo(Quote.mainnet.CURVE_TRIPOOL_LP_USD, toUSD('0.01'))
       })
 
       it('should get price for SBTC', async function () {
@@ -272,7 +273,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(SBTC_LP)
 
         // then
-        expect(price).closeTo(toUSD('44,137.36'), toUSD('0.01'))
+        expect(price).closeTo(Quote.mainnet.CURVE_SBTC_LP_USD, toUSD('1'))
       })
 
       it('should get price for MIMx3CRV', async function () {
@@ -280,7 +281,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(MIM_3CRV_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.004'), toUSD('0.001'))
+        expect(price).closeTo(Quote.mainnet.CURVE_MIM_3CRV_LP_USD, toUSD('0.001'))
       })
 
       it('should get price for SUSD', async function () {
@@ -288,7 +289,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(SUSD_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.046'), toUSD('0.001'))
+        expect(price).closeTo(Quote.mainnet.CURVE_SUSD_LP_USD, toUSD('0.01'))
       })
 
       it('should get price for D3POOL', async function () {
@@ -296,7 +297,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(D3_LP)
 
         // then
-        expect(price).closeTo(toUSD('0.991'), toUSD('0.001'))
+        expect(price).closeTo(Quote.mainnet.CURVE_D3POOL_LP_USD, toUSD('0.01'))
       })
 
       it('should get price for FRAXx3Crv', async function () {
@@ -304,7 +305,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(FRAX_3CRV_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.006'), toUSD('0.001'))
+        expect(price).closeTo(Quote.mainnet.CURVE_FRAX_3CRV_LP_USD, toUSD('0.01'))
       })
 
       it('should get price for ibBTC', async function () {
@@ -312,7 +313,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(IBBTC_SBTC_LP)
 
         // then
-        expect(price).closeTo(toUSD('43,803.65'), toUSD('0.01'))
+        expect(price).closeTo(Quote.mainnet.CURVE_IBBTC_LP_USD, toUSD('0.01'))
       })
 
       it('should get price for mUSD Pool', async function () {
@@ -320,7 +321,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(MUSD_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.015'), toUSD('0.001'))
+        expect(price).closeTo(Quote.mainnet.CURVE_MUSD_LP_USD, toUSD('0.001'))
       })
 
       it('should get price for aAve Pool', async function () {
@@ -328,7 +329,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(AAVE_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.087'), toUSD('0.001'))
+        expect(price).closeTo(Quote.mainnet.CURVE_AAVE_LP_USD, toUSD('0.001'))
       })
 
       it('should get price for compound Pool', async function () {
@@ -336,7 +337,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(COMPOUND_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.103'), toUSD('0.01'))
+        expect(price).closeTo(Quote.mainnet.CURVE_COMPOUND_LP_USD, toUSD('0.01'))
       })
 
       it('should get price for usdt Pool', async function () {
@@ -344,7 +345,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(USDT_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.104'), toUSD('0.01'))
+        expect(price).closeTo(Quote.mainnet.CURVE_USDT_LP_USD, toUSD('0.01'))
       })
 
       it('should get price for busd Pool', async function () {
@@ -352,7 +353,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(BUSD_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.133'), toUSD('0.01'))
+        expect(price).closeTo(Quote.mainnet.CURVE_BUSD_LP_USD, toUSD('0.01'))
       })
 
       it('should get price for pax Pool', async function () {
@@ -360,7 +361,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(PAX_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.04'), toUSD('0.01'))
+        expect(price).closeTo(Quote.mainnet.CURVE_PAX_LP_USD, toUSD('0.01'))
       })
 
       it('should get price for y Pool', async function () {
@@ -368,24 +369,24 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(Y_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.138'), toUSD('0.01'))
+        expect(price).closeTo(Quote.mainnet.CURVE_Y_LP_USD, toUSD('0.01'))
       })
     })
 
     describe('CTokens', function () {
       it('getPriceInUsd (18 decimals underlying)', async function () {
         const price = await masterOracle.getPriceInUsd(CDAI)
-        expect(price).closeTo(toUSD('0.021'), toUSD('0.001')) // 1 cDAI ~= $0.021
+        expect(price).closeTo(Quote.mainnet.CDAI_USD, toUSD('0.001'))
       })
 
       it('getPriceInUsd (6 decimals underlying)', async function () {
         const price = await masterOracle.getPriceInUsd(CUSDC)
-        expect(price).closeTo(toUSD('0.022'), toUSD('0.001')) // 1 cUSDC ~= $0.022
+        expect(price).closeTo(toUSD('0.022'), toUSD('0.01'))
       })
 
       it('getPriceInUsd (ETH - 0x00..00 underlying)', async function () {
         const price = await masterOracle.getPriceInUsd(CETH)
-        expect(price).closeTo(toUSD('64.92'), toUSD('0.1')) // 1 cETH ~= $64.92
+        expect(price).closeTo(Quote.mainnet.CETH_USD, toUSD('1'))
       })
     })
   })
@@ -468,7 +469,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(REN_LP)
 
         // then
-        expect(price).closeTo(toUSD('43,047.01'), toUSD('0.01'))
+        expect(price).closeTo(Quote.avalanche.CURVE_REN_LP_USD, toUSD('1'))
       })
 
       it('should get price for aAve Pool', async function () {
@@ -476,7 +477,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(AAVE_LP)
 
         // then
-        expect(price).closeTo(toUSD('1.016'), toUSD('0.001'))
+        expect(price).closeTo(Quote.avalanche.CURVE_AAVE_LP_USD, toUSD('0.1'))
       })
     })
 
@@ -526,7 +527,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(MSD_WAVAX)
 
         // then
-        expect(price).closeTo(toUSD('86.37'), toUSD('0.01'))
+        expect(price).closeTo(Quote.avalanche.AVAX_USD, toUSD('1'))
       })
 
       it('should get price for msdWETH', async function () {
@@ -534,7 +535,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(MSD_WETH)
 
         // then
-        expect(price).closeTo(toUSD('3,251.60'), toUSD('0.01'))
+        expect(price).closeTo(Quote.avalanche.ETH_USD, toUSD('1'))
       })
 
       it('should get price for msdDAI', async function () {
@@ -542,7 +543,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(MSD_DAI)
 
         // then
-        expect(price).closeTo(toUSD('1'), toUSD('0.001'))
+        expect(price).closeTo(parseEther('1'), toUSD('0.1'))
       })
 
       it('should get price for msdUSDT', async function () {
@@ -550,7 +551,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(MSD_USDT)
 
         // then
-        expect(price).closeTo(toUSD('1'), toUSD('0.001'))
+        expect(price).closeTo(parseEther('1'), toUSD('0.1'))
       })
 
       it('should get price for msBTC', async function () {
@@ -558,7 +559,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(MS_BTC)
 
         // then
-        expect(price).closeTo(toUSD('42,794.64'), toUSD('0.01'))
+        expect(price).closeTo(Quote.avalanche.BTC_USD, toUSD('50'))
       })
 
       it('should get price for msUSD', async function () {
@@ -574,7 +575,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(MS_UNI)
 
         // then
-        expect(price).closeTo(toUSD('9.89'), toUSD('0.01'))
+        expect(price).closeTo(Quote.avalanche.UNI_USD, toUSD('0.01'))
       })
 
       it('should get price for msCRV', async function () {
@@ -582,7 +583,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(MS_CRV)
 
         // then
-        expect(price).closeTo(toUSD('2.41'), toUSD('0.01'))
+        expect(price).closeTo(Quote.avalanche.CRV_USD, toUSD('0.01'))
       })
 
       it('should get price for msAAVE', async function () {
@@ -590,7 +591,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(MS_AAVE)
 
         // then
-        expect(price).closeTo(toUSD('190.75'), toUSD('0.01'))
+        expect(price).closeTo(Quote.avalanche.AAVE_USD, toUSD('1'))
       })
     })
   })

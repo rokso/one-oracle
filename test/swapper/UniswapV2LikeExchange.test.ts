@@ -14,6 +14,7 @@ import Address from '../../helpers/address'
 import {InitCodeHash} from '../../helpers/index'
 import {parseEther, min, max, parseUnits} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
+import Quote from '../helpers/quotes'
 
 const abi = ethers.utils.defaultAbiCoder
 
@@ -75,7 +76,7 @@ describe('UniswapV2LikeExchange', function () {
         const [amountInA] = await router.getAmountsIn(amountOut, [USDC, DAI])
         const [amountInB] = await router.getAmountsIn(amountOut, [USDC, WETH, DAI])
         const bestAmountIn = min(amountInA, amountInB)
-        expect(bestAmountIn).closeTo(parseUnits('1,000', 6), parseUnits('1', 6))
+        expect(bestAmountIn).closeTo(parseUnits('1,000', 6), parseUnits('2', 6))
 
         // when
         const {_amountIn} = await dex.callStatic.getBestAmountIn(USDC, DAI, amountOut)
@@ -84,16 +85,16 @@ describe('UniswapV2LikeExchange', function () {
         expect(_amountIn).eq(bestAmountIn)
       })
 
-      it('should get best amountIn for WBTC->DAI', async function () {
+      it('should get best amountIn for WBTC->USDC', async function () {
         // given
-        const amountOut = parseEther('43,221')
-        const [amountInA] = await router.getAmountsIn(amountOut, [WBTC, DAI])
-        const [amountInB] = await router.getAmountsIn(amountOut, [WBTC, WETH, DAI])
+        const amountOut = Quote.mainnet.BTC_USD.div(`${1e12}`)
+        const [amountInA] = await router.getAmountsIn(amountOut, [WBTC, USDC])
+        const [amountInB] = await router.getAmountsIn(amountOut, [WBTC, WETH, USDC])
         const bestAmountIn = min(amountInA, amountInB)
         expect(bestAmountIn).closeTo(parseUnits('1', 8), parseUnits('0.1', 8))
 
         // when
-        const {_amountIn} = await dex.callStatic.getBestAmountIn(WBTC, DAI, amountOut)
+        const {_amountIn} = await dex.callStatic.getBestAmountIn(WBTC, USDC, amountOut)
 
         // then
         expect(_amountIn).eq(bestAmountIn)
@@ -115,7 +116,7 @@ describe('UniswapV2LikeExchange', function () {
         const [, amountOutA] = await router.getAmountsOut(amountIn, [USDC, DAI])
         const [, , amountOutB] = await router.getAmountsOut(amountIn, [USDC, WETH, DAI])
         const bestAmountOut = max(amountOutA, amountOutB)
-        expect(bestAmountOut).closeTo(parseEther('997'), parseEther('1'))
+        expect(bestAmountOut).closeTo(parseEther('1,000'), parseEther('5'))
 
         // when
         const {_amountOut} = await dex.callStatic.getBestAmountOut(USDC, DAI, amountIn)
@@ -130,7 +131,7 @@ describe('UniswapV2LikeExchange', function () {
         const [, amountOutA] = await router.getAmountsOut(amountIn, [WBTC, DAI])
         const [, , amountOutB] = await router.getAmountsOut(amountIn, [WBTC, WETH, DAI])
         const bestAmountOut = max(amountOutA, amountOutB)
-        expect(bestAmountOut).closeTo(parseEther('43,221'), parseEther('1'))
+        expect(bestAmountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('500'))
 
         // when
         const {_amountOut} = await dex.callStatic.getBestAmountOut(WBTC, DAI, amountIn)
@@ -304,11 +305,11 @@ describe('UniswapV2LikeExchange', function () {
 
       it('should get best amountIn for USDC->DAI', async function () {
         // given
-        const amountOut = parseEther('997')
+        const amountOut = parseEther('1000')
         const [amountInA] = await router.getAmountsIn(amountOut, [USDC, DAI])
         const [amountInB] = await router.getAmountsIn(amountOut, [USDC, WAVAX, DAI])
         const bestAmountIn = min(amountInA, amountInB)
-        expect(bestAmountIn).closeTo(parseUnits('1,002', 6), parseUnits('1', 6))
+        expect(bestAmountIn).closeTo(parseUnits('1000', 6), parseUnits('100', 6))
 
         // when
         const {_amountIn} = await dex.callStatic.getBestAmountIn(USDC, DAI, amountOut)
@@ -327,16 +328,16 @@ describe('UniswapV2LikeExchange', function () {
         await expect(call1).revertedWith('no-path-found')
       })
 
-      it('should get best amountOut for WBTC->DAI', async function () {
+      it('should get best amountOut for WBTC->USDC', async function () {
         // given
         const amountIn = parseUnits('1', 8)
-        const [, amountOutA] = await router.getAmountsOut(amountIn, [WBTC, DAI])
-        const [, , amountOutB] = await router.getAmountsOut(amountIn, [WBTC, WAVAX, DAI])
+        const [, amountOutA] = await router.getAmountsOut(amountIn, [WBTC, USDC])
+        const [, , amountOutB] = await router.getAmountsOut(amountIn, [WBTC, WAVAX, USDC])
         const bestAmountOut = max(amountOutA, amountOutB)
-        expect(bestAmountOut).closeTo(parseEther('38,754'), parseEther('1'))
+        expect(bestAmountOut).closeTo(Quote.avalanche.BTC_USD.div(`${1e12}`), parseEther('1'))
 
         // when
-        const {_amountOut} = await dex.callStatic.getBestAmountOut(WBTC, DAI, amountIn)
+        const {_amountOut} = await dex.callStatic.getBestAmountOut(WBTC, USDC, amountIn)
 
         // then
         expect(_amountOut).eq(bestAmountOut)

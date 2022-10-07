@@ -51,7 +51,8 @@ const STALE_PERIOD = ethers.constants.MaxUint256
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
 
-describe('GasUsage:Swapper @mainnet', function () {
+// Use this test when working on gas optimizations
+describe.skip('GasUsage:Swapper @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
   let uniswapV2Exchange: UniswapV2LikeExchange

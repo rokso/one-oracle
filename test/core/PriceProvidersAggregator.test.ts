@@ -16,6 +16,7 @@ import {
 import {Address, Provider} from '../../helpers'
 import {parseEther, parseUnits, HOUR} from '../helpers'
 import {smock} from '@defi-wonderland/smock'
+import Quote from '../helpers/quotes'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
@@ -125,7 +126,7 @@ describe('PriceProvidersAggregator @mainnet', function () {
         usdc.address,
         parseEther('1')
       )
-      expect(_amountOut).closeTo(parseUnits('3,230', 6), parseUnits('1', 6))
+      expect(_amountOut).closeTo(Quote.mainnet.ETH_USD.div(`${1e12}`), parseUnits('10', 6))
     })
 
     it('should quote using WBTC-NATIVE-USDC', async function () {
@@ -136,7 +137,7 @@ describe('PriceProvidersAggregator @mainnet', function () {
         usdc.address,
         parseUnits('1', 8)
       )
-      expect(_amountOut).closeTo(parseUnits('43,784', 6), parseUnits('1', 6))
+      expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('100', 6))
     })
   })
 })

@@ -5,6 +5,7 @@ import {ethers} from 'hardhat'
 import {ChainlinkMainnetPriceProvider, ChainlinkMainnetPriceProvider__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
+import Quote from '../helpers/quotes'
 
 const {DAI, WETH, WBTC} = Address.mainnet
 
@@ -40,27 +41,27 @@ describe('ChainlinkMainnetPriceProvider @mainnet', function () {
 
     it('should quote 1 WETH to DAI', async function () {
       const {_amountOut} = await priceProvider.quote(WETH, DAI, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('3,235'), parseEther('1'))
+      expect(_amountOut).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
     })
 
     it('should quote 1 WBTC to DAI', async function () {
       const {_amountOut} = await priceProvider.quote(WBTC, DAI, parseUnits('1', 8))
-      expect(_amountOut).closeTo(parseEther('43,666'), parseEther('1'))
+      expect(_amountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('50'))
     })
 
     it('should quote 1 WBTC to WETH', async function () {
       const {_amountOut} = await priceProvider.quote(WBTC, WETH, parseUnits('1', 8))
-      expect(_amountOut).closeTo(parseEther('13'), parseEther('1'))
+      expect(_amountOut).closeTo(Quote.mainnet.BTC_ETH, parseEther('1'))
     })
 
     it('should quote 1 DAI to WETH', async function () {
       const {_amountOut} = await priceProvider.quote(DAI, WETH, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('0.0003'), parseEther('0.0001'))
+      expect(_amountOut).closeTo(Quote.mainnet.USD_ETH, parseEther('0.0001'))
     })
 
     it('should quote 1 DAI to WBTC', async function () {
       const {_amountOut} = await priceProvider.quote(DAI, WBTC, parseEther('1'))
-      expect(_amountOut).closeTo(parseUnits('0.00002', 8), parseUnits('0.00001', 8))
+      expect(_amountOut).closeTo(Quote.mainnet.USD_BTC, parseEther('0.0001'))
     })
   })
 })

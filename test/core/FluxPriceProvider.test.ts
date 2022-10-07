@@ -11,6 +11,7 @@ import {
 import Address from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
+import Quote from '../helpers/quotes'
 
 const {
   USDC,
@@ -48,14 +49,16 @@ describe('FluxPriceProvider @mumbai', function () {
   })
 
   describe('getPriceInUsd', function () {
-    it('should WETH price', async function () {
+    // Note: price is outdated
+    it.skip('should WETH price', async function () {
       const {_priceInUsd} = await priceProvider.getPriceInUsd(WETH)
-      expect(_priceInUsd).closeTo(parseEther('2,340'), parseEther('1'))
+      expect(_priceInUsd).closeTo(Quote.mumbai.ETH_USD, parseEther('10'))
     })
 
-    it('should WMATIC price', async function () {
+    // Note: price is outdated
+    it.skip('should WMATIC price', async function () {
       const {_priceInUsd} = await priceProvider.getPriceInUsd(WMATIC)
-      expect(_priceInUsd).closeTo(parseEther('0.9357'), parseEther('0.1'))
+      expect(_priceInUsd).closeTo(Quote.mumbai.MATIC_USD, parseEther('0.1'))
     })
 
     it('should USDC price', async function () {

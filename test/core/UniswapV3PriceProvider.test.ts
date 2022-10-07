@@ -13,6 +13,7 @@ import Address from '../../helpers/address'
 import {parseEther, parseUnits, HOUR} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {BigNumber} from 'ethers'
+import Quote from '../helpers/quotes'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
@@ -111,7 +112,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseEther('1')
         )
-        expect(_amountOut).closeTo(parseUnits('3,230', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(Quote.mainnet.ETH_USD.div(`${1e12}`), parseUnits('5', 6))
       })
 
       it('should quote using WBTC-NATIVE-USDC', async function () {
@@ -120,7 +121,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseUnits('1', 8)
         )
-        expect(_amountOut).closeTo(parseUnits('43,711', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('50', 6))
       })
 
       it('should quote using WBTC-NATIVE-USDC with 0.05% fee pools', async function () {
@@ -131,7 +132,7 @@ describe('UniswapV3PriceProvider', function () {
           poolFee,
           parseUnits('1', 8)
         )
-        expect(_amountOut).closeTo(parseUnits('43,676', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('50', 6))
       })
     })
 
@@ -157,12 +158,12 @@ describe('UniswapV3PriceProvider', function () {
 
         it('should WETH price', async function () {
           const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WETH)
-          expect(_priceInUsd).closeTo(parseEther('3,230'), parseEther('1'))
+          expect(_priceInUsd).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
         })
 
         it('should WBTC price', async function () {
           const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WBTC)
-          expect(_priceInUsd).closeTo(parseEther('43,711'), parseEther('1'))
+          expect(_priceInUsd).closeTo(Quote.mainnet.BTC_USD, parseEther('50'))
         })
 
         it('should DAI price', async function () {
@@ -248,7 +249,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseEther('1')
         )
-        expect(_amountOut).closeTo(parseUnits('3,006', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(Quote.polygon.ETH_USD.div(`${1e12}`), parseUnits('10', 6))
       })
 
       it('should quote using WBTC-WETH-USDC', async function () {
@@ -257,7 +258,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseUnits('1', 8)
         )
-        expect(_amountOut).closeTo(parseUnits('40,597', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(Quote.polygon.BTC_USD.div(`${1e12}`), parseUnits('10', 6))
       })
     })
   })

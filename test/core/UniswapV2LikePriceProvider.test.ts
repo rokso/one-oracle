@@ -9,6 +9,7 @@ import {
   IERC20__factory,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
+import Quote from '../helpers/quotes'
 import {parseEther, parseUnits, HOUR, increaseTime} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 
@@ -153,7 +154,7 @@ describe('UniswapV2LikePriceProvider', function () {
             usdc.address,
             parseEther('1')
           )
-          expect(_amountOut).closeTo(parseUnits('3,236', 6), parseUnits('1', 6))
+          expect(_amountOut).closeTo(Quote.mainnet.ETH_USD.div(`${1e12}`), parseUnits('5', 6))
         })
 
         it('should quote using WBTC-NATIVE-USDC', async function () {
@@ -162,7 +163,7 @@ describe('UniswapV2LikePriceProvider', function () {
             usdc.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(parseUnits('43,784', 6), parseUnits('1', 6))
+          expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('100', 6))
         })
       })
 
@@ -179,12 +180,12 @@ describe('UniswapV2LikePriceProvider', function () {
 
           it('should WETH price', async function () {
             const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WETH)
-            expect(_priceInUsd).closeTo(parseEther('3,233'), parseEther('1'))
+            expect(_priceInUsd).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
           })
 
           it('should WBTC price', async function () {
             const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WBTC)
-            expect(_priceInUsd).closeTo(parseEther('43,733'), parseEther('1'))
+            expect(_priceInUsd).closeTo(Quote.mainnet.BTC_USD, parseEther('500'))
           })
 
           it('should DAI price', async function () {
@@ -229,7 +230,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseEther('1')
           )
-          expect(_amountOut).closeTo(parseEther('3,238'), parseEther('1'))
+          expect(_amountOut).closeTo(Quote.mainnet.ETH_USD, parseEther('1'))
         })
 
         it('should quote using WBTC-NATIVE-DAI', async function () {
@@ -238,7 +239,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(parseEther('43,813'), parseEther('1'))
+          expect(_amountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('1'))
         })
       })
     })
@@ -287,7 +288,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseEther('1')
           )
-          expect(_amountOut).closeTo(parseEther('86'), parseEther('1'))
+          expect(_amountOut).closeTo(Quote.avalanche.AVAX_USD, parseEther('1'))
         })
 
         it('should quote using WBTC-NATIVE-DAI', async function () {
@@ -296,7 +297,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(parseEther('42,750'), parseEther('1'))
+          expect(_amountOut).closeTo(Quote.avalanche.BTC_USD, parseEther('1'))
         })
       })
     })
@@ -335,7 +336,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseEther('1')
           )
-          expect(_amountOut).closeTo(parseEther('86'), parseEther('1'))
+          expect(_amountOut).closeTo(Quote.avalanche.AVAX_USD, parseEther('1'))
         })
 
         it('should quote using WBTC-NATIVE-DAI', async function () {
@@ -344,7 +345,8 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(parseEther('42,626'), parseEther('1'))
+          expect(_amountOut).closeTo(Quote.avalanche.BTC_USD, parseEther('25'))
+          // BTC_USD: parseEther('20,058'),
         })
       })
     })
@@ -451,7 +453,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseEther('1')
           )
-          expect(_amountOut).closeTo(parseEther('1.35'), parseEther('0.1'))
+          expect(_amountOut).closeTo(Quote.polygon.MATIC_USD, parseEther('0.1'))
         })
 
         it('should quote using WBTC-NATIVE-DAI', async function () {
@@ -460,7 +462,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(parseEther('40,832'), parseEther('1'))
+          expect(_amountOut).closeTo(Quote.polygon.BTC_USD, parseEther('10'))
         })
       })
     })
@@ -499,7 +501,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseEther('1')
           )
-          expect(_amountOut).closeTo(parseEther('1.35'), parseEther('0.1'))
+          expect(_amountOut).closeTo(Quote.polygon.MATIC_USD, parseEther('0.1'))
         })
 
         it('should quote using WBTC-NATIVE-DAI', async function () {
@@ -508,7 +510,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(parseEther('40,739'), parseEther('1'))
+          expect(_amountOut).closeTo(Quote.polygon.BTC_USD, parseEther('100'))
         })
       })
     })

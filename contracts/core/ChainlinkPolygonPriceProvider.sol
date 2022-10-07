@@ -52,7 +52,6 @@ contract ChainlinkPolygonPriceProvider is ChainlinkPriceProvider {
         _setAggregator(0xb33EaAd8d922B1083446DC23f610c2567fB5180f, AggregatorV3Interface(0xdf0Fb4e4F928d2dCB76f438575fDD8682386e13C)); // UNI
         _setAggregator(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174, AggregatorV3Interface(0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7)); // USDC
         _setAggregator(0xc2132D05D31c914a87C6611C10748AEb04B58e8F, AggregatorV3Interface(0x0A6513e40db6EB1b165753AD52E80663aeA50545)); // USDT
-        _setAggregator(0x692597b009d13C4049a947CAB2239b7d6517875F, AggregatorV3Interface(0x2D455E55e8Ad3BA965E3e95e7AaB7dF1C671af19)); // UST
         _setAggregator(0xDA537104D6A5edd53c6fBba9A898708E465260b6, AggregatorV3Interface(0x9d3A43c111E7b2C6601705D9fcF7a70c95b1dc55)); // YFI
         _setAggregator(0x5559Edb74751A0edE9DeA4DC23aeE72cCA6bE3D5, AggregatorV3Interface(0x6EA4d89474d9410939d429B786208c74853A5B47)); // ZRX
     }

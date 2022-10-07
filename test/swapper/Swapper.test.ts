@@ -16,6 +16,7 @@ import {parseEther, parseUnits} from '../helpers'
 import {Address, ExchangeType, SwapType, InitCodeHash} from '../../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {adjustBalance} from '../helpers/balance'
+import Quote from '../helpers/quotes'
 
 const {WETH, DAI, WBTC, USDC, UNISWAP_V2_FACTORY_ADDRESS, SUSHISWAP_FACTORY_ADDRESS} = Address.mainnet
 
@@ -124,13 +125,13 @@ describe('Swapper @mainnet', function () {
 
     it('should get best amountIn for WETH->DAI', async function () {
       // given
-      const amountOut = parseEther('3,222')
-      const {_amountIn: bestAmountIn, _path: bestPath} = await sushiswapExchange.callStatic.getBestAmountIn(
+      const amountOut = Quote.mainnet.ETH_USD
+      const {_amountIn: bestAmountIn, _path: bestPath} = await uniswapV2Exchange.callStatic.getBestAmountIn(
         WETH,
         DAI,
         amountOut
       )
-      const {_amountIn: amountInA} = await uniswapV2Exchange.callStatic.getBestAmountIn(WETH, DAI, amountOut)
+      const {_amountIn: amountInA} = await sushiswapExchange.callStatic.getBestAmountIn(WETH, DAI, amountOut)
       expect(bestAmountIn).lt(amountInA)
       expect(bestAmountIn).closeTo(parseEther('1'), parseEther('0.1'))
       chainlinkAndFallbacksOracleFake.quote.returns(() => bestAmountIn)
@@ -139,7 +140,7 @@ describe('Swapper @mainnet', function () {
       const {_exchange, _path} = await swapper.callStatic.getBestAmountIn(WETH, DAI, amountOut)
 
       // then
-      expect(_exchange).eq(sushiswapExchange.address)
+      expect(_exchange).eq(uniswapV2Exchange.address)
       expect(_path).deep.eq(bestPath)
     })
 
@@ -153,7 +154,7 @@ describe('Swapper @mainnet', function () {
         amountOut
       )
       expect(bestAmountIn).lt(amountInA)
-      expect(bestAmountIn).closeTo(parseUnits('1002', 6), parseUnits('1', 6))
+      expect(bestAmountIn).closeTo(parseUnits('1000', 6), parseUnits('5', 6))
       chainlinkAndFallbacksOracleFake.quote.returns(() => bestAmountIn)
 
       // when
@@ -166,7 +167,7 @@ describe('Swapper @mainnet', function () {
 
     it('should get best amountIn for WBTC->DAI', async function () {
       // given
-      const amountOut = parseEther('43,221')
+      const amountOut = Quote.mainnet.BTC_USD
       const {_amountIn: amountInA} = await uniswapV2Exchange.callStatic.getBestAmountIn(WBTC, DAI, amountOut)
       const {_amountIn: amountInB} = await sushiswapExchange.callStatic.getBestAmountIn(WBTC, DAI, amountOut)
       const {_amountIn: bestAmountIn, _path: bestPath} = await uniswapV3Exchange.callStatic.getBestAmountIn(
@@ -213,20 +214,21 @@ describe('Swapper @mainnet', function () {
     it('should get best amountOut for WETH->DAI', async function () {
       // given
       const amountIn = parseEther('1')
-      const {_amountOut: amountOutA} = await uniswapV2Exchange.callStatic.getBestAmountOut(WETH, DAI, amountIn)
-      const {_amountOut: bestAmountOut, _path: bestPath} = await sushiswapExchange.callStatic.getBestAmountOut(
+
+      const {_amountOut: amountOutA} = await sushiswapExchange.callStatic.getBestAmountOut(WETH, DAI, amountIn)
+      const {_amountOut: bestAmountOut, _path: bestPath} = await uniswapV2Exchange.callStatic.getBestAmountOut(
         WETH,
         DAI,
         amountIn
       )
       expect(bestAmountOut).gt(amountOutA)
-      expect(bestAmountOut).closeTo(parseEther('3,228'), parseEther('1'))
+      expect(bestAmountOut).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
 
       // when
       const {_exchange, _path} = await swapper.callStatic.getBestAmountOut(WETH, DAI, amountIn)
 
       // then
-      expect(_exchange).eq(sushiswapExchange.address)
+      expect(_exchange).eq(uniswapV2Exchange.address)
       expect(_path).deep.eq(bestPath)
     })
 
@@ -240,7 +242,7 @@ describe('Swapper @mainnet', function () {
         amountIn
       )
       expect(bestAmountOut).gt(amountOutA)
-      expect(bestAmountOut).closeTo(parseEther('997'), parseEther('1'))
+      expect(bestAmountOut).closeTo(parseEther('1,000'), parseEther('5'))
 
       // when
       const {_exchange, _path} = await swapper.callStatic.getBestAmountOut(USDC, DAI, amountIn)
@@ -262,7 +264,7 @@ describe('Swapper @mainnet', function () {
       )
 
       expect(bestAmountOut).gt(amountOutB).gt(amountOutA)
-      expect(bestAmountOut).closeTo(parseEther('43,515'), parseEther('1'))
+      expect(bestAmountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('500'))
 
       // when
       const {_exchange, _path} = await swapper.callStatic.getBestAmountOut(WBTC, DAI, amountIn)
@@ -278,8 +280,8 @@ describe('Swapper @mainnet', function () {
       // given
       const amountIn = parseUnits('1', 8)
       const {_exchange} = await swapper.callStatic.getBestAmountOut(WBTC, USDC, amountIn)
-      expect(_exchange).eq(sushiswapExchange.address)
-      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(WBTC, USDC, amountIn)
+      expect(_exchange).eq(uniswapV3Exchange.address)
+      const {_amountOut} = await uniswapV3Exchange.callStatic.getBestAmountOut(WBTC, USDC, amountIn)
 
       // when
       chainlinkAndFallbacksOracleFake.quote.returns(() => _amountOut.mul('10'))
@@ -297,8 +299,8 @@ describe('Swapper @mainnet', function () {
       // given
       const amountIn = parseUnits('1', 8)
       const {_exchange} = await swapper.callStatic.getBestAmountOut(WBTC, USDC, amountIn)
-      expect(_exchange).eq(sushiswapExchange.address)
-      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(WBTC, USDC, amountIn)
+      expect(_exchange).eq(uniswapV3Exchange.address)
+      const {_amountOut} = await uniswapV3Exchange.callStatic.getBestAmountOut(WBTC, USDC, amountIn)
       const wbtcBefore = await wbtc.balanceOf(deployer.address)
       const usdcBefore = await usdc.balanceOf(deployer.address)
 
