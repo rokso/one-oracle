@@ -411,4 +411,46 @@ describe('MasterOracle', function () {
       })
     })
   })
+
+  describe('MasterOracle @bsc', function () {
+    const {WBNB, BUSD} = Address.bsc
+
+    before(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/bsc']
+
+      // eslint-disable-next-line no-shadow
+      const {MasterOracle} = await deployments.fixture()
+
+      masterOracle = MasterOracle__factory.connect(MasterOracle.address, deployer)
+    })
+
+    describe('getPriceInUsd', function () {
+      it('should revert if token oracle returns 0', async function () {
+        // given
+        const wbnbFakeOracle = await smock.fake('ITokenOracle')
+        wbnbFakeOracle.getPriceInUsd.returns(0)
+        await masterOracle.updateTokenOracle(WBNB, wbnbFakeOracle.address)
+
+        // when-then
+        expect(masterOracle.getPriceInUsd(WBNB)).to.revertedWith('invalid-token-price')
+      })
+
+      it('should get price for WBNB', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(WBNB)
+
+        // then
+        expect(price).closeTo(Quote.bsc.BNB_USD, toUSD('1'))
+      })
+
+      it('should get price for BUSD', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(BUSD)
+
+        // then
+        expect(price).closeTo(Quote.bsc.BUSD_USD, toUSD('1'))
+      })
+    })
+  })
 })

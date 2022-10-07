@@ -29,6 +29,9 @@ function resolveChainId() {
   if (FORK_NODE_URL!.includes('arb-mainnet')) {
     return 42161
   }
+  if (FORK_NODE_URL!.includes('bsc')) {
+    return 56
+  }
   return 31337
 }
 
@@ -72,6 +75,14 @@ const config: HardhatUserConfig = {
       deploy: ['deploy/avalanche'],
       accounts,
     },
+    bsc: {
+      url: process.env.BSC_NODE_URL || '',
+      chainId: 56,
+      gas: 8000000,
+      verify: {etherscan: {apiKey: process.env.BSCSCAN_API_KEY}},
+      deploy: ['deploy/bsc'],
+      accounts,
+    },
   },
   // Note: Using factories from Safe
   // See more: https://github.com/safe-global/safe-singleton-factory/tree/main/artifacts
@@ -107,6 +118,14 @@ const config: HardhatUserConfig = {
       signedTx:
         //  eslint-disable-next-line max-len
         '0xf8a780843b9aca00830f42408080b853604580600e600039806000f350fe7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf383014986a0364fe6abfcf1a77465394bb2e8bc0855597e9c777308a8686b81a4e315e1e7dba00e36e1a98d3eaa6af29e86c75211090489d8340b0e247536c9bc22a0be8e86ab',
+    },
+    '56': {
+      factory: '0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7',
+      deployer: '0xE1CB04A0fA36DdD16a06ea828007E35e1a3cBC37',
+      funding: '10000000000000000',
+      signedTx:
+        //  eslint-disable-next-line max-len
+        '0xf8a68085174876e800830186a08080b853604580600e600039806000f350fe7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf38194a039bc1ffd46e4ea51a31d7c856d3a07b0c6a5bc1397e7ee0743813036b92fba02a008e8e2062a30b12774adbedcebc49e1b96f51afc3534f251e65b2e67b270bf4d',
     },
   },
   namedAccounts: {

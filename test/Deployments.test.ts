@@ -6,6 +6,8 @@ import {
   ChainlinkAvalanchePriceProvider__factory,
   PriceProvidersAggregator__factory,
   ChainlinkAvalanchePriceProvider,
+  ChainlinkBscPriceProvider__factory,
+  ChainlinkBscPriceProvider,
   PriceProvidersAggregator,
   UniswapV2LikeExchange,
   UniswapV3Exchange,
@@ -99,6 +101,53 @@ describe('Deployments ', function () {
       expect(priceInUsd).eq(toUSD('1'))
     })
   })
+
+  describe('@bsc', function () {
+    let addressProvider: AddressProvider
+    let chainlinkPriceProvider: ChainlinkBscPriceProvider
+    let priceProvidersAggregator: PriceProvidersAggregator
+    let chainlinkOracle: ChainlinkOracle
+    let msUsdOracle: USDPeggedTokenOracle
+
+    const {WBNB} = Address.bsc
+
+    beforeEach(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/bsc']
+
+      // eslint-disable-next-line no-shadow
+      const {AddressProvider, ChainlinkPriceProvider, PriceProvidersAggregator, ChainlinkOracle, USDPeggedTokenOracle} =
+        await deployments.fixture()
+
+      addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
+      chainlinkPriceProvider = ChainlinkBscPriceProvider__factory.connect(
+        ChainlinkPriceProvider.address,
+        deployer
+      )
+      priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
+      chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
+    })
+
+    it('AddressProvider', async function () {
+      expect(await addressProvider.governor()).eq(deployer.address)
+    })
+
+    it('ChainlinkPriceProvider', async function () {
+      const {_priceInUsd: price} = await chainlinkPriceProvider.getPriceInUsd(WBNB)
+      expect(price).closeTo(Quote.bsc.BNB_USD, toUSD('1'))
+    })
+
+    it('PriceProvidersAggregator', async function () {
+      const {_priceInUsd: priceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, WBNB)
+      expect(priceInUsd).closeTo(Quote.bsc.BNB_USD, toUSD('1'))
+    })
+
+    it('ChainlinkOracle', async function () {
+      const priceInUsd = await chainlinkOracle.getPriceInUsd(WBNB)
+      expect(priceInUsd).closeTo(Quote.bsc.BNB_USD, toUSD('1'))
+    })    
+  })
+
 
   describe('@mainnet', function () {
     let addressProvider: AddressProvider
