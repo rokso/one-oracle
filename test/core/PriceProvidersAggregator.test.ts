@@ -16,11 +16,12 @@ import {
 import {Address, Provider} from '../../helpers'
 import {parseEther, parseUnits, HOUR} from '../helpers'
 import {smock} from '@defi-wonderland/smock'
+import Quote from '../helpers/quotes'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
 
-const {WETH_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS} = Address.mainnet
+const {WETH, WBTC, USDC} = Address.mainnet
 
 // Note: No need to cover all chains on this test
 describe('PriceProvidersAggregator @mainnet', function () {
@@ -37,9 +38,9 @@ describe('PriceProvidersAggregator @mainnet', function () {
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
-    weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-    wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
-    usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
+    weth = IERC20__factory.connect(WETH, deployer)
+    wbtc = IERC20__factory.connect(WBTC, deployer)
+    usdc = IERC20__factory.connect(USDC, deployer)
 
     const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
@@ -61,7 +62,7 @@ describe('PriceProvidersAggregator @mainnet', function () {
     await chainlinkProvider.deployed()
 
     const aggregatorProviderFactory = new PriceProvidersAggregator__factory(deployer)
-    aggregator = await aggregatorProviderFactory.deploy(WETH_ADDRESS)
+    aggregator = await aggregatorProviderFactory.deploy(WETH)
     await aggregator.deployed()
 
     await aggregator.setPriceProvider(Provider.UNISWAP_V3, uniswapV3Provider.address)
@@ -125,7 +126,7 @@ describe('PriceProvidersAggregator @mainnet', function () {
         usdc.address,
         parseEther('1')
       )
-      expect(_amountOut).closeTo(parseUnits('3,230', 6), parseUnits('1', 6))
+      expect(_amountOut).closeTo(Quote.mainnet.ETH_USD.div(`${1e12}`), parseUnits('10', 6))
     })
 
     it('should quote using WBTC-NATIVE-USDC', async function () {
@@ -136,7 +137,7 @@ describe('PriceProvidersAggregator @mainnet', function () {
         usdc.address,
         parseUnits('1', 8)
       )
-      expect(_amountOut).closeTo(parseUnits('43,784', 6), parseUnits('1', 6))
+      expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('100', 6))
     })
   })
 })

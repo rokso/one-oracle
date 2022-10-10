@@ -5,8 +5,9 @@ import {ethers} from 'hardhat'
 import {ChainlinkAvalanchePriceProvider, ChainlinkAvalanchePriceProvider__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther} from '../helpers'
+import Quote from '../helpers/quotes'
 
-const {DAI_ADDRESS, WETH_ADDRESS} = Address.avalanche
+const {DAI, WETH} = Address.avalanche
 
 describe('ChainlinkAvalanchePriceProvider @avalanche', function () {
   let snapshotId: string
@@ -28,8 +29,8 @@ describe('ChainlinkAvalanchePriceProvider @avalanche', function () {
 
   describe('quote', function () {
     it('should quote WETH to DAI', async function () {
-      const {_amountOut} = await priceProvider.quote(WETH_ADDRESS, DAI_ADDRESS, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('3,251'), parseEther('1'))
+      const {_amountOut} = await priceProvider.quote(WETH, DAI, parseEther('1'))
+      expect(_amountOut).closeTo(Quote.avalanche.ETH_USD, parseEther('1'))
     })
   })
 })

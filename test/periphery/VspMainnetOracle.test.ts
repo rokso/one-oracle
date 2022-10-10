@@ -11,7 +11,7 @@ import {BigNumber} from 'ethers'
 const STALE_PERIOD = HOUR
 const MAX_DEVIATION = parseEther('0.1') // 10%
 
-const {DAI_ADDRESS, VSP_ADDRESS} = Address.mainnet
+const {DAI, VSP} = Address.mainnet
 
 describe('VspMainnetOracle @mainnet', function () {
   let snapshotId: string
@@ -37,7 +37,7 @@ describe('VspMainnetOracle @mainnet', function () {
     aggregator['priceProviders(uint8)'].returns(() => uniswapV2PriceProvider.address)
 
     stableCoinProvider = await smock.fake('StableCoinProvider')
-    stableCoinProvider.getStableCoinIfPegged.returns(DAI_ADDRESS)
+    stableCoinProvider.getStableCoinIfPegged.returns(DAI)
 
     const vspMainnetOracleFactory = new VspMainnetOracle__factory(deployer)
     vspOracle = await vspMainnetOracleFactory.deploy(MAX_DEVIATION, STALE_PERIOD)
@@ -64,7 +64,7 @@ describe('VspMainnetOracle @mainnet', function () {
       })
 
       // when
-      const amountOut = await vspOracle.getPriceInUsd(VSP_ADDRESS)
+      const amountOut = await vspOracle.getPriceInUsd(VSP)
 
       // then
       expect(amountOut).eq(uniswapV2AmountOut)
@@ -72,7 +72,7 @@ describe('VspMainnetOracle @mainnet', function () {
 
     it('should revert if not quoting VSP', async function () {
       // when
-      const tx = vspOracle.getPriceInUsd(DAI_ADDRESS)
+      const tx = vspOracle.getPriceInUsd(DAI)
 
       // then
       await expect(tx).revertedWith('invalid-token')
@@ -89,7 +89,7 @@ describe('VspMainnetOracle @mainnet', function () {
       })
 
       // when
-      const tx = vspOracle.getPriceInUsd(VSP_ADDRESS)
+      const tx = vspOracle.getPriceInUsd(VSP)
 
       // then
       await expect(tx).revertedWith('one-or-both-prices-invalid')
@@ -106,7 +106,7 @@ describe('VspMainnetOracle @mainnet', function () {
       })
 
       // when
-      const tx = vspOracle.getPriceInUsd(VSP_ADDRESS)
+      const tx = vspOracle.getPriceInUsd(VSP)
 
       // then
       await expect(tx).revertedWith('one-or-both-prices-invalid')
@@ -123,7 +123,7 @@ describe('VspMainnetOracle @mainnet', function () {
       })
 
       // when
-      const tx = vspOracle.getPriceInUsd(VSP_ADDRESS)
+      const tx = vspOracle.getPriceInUsd(VSP)
 
       // then
       await expect(tx).revertedWith('prices-deviation-too-high')

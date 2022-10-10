@@ -5,24 +5,24 @@ const {hexlify, solidityKeccak256, zeroPad, getAddress, hexStripZeros} = ethers.
 
 // Slot number mapping for a token. Prepared using utility https://github.com/kendricktan/slot20
 const slots = {
-  [Address.mainnet.DAI_ADDRESS]: 2,
-  [Address.mainnet.WETH_ADDRESS]: 3,
-  [Address.mainnet.USDC_ADDRESS]: 9,
-  [Address.mainnet.WBTC_ADDRESS]: 0,
-  [Address.mainnet.NOT_ON_CHAINLINK_TOKEN]: 0,
-  [Address.avalanche.WAVAX_ADDRESS]: 3,
-  [Address.avalanche.DAI_ADDRESS]: 0,
-  [Address.avalanche.WETH_ADDRESS]: 0,
-  [Address.avalanche.USDC_ADDRESS]: 0,
-  [Address.avalanche.WBTC_ADDRESS]: 0,
-  [Address.bsc.UMB_ADDRESS]: 1,
-  [Address.polygon.WMATIC_ADDRESS]: 3,
+  [Address.mainnet.DAI]: 2,
+  [Address.mainnet.WETH]: 3,
+  [Address.mainnet.USDC]: 9,
+  [Address.mainnet.WBTC]: 0,
+  [Address.mainnet.Chainlink.NOT_ON_CHAINLINK_TOKEN]: 0,
+  [Address.avalanche.WAVAX]: 3,
+  [Address.avalanche.DAI]: 0,
+  [Address.avalanche.WETH]: 0,
+  [Address.avalanche.USDC]: 0,
+  [Address.avalanche.WBTC]: 0,
+  [Address.bsc.Umbrella.UMB]: 1,
+  [Address.polygon.WMATIC]: 3,
 }
 
 // Some tokens, specially rebase tokens, uses dynamic storage or multi storage hence
 // there is no clear balanceOf storage so using whale address for adjusting balance
 const whales = {
-  [Address.mainnet.STETH_ADDRESS]: '0x1982b2F5814301d4e9a8b0201555376e62F82428',
+  [Address.mainnet.STETH]: '0x1982b2F5814301d4e9a8b0201555376e62F82428',
 }
 
 /**

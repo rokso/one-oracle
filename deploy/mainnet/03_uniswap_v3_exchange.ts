@@ -2,7 +2,7 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
 import {Address} from '../../helpers/index'
 
-const {WETH_ADDRESS} = Address.mainnet
+const {WETH} = Address.mainnet
 
 const UniswapV3Exchange = 'UniswapV3Exchange'
 
@@ -14,7 +14,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy(UniswapV3Exchange, {
     from,
     log: true,
-    args: [WETH_ADDRESS],
+    args: [WETH],
   })
 }
 

@@ -16,6 +16,7 @@ import {
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {impersonateAccount, parseEther, parseUnits} from '../helpers'
+import Quote from '../helpers/quotes'
 
 const UNISWAP_V2_WETH_DAI_PAIR = '0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11'
 const UNISWAP_V2_WETH_DAI_LIQUIDITY_PROVIDER = '0x79317fc0fb17bc0ce213a2b50f343e4d4c277704'
@@ -23,7 +24,7 @@ const UNISWAP_V2_WETH_WBTC_PAIR = '0xBb2b8038a1640196FbE3e38816F3e67Cba72D940'
 const UNISWAP_V2_WBTC_USDC_PAIR = '0x004375dff511095cc5a197a54140a24efef3a416'
 const DAI_HOLDER = '0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8'
 
-const {UNISWAP_V2_ROUTER_ADDRESS, WETH_ADDRESS, DAI_ADDRESS, WBTC_ADDRESS, USDC_ADDRESS} = Address.mainnet
+const {UNISWAP_V2_ROUTER_ADDRESS, WETH, DAI, WBTC, USDC} = Address.mainnet
 
 describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
   let snapshotId: string
@@ -55,10 +56,10 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
     ethDaiPair = IUniswapV2Pair__factory.connect(UNISWAP_V2_WETH_DAI_PAIR, deployer)
     ethWbtcPair = IUniswapV2Pair__factory.connect(UNISWAP_V2_WETH_WBTC_PAIR, deployer)
     wbtcUsdcPair = IUniswapV2Pair__factory.connect(UNISWAP_V2_WBTC_USDC_PAIR, deployer)
-    weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-    dai = IERC20__factory.connect(DAI_ADDRESS, deployer)
-    wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
-    usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
+    weth = IERC20__factory.connect(WETH, deployer)
+    dai = IERC20__factory.connect(DAI, deployer)
+    wbtc = IERC20__factory.connect(WBTC, deployer)
+    usdc = IERC20__factory.connect(USDC, deployer)
   })
 
   afterEach(async function () {
@@ -82,7 +83,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         const priceInUsd = await lpOracle.getPriceInUsd(ethDaiPair.address)
 
         // then
-        expect(priceInUsd).closeTo(parseEther('187.11'), parseEther('0.01'))
+        expect(priceInUsd).closeTo(Quote.mainnet.UNIV2_ETH_DAI_LP_USD, parseEther('1'))
         expect(priceInUsd).closeTo(expectedPriceInUsd, parseEther('0.001'))
       })
 
@@ -101,7 +102,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         const priceInUsd = await lpOracle.getPriceInUsd(ethWbtcPair.address)
 
         // then
-        expect(priceInUsd).closeTo(parseEther('2,866,621,297.70'), parseEther('0.01'))
+        expect(priceInUsd).closeTo(Quote.mainnet.UNIV2_ETH_WBTC_LP_USD, parseEther('1'))
         expect(priceInUsd).closeTo(expectedPriceInUsd, parseEther('2,000'))
       })
 
@@ -120,7 +121,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         const priceInUsd = await lpOracle.getPriceInUsd(wbtcUsdcPair.address)
 
         // then
-        expect(priceInUsd).closeTo(parseEther('52,377,577,732,134.20'), parseEther('0.01'))
+        expect(priceInUsd).closeTo(Quote.mainnet.UNIV2_WBTC_USDC_LP_USD, parseEther('1'))
         expect(priceInUsd).closeTo(expectedPriceInUsd, parseEther('125,000,000'))
       })
 
@@ -131,7 +132,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         const lpBalanceOfProvider = await ethDaiPair.balanceOf(provider.address)
         const lpSupplyBefore = await ethDaiPair.totalSupply()
         const lpShareOfProvider = lpBalanceOfProvider.mul(parseEther('1')).div(lpSupplyBefore)
-        expect(lpShareOfProvider).closeTo(parseEther('0.08'), parseEther('0.01')) // ~8% of all liquidity
+        expect(lpShareOfProvider).closeTo(parseEther('0.11'), parseEther('0.01')) // ~11% of all liquidity
 
         // when
         await ethDaiPair.connect(provider).approve(router.address, lpBalanceOfProvider)
@@ -181,9 +182,8 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         const daiBalanceOfProvider = await dai.balanceOf(provider.address)
         const daiBalanceOfPair = await dai.balanceOf(ethDaiPair.address)
         expect(daiBalanceOfProvider).gt(daiBalanceOfPair)
-        expect(daiBalanceOfPair).closeTo(parseEther('13,483,054.61'), parseEther('0.01'))
         const [ethPriceInUsd] = await underlyingOracle.getPriceInUsd(weth.address)
-        expect(ethPriceInUsd).closeTo(parseEther('3,236.41'), parseEther('0.01'))
+        expect(ethPriceInUsd).closeTo(Quote.mainnet.ETH_USD, parseEther('5'))
 
         // when
         const daiToAdd = daiBalanceOfPair // ~$13.5M

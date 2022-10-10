@@ -2,7 +2,7 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
 import {Address, Provider} from '../../helpers'
 
-const {WAVAX_ADDRESS} = Address.avalanche
+const {WAVAX} = Address.avalanche
 
 const AddressProvider = 'AddressProvider'
 const ChainlinkAvalanchePriceProvider = 'ChainlinkAvalanchePriceProvider'
@@ -16,7 +16,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {address: priceProviderAggregatorAddress} = await deploy(PriceProvidersAggregator, {
     from,
     log: true,
-    args: [WAVAX_ADDRESS],
+    args: [WAVAX],
   })
 
   const {address: chainlinkAddress} = await get(ChainlinkAvalanchePriceProvider)

@@ -1,22 +1,19 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address} from '../../helpers'
 
-const {WETH} = Address.mainnet
-
-const CTokenOracle = 'CTokenOracle'
+const VPoolTokenOracle = 'VPoolTokenOracle'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy} = deployments
   const {deployer} = await getNamedAccounts()
 
-  await deploy(CTokenOracle, {
+  await deploy(VPoolTokenOracle, {
     from: deployer,
     log: true,
-    args: [WETH],
+    args: [],
   })
 }
 
 export default func
-func.tags = [CTokenOracle]
+func.tags = [VPoolTokenOracle]

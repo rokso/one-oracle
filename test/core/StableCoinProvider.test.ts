@@ -7,7 +7,7 @@ import Address from '../../helpers/address'
 import {HOUR, parseEther, parseUnits, timestampFromLatestBlock, toUSD} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 
-const {DAI_ADDRESS, USDC_ADDRESS, USDT_ADDRESS} = Address.mainnet
+const {DAI, USDC, USDT} = Address.mainnet
 const {AddressZero} = ethers.constants
 
 const STALE_PERIOD = HOUR
@@ -31,7 +31,7 @@ describe('StableCoinProvider @mainnet', function () {
     providersAggregator.priceProviders.returns(() => priceProvider.address)
 
     const stableCoinProviderFactory = new StableCoinProvider__factory(deployer)
-    stableCoinProvider = await stableCoinProviderFactory.deploy(DAI_ADDRESS, USDC_ADDRESS, STALE_PERIOD, MAX_DEVIATION)
+    stableCoinProvider = await stableCoinProviderFactory.deploy(DAI, USDC, STALE_PERIOD, MAX_DEVIATION)
     await stableCoinProvider.deployed()
 
     const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
@@ -45,27 +45,27 @@ describe('StableCoinProvider @mainnet', function () {
 
   describe('updateStableCoins', function () {
     it('should revert if not governor', async function () {
-      const tx = stableCoinProvider.connect(alice).updateStableCoins(USDC_ADDRESS, DAI_ADDRESS)
+      const tx = stableCoinProvider.connect(alice).updateStableCoins(USDC, DAI)
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should update stable coins token', async function () {
       // given
-      expect(await stableCoinProvider.primaryStableCoin()).eq(DAI_ADDRESS)
-      expect(await stableCoinProvider.secondaryStableCoin()).eq(USDC_ADDRESS)
+      expect(await stableCoinProvider.primaryStableCoin()).eq(DAI)
+      expect(await stableCoinProvider.secondaryStableCoin()).eq(USDC)
 
       // when
-      await stableCoinProvider.updateStableCoins(USDT_ADDRESS, DAI_ADDRESS)
+      await stableCoinProvider.updateStableCoins(USDT, DAI)
 
       // then
-      expect(await stableCoinProvider.primaryStableCoin()).eq(USDT_ADDRESS)
-      expect(await stableCoinProvider.secondaryStableCoin()).eq(DAI_ADDRESS)
+      expect(await stableCoinProvider.primaryStableCoin()).eq(USDT)
+      expect(await stableCoinProvider.secondaryStableCoin()).eq(DAI)
     })
 
     it('should revert if setting stable coins to null', async function () {
       // given
-      expect(await stableCoinProvider.primaryStableCoin()).eq(DAI_ADDRESS)
-      expect(await stableCoinProvider.secondaryStableCoin()).eq(USDC_ADDRESS)
+      expect(await stableCoinProvider.primaryStableCoin()).eq(DAI)
+      expect(await stableCoinProvider.secondaryStableCoin()).eq(USDC)
 
       // when
       const tx = stableCoinProvider.updateStableCoins(AddressZero, AddressZero)
@@ -76,7 +76,7 @@ describe('StableCoinProvider @mainnet', function () {
 
     it('should revert if setting stable coins are the same', async function () {
       // when
-      const tx = stableCoinProvider.updateStableCoins(DAI_ADDRESS, DAI_ADDRESS)
+      const tx = stableCoinProvider.updateStableCoins(DAI, DAI)
 
       // then
       await expect(tx).revertedWith('stable-coins-are-the-same')
@@ -94,8 +94,8 @@ describe('StableCoinProvider @mainnet', function () {
       // given
       priceProvider['getPriceInUsd(address)'].returns((args: [string]) => {
         const [token] = args
-        if (token === DAI_ADDRESS) return [0, 0]
-        if (token === USDC_ADDRESS) return [0, 0]
+        if (token === DAI) return [0, 0]
+        if (token === USDC) return [0, 0]
         throw Error('not-expected')
       })
 
@@ -110,8 +110,8 @@ describe('StableCoinProvider @mainnet', function () {
       // given
       priceProvider['getPriceInUsd(address)'].returns((args: [string]) => {
         const [token] = args
-        if (token === DAI_ADDRESS) return [parseEther('0.85'), lastUpdatedAt]
-        if (token === USDC_ADDRESS) return [parseEther('0.85'), lastUpdatedAt]
+        if (token === DAI) return [parseEther('0.85'), lastUpdatedAt]
+        if (token === USDC) return [parseEther('0.85'), lastUpdatedAt]
         throw Error('not-expected')
       })
 
@@ -126,8 +126,8 @@ describe('StableCoinProvider @mainnet', function () {
       // given
       priceProvider['getPriceInUsd(address)'].returns((args: [string]) => {
         const [token] = args
-        if (token === DAI_ADDRESS) return [parseEther('0.99'), lastUpdatedAt]
-        if (token === USDC_ADDRESS) return [0, 0]
+        if (token === DAI) return [parseEther('0.99'), lastUpdatedAt]
+        if (token === USDC) return [0, 0]
         throw Error('not-expected')
       })
 
@@ -135,15 +135,15 @@ describe('StableCoinProvider @mainnet', function () {
       const stableCoinAddress = await stableCoinProvider.getStableCoinIfPegged()
 
       // then
-      expect(stableCoinAddress).eq(DAI_ADDRESS)
+      expect(stableCoinAddress).eq(DAI)
     })
 
     it('should get secondary stable coin if the primary is NOT OK', async function () {
       // given
       priceProvider['getPriceInUsd(address)'].returns((args: [string]) => {
         const [token] = args
-        if (token === DAI_ADDRESS) return [parseEther('0.55'), lastUpdatedAt]
-        if (token === USDC_ADDRESS) return [parseEther('0.99'), lastUpdatedAt]
+        if (token === DAI) return [parseEther('0.55'), lastUpdatedAt]
+        if (token === USDC) return [parseEther('0.99'), lastUpdatedAt]
         throw Error('not-expected')
       })
 
@@ -151,14 +151,14 @@ describe('StableCoinProvider @mainnet', function () {
       const stableCoinAddress = await stableCoinProvider.getStableCoinIfPegged()
 
       // then
-      expect(stableCoinAddress).eq(USDC_ADDRESS)
+      expect(stableCoinAddress).eq(USDC)
     })
   })
 
   describe('toUsdRepresentation', function () {
     it('should get correct USD representation (from 6-decimals)', async function () {
       // given
-      await stableCoinProvider.updateStableCoins(USDC_ADDRESS, USDT_ADDRESS)
+      await stableCoinProvider.updateStableCoins(USDC, USDT)
 
       // when
       const usdcAmount = parseUnits('1', 6)
@@ -170,7 +170,7 @@ describe('StableCoinProvider @mainnet', function () {
 
     it('should get correct USD representation (from 18-decimals)', async function () {
       // given
-      await stableCoinProvider.updateStableCoins(DAI_ADDRESS, USDT_ADDRESS)
+      await stableCoinProvider.updateStableCoins(DAI, USDT)
 
       // when
       const daiAmount = parseEther('1')

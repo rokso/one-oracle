@@ -13,6 +13,7 @@ import Address from '../../helpers/address'
 import {parseEther, parseUnits, HOUR} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {BigNumber} from 'ethers'
+import Quote from '../helpers/quotes'
 
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
@@ -40,12 +41,12 @@ describe('UniswapV3PriceProvider', function () {
   })
 
   describe('UniswapV3PriceProvider @mainnet', function () {
-    const {USDC_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.mainnet
+    const {USDC, WETH, WBTC} = Address.mainnet
 
     beforeEach(async function () {
-      usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
-      weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-      wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
+      usdc = IERC20__factory.connect(USDC, deployer)
+      weth = IERC20__factory.connect(WETH, deployer)
+      wbtc = IERC20__factory.connect(WBTC, deployer)
 
       const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
       const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
@@ -111,7 +112,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseEther('1')
         )
-        expect(_amountOut).closeTo(parseUnits('3,230', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(Quote.mainnet.ETH_USD.div(`${1e12}`), parseUnits('5', 6))
       })
 
       it('should quote using WBTC-NATIVE-USDC', async function () {
@@ -120,7 +121,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseUnits('1', 8)
         )
-        expect(_amountOut).closeTo(parseUnits('43,711', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('50', 6))
       })
 
       it('should quote using WBTC-NATIVE-USDC with 0.05% fee pools', async function () {
@@ -131,13 +132,13 @@ describe('UniswapV3PriceProvider', function () {
           poolFee,
           parseUnits('1', 8)
         )
-        expect(_amountOut).closeTo(parseUnits('43,676', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('50', 6))
       })
     })
 
     describe('getPriceInUsd', function () {
       it('should revert if stable coin provider is null', async function () {
-        const tx = priceProvider['getPriceInUsd(address)'](WETH_ADDRESS)
+        const tx = priceProvider['getPriceInUsd(address)'](WETH)
         await expect(tx).revertedWith('stable-coin-not-supported')
       })
 
@@ -146,7 +147,7 @@ describe('UniswapV3PriceProvider', function () {
 
         beforeEach(async function () {
           stableCoinProvider = await smock.fake('StableCoinProvider')
-          stableCoinProvider.getStableCoinIfPegged.returns(USDC_ADDRESS)
+          stableCoinProvider.getStableCoinIfPegged.returns(USDC)
           stableCoinProvider.toUsdRepresentation.returns((args: BigNumber[]) => {
             const [stableCoinAmount_] = args
             return stableCoinAmount_.mul(parseUnits('1', 12)) // USDC amount to 18 decimals
@@ -156,17 +157,17 @@ describe('UniswapV3PriceProvider', function () {
         })
 
         it('should WETH price', async function () {
-          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WETH_ADDRESS)
-          expect(_priceInUsd).closeTo(parseEther('3,230'), parseEther('1'))
+          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WETH)
+          expect(_priceInUsd).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
         })
 
         it('should WBTC price', async function () {
-          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WBTC_ADDRESS)
-          expect(_priceInUsd).closeTo(parseEther('43,711'), parseEther('1'))
+          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WBTC)
+          expect(_priceInUsd).closeTo(Quote.mainnet.BTC_USD, parseEther('50'))
         })
 
         it('should DAI price', async function () {
-          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](USDC_ADDRESS)
+          const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](USDC)
           expect(_priceInUsd).closeTo(parseEther('1'), parseEther('0.1'))
         })
       })
@@ -174,12 +175,12 @@ describe('UniswapV3PriceProvider', function () {
   })
 
   describe('UniswapV3PriceProvider @arbitrum', function () {
-    const {USDC_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.arbitrum
+    const {USDC, WETH, WBTC} = Address.arbitrum
 
     beforeEach(async function () {
-      usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
-      weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-      wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
+      usdc = IERC20__factory.connect(USDC, deployer)
+      weth = IERC20__factory.connect(WETH, deployer)
+      wbtc = IERC20__factory.connect(WBTC, deployer)
 
       const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
       const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
@@ -218,13 +219,13 @@ describe('UniswapV3PriceProvider', function () {
   })
 
   describe('UniswapV3PriceProvider @polygon', function () {
-    const {USDC_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.polygon
+    const {USDC, WETH, WBTC} = Address.polygon
 
     beforeEach(async function () {
-      usdc = IERC20__factory.connect(USDC_ADDRESS, deployer)
+      usdc = IERC20__factory.connect(USDC, deployer)
       // WETH has more liquid pools than WMATIC
-      weth = IERC20__factory.connect(WETH_ADDRESS, deployer)
-      wbtc = IERC20__factory.connect(WBTC_ADDRESS, deployer)
+      weth = IERC20__factory.connect(WETH, deployer)
+      wbtc = IERC20__factory.connect(WBTC, deployer)
 
       const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
       const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
@@ -248,7 +249,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseEther('1')
         )
-        expect(_amountOut).closeTo(parseUnits('3,006', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(Quote.polygon.ETH_USD.div(`${1e12}`), parseUnits('10', 6))
       })
 
       it('should quote using WBTC-WETH-USDC', async function () {
@@ -257,7 +258,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseUnits('1', 8)
         )
-        expect(_amountOut).closeTo(parseUnits('40,597', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(Quote.polygon.BTC_USD.div(`${1e12}`), parseUnits('10', 6))
       })
     })
   })

@@ -6,10 +6,11 @@ import {FakeContract, smock} from '@defi-wonderland/smock'
 import {ChainlinkOracle, ChainlinkOracle__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther} from '../helpers'
+import Quote from '../helpers/quotes'
 
 const STALE_PERIOD = ethers.constants.MaxUint256
 
-const {DAI_ADDRESS, WETH_ADDRESS, WBTC_ADDRESS} = Address.mainnet
+const {DAI, WETH, WBTC} = Address.mainnet
 
 describe('ChainlinkOracle @mainnet', function () {
   let snapshotId: string
@@ -39,24 +40,24 @@ describe('ChainlinkOracle @mainnet', function () {
   it('getPriceInUsd', async function () {
     const price = parseEther('1.02')
     aggregator.getPriceInUsd.returns(() => [price, 0])
-    expect(await oracle.getPriceInUsd(DAI_ADDRESS)).eq(price)
+    expect(await oracle.getPriceInUsd(DAI)).eq(price)
   })
 
   it('quote', async function () {
     const amountOut = parseEther('24,510.58')
     aggregator['quote(uint8,address,address,uint256)'].returns(() => [amountOut, 0])
-    expect(await oracle.quote(WBTC_ADDRESS, DAI_ADDRESS, parseEther('1'))).eq(amountOut)
+    expect(await oracle.quote(WBTC, DAI, parseEther('1'))).eq(amountOut)
   })
 
   it('quoteTokenToUsd', async function () {
-    const amountOut = parseEther('24,500.12')
+    const amountOut = Quote.mainnet.BTC_USD
     aggregator.quoteTokenToUsd.returns(() => [amountOut, 0])
-    expect(await oracle.quoteTokenToUsd(WBTC_ADDRESS, parseEther('1'))).eq(amountOut)
+    expect(await oracle.quoteTokenToUsd(WBTC, parseEther('1'))).eq(amountOut)
   })
 
   it('quoteUsdToToken', async function () {
-    const amountOut = parseEther('0.0005260')
+    const amountOut = Quote.mainnet.USD_ETH
     aggregator.quoteUsdToToken.returns(() => [amountOut, 0])
-    expect(await oracle.quoteUsdToToken(WETH_ADDRESS, parseEther('1'))).eq(amountOut)
+    expect(await oracle.quoteUsdToToken(WETH, parseEther('1'))).eq(amountOut)
   })
 })
