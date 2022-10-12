@@ -5,7 +5,7 @@ import {Address, Provider} from '../../helpers'
 const {WAVAX} = Address.avalanche
 
 const AddressProvider = 'AddressProvider'
-const ChainlinkAvalanchePriceProvider = 'ChainlinkAvalanchePriceProvider'
+const ChainlinkPriceProvider = 'ChainlinkPriceProvider'
 const PriceProvidersAggregator = 'PriceProvidersAggregator'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
@@ -19,7 +19,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     args: [WAVAX],
   })
 
-  const {address: chainlinkAddress} = await get(ChainlinkAvalanchePriceProvider)
+  const {address: chainlinkAddress} = await get(ChainlinkPriceProvider)
 
   if ((await read(PriceProvidersAggregator, 'priceProviders', [Provider.CHAINLINK])) !== chainlinkAddress) {
     await execute(PriceProvidersAggregator, {from, log: true}, 'setPriceProvider', Provider.CHAINLINK, chainlinkAddress)
@@ -30,6 +30,6 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   }
 }
 
-func.dependencies = [AddressProvider, ChainlinkAvalanchePriceProvider]
+func.dependencies = [AddressProvider, ChainlinkPriceProvider]
 func.tags = [PriceProvidersAggregator]
 export default func

@@ -49,7 +49,7 @@ describe('Deployments ', function () {
 
   describe('@avalanche', function () {
     let addressProvider: AddressProvider
-    let chainlinkAvalanchePriceProvider: ChainlinkAvalanchePriceProvider
+    let chainlinkPriceProvider: ChainlinkAvalanchePriceProvider
     let priceProvidersAggregator: PriceProvidersAggregator
     let chainlinkOracle: ChainlinkOracle
     let msUsdOracle: SynthUsdTokenOracle
@@ -61,17 +61,12 @@ describe('Deployments ', function () {
       hre.network.deploy = ['deploy/avalanche']
 
       // eslint-disable-next-line no-shadow
-      const {
-        AddressProvider,
-        ChainlinkAvalanchePriceProvider,
-        PriceProvidersAggregator,
-        ChainlinkOracle,
-        SynthUsdTokenOracle,
-      } = await deployments.fixture()
+      const {AddressProvider, ChainlinkPriceProvider, PriceProvidersAggregator, ChainlinkOracle, SynthUsdTokenOracle} =
+        await deployments.fixture()
 
       addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
-      chainlinkAvalanchePriceProvider = ChainlinkAvalanchePriceProvider__factory.connect(
-        ChainlinkAvalanchePriceProvider.address,
+      chainlinkPriceProvider = ChainlinkAvalanchePriceProvider__factory.connect(
+        ChainlinkPriceProvider.address,
         deployer
       )
       priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
@@ -83,8 +78,8 @@ describe('Deployments ', function () {
       expect(await addressProvider.governor()).eq(deployer.address)
     })
 
-    it('ChainlinkAvalanchePriceProvider', async function () {
-      const {_priceInUsd: price} = await chainlinkAvalanchePriceProvider.getPriceInUsd(WETH)
+    it('ChainlinkPriceProvider', async function () {
+      const {_priceInUsd: price} = await chainlinkPriceProvider.getPriceInUsd(WETH)
       expect(price).closeTo(Quote.avalanche.ETH_USD, toUSD('1'))
     })
 

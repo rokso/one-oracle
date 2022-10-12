@@ -1,53 +1,34 @@
 /* eslint-disable camelcase */
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
-import {ethers} from 'hardhat'
+import hre, {ethers, deployments} from 'hardhat'
 import {
-  CurveLpTokenOracle,
-  CurveLpTokenOracle__factory,
-  CurveFactoryLpTokenOracle,
-  CurveFactoryLpTokenOracle__factory,
-  ChainlinkMainnetPriceProvider__factory,
-  ChainlinkOracleMock,
-  ChainlinkOracleMock__factory,
   MasterOracle,
   MasterOracle__factory,
-  MStableTokenOracle__factory,
   BTCPeggedTokenOracle__factory,
-  IbBtcTokenOracle__factory,
+  ChainlinkAndFallbacksOracle__factory,
   AlusdTokenMainnetOracle__factory,
-  ATokenOracle__factory,
-  CTokenOracle__factory,
-  ChainlinkAvalanchePriceProvider__factory,
-  ChainlinkArbitrumPriceProvider__factory,
-  ChainlinkOracle__factory,
-  ChainlinkOracle,
-  PriceProvidersAggregator__factory,
-  SynthUsdTokenOracle__factory,
-  ChainlinkAvalanchePriceProvider,
-  YEarnTokenOracle__factory,
+  StableCoinProvider__factory,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
-import {parseEther, timestampFromLatestBlock, toUSD} from '../helpers'
-import {FakeContract, smock} from '@defi-wonderland/smock'
-import {Provider} from '../../helpers'
+import {impersonateAccount, increaseTime, resetFork, toUSD} from '../helpers'
+import {smock} from '@defi-wonderland/smock'
 import Quote from '../helpers/quotes'
-import {VPoolTokenOracle__factory} from '../../typechain-types/factories/contracts/periphery/tokens'
-
-const STALE_PERIOD = ethers.constants.MaxUint256
 
 describe('MasterOracle', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
   let masterOracle: MasterOracle
-  let addressProvider: FakeContract
+
+  before(async function () {
+    // Reset fork to clean up fake `AddressProvider` contract from other test suites
+    await resetFork()
+
+    deployer = await impersonateAccount(Address.DEPLOYER)
+  })
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    ;[deployer] = await ethers.getSigners()
-
-    addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
-    addressProvider.governor.returns(deployer.address)
   })
 
   afterEach(async function () {
@@ -55,27 +36,9 @@ describe('MasterOracle', function () {
   })
 
   describe('MasterOracle @mainnet', function () {
-    let chainlinkOracle: ChainlinkOracleMock
-
     const {
       DAI,
-      RENBTC,
-      SBTC,
-      ALUSD,
-      WIBBTC,
-      MUSD,
-      Aave: {ADAI, AUSDC, AUSDT},
       Compound: {CDAI, CUSDC, CETH},
-      WETH,
-      BUSD,
-      USDP,
-      stETH,
-      Chainlink: {
-        CHAINLINK_BTC_USD_AGGREGATOR,
-        CHAINLINK_BUSD_USD_AGGREGATOR,
-        CHAINLINK_USDP_USD_AGGREGATOR,
-        CHAINLINK_STETH_USD_AGGREGATOR,
-      },
       Curve: {
         TRIPOOL_LP,
         SBTC_LP,
@@ -87,40 +50,47 @@ describe('MasterOracle', function () {
         MUSD_LP,
         AAVE_LP,
         BUSD_LP,
-        BUSD_POOL,
         PAX_LP,
-        PAX_POOL,
         Y_LP,
-        Y_POOL,
         COMPOUND_LP,
         USDT_LP,
       },
       Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK},
+      Synth: {msETH, msUSD},
     } = Address.mainnet
 
-    beforeEach(async function () {
-      const chainlinkPriceProviderFactory = new ChainlinkMainnetPriceProvider__factory(deployer)
-      const chainlinkPriceProvider = await chainlinkPriceProviderFactory.deploy()
-      await chainlinkPriceProvider.deployed()
-      await chainlinkPriceProvider.updateAggregator(BUSD, CHAINLINK_BUSD_USD_AGGREGATOR)
-      await chainlinkPriceProvider.updateAggregator(USDP, CHAINLINK_USDP_USD_AGGREGATOR)
-      await chainlinkPriceProvider.updateAggregator(stETH, CHAINLINK_STETH_USD_AGGREGATOR)
+    before(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/mainnet']
 
-      const chainlinkOracleMockFactory = new ChainlinkOracleMock__factory(deployer)
-      chainlinkOracle = await chainlinkOracleMockFactory.deploy(chainlinkPriceProvider.address)
-      await chainlinkOracle.deployed()
+      const {
+        // eslint-disable-next-line no-shadow
+        MasterOracle,
+        ChainlinkAndFallbacksOracle,
+        AlusdTokenMainnetOracle,
+        StableCoinProvider,
+        BTCPeggedTokenOracle,
+      } = await deployments.fixture()
 
-      const masterOracleFactory = new MasterOracle__factory(deployer)
-      masterOracle = await masterOracleFactory.deploy(chainlinkOracle.address)
-      await masterOracle.deployed()
+      masterOracle = MasterOracle__factory.connect(MasterOracle.address, deployer)
 
-      const cTokenOracleFactory = new CTokenOracle__factory(deployer)
-      const cTokenOracle = await cTokenOracleFactory.deploy(WETH)
-      await cTokenOracle.deployed()
+      const defaultOracle = ChainlinkAndFallbacksOracle__factory.connect(ChainlinkAndFallbacksOracle.address, deployer)
+      await defaultOracle.updateStalePeriod(ethers.constants.MaxUint256)
 
-      await masterOracle.updateTokenOracle(CDAI, cTokenOracle.address)
-      await masterOracle.updateTokenOracle(CUSDC, cTokenOracle.address)
-      await masterOracle.updateTokenOracle(CETH, cTokenOracle.address)
+      const stableCoinProvider = StableCoinProvider__factory.connect(StableCoinProvider.address, deployer)
+      await stableCoinProvider.updateStalePeriod(ethers.constants.MaxUint256)
+
+      const alusdTokenMainnetOracle = AlusdTokenMainnetOracle__factory.connect(
+        AlusdTokenMainnetOracle.address,
+        deployer
+      )
+      await alusdTokenMainnetOracle.updateStalePeriod(ethers.constants.MaxUint256)
+      await alusdTokenMainnetOracle.update()
+      await increaseTime(ethers.BigNumber.from(60 * 60 * 24))
+      await alusdTokenMainnetOracle.update()
+
+      const bTCPeggedTokenOracle = BTCPeggedTokenOracle__factory.connect(BTCPeggedTokenOracle.address, deployer)
+      await bTCPeggedTokenOracle.updateStalePeriod(ethers.constants.MaxUint256)
     })
 
     describe('getPriceInUsd', function () {
@@ -136,139 +106,6 @@ describe('MasterOracle', function () {
     })
 
     describe('Curve LP Tokens', function () {
-      let curveLpTokenOracle: CurveLpTokenOracle
-      let curveLpFactoryTokenOracle: CurveFactoryLpTokenOracle
-
-      beforeEach(async function () {
-        const curveLpTokenOracleFactory = new CurveLpTokenOracle__factory(deployer)
-        curveLpTokenOracle = await curveLpTokenOracleFactory.deploy()
-        await curveLpTokenOracle.deployed()
-
-        const curveLpFactoryTokenOracleFactory = new CurveFactoryLpTokenOracle__factory(deployer)
-        curveLpFactoryTokenOracle = await curveLpFactoryTokenOracleFactory.deploy()
-        await curveLpFactoryTokenOracle.deployed()
-
-        // 3Crv (DAI+USDC+USDT)
-        await curveLpTokenOracle.registerLp(TRIPOOL_LP)
-        await masterOracle.updateTokenOracle(TRIPOOL_LP, curveLpTokenOracle.address)
-
-        // MIM+3Crv
-        await curveLpTokenOracle.registerLp(MIM_3CRV_LP)
-        await masterOracle.updateTokenOracle(MIM_3CRV_LP, curveLpTokenOracle.address)
-
-        // FRAX+3Crv
-        await curveLpTokenOracle.registerLp(FRAX_3CRV_LP)
-        await masterOracle.updateTokenOracle(FRAX_3CRV_LP, curveLpTokenOracle.address)
-
-        // sUSD+DAI+USDC+USDT
-        await curveLpTokenOracle.registerLp(SUSD_LP)
-        await masterOracle.updateTokenOracle(SUSD_LP, curveLpTokenOracle.address)
-
-        // mUSD+DAI+USDC+USDT
-        const mStableTokenOracleFactory = new MStableTokenOracle__factory(deployer)
-        const mStableTokenOracle = await mStableTokenOracleFactory.deploy()
-        await mStableTokenOracle.deployed()
-
-        await masterOracle.updateTokenOracle(MUSD, mStableTokenOracle.address)
-        await curveLpTokenOracle.registerLp(MUSD_LP)
-        await masterOracle.updateTokenOracle(MUSD_LP, curveLpTokenOracle.address)
-
-        // SBTC (WBTC+renBTC+sBTC)
-        const bTCPeggedTokenOracleFactory = new BTCPeggedTokenOracle__factory(deployer)
-        const bTCPeggedTokenOracle = await bTCPeggedTokenOracleFactory.deploy(CHAINLINK_BTC_USD_AGGREGATOR, 60 * 60)
-        await bTCPeggedTokenOracle.deployed()
-
-        // MakerDAO uses BTC/USD Chainlink feed for renBTC
-        // See: https://forum.makerdao.com/t/renbtc-mip6-collateral-application/2971
-        await masterOracle.updateTokenOracle(RENBTC, bTCPeggedTokenOracle.address)
-        // Synthetix uses BTC/USD Chainlink feed for sBTC
-        await masterOracle.updateTokenOracle(SBTC, bTCPeggedTokenOracle.address)
-        await curveLpTokenOracle.registerLp(SBTC_LP)
-        await masterOracle.updateTokenOracle(SBTC_LP, curveLpTokenOracle.address)
-
-        // wibBTC+SBTC
-        const IbBtcTokenOracleFactory = new IbBtcTokenOracle__factory(deployer)
-        const IbBtcTokenOracle = await IbBtcTokenOracleFactory.deploy(bTCPeggedTokenOracle.address)
-        await IbBtcTokenOracle.deployed()
-
-        await masterOracle.updateTokenOracle(WIBBTC, IbBtcTokenOracle.address)
-        await curveLpFactoryTokenOracle.registerLp(IBBTC_SBTC_LP)
-        await masterOracle.updateTokenOracle(IBBTC_SBTC_LP, curveLpFactoryTokenOracle.address)
-
-        // D3 (FRAX+FEI+alUSD)
-        const aggregator = await smock.fake('PriceProvidersAggregator')
-        const lastUpdatedAt = await timestampFromLatestBlock()
-        aggregator['quoteTokenToUsd(uint8,address,uint256)'].returns(() => [parseEther('0.99'), lastUpdatedAt])
-
-        const stableCoinProvider = await smock.fake('StableCoinProvider')
-        stableCoinProvider.getStableCoinIfPegged.returns(DAI)
-
-        addressProvider.providersAggregator.returns(aggregator.address)
-        addressProvider.stableCoinProvider.returns(stableCoinProvider.address)
-
-        const alUsdMainnetOracleFactory = new AlusdTokenMainnetOracle__factory(deployer)
-        const alUsdMainnetOracle = await alUsdMainnetOracleFactory.deploy(
-          ethers.constants.MaxUint256 // stalePeriod
-        )
-        await alUsdMainnetOracle.deployed()
-
-        await masterOracle.updateTokenOracle(ALUSD, alUsdMainnetOracle.address)
-        await curveLpFactoryTokenOracle.registerLp(D3_LP)
-        await masterOracle.updateTokenOracle(D3_LP, curveLpFactoryTokenOracle.address)
-
-        // Aave (aDAI+aUSDC+aUSDT)
-        const aTokenOracleFactory = new ATokenOracle__factory(deployer)
-        const aTokenOracle = await aTokenOracleFactory.deploy()
-        await aTokenOracle.deployed()
-
-        await curveLpTokenOracle.registerLp(AAVE_LP)
-        await masterOracle.updateTokenOracle(AAVE_LP, curveLpTokenOracle.address)
-        await masterOracle.updateTokenOracle(ADAI, aTokenOracle.address)
-        await masterOracle.updateTokenOracle(AUSDC, aTokenOracle.address)
-        await masterOracle.updateTokenOracle(AUSDT, aTokenOracle.address)
-
-        //
-        // yEarn lending pools
-        //
-        const yEarnTokenOracleFactory = new YEarnTokenOracle__factory(deployer)
-        const yEarnTokenOracle = await yEarnTokenOracleFactory.deploy()
-        await yEarnTokenOracle.deployed()
-
-        // compound (cDAI+cUSDC)
-        await curveLpTokenOracle.registerLendingLp(COMPOUND_LP)
-        await masterOracle.updateTokenOracle(COMPOUND_LP, curveLpTokenOracle.address)
-
-        // usdt (cDAI+cUSDC+USDT)
-        await curveLpTokenOracle.registerLendingLp(USDT_LP)
-        await masterOracle.updateTokenOracle(USDT_LP, curveLpTokenOracle.address)
-
-        // busd (yDAI+yUSDC+yUSDT+yBUSD)
-        const busdPool = new ethers.Contract(BUSD_POOL, ['function coins(int128) view returns(address)'], deployer)
-        await curveLpTokenOracle.registerLendingLp(BUSD_LP)
-        await masterOracle.updateTokenOracle(BUSD_LP, curveLpTokenOracle.address)
-        await masterOracle.updateTokenOracle(await busdPool.coins(0), yEarnTokenOracle.address)
-        await masterOracle.updateTokenOracle(await busdPool.coins(1), yEarnTokenOracle.address)
-        await masterOracle.updateTokenOracle(await busdPool.coins(2), yEarnTokenOracle.address)
-        await masterOracle.updateTokenOracle(await busdPool.coins(3), yEarnTokenOracle.address)
-
-        // pax (ycDAI+ycUSDC+ycUSDT+USDP)
-        const paxPool = new ethers.Contract(PAX_POOL, ['function coins(int128) view returns(address)'], deployer)
-        await curveLpTokenOracle.registerLendingLp(PAX_LP)
-        await masterOracle.updateTokenOracle(PAX_LP, curveLpTokenOracle.address)
-        await masterOracle.updateTokenOracle(await paxPool.coins(0), yEarnTokenOracle.address)
-        await masterOracle.updateTokenOracle(await paxPool.coins(1), yEarnTokenOracle.address)
-        await masterOracle.updateTokenOracle(await paxPool.coins(2), yEarnTokenOracle.address)
-
-        // y (yDAI+yUSDC+yYSDT+yTUSD)
-        const yPool = new ethers.Contract(Y_POOL, ['function coins(int128) view returns(address)'], deployer)
-        await curveLpTokenOracle.registerLendingLp(Y_LP)
-        await masterOracle.updateTokenOracle(Y_LP, curveLpTokenOracle.address)
-        await masterOracle.updateTokenOracle(await yPool.coins(0), yEarnTokenOracle.address)
-        await masterOracle.updateTokenOracle(await yPool.coins(1), yEarnTokenOracle.address)
-        await masterOracle.updateTokenOracle(await yPool.coins(2), yEarnTokenOracle.address)
-        await masterOracle.updateTokenOracle(await yPool.coins(3), yEarnTokenOracle.address)
-      })
-
       it('should get price for 3CRV', async function () {
         // when
         const price = await masterOracle.getPriceInUsd(TRIPOOL_LP)
@@ -400,20 +237,6 @@ describe('MasterOracle', function () {
     })
 
     describe('VPool tokens', function () {
-      beforeEach(async function () {
-        const vPoolTokenOracleFactory = new VPoolTokenOracle__factory(deployer)
-        const vPoolTokenOracle = await vPoolTokenOracleFactory.deploy()
-        await vPoolTokenOracle.deployed()
-
-        await masterOracle.updateTokenOracle(vaUSDC, vPoolTokenOracle.address)
-        await masterOracle.updateTokenOracle(vaDAI, vPoolTokenOracle.address)
-        await masterOracle.updateTokenOracle(vaFRAX, vPoolTokenOracle.address)
-        await masterOracle.updateTokenOracle(vaETH, vPoolTokenOracle.address)
-        await masterOracle.updateTokenOracle(vastETH, vPoolTokenOracle.address)
-        await masterOracle.updateTokenOracle(vaWBTC, vPoolTokenOracle.address)
-        await masterOracle.updateTokenOracle(vaLINK, vPoolTokenOracle.address)
-      })
-
       it('should get price for vaUSDC', async function () {
         const price = await masterOracle.getPriceInUsd(vaUSDC)
         expect(price).closeTo(Quote.mainnet.vaUSDC_USD, toUSD('0.01'))
@@ -449,39 +272,35 @@ describe('MasterOracle', function () {
         expect(price).closeTo(Quote.mainnet.vaLINK_USD, toUSD('0.1'))
       })
     })
+
+    describe('Synth', function () {
+      it('should get price for msUSD', async function () {
+        const price = await masterOracle.getPriceInUsd(msUSD)
+        expect(price).eq(toUSD('1'))
+      })
+
+      it('should get price for msETH', async function () {
+        const price = await masterOracle.getPriceInUsd(msETH)
+        expect(price).closeTo(Quote.mainnet.ETH_USD, toUSD('5'))
+      })
+    })
   })
 
   describe('MasterOracle @avalanche', function () {
-    let chainlinkPriceProvider: ChainlinkAvalanchePriceProvider
-    let chainlinkOracle: ChainlinkOracle
-
     const {
       DAI,
-      RENBTCe,
-      WETH,
-      Chainlink: {CHAINLINK_BTC_USD_AGGREGATOR},
       Curve: {REN_LP, AAVE_LP},
-      Aave: {avDAI, avUSDC, avUSDT, avWBTC},
+      Synth: {msBTC, msUSD, msUNI, msCRV, msAAVE},
     } = Address.avalanche
 
-    beforeEach(async function () {
-      const chainlinkPriceProviderFactory = new ChainlinkAvalanchePriceProvider__factory(deployer)
-      chainlinkPriceProvider = await chainlinkPriceProviderFactory.deploy()
-      await chainlinkPriceProvider.deployed()
+    before(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/avalanche']
 
-      const aggregatorProviderFactory = new PriceProvidersAggregator__factory(deployer)
-      const aggregator = await aggregatorProviderFactory.deploy(WETH)
-      await aggregator.deployed()
-      await aggregator.setPriceProvider(Provider.CHAINLINK, chainlinkPriceProvider.address)
-      addressProvider.providersAggregator.returns(aggregator.address)
+      // eslint-disable-next-line no-shadow
+      const {MasterOracle} = await deployments.fixture()
 
-      const chainlinkOracleFactory = new ChainlinkOracle__factory(deployer)
-      chainlinkOracle = await chainlinkOracleFactory.deploy(STALE_PERIOD)
-      await chainlinkOracle.deployed()
-
-      const masterOracleFactory = new MasterOracle__factory(deployer)
-      masterOracle = await masterOracleFactory.deploy(chainlinkOracle.address)
-      await masterOracle.deployed()
+      masterOracle = MasterOracle__factory.connect(MasterOracle.address, deployer)
     })
 
     describe('getPriceInUsd', function () {
@@ -497,33 +316,6 @@ describe('MasterOracle', function () {
     })
 
     describe('Curve LP Tokens', function () {
-      beforeEach(async function () {
-        const curveLpTokenOracleFactory = new CurveLpTokenOracle__factory(deployer)
-        const curveLpTokenOracle = await curveLpTokenOracleFactory.deploy()
-        await curveLpTokenOracle.deployed()
-
-        const aTokenOracleFactory = new ATokenOracle__factory(deployer)
-        const aTokenOracle = await aTokenOracleFactory.deploy()
-        await aTokenOracle.deployed()
-
-        // ren (avWBTC + renBTC.e)
-        const bTCPeggedTokenOracleFactory = new BTCPeggedTokenOracle__factory(deployer)
-        const bTCPeggedTokenOracle = await bTCPeggedTokenOracleFactory.deploy(CHAINLINK_BTC_USD_AGGREGATOR, 60 * 60)
-        await bTCPeggedTokenOracle.deployed()
-
-        await curveLpTokenOracle.registerLp(REN_LP)
-        await masterOracle.updateTokenOracle(REN_LP, curveLpTokenOracle.address)
-        await masterOracle.updateTokenOracle(RENBTCe, bTCPeggedTokenOracle.address)
-        await masterOracle.updateTokenOracle(avWBTC, aTokenOracle.address)
-
-        // Aave (aDAI.e + aUSDC.e + aUSDT.e)
-        await curveLpTokenOracle.registerLp(AAVE_LP)
-        await masterOracle.updateTokenOracle(AAVE_LP, curveLpTokenOracle.address)
-        await masterOracle.updateTokenOracle(avDAI, aTokenOracle.address)
-        await masterOracle.updateTokenOracle(avUSDC, aTokenOracle.address)
-        await masterOracle.updateTokenOracle(avUSDT, aTokenOracle.address)
-      })
-
       it('should get price for ren', async function () {
         // when
         const price = await masterOracle.getPriceInUsd(REN_LP)
@@ -542,81 +334,9 @@ describe('MasterOracle', function () {
     })
 
     describe('Synth Tokens', function () {
-      const {
-        Chainlink: {
-          CHAINLINK_USDC_USD_AGGREGATOR,
-          CHAINLINK_AVAX_USD_AGGREGATOR,
-          CHAINLINK_ETH_USD_AGGREGATOR,
-          CHAINLINK_DAI_USD_AGGREGATOR,
-          CHAINLINK_USDT_USD_AGGREGATOR,
-          CHAINLINK_UNI_USD_AGGREGATOR,
-          CHAINLINK_CRV_USD_AGGREGATOR,
-          CHAINLINK_AAVE_USD_AGGREGATOR,
-        },
-        Synth: {MSD_USDC, MSD_WAVAX, MSD_WETH, MSD_DAI, MSD_USDT, MS_BTC, MS_USD, MS_UNI, MS_CRV, MS_AAVE},
-      } = Address.avalanche
-
-      beforeEach(async function () {
-        const msUsdTokenOracleFactory = new SynthUsdTokenOracle__factory(deployer)
-        const msUsdTokenOracle = await msUsdTokenOracleFactory.deploy()
-        await msUsdTokenOracle.deployed()
-
-        await chainlinkPriceProvider.updateAggregator(MSD_USDC, CHAINLINK_USDC_USD_AGGREGATOR)
-        await chainlinkPriceProvider.updateAggregator(MSD_WAVAX, CHAINLINK_AVAX_USD_AGGREGATOR)
-        await chainlinkPriceProvider.updateAggregator(MSD_WETH, CHAINLINK_ETH_USD_AGGREGATOR)
-        await chainlinkPriceProvider.updateAggregator(MSD_DAI, CHAINLINK_DAI_USD_AGGREGATOR)
-        await chainlinkPriceProvider.updateAggregator(MSD_USDT, CHAINLINK_USDT_USD_AGGREGATOR)
-        await chainlinkPriceProvider.updateAggregator(MS_BTC, CHAINLINK_BTC_USD_AGGREGATOR)
-        await chainlinkPriceProvider.updateAggregator(MS_UNI, CHAINLINK_UNI_USD_AGGREGATOR)
-        await chainlinkPriceProvider.updateAggregator(MS_CRV, CHAINLINK_CRV_USD_AGGREGATOR)
-        await chainlinkPriceProvider.updateAggregator(MS_AAVE, CHAINLINK_AAVE_USD_AGGREGATOR)
-
-        await masterOracle.updateTokenOracle(MS_USD, msUsdTokenOracle.address)
-      })
-
-      it('should get price for msdUSDC', async function () {
-        // when
-        const price = await masterOracle.getPriceInUsd(MSD_USDC)
-
-        // then
-        expect(price).closeTo(toUSD('1'), toUSD('0.01'))
-      })
-
-      it('should get price for msdWAVAX', async function () {
-        // when
-        const price = await masterOracle.getPriceInUsd(MSD_WAVAX)
-
-        // then
-        expect(price).closeTo(Quote.avalanche.AVAX_USD, toUSD('1'))
-      })
-
-      it('should get price for msdWETH', async function () {
-        // when
-        const price = await masterOracle.getPriceInUsd(MSD_WETH)
-
-        // then
-        expect(price).closeTo(Quote.avalanche.ETH_USD, toUSD('1'))
-      })
-
-      it('should get price for msdDAI', async function () {
-        // when
-        const price = await masterOracle.getPriceInUsd(MSD_DAI)
-
-        // then
-        expect(price).closeTo(parseEther('1'), toUSD('0.1'))
-      })
-
-      it('should get price for msdUSDT', async function () {
-        // when
-        const price = await masterOracle.getPriceInUsd(MSD_USDT)
-
-        // then
-        expect(price).closeTo(parseEther('1'), toUSD('0.1'))
-      })
-
       it('should get price for msBTC', async function () {
         // when
-        const price = await masterOracle.getPriceInUsd(MS_BTC)
+        const price = await masterOracle.getPriceInUsd(msBTC)
 
         // then
         expect(price).closeTo(Quote.avalanche.BTC_USD, toUSD('50'))
@@ -624,7 +344,7 @@ describe('MasterOracle', function () {
 
       it('should get price for msUSD', async function () {
         // when
-        const price = await masterOracle.getPriceInUsd(MS_USD)
+        const price = await masterOracle.getPriceInUsd(msUSD)
 
         // then
         expect(price).eq(toUSD('1'))
@@ -632,7 +352,7 @@ describe('MasterOracle', function () {
 
       it('should get price for msUNI', async function () {
         // when
-        const price = await masterOracle.getPriceInUsd(MS_UNI)
+        const price = await masterOracle.getPriceInUsd(msUNI)
 
         // then
         expect(price).closeTo(Quote.avalanche.UNI_USD, toUSD('0.01'))
@@ -640,7 +360,7 @@ describe('MasterOracle', function () {
 
       it('should get price for msCRV', async function () {
         // when
-        const price = await masterOracle.getPriceInUsd(MS_CRV)
+        const price = await masterOracle.getPriceInUsd(msCRV)
 
         // then
         expect(price).closeTo(Quote.avalanche.CRV_USD, toUSD('0.01'))
@@ -648,67 +368,10 @@ describe('MasterOracle', function () {
 
       it('should get price for msAAVE', async function () {
         // when
-        const price = await masterOracle.getPriceInUsd(MS_AAVE)
+        const price = await masterOracle.getPriceInUsd(msAAVE)
 
         // then
         expect(price).closeTo(Quote.avalanche.AAVE_USD, toUSD('1'))
-      })
-    })
-  })
-
-  describe('MasterOracle @arbitrum', function () {
-    let chainlinkOracle: ChainlinkOracleMock
-
-    const {
-      DAI: DAI,
-      Curve: {TWOPOOL_LP},
-    } = Address.arbitrum
-
-    beforeEach(async function () {
-      const chainlinkPriceProviderFactory = new ChainlinkArbitrumPriceProvider__factory(deployer)
-      const chainlinkPriceProvider = await chainlinkPriceProviderFactory.deploy()
-      await chainlinkPriceProvider.deployed()
-
-      const chainlinkOracleMockFactory = new ChainlinkOracleMock__factory(deployer)
-      chainlinkOracle = await chainlinkOracleMockFactory.deploy(chainlinkPriceProvider.address)
-      await chainlinkOracle.deployed()
-
-      const masterOracleFactory = new MasterOracle__factory(deployer)
-      masterOracle = await masterOracleFactory.deploy(chainlinkOracle.address)
-      await masterOracle.deployed()
-    })
-
-    describe('getPriceInUsd', function () {
-      it('should revert if token oracle returns 0', async function () {
-        // given
-        const daiFakeOracle = await smock.fake('ITokenOracle')
-        daiFakeOracle.getPriceInUsd.returns(0)
-        await masterOracle.updateTokenOracle(DAI, daiFakeOracle.address)
-
-        // when-then
-        expect(masterOracle.getPriceInUsd(DAI)).to.revertedWith('invalid-token-price')
-      })
-    })
-
-    describe('Curve LP Tokens', function () {
-      let curveLpTokenOracle: CurveLpTokenOracle
-
-      beforeEach(async function () {
-        const curveLpTokenOracleFactory = new CurveLpTokenOracle__factory(deployer)
-        curveLpTokenOracle = await curveLpTokenOracleFactory.deploy()
-        await curveLpTokenOracle.deployed()
-
-        // 2pool (USDC + USDT)
-        await curveLpTokenOracle.registerLp(TWOPOOL_LP)
-        await masterOracle.updateTokenOracle(TWOPOOL_LP, curveLpTokenOracle.address)
-      })
-
-      it('should get price for 2pool', async function () {
-        // when
-        const price = await masterOracle.getPriceInUsd(TWOPOOL_LP)
-
-        // then
-        expect(price).closeTo(toUSD('1.004'), toUSD('0.001'))
       })
     })
   })
