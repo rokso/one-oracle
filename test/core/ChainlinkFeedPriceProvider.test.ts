@@ -5,14 +5,21 @@ import {ethers} from 'hardhat'
 import {
   ChainlinkFeedPriceProvider,
   ChainlinkFeedPriceProvider__factory,
+  ERC20Mock__factory,
   IERC20,
   IERC20__factory,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 import Quote from '../helpers/quotes'
+import {smock} from '@defi-wonderland/smock'
 
-const {DAI, WETH, WBTC} = Address.mainnet
+const {
+  DAI,
+  WETH,
+  WBTC,
+  Chainlink: {CHAINLINK_BTC_USD_AGGREGATOR},
+} = Address.mainnet
 
 describe('ChainlinkFeedPriceProvider @mainnet', function () {
   let snapshotId: string
@@ -30,6 +37,9 @@ describe('ChainlinkFeedPriceProvider @mainnet', function () {
     weth = IERC20__factory.connect(WETH, deployer)
     wbtc = IERC20__factory.connect(WBTC, deployer)
 
+    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    addressProvider.governor.returns(deployer.address)
+
     const priceProviderFactory = new ChainlinkFeedPriceProvider__factory(deployer)
     priceProvider = await priceProviderFactory.deploy()
     await priceProvider.deployed()
@@ -39,10 +49,20 @@ describe('ChainlinkFeedPriceProvider @mainnet', function () {
     await ethers.provider.send('evm_revert', [snapshotId])
   })
 
+  describe('getPriceInUsd', function () {
+    it('should get price for custom token', async function () {
+      const erc20MockFactory = new ERC20Mock__factory(deployer)
+      const btcPegged = await erc20MockFactory.deploy('BTC Pegged', 'BTCp')
+      await priceProvider.updateAggregator(btcPegged.address, CHAINLINK_BTC_USD_AGGREGATOR)
+      const {_priceInUsd} = await priceProvider.getPriceInUsd(btcPegged.address)
+      expect(_priceInUsd).closeTo(Quote.mainnet.BTC_USD, parseEther('250'))
+    })
+  })
+
   describe('quote', function () {
     it('should revert if aggregator does not exist', async function () {
       const tx = priceProvider.quote(weth.address, ethers.constants.AddressZero, parseEther('1'))
-      await expect(tx).revertedWith('Feed not found')
+      await expect(tx).revertedWith('token-without-aggregator')
     })
 
     it('should quote same token to same token', async function () {
@@ -80,7 +100,7 @@ describe('ChainlinkFeedPriceProvider @mainnet', function () {
   describe('quoteTokenToUsd', function () {
     it('should revert if aggregator does not exist', async function () {
       const tx = priceProvider.quoteTokenToUsd(ethers.constants.AddressZero, parseEther('1'))
-      await expect(tx).revertedWith('Feed not found')
+      await expect(tx).revertedWith('token-without-aggregator')
     })
 
     it('should quote WETH to USD', async function () {
@@ -102,7 +122,7 @@ describe('ChainlinkFeedPriceProvider @mainnet', function () {
   describe('quoteUsdToToken', function () {
     it('should revert if aggregator does not exist', async function () {
       const tx = priceProvider.quoteUsdToToken(ethers.constants.AddressZero, parseEther('1'))
-      await expect(tx).revertedWith('Feed not found')
+      await expect(tx).revertedWith('token-without-aggregator')
     })
 
     it('should quote USD to WETH', async function () {

@@ -11,8 +11,6 @@ import "../../interfaces/external/vesper/IVesperPool.sol";
  * @title Oracle for vPool token
  */
 contract VPoolTokenOracle is ITokenOracle {
-    uint256 public constant ONE_VTOKEN = 1e18;
-
     /// @inheritdoc ITokenOracle
     function getPriceInUsd(address token_) external view override returns (uint256 _priceInUsd) {
         IVesperPool _vToken = IVesperPool(token_);

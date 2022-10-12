@@ -7,7 +7,7 @@
       "AddressProvider_Implementation": "0x7B970C578B354F0F816Ec0fEf3b236096C11E156",
       "AddressProvider_Proxy": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
       "BTCPeggedTokenOracle": "0x47A584a5C10A3BC39b61977411f976f5787663d4",
-      "ChainlinkAvalanchePriceProvider": "0xf51aCe69A082eE132c54aBd6eb4b304E20383e93",
+      "ChainlinkPriceProvider": "0xf51aCe69A082eE132c54aBd6eb4b304E20383e93",
       "ChainlinkOracle": "0xA607D7aD77df51E57A8A991538116Dd6D555db38",
       "CurveLpTokenOracle": "0x42466f82Bb8ba17A320C5C78C180cC3E0abb4Af8",
       "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf",
