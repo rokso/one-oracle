@@ -23,7 +23,7 @@ const customOracles = [
   {token: Address.Aave.avDAI, oracle: 'ATokenOracle'},
   {token: Address.Aave.avUSDC, oracle: 'ATokenOracle'},
   {token: Address.Aave.avUSDT, oracle: 'ATokenOracle'},
-  {token: Address.Synth.msUSD, oracle: 'SynthUsdTokenOracle'},
+  {token: Address.Synth.msUSD, oracle: 'USDPeggedTokenOracle'},
 ]
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {

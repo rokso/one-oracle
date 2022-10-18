@@ -29,7 +29,7 @@ const curveLpTokens = [
   {token: Address.Curve.Y_LP, isLending: true},
 ]
 
-const curveFactoryLps = [Address.Curve.IBBTC_SBTC_LP, Address.Curve.D3_LP]
+const curveFactoryLps = [Address.Curve.IBBTC_SBTC_LP, Address.Curve.D3_LP, Address.Curve.DOLA_3CRV_LP]
 
 const customOracles = [
   {token: Address.MUSD, oracle: 'MStableTokenOracle'},
@@ -62,7 +62,8 @@ const customOracles = [
   {token: Address.Yearn.yUSDC, oracle: 'YEarnTokenOracle'},
   {token: Address.Yearn.yUSDT, oracle: 'YEarnTokenOracle'},
   {token: Address.Yearn.yTUSD, oracle: 'YEarnTokenOracle'},
-  {token: Address.Synth.msUSD, oracle: 'SynthUsdTokenOracle'},
+  {token: Address.Synth.msUSD, oracle: 'USDPeggedTokenOracle'},
+  {token: Address.DOLA, oracle: 'USDPeggedTokenOracle'},
 ]
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {

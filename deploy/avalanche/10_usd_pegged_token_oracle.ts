@@ -1,14 +1,14 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
 
-const SynthUsdTokenOracle = 'SynthUsdTokenOracle'
+const USDPeggedTokenOracle = 'USDPeggedTokenOracle'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy} = deployments
   const {deployer} = await getNamedAccounts()
 
-  await deploy(SynthUsdTokenOracle, {
+  await deploy(USDPeggedTokenOracle, {
     from: deployer,
     log: true,
     args: [],
@@ -16,4 +16,4 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 }
 
 export default func
-func.tags = [SynthUsdTokenOracle]
+func.tags = [USDPeggedTokenOracle]
