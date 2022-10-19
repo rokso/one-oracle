@@ -27,6 +27,9 @@ const curveLpTokens = [
   {token: Address.Curve.BUSD_LP, isLending: true},
   {token: Address.Curve.PAX_LP, isLending: true},
   {token: Address.Curve.Y_LP, isLending: true},
+  {token: Address.Curve.GUSD_LP, isLending: false},
+  {token: Address.Curve.REN_LP, isLending: false},
+  {token: Address.Curve.FRAX_USDC_LP, isLending: false},
 ]
 
 const curveFactoryLps = [Address.Curve.IBBTC_SBTC_LP, Address.Curve.D3_LP, Address.Curve.DOLA_3CRV_LP]

@@ -55,6 +55,9 @@ describe('MasterOracle', function () {
         COMPOUND_LP,
         USDT_LP,
         DOLA_3CRV_LP,
+        GUSD_LP,
+        REN_LP,
+        FRAX_USDC_LP,
       },
       Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK},
       Synth: {msETH, msUSD},
@@ -225,6 +228,30 @@ describe('MasterOracle', function () {
 
         // then
         expect(price).closeTo(Quote.mainnet.CURVE_DOLA_3CRV_LP_USD, toUSD('0.01'))
+      })
+
+      it('should get price for gusd Pool', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(GUSD_LP)
+
+        // then
+        expect(price).closeTo(Quote.mainnet.CURVE_GUSD_LP_USD, toUSD('0.01'))
+      })
+
+      it('should get price for ren Pool', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(REN_LP)
+
+        // then
+        expect(price).closeTo(Quote.mainnet.CURVE_REN_LP_USD, toUSD('0.01'))
+      })
+
+      it('should get price for fraxusdc Pool', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(FRAX_USDC_LP)
+
+        // then
+        expect(price).closeTo(Quote.mainnet.CURVE_FRAX_USDC_LP_USD, toUSD('0.01'))
       })
     })
 
