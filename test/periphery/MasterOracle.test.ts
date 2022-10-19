@@ -54,6 +54,7 @@ describe('MasterOracle', function () {
         Y_LP,
         COMPOUND_LP,
         USDT_LP,
+        DOLA_3CRV_LP,
       },
       Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK},
       Synth: {msETH, msUSD},
@@ -216,6 +217,14 @@ describe('MasterOracle', function () {
 
         // then
         expect(price).closeTo(Quote.mainnet.CURVE_Y_LP_USD, toUSD('0.01'))
+      })
+
+      it('should get price for dola+3crv Pool', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(DOLA_3CRV_LP)
+
+        // then
+        expect(price).closeTo(Quote.mainnet.CURVE_DOLA_3CRV_LP_USD, toUSD('0.01'))
       })
     })
 
