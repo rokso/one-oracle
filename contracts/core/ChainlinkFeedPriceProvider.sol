@@ -25,24 +25,20 @@ contract ChainlinkFeedPriceProvider is ChainlinkPriceProvider {
 
     /// @inheritdoc IPriceProvider
     function getPriceInUsd(address token_) public view override returns (uint256 _priceInUsd, uint256 _lastUpdatedAt) {
-        // Chainlink price feed use ETH and BTC as token address
+        int256 _price;
+
+        AggregatorV3Interface _aggregator = aggregators[token_];
+        if (address(_aggregator) != address(0)) {
+            (, _price, , _lastUpdatedAt, ) = _aggregator.latestRoundData();
+            return (_price.toUint256() * TO_SCALE, _lastUpdatedAt);
+        }
+
         if (token_ == WETH) {
             token_ = ETH;
         } else if (token_ == WBTC) {
             token_ = BTC;
         }
-
-        try PRICE_FEED.latestRoundData(token_, USD) returns (
-            uint80,
-            int256 _price,
-            uint256,
-            uint256 __lastUpdatedAt,
-            uint80
-        ) {
-            return (_price.toUint256().scaleDecimal(PRICE_FEED.decimals(token_, USD), USD_DECIMALS), __lastUpdatedAt);
-        } catch {
-            // Try get price from custom aggregator
-            return super.getPriceInUsd(token_);
-        }
+        (, _price, , _lastUpdatedAt, ) = PRICE_FEED.latestRoundData(token_, USD);
+        _priceInUsd = _price.toUint256().scaleDecimal(PRICE_FEED.decimals(token_, USD), USD_DECIMALS);
     }
 }
