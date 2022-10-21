@@ -60,6 +60,17 @@
       "QuickSwapExchange": "0x9fddEEc5E3BeD310C28cE29b2571Bf17E0Bd634C",
       "RoutedSwapper": "0xa74E8dbB6970f78C368cD1CdfDd509D16b88b11A",
       "SushiSwapExchange": "0xd1B6CEFC02c25BF6b07d7F86b25b06d93F326Bec"
+    },
+    "bsc": {
+      "AddressProvider": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
+      "AddressProvider_Implementation": "0x7B970C578B354F0F816Ec0fEf3b236096C11E156",
+      "AddressProvider_Proxy": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
+      "ChainlinkBscPriceProvider": "0xfac3d360835D58AaDc22eac80eE747583D7a9Cf0",
+      "ChainlinkOracle": "0x42c9De8bf891F0bE9dA7dA8078c1f301553CE064",
+      "ChainlinkPriceProvider": "0x7d0DC1ec332512E16Ca5b63A61Db9Ad9Ac9839Dc",
+      "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf",
+      "MasterOracle": "0x0aac835162D368F246dc71628AfcD6d2930c47d3",
+      "PriceProvidersAggregator": "0x82611C86d98Bd0730b0460ea7D5Dc5Da327F00eE"
     }
   }
 }
