@@ -13,6 +13,8 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {deploy} = deployments
   const {deployer: from} = await getNamedAccounts()
 
+  if(!TRADER_JOE_INIT_CODE_HASH) throw new Error('Swap init code hash is missing')
+
   await deploy(TraderJoeExchange, {
     contract: UniswapV2LikeExchange,
     from,

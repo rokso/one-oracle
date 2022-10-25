@@ -38,6 +38,7 @@ const InitCodeHash = {
   [Address.avalanche.PANGOLIN_FACTORY_ADDRESS]: '0x40231f6b438bce0797c9ada29b718a87ea0a5cea3fe9a771abdd76bd41a3e545',
   [Address.polygon.QUICKSWAP_FACTORY_ADDRESS]: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f',
   [Address.polygon.SUSHISWAP_FACTORY_ADDRESS]: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
+  [Address.bsc.SUSHISWAP_FACTORY_ADDRESS]: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
 }
 
 export {Address, Provider, ExchangeType, SwapType, InitCodeHash}

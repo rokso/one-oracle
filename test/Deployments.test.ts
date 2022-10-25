@@ -107,17 +107,25 @@ describe('Deployments ', function () {
     let chainlinkPriceProvider: ChainlinkBscPriceProvider
     let priceProvidersAggregator: PriceProvidersAggregator
     let chainlinkOracle: ChainlinkOracle
-    let msUsdOracle: USDPeggedTokenOracle
-
-    const {WBNB} = Address.bsc
+    let wbnb: IERC20
+    let sushiswapExchange: UniswapV2LikeExchange
+    let routedSwapper: RoutedSwapper
+    
+    const {WBNB, BUSD} = Address.bsc
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
       hre.network.deploy = ['deploy/bsc']
 
       // eslint-disable-next-line no-shadow
-      const {AddressProvider, ChainlinkPriceProvider, PriceProvidersAggregator, ChainlinkOracle, USDPeggedTokenOracle} =
-        await deployments.fixture()
+      const {
+        AddressProvider, 
+        ChainlinkPriceProvider, 
+        PriceProvidersAggregator, 
+        ChainlinkOracle, 
+        SushiSwapExchange, 
+        RoutedSwapper
+      } = await deployments.fixture()
 
       addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
       chainlinkPriceProvider = ChainlinkBscPriceProvider__factory.connect(
@@ -126,6 +134,10 @@ describe('Deployments ', function () {
       )
       priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
       chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
+      wbnb = IERC20__factory.connect(WBNB, deployer)
+      sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiSwapExchange.address, deployer)
+      routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
+      
     })
 
     it('AddressProvider', async function () {
@@ -145,7 +157,29 @@ describe('Deployments ', function () {
     it('ChainlinkOracle', async function () {
       const priceInUsd = await chainlinkOracle.getPriceInUsd(WBNB)
       expect(priceInUsd).closeTo(Quote.bsc.BNB_USD, toUSD('1'))
-    })    
+    })
+
+    it('SushiswapExchange', async function () {
+      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(WBNB, BUSD, parseEther('1'))
+      expect(_amountOut).closeTo(Quote.bsc.BNB_USD, toUSD('1'))
+    })
+
+    it('RoutedSwapper', async function () {
+      // given
+      const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[WBNB, BUSD]])
+      await routedSwapper.setDefaultRouting(SwapType.EXACT_INPUT, WBNB, BUSD, ExchangeType.SUSHISWAP, path)
+      await wbnb.approve(routedSwapper.address, ethers.constants.MaxUint256)
+
+      // when
+      const amountIn = parseEther('1')
+      const before = await wbnb.balanceOf(deployer.address)
+      await routedSwapper.swapExactInput(WBNB, BUSD, amountIn, 0, deployer.address)
+      const after = await wbnb.balanceOf(deployer.address)
+
+      // then
+      expect(after.sub(before)).closeTo(Quote.bsc.BNB_USD, parseEther('10'))
+    })
+
   })
 
 

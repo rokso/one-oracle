@@ -1,27 +1,26 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address, InitCodeHash} from '../../helpers/index'
+import {Address, InitCodeHash} from '../../helpers'
 
-const {UNISWAP_V2_FACTORY_ADDRESS, WETH} = Address.mainnet
-const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
+const {SUSHISWAP_FACTORY_ADDRESS, WBNB} = Address.bsc
+const SUSHI_SWAP_INIT_CODE_HASH = InitCodeHash[SUSHISWAP_FACTORY_ADDRESS]
 
 const UniswapV2LikeExchange = 'UniswapV2LikeExchange'
-const UniswapV2Exchange = 'UniswapV2Exchange'
+const SushiSwapExchange = 'SushiSwapExchange'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy} = deployments
   const {deployer: from} = await getNamedAccounts()
-
-  if(!UNISWAP_INIT_CODE_HASH) throw new Error('Swap init code hash is missing')
-
-  await deploy(UniswapV2Exchange, {
+  if(!SUSHI_SWAP_INIT_CODE_HASH) throw new Error('Swap init code hash is missing')
+  
+  await deploy(SushiSwapExchange, {
     contract: UniswapV2LikeExchange,
     from,
     log: true,
-    args: [UNISWAP_V2_FACTORY_ADDRESS, UNISWAP_INIT_CODE_HASH, WETH],
+    args: [SUSHISWAP_FACTORY_ADDRESS, SUSHI_SWAP_INIT_CODE_HASH, WBNB],
   })
 }
 
-func.tags = [UniswapV2Exchange]
+func.tags = [SushiSwapExchange]
 export default func
