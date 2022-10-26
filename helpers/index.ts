@@ -23,6 +23,7 @@ enum ExchangeType {
   PANGOLIN = 3,
   QUICKSWAP = 4,
   UNISWAP_V3 = 5,
+  PANCAKE_SWAP = 6,
 }
 
 // Note: See `contracts/libraries/DataTypes.sol`
@@ -39,6 +40,7 @@ const InitCodeHash = {
   [Address.polygon.QUICKSWAP_FACTORY_ADDRESS]: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f',
   [Address.polygon.SUSHISWAP_FACTORY_ADDRESS]: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
   [Address.bsc.SUSHISWAP_FACTORY_ADDRESS]: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
+  [Address.bsc.PANCAKE_SWAP_FACTORY_ADDRESS]: '0x00fb7f630766e6a796048ea87d01acd3068e8ff67d078148a3fa3f4a84f69bd5',
 }
 
 export {Address, Provider, ExchangeType, SwapType, InitCodeHash}
