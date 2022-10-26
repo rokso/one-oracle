@@ -70,7 +70,9 @@
       "ChainlinkPriceProvider": "0x7d0DC1ec332512E16Ca5b63A61Db9Ad9Ac9839Dc",
       "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf",
       "MasterOracle": "0x0aac835162D368F246dc71628AfcD6d2930c47d3",
-      "PriceProvidersAggregator": "0x82611C86d98Bd0730b0460ea7D5Dc5Da327F00eE"
+      "PriceProvidersAggregator": "0x82611C86d98Bd0730b0460ea7D5Dc5Da327F00eE",
+      "RoutedSwapper": "0x2E99f1b571d1A3D7987f8CaDd9F4C5f2240354e2",
+      "SushiSwapExchange": "0xDAf982c67712780D54C298A91D86788165B701A4"
     }
   }
 }
