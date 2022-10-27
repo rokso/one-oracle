@@ -116,7 +116,10 @@ const setupTokenOracles = async (
       const current = await read(MasterOracle, 'oracles', token)
       if (current !== curveFactoryLpOracleAddress) {
         await execute(MasterOracle, {from, log: true}, 'updateTokenOracle', token, curveFactoryLpOracleAddress)
-        await execute(CurveFactoryLpTokenOracle, {from, log: true}, 'registerLp', token)
+        const alreadyRegistered = (await read(CurveFactoryLpTokenOracle, 'underlyingTokens', token)).length > 0
+        if (!alreadyRegistered) {
+          await execute(CurveFactoryLpTokenOracle, {from, log: true}, 'registerLp', token)
+        }
       }
     }
   }
