@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { parseEther } from '.'
+import {parseEther} from '.'
 
 /**
  * This file centralizes all prices to make it easier to update them when changing fork blocks
@@ -63,11 +63,13 @@ const Quote = {
     BTC_USD: parseEther('20,060'),
     ETH_USD: parseEther('1,359'),
   },
-  bsc: { 
-    BTC_USD: parseEther('20,058'), 
-    ETH_USD: parseEther('1,359'), 
-    BNB_USD: parseEther('266'), 
-    BUSD_USD: parseEther('1') },
-  mumbai: { MATIC_USD: parseEther('0.84'), ETH_USD: parseEther('1,359') },
+  bsc: {
+    BTC_USD: parseEther('20,058'),
+    ETH_USD: parseEther('1,359'),
+    BNB_USD: parseEther('266'),
+    BNB_USD_2: parseEther('253'),
+    BUSD_USD: parseEther('1'),
+  },
+  mumbai: {MATIC_USD: parseEther('0.84'), ETH_USD: parseEther('1,359')},
 }
 export default Quote

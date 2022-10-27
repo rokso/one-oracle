@@ -164,7 +164,7 @@ describe('Deployments ', function () {
 
     it('SushiswapExchange', async function () {
       const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(WBNB, BUSD, parseEther('1'))
-      expect(_amountOut).closeTo(Quote.bsc.BNB_USD, toUSD('1'))
+      expect(_amountOut).closeTo(Quote.bsc.BNB_USD_2, toUSD('1'))
     })
 
     it('PancakeSwapExchange', async function () {
