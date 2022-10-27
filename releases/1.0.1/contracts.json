@@ -26,6 +26,7 @@
       "BTCPeggedTokenOracle": "0xE2131907E2A999D60e765660e96dEcca0d4372d0",
       "CTokenOracle": "0x7C3085721aa6F36081ee5E00583Da5526d57a87e",
       "ChainlinkAndFallbacksOracle": "0x60f440B2013Aa8d5CbD389F48E30eA942231449b",
+      "ChainlinkOracle": "0x602BA8C28D235a106455B6F88ce92471c369262C",
       "ChainlinkPriceProvider": "0xCa3932dEA820061033531208441c8E598D3acb1A",
       "CurveFactoryLpTokenOracle": "0xDc9d45E320AbD6907E1c1f0826Fa729c9f658CBf",
       "CurveLpTokenOracle": "0x794fE3Aa3C1c4A003d1B649b3F71852A2C21A7d3",
