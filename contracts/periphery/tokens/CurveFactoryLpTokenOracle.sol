@@ -47,10 +47,15 @@ contract CurveFactoryLpTokenOracle is ITokenOracle {
         return (_min * ICurvePool(lpToken_).get_virtual_price()) / 1e18;
     }
 
+    /// @notice Check if a token is already registered
+    function isLpRegistered(address lpToken_) public view returns (bool) {
+        return underlyingTokens[lpToken_].length > 0;
+    }
+
     /// @notice Register LP token data
     /// @dev For factory pools, the LP and pool addresses are the same
     function registerLp(address lpToken_) external {
-        require(underlyingTokens[lpToken_].length == 0, "lp-already-registered");
+        require(!isLpRegistered(lpToken_), "lp-already-registered");
 
         uint256 _n = registry.get_n_coins(lpToken_);
         if (_n == 0) (_n, ) = registry.get_meta_n_coins(lpToken_);

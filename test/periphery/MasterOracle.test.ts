@@ -6,7 +6,7 @@ import {
   MasterOracle,
   MasterOracle__factory,
   BTCPeggedTokenOracle__factory,
-  ChainlinkAndFallbacksOracle__factory,
+  ChainlinkOracle__factory,
   AlusdTokenMainnetOracle__factory,
   StableCoinProvider__factory,
 } from '../../typechain-types'
@@ -70,7 +70,7 @@ describe('MasterOracle', function () {
       const {
         // eslint-disable-next-line no-shadow
         MasterOracle,
-        ChainlinkAndFallbacksOracle,
+        ChainlinkOracle,
         AlusdTokenMainnetOracle,
         StableCoinProvider,
         BTCPeggedTokenOracle,
@@ -78,7 +78,7 @@ describe('MasterOracle', function () {
 
       masterOracle = MasterOracle__factory.connect(MasterOracle.address, deployer)
 
-      const defaultOracle = ChainlinkAndFallbacksOracle__factory.connect(ChainlinkAndFallbacksOracle.address, deployer)
+      const defaultOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
       await defaultOracle.updateStalePeriod(ethers.constants.MaxUint256)
 
       const stableCoinProvider = StableCoinProvider__factory.connect(StableCoinProvider.address, deployer)
