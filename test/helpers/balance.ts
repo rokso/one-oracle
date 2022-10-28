@@ -23,6 +23,7 @@ const slots = {
 // there is no clear balanceOf storage so using whale address for adjusting balance
 const whales = {
   [Address.mainnet.STETH]: '0x1982b2F5814301d4e9a8b0201555376e62F82428',
+  [Address.bsc.WBNB]: '0x0ed7e52944161450477ee417de9cd3a859b14fd0',
 }
 
 /**

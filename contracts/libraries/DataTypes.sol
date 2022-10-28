@@ -26,7 +26,8 @@ library DataTypes {
         TRADERJOE,
         PANGOLIN,
         QUICKSWAP,
-        UNISWAP_V3
+        UNISWAP_V3,
+        PANCAKE_SWAP
     }
 
     enum SwapType {
