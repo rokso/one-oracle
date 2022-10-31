@@ -13,14 +13,10 @@ import "../../access/Governable.sol";
  * @title Oracle for Curve LP tokens
  */
 contract CurveLpTokenOracle is ITokenOracle, Governable {
-    address private constant SBTC_POOL = 0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714;
-
-    /// @dev Same address for all chains
-    ICurveAddressProvider public constant curveAddressProvider =
-        ICurveAddressProvider(0x0000000022D53366457F9d5E68Ec105046FC4383);
+    ICurveAddressProvider public immutable curveAddressProvider;
 
     /// @notice Registry contract
-    ICurveRegistry public immutable registry;
+    address public immutable registry;
 
     /// @notice LP token => coins mapping
     mapping(address => address[]) public underlyingTokens;
@@ -31,8 +27,10 @@ contract CurveLpTokenOracle is ITokenOracle, Governable {
     /// @notice Emitted when a token is registered
     event LpRegistered(address indexed lpToken, bool isLending);
 
-    constructor() {
-        registry = ICurveRegistry(curveAddressProvider.get_registry());
+    constructor(ICurveAddressProvider curveAddressProvider_) {
+        require(address(curveAddressProvider_) != address(0), "null-address-provider");
+        curveAddressProvider = curveAddressProvider_;
+        registry = curveAddressProvider.get_registry();
     }
 
     /// @inheritdoc ITokenOracle
@@ -67,15 +65,16 @@ contract CurveLpTokenOracle is ITokenOracle, Governable {
     }
 
     /// @notice Register LP token data
-    function _registerLp(address lpToken_, bool isLending_) private {
-        address _pool = registry.get_pool_from_lp_token(lpToken_);
+    function _registerLp(address lpToken_, bool isLending_) internal virtual {
+        ICurveRegistry _registry = ICurveRegistry(registry);
+        address _pool = _registry.get_pool_from_lp_token(lpToken_);
         require(_pool != address(0), "invalid-non-factory-lp");
 
         address[8] memory _tokens;
         if (isLending_) {
-            _tokens = registry.get_underlying_coins(_pool);
+            _tokens = _registry.get_underlying_coins(_pool);
         } else {
-            _tokens = registry.get_coins(_pool);
+            _tokens = _registry.get_coins(_pool);
         }
 
         if (poolOf[lpToken_] != address(0)) {
@@ -85,7 +84,7 @@ contract CurveLpTokenOracle is ITokenOracle, Governable {
 
         poolOf[lpToken_] = _pool;
 
-        uint256 _n = registry.get_n_coins(_pool);
+        uint256 _n = _registry.get_n_coins(_pool);
         for (uint256 i; i < _n; i++) {
             underlyingTokens[lpToken_].push(_tokens[i]);
         }

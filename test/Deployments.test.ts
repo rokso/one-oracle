@@ -269,7 +269,7 @@ describe('Deployments ', function () {
       // then
       expect(price).closeTo(Quote.mainnet.VSP_USD, parseEther('0.01'))
     })
-  })  
+  })
 
   describe('@polygon', function () {
     let addressProvider: AddressProvider

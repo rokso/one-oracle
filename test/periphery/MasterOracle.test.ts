@@ -413,7 +413,11 @@ describe('MasterOracle', function () {
   })
 
   describe('MasterOracle @bsc', function () {
-    const {WBNB, BUSD} = Address.bsc
+    const {
+      WBNB,
+      BUSD,
+      Ellipsis: {VAL_3EPS_LP},
+    } = Address.bsc
 
     before(async function () {
       // Setting the folder to execute deployment scripts from
@@ -450,6 +454,16 @@ describe('MasterOracle', function () {
 
         // then
         expect(price).closeTo(Quote.bsc.BUSD_USD, toUSD('1'))
+      })
+    })
+
+    describe('Ellipsis LP Tokens', function () {
+      it('should get price for val3EPS', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(VAL_3EPS_LP)
+
+        // then
+        expect(price).closeTo(Quote.bsc.ELLIPSIS_VAL_3EPS, toUSD('0.01'))
       })
     })
   })
