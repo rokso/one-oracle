@@ -269,25 +269,7 @@ describe('Deployments ', function () {
       // then
       expect(price).closeTo(Quote.mainnet.VSP_USD, parseEther('0.01'))
     })
-  })
-
-  describe('@arbitrum', function () {
-    let addressProvider: AddressProvider
-
-    beforeEach(async function () {
-      // Setting the folder to execute deployment scripts from
-      hre.network.deploy = ['deploy/arbitrum']
-
-      // eslint-disable-next-line no-shadow
-      const {AddressProvider} = await deployments.fixture()
-
-      addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
-    })
-
-    it('AddressProvider', async function () {
-      expect(await addressProvider.governor()).eq(deployer.address)
-    })
-  })
+  })  
 
   describe('@polygon', function () {
     let addressProvider: AddressProvider
