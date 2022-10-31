@@ -20,10 +20,20 @@ abstract contract PriceProvider is IPriceProvider {
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    ) external view virtual override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
-        (uint256 _amountInUsd, uint256 _lastUpdatedAt0) = quoteTokenToUsd(tokenIn_, amountIn_);
-        (_amountOut, _lastUpdatedAt) = quoteUsdToToken(tokenOut_, _amountInUsd);
-        _lastUpdatedAt = Math.min(_lastUpdatedAt0, _lastUpdatedAt);
+    )
+        external
+        view
+        virtual
+        override
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
+        uint256 _amountInUsd;
+        (_amountInUsd, _tokenInLastUpdatedAt) = quoteTokenToUsd(tokenIn_, amountIn_);
+        (_amountOut, _tokenOutLastUpdatedAt) = quoteUsdToToken(tokenOut_, _amountInUsd);
     }
 
     /// @inheritdoc IPriceProvider

@@ -21,7 +21,14 @@ contract PriceProviderMock is PriceProvider {
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    ) public returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    )
+        public
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
         return _pp.quote(tokenIn_, tokenOut_, amountIn_);
     }
 }

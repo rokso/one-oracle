@@ -53,14 +53,22 @@ interface IUniswapV2LikePriceProvider is IPriceProvider {
      * @param twapPeriod_ The TWAP period
      * @param amountIn_ Amount of input token
      * @return _amountOut Amount out
-     * @return _lastUpdatedAt Last updated timestamp
+     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`
+     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`
      */
     function quote(
         address tokenIn_,
         address tokenOut_,
         uint256 twapPeriod_,
         uint256 amountIn_
-    ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
+    )
+        external
+        view
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        );
 
     /**
      * @notice Get quote in USD (or equivalent) amount
@@ -98,13 +106,20 @@ interface IUniswapV2LikePriceProvider is IPriceProvider {
      * @param tokenOut_ The address of assetOut
      * @param amountIn_ Amount of input token
      * @return _amountOut Amount out
-     * @return _lastUpdatedAt Last updated timestamp
+     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`
+     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`
      */
     function updateAndQuote(
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    ) external returns (uint256 _amountOut, uint256 _lastUpdatedAt);
+    )
+        external
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        );
 
     /**
      * @notice Get quote
@@ -114,14 +129,21 @@ interface IUniswapV2LikePriceProvider is IPriceProvider {
      * @param twapPeriod_ The TWAP period
      * @param amountIn_ Amount of input token
      * @return _amountOut Amount out
-     * @return _lastUpdatedAt Last updated timestamp
+     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`
+     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`
      */
     function updateAndQuote(
         address tokenIn_,
         address tokenOut_,
         uint256 twapPeriod_,
         uint256 amountIn_
-    ) external returns (uint256 _amountOut, uint256 _lastUpdatedAt);
+    )
+        external
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        );
 
     /**
      * @notice Update the default TWAP period

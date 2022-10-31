@@ -56,13 +56,16 @@ contract StableCoinProvider is IStableCoinProvider, UsingStalePeriod, UsingMaxDe
 
         (uint256 _priceInUsd, uint256 _lastUpdatedAt) = _chainlink.getPriceInUsd(primaryStableCoin);
 
-        if (!_priceIsStale(_lastUpdatedAt) && _isDeviationOK(_priceInUsd, ONE_USD)) {
+        if (!_priceIsStale(primaryStableCoin, _lastUpdatedAt) && _isDeviationOK(_priceInUsd, ONE_USD)) {
             return primaryStableCoin;
         }
 
         (_priceInUsd, _lastUpdatedAt) = _chainlink.getPriceInUsd(secondaryStableCoin);
 
-        require(!_priceIsStale(_lastUpdatedAt) && _isDeviationOK(_priceInUsd, ONE_USD), "stable-prices-invalid");
+        require(
+            !_priceIsStale(secondaryStableCoin, _lastUpdatedAt) && _isDeviationOK(_priceInUsd, ONE_USD),
+            "stable-prices-invalid"
+        );
 
         return secondaryStableCoin;
     }

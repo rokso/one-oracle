@@ -57,14 +57,22 @@ interface IUniswapV3PriceProvider is IPriceProvider {
      * @param twapPeriod_ The TWAP period
      * @param amountIn_ Amount of input token
      * @return _amountOut Amount out
-     * @return _lastUpdatedAt Last updated timestamp
+     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`
+     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`
      */
     function quote(
         address tokenIn_,
         address tokenOut_,
         uint32 twapPeriod_,
         uint256 amountIn_
-    ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
+    )
+        external
+        view
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        );
 
     /**
      * @notice Get quote
@@ -73,14 +81,22 @@ interface IUniswapV3PriceProvider is IPriceProvider {
      * @param poolFee_ The pools' fees
      * @param amountIn_ Amount of input token
      * @return _amountOut Amount out
-     * @return _lastUpdatedAt Last updated timestamp
+     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`
+     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`
      */
     function quote(
         address tokenIn_,
         address tokenOut_,
         uint24 poolFee_,
         uint256 amountIn_
-    ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
+    )
+        external
+        view
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        );
 
     /**
      * @notice Get quote
@@ -90,7 +106,8 @@ interface IUniswapV3PriceProvider is IPriceProvider {
      * @param twapPeriod_ The TWAP period
      * @param amountIn_ Amount of input token
      * @return _amountOut Amount out
-     * @return _lastUpdatedAt Last updated timestamp
+     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`
+     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`
      */
     function quote(
         address tokenIn_,
@@ -98,7 +115,14 @@ interface IUniswapV3PriceProvider is IPriceProvider {
         uint24 poolFee_,
         uint32 twapPeriod_,
         uint256 amountIn_
-    ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);
+    )
+        external
+        view
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        );
 
     /**
      * @notice Get quote in USD (or equivalent) amount

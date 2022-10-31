@@ -45,7 +45,7 @@ describe('ChainlinkOracle @mainnet', function () {
 
   it('quote', async function () {
     const amountOut = parseEther('24,510.58')
-    aggregator['quote(uint8,address,address,uint256)'].returns(() => [amountOut, 0])
+    aggregator['quote(uint8,address,address,uint256)'].returns(() => [amountOut, 0, 0])
     expect(await oracle.quote(WBTC, DAI, parseEther('1'))).eq(amountOut)
   })
 

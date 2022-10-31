@@ -23,7 +23,7 @@ contract BTCPeggedTokenOracle is ITokenOracle, UsingStalePeriod {
     /// @inheritdoc ITokenOracle
     function getPriceInUsd(address) external view override returns (uint256 _priceInUsd) {
         (, int256 _price, , uint256 _lastUpdatedAt, ) = btcAggregator.latestRoundData();
-        require(!_priceIsStale(_lastUpdatedAt), "stale-price");
+        require(!_priceIsStale(_lastUpdatedAt, defaultStalePeriod), "stale-price");
         return _price.toUint256() * 1e10; // To 18 decimals
     }
 }

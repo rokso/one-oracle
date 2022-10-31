@@ -2,6 +2,7 @@
 
 pragma solidity 0.8.9;
 
+import "@openzeppelin/contracts/utils/math/Math.sol";
 import "../interfaces/periphery/IOracle.sol";
 import "../features/UsingStalePeriod.sol";
 
@@ -18,7 +19,7 @@ contract ChainlinkOracle is IOracle, UsingStalePeriod {
             DataTypes.Provider.CHAINLINK,
             token_
         );
-        require(_priceInUsd > 0 && !_priceIsStale(_lastUpdatedAt), "price-invalid");
+        require(_priceInUsd > 0 && !_priceIsStale(token_, _lastUpdatedAt), "price-invalid");
     }
 
     /// @inheritdoc IOracle
@@ -27,14 +28,21 @@ contract ChainlinkOracle is IOracle, UsingStalePeriod {
         address tokenOut_,
         uint256 amountIn_
     ) public view virtual returns (uint256 _amountOut) {
-        uint256 _lastUpdatedAt;
-        (_amountOut, _lastUpdatedAt) = addressProvider.providersAggregator().quote(
+        uint256 _tokenInLastUpdatedAt;
+        uint256 _tokenOutLastUpdatedAt;
+        (_amountOut, _tokenInLastUpdatedAt, _tokenOutLastUpdatedAt) = addressProvider.providersAggregator().quote(
             DataTypes.Provider.CHAINLINK,
             tokenIn_,
             tokenOut_,
             amountIn_
         );
-        require(_amountOut > 0 && !_priceIsStale(_lastUpdatedAt), "price-invalid");
+
+        require(
+            _amountOut > 0 &&
+                !_priceIsStale(tokenIn_, _tokenInLastUpdatedAt) &&
+                !_priceIsStale(tokenIn_, _tokenOutLastUpdatedAt),
+            "price-invalid"
+        );
     }
 
     /// @inheritdoc IOracle
@@ -45,7 +53,7 @@ contract ChainlinkOracle is IOracle, UsingStalePeriod {
             token_,
             amountIn_
         );
-        require(_amountOut > 0 && !_priceIsStale(_lastUpdatedAt), "price-invalid");
+        require(_amountOut > 0 && !_priceIsStale(token_, _lastUpdatedAt), "price-invalid");
     }
 
     /// @inheritdoc IOracle
@@ -56,6 +64,6 @@ contract ChainlinkOracle is IOracle, UsingStalePeriod {
             token_,
             amountIn_
         );
-        require(_amountOut > 0 && !_priceIsStale(_lastUpdatedAt), "price-invalid");
+        require(_amountOut > 0 && !_priceIsStale(token_, _lastUpdatedAt), "price-invalid");
     }
 }

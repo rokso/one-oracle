@@ -51,7 +51,16 @@ contract PriceProvidersAggregator is IPriceProvidersAggregator, Governable {
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    ) external view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    )
+        external
+        view
+        override
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
         IPriceProvider _provider = priceProviders[provider_];
         require(address(_provider) != address(0), "provider-not-set");
         return _provider.quote(tokenIn_, tokenOut_, amountIn_);
@@ -64,21 +73,46 @@ contract PriceProvidersAggregator is IPriceProvidersAggregator, Governable {
         DataTypes.Provider providerOut_,
         address tokenOut_,
         uint256 amountIn_
-    ) public view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    )
+        public
+        view
+        override
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _nativeTokenLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
         IPriceProvider _providerIn = priceProviders[providerIn_];
         require(address(_providerIn) != address(0), "provider-in-not-set");
 
         if (providerIn_ == providerOut_) {
-            return _providerIn.quote(tokenIn_, tokenOut_, amountIn_);
+            (_amountOut, _tokenInLastUpdatedAt, _tokenOutLastUpdatedAt) = _providerIn.quote(
+                tokenIn_,
+                tokenOut_,
+                amountIn_
+            );
+            _nativeTokenLastUpdatedAt = block.timestamp;
+            return (_amountOut, _tokenInLastUpdatedAt, _nativeTokenLastUpdatedAt, _tokenOutLastUpdatedAt);
         }
 
         IPriceProvider _providerOut = priceProviders[providerOut_];
         require(address(_providerOut) != address(0), "provider-out-not-set");
 
-        (_amountOut, _lastUpdatedAt) = _providerIn.quote(tokenIn_, nativeToken, amountIn_);
-        uint256 __lastUpdatedAt;
-        (_amountOut, __lastUpdatedAt) = _providerOut.quote(nativeToken, tokenOut_, _amountOut);
-        _lastUpdatedAt = Math.min(__lastUpdatedAt, _lastUpdatedAt);
+        uint256 _nativeTokenLastUpdatedAt0;
+        uint256 _nativeTokenLastUpdatedAt1;
+        (_amountOut, _tokenInLastUpdatedAt, _nativeTokenLastUpdatedAt0) = _providerIn.quote(
+            tokenIn_,
+            nativeToken,
+            amountIn_
+        );
+        (_amountOut, _nativeTokenLastUpdatedAt1, _tokenOutLastUpdatedAt) = _providerOut.quote(
+            nativeToken,
+            tokenOut_,
+            _amountOut
+        );
+        _nativeTokenLastUpdatedAt = Math.min(_nativeTokenLastUpdatedAt0, _nativeTokenLastUpdatedAt1);
     }
 
     /// @inheritdoc IPriceProvidersAggregator

@@ -97,7 +97,7 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable, 
         require(address(_stableCoinProvider) != address(0), "stable-coin-not-supported");
 
         uint256 _stableCoinAmount;
-        (_stableCoinAmount, _lastUpdatedAt) = quote(
+        (_stableCoinAmount, _lastUpdatedAt, ) = quote(
             token_,
             _stableCoinProvider.getStableCoinIfPegged(),
             twapPeriod_,
@@ -111,7 +111,16 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable, 
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    ) external view override(IPriceProvider, PriceProvider) returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    )
+        external
+        view
+        override(IPriceProvider, PriceProvider)
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
         return quote(tokenIn_, tokenOut_, defaultTwapPeriod, amountIn_);
     }
 
@@ -121,18 +130,26 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable, 
         address tokenOut_,
         uint256 twapPeriod_,
         uint256 amountIn_
-    ) public view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    )
+        public
+        view
+        override
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
         if (tokenIn_ == tokenOut_) {
-            return (amountIn_, block.timestamp);
+            return (amountIn_, block.timestamp, block.timestamp);
         }
 
         if (hasOracle(pairFor(tokenIn_, tokenOut_), twapPeriod_)) {
-            (_amountOut, _lastUpdatedAt) = _getAmountOut(tokenIn_, tokenOut_, twapPeriod_, amountIn_);
+            (_amountOut, _tokenInLastUpdatedAt) = _getAmountOut(tokenIn_, tokenOut_, twapPeriod_, amountIn_);
+            _tokenOutLastUpdatedAt = _tokenInLastUpdatedAt;
         } else {
-            (_amountOut, _lastUpdatedAt) = _getAmountOut(tokenIn_, nativeToken, twapPeriod_, amountIn_);
-            uint256 __lastUpdatedAt;
-            (_amountOut, __lastUpdatedAt) = _getAmountOut(nativeToken, tokenOut_, twapPeriod_, _amountOut);
-            _lastUpdatedAt = Math.min(__lastUpdatedAt, _lastUpdatedAt);
+            (_amountOut, _tokenInLastUpdatedAt) = _getAmountOut(tokenIn_, nativeToken, twapPeriod_, amountIn_);
+            (_amountOut, _tokenOutLastUpdatedAt) = _getAmountOut(nativeToken, tokenOut_, twapPeriod_, _amountOut);
         }
     }
 
@@ -163,7 +180,15 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable, 
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    ) external override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    )
+        external
+        override
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
         return updateAndQuote(tokenIn_, tokenOut_, defaultTwapPeriod, amountIn_);
     }
 
@@ -173,7 +198,15 @@ contract UniswapV2LikePriceProvider is IUniswapV2LikePriceProvider, Governable, 
         address tokenOut_,
         uint256 twapPeriod_,
         uint256 amountIn_
-    ) public override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    )
+        public
+        override
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
         updateOrAdd(tokenIn_, tokenOut_, twapPeriod_);
         return quote(tokenIn_, tokenOut_, twapPeriod_, amountIn_);
     }
