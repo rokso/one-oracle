@@ -1,22 +1,23 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
 import Addresses from '../../helpers/address'
-const {avalanche: Address} = Addresses
 
-const CurveLpTokenOracle = 'CurveLpTokenOracle'
+const {bsc: Address} = Addresses
+
+const EllipsisLpTokenOracle = 'EllipsisLpTokenOracle'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy} = deployments
   const {deployer} = await getNamedAccounts()
 
-  await deploy(CurveLpTokenOracle, {
+  await deploy(EllipsisLpTokenOracle, {
     from: deployer,
     log: true,
-    args: [Address.Curve.ADDRESS_PROVIDER],
+    args: [Address.Ellipsis.ADDRESS_PROVIDER],
   })
 }
 
 export default func
 
-func.tags = [CurveLpTokenOracle]
+func.tags = [EllipsisLpTokenOracle]

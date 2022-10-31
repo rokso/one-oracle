@@ -11,6 +11,7 @@ const ChainlinkPriceProvider = 'ChainlinkPriceProvider'
 const MasterOracle = 'MasterOracle'
 const CurveLpTokenOracle = 'CurveLpTokenOracle'
 const CurveFactoryLpTokenOracle = 'CurveFactoryLpTokenOracle'
+const EllipsisLpTokenOracle = 'EllipsisLpTokenOracle'
 
 const deployAddressProvider = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
@@ -67,9 +68,9 @@ const setupTokenOracles = async (
     curveLpTokens,
     curveFactoryLps = [],
   }: {
-    customOracles: {token: string; oracle: string}[]
-    chainlinkAggregators: {token: string; aggregator: string}[]
-    curveLpTokens: {token: string; isLending: boolean}[]
+    customOracles?: {token: string; oracle: string}[]
+    chainlinkAggregators?: {token: string; aggregator: string}[]
+    curveLpTokens?: {token: string; isLending: boolean}[]
     curveFactoryLps?: string[]
   }
 ) => {
@@ -78,32 +79,44 @@ const setupTokenOracles = async (
   const {deployer: from} = await getNamedAccounts()
 
   // Custom Oracles
-  for (const {token, oracle} of customOracles) {
-    const {address: oracleAddress} = await get(oracle)
-    const current = await read(MasterOracle, 'oracles', token)
-    if (current !== oracleAddress) {
-      await execute(MasterOracle, {from, log: true}, 'updateTokenOracle', token, oracleAddress)
+  if (customOracles) {
+    for (const {token, oracle} of customOracles) {
+      const {address: oracleAddress} = await get(oracle)
+      const current = await read(MasterOracle, 'oracles', token)
+      if (current !== oracleAddress) {
+        await execute(MasterOracle, {from, log: true}, 'updateTokenOracle', token, oracleAddress)
+      }
     }
   }
 
   // Chainlink
-  for (const {token, aggregator} of chainlinkAggregators) {
-    const current = await read(ChainlinkPriceProvider, 'aggregators', token)
-    if (current !== aggregator) {
-      await execute(ChainlinkPriceProvider, {from, log: true}, 'updateAggregator', token, aggregator)
+  if (chainlinkAggregators) {
+    for (const {token, aggregator} of chainlinkAggregators) {
+      const current = await read(ChainlinkPriceProvider, 'aggregators', token)
+      if (current !== aggregator) {
+        await execute(ChainlinkPriceProvider, {from, log: true}, 'updateAggregator', token, aggregator)
+      }
     }
   }
 
   // Curve LPs
-  const {address: curveLpOracleAddress} = await get(CurveLpTokenOracle)
-  for (const {token, isLending} of curveLpTokens) {
-    const current = await read(MasterOracle, 'oracles', token)
-    if (current !== curveLpOracleAddress) {
-      await execute(MasterOracle, {from, log: true}, 'updateTokenOracle', token, curveLpOracleAddress)
-      if (isLending) {
-        await execute(CurveLpTokenOracle, {from, log: true}, 'registerLendingLp', token)
-      } else {
-        await execute(CurveLpTokenOracle, {from, log: true}, 'registerLp', token)
+  if (curveLpTokens) {
+    let CurveLikeLpTokenOracle = CurveLpTokenOracle
+    let curveLpTokenOracle = await getOrNull(CurveLikeLpTokenOracle)
+    if (!curveLpTokenOracle) {
+      CurveLikeLpTokenOracle = EllipsisLpTokenOracle
+      curveLpTokenOracle = await get(CurveLikeLpTokenOracle)
+    }
+    const {address: curveLpOracleAddress} = curveLpTokenOracle
+    for (const {token, isLending} of curveLpTokens) {
+      const current = await read(MasterOracle, 'oracles', token)
+      if (current !== curveLpOracleAddress) {
+        await execute(MasterOracle, {from, log: true}, 'updateTokenOracle', token, curveLpOracleAddress)
+        if (isLending) {
+          await execute(CurveLikeLpTokenOracle, {from, log: true}, 'registerLendingLp', token)
+        } else {
+          await execute(CurveLikeLpTokenOracle, {from, log: true}, 'registerLp', token)
+        }
       }
     }
   }
