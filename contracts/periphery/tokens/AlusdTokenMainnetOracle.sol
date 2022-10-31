@@ -29,7 +29,7 @@ contract AlusdTokenMainnetOracle is IUpdatableOracle, UsingStalePeriod {
             ONE_ALUSD
         );
 
-        require(_priceInUsd > 0 && !_priceIsStale(_lastUpdatedAt), "price-invalid");
+        require(_priceInUsd > 0 && !_priceIsStale(_lastUpdatedAt, defaultStalePeriod), "price-invalid");
     }
 
     /// @inheritdoc IUpdatableOracle

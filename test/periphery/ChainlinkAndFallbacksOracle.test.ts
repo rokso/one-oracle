@@ -275,7 +275,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
         const chainlinkAmounOut = parseEther('3,000')
         aggregator['quote(uint8,address,address,uint256)'].returns((args: [number, string, string, BigNumber]) => {
           const [provider] = args
-          if (provider === Provider.CHAINLINK) return [chainlinkAmounOut, lastUpdatedAt]
+          if (provider === Provider.CHAINLINK) return [chainlinkAmounOut, lastUpdatedAt, lastUpdatedAt]
         })
 
         // when
@@ -295,8 +295,8 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             const v3AmountOut = parseEther('3,000')
             aggregator['quote(uint8,address,address,uint256)'].returns((args: [number, string, string, BigNumber]) => {
               const [provider] = args
-              if (provider === Provider.CHAINLINK) return [0, 0]
-              if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt]
+              if (provider === Provider.CHAINLINK) return [0, 0, 0]
+              if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt, lastUpdatedAt]
             })
 
             // when
@@ -316,9 +316,9 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
               aggregator['quote(uint8,address,address,uint256)'].returns(
                 (args: [number, string, string, BigNumber]) => {
                   const [provider] = args
-                  if (provider === Provider.CHAINLINK) return [0, 0]
-                  if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt]
-                  if (provider === Provider.UNISWAP_V2) return [v2AmountOut, lastUpdatedAt]
+                  if (provider === Provider.CHAINLINK) return [0, 0, 0]
+                  if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt, lastUpdatedAt]
+                  if (provider === Provider.UNISWAP_V2) return [v2AmountOut, lastUpdatedAt, lastUpdatedAt]
                 }
               )
 
@@ -337,9 +337,9 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
               aggregator['quote(uint8,address,address,uint256)'].returns(
                 (args: [number, string, string, BigNumber]) => {
                   const [provider] = args
-                  if (provider === Provider.CHAINLINK) return [0, 0]
-                  if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt]
-                  if (provider === Provider.UNISWAP_V2) return [v2AmountOut, lastUpdatedAt]
+                  if (provider === Provider.CHAINLINK) return [0, 0, 0]
+                  if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt, lastUpdatedAt]
+                  if (provider === Provider.UNISWAP_V2) return [v2AmountOut, lastUpdatedAt, lastUpdatedAt]
                 }
               )
 
@@ -358,9 +358,9 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             const v3AmountOut = parseEther('3,000')
             aggregator['quote(uint8,address,address,uint256)'].returns((args: [number, string, string, BigNumber]) => {
               const [provider] = args
-              if (provider === Provider.CHAINLINK) return [0, 0]
-              if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt]
-              if (provider === Provider.UNISWAP_V2) return [0, 0]
+              if (provider === Provider.CHAINLINK) return [0, 0, 0]
+              if (provider === Provider.UNISWAP_V3) return [v3AmountOut, lastUpdatedAt, lastUpdatedAt]
+              if (provider === Provider.UNISWAP_V2) return [0, 0, 0]
             })
 
             // when
@@ -379,8 +379,8 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             await chainlinkAndFallbacksOracle.updateFallbackProviders(Provider.UNISWAP_V3, Provider.NONE)
             aggregator['quote(uint8,address,address,uint256)'].returns((args: [number, string, string, BigNumber]) => {
               const [provider] = args
-              if (provider === Provider.CHAINLINK) return [0, 0]
-              if (provider === Provider.UNISWAP_V3) return [0, 0]
+              if (provider === Provider.CHAINLINK) return [0, 0, 0]
+              if (provider === Provider.UNISWAP_V3) return [0, 0, 0]
             })
 
             // when
@@ -397,9 +397,9 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             const v2AmountOut = parseEther('3,000')
             aggregator['quote(uint8,address,address,uint256)'].returns((args: [number, string, string, BigNumber]) => {
               const [provider] = args
-              if (provider === Provider.CHAINLINK) return [0, 0]
-              if (provider === Provider.UNISWAP_V3) return [0, 0]
-              if (provider === Provider.UNISWAP_V2) return [v2AmountOut, lastUpdatedAt]
+              if (provider === Provider.CHAINLINK) return [0, 0, 0]
+              if (provider === Provider.UNISWAP_V3) return [0, 0, 0]
+              if (provider === Provider.UNISWAP_V2) return [v2AmountOut, lastUpdatedAt, lastUpdatedAt]
             })
 
             // when
@@ -415,9 +415,9 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
             // given
             aggregator['quote(uint8,address,address,uint256)'].returns((args: [number, string, string, BigNumber]) => {
               const [provider] = args
-              if (provider === Provider.CHAINLINK) return [0, 0]
-              if (provider === Provider.UNISWAP_V3) return [0, 0]
-              if (provider === Provider.UNISWAP_V2) return [0, 0]
+              if (provider === Provider.CHAINLINK) return [0, 0, 0]
+              if (provider === Provider.UNISWAP_V3) return [0, 0, 0]
+              if (provider === Provider.UNISWAP_V2) return [0, 0, 0]
             })
 
             // when

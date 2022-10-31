@@ -2,6 +2,7 @@
 
 pragma solidity 0.8.9;
 
+import "@openzeppelin/contracts/utils/math/Math.sol";
 import "../interfaces/core/IPriceProvidersAggregator.sol";
 import "../interfaces/periphery/IOracle.sol";
 import "../features/UsingMaxDeviation.sol";
@@ -43,9 +44,10 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingMaxDeviation, UsingStalePe
         // 1. Get price from chainlink
         uint256 _lastUpdatedAt;
         (_priceInUsd, _lastUpdatedAt) = _getPriceInUsd(DataTypes.Provider.CHAINLINK, _asset);
+        uint256 _stalePeriod = stalePeriodOf(_asset);
 
         // 2. If price from chainlink is OK return it
-        if (_priceInUsd > 0 && !_priceIsStale(_lastUpdatedAt)) {
+        if (_priceInUsd > 0 && !_priceIsStale(_lastUpdatedAt, _stalePeriod)) {
             return _priceInUsd;
         }
 
@@ -53,7 +55,7 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingMaxDeviation, UsingStalePe
         (uint256 _amountOutA, uint256 _lastUpdatedAtA) = _getPriceInUsd(fallbackProviderA, _asset);
 
         // 4. If price from fallback A is OK and there isn't a fallback B, return price from fallback A
-        bool _aPriceOK = _amountOutA > 0 && !_priceIsStale(_lastUpdatedAtA);
+        bool _aPriceOK = _amountOutA > 0 && !_priceIsStale(_lastUpdatedAtA, _stalePeriod);
         if (fallbackProviderB == DataTypes.Provider.NONE) {
             require(_aPriceOK, "fallback-a-failed");
             return _amountOutA;
@@ -63,7 +65,7 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingMaxDeviation, UsingStalePe
         (uint256 _amountOutB, uint256 _lastUpdatedAtB) = _getPriceInUsd(fallbackProviderB, _asset);
 
         // 6. If only one price from fallbacks is valid, return it
-        bool _bPriceOK = _amountOutB > 0 && !_priceIsStale(_lastUpdatedAtB);
+        bool _bPriceOK = _amountOutB > 0 && !_priceIsStale(_lastUpdatedAtB, _stalePeriod);
         if (!_bPriceOK && _aPriceOK) {
             return _amountOutA;
         } else if (_bPriceOK && !_aPriceOK) {
@@ -85,29 +87,53 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingMaxDeviation, UsingStalePe
         uint256 amountIn_
     ) public view virtual returns (uint256 _amountOut) {
         // 1. Get price from chainlink
-        uint256 _lastUpdatedAt;
-        (_amountOut, _lastUpdatedAt) = _quote(DataTypes.Provider.CHAINLINK, tokenIn_, tokenOut_, amountIn_);
+        uint256 _tokenInLastUpdatedAt;
+        uint256 _tokenOutLastUpdatedAt;
+        (_amountOut, _tokenInLastUpdatedAt, _tokenOutLastUpdatedAt) = _quote(
+            DataTypes.Provider.CHAINLINK,
+            tokenIn_,
+            tokenOut_,
+            amountIn_
+        );
 
         // 2. If price from chainlink is OK return it
-        if (_amountOut > 0 && !_priceIsStale(_lastUpdatedAt)) {
+        if (
+            _amountOut > 0 &&
+            !_priceIsStale(tokenIn_, _tokenInLastUpdatedAt) &&
+            !_priceIsStale(tokenOut_, _tokenOutLastUpdatedAt)
+        ) {
             return _amountOut;
         }
 
         // 3. Get price from fallback A
-        (uint256 _amountOutA, uint256 _lastUpdatedAtA) = _quote(fallbackProviderA, tokenIn_, tokenOut_, amountIn_);
+        (uint256 _amountOutA, uint256 _tokenInLastUpdatedAtA, uint256 _tokenOutLastUpdatedAtA) = _quote(
+            fallbackProviderA,
+            tokenIn_,
+            tokenOut_,
+            amountIn_
+        );
 
         // 4. If price from fallback A is OK and there isn't a fallback B, return price from fallback A
-        bool _aPriceOK = _amountOutA > 0 && !_priceIsStale(_lastUpdatedAtA);
+        bool _aPriceOK = _amountOutA > 0 &&
+            !_priceIsStale(tokenIn_, _tokenInLastUpdatedAtA) &&
+            !_priceIsStale(tokenOut_, _tokenOutLastUpdatedAtA);
         if (fallbackProviderB == DataTypes.Provider.NONE) {
             require(_aPriceOK, "fallback-a-failed");
             return _amountOutA;
         }
 
         // 5. Get price from fallback B
-        (uint256 _amountOutB, uint256 _lastUpdatedAtB) = _quote(fallbackProviderB, tokenIn_, tokenOut_, amountIn_);
+        (uint256 _amountOutB, uint256 _tokenInLastUpdatedAtB, uint256 _tokenOutLastUpdatedAtB) = _quote(
+            fallbackProviderB,
+            tokenIn_,
+            tokenOut_,
+            amountIn_
+        );
 
         // 6. If only one price from fallbacks is valid, return it
-        bool _bPriceOK = _amountOutB > 0 && !_priceIsStale(_lastUpdatedAtB);
+        bool _bPriceOK = _amountOutB > 0 &&
+            !_priceIsStale(tokenIn_, _tokenInLastUpdatedAtB) &&
+            !_priceIsStale(tokenOut_, _tokenOutLastUpdatedAtB);
         if (!_bPriceOK && _aPriceOK) {
             return _amountOutA;
         } else if (_bPriceOK && !_aPriceOK) {
@@ -127,9 +153,10 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingMaxDeviation, UsingStalePe
         // 1. Get price from chainlink
         uint256 _lastUpdatedAt;
         (_amountOut, _lastUpdatedAt) = _quoteTokenToUsd(DataTypes.Provider.CHAINLINK, token_, amountIn_);
+        uint256 _stalePeriod = stalePeriodOf(token_);
 
         // 2. If price from chainlink is OK return it
-        if (_amountOut > 0 && !_priceIsStale(_lastUpdatedAt)) {
+        if (_amountOut > 0 && !_priceIsStale(_lastUpdatedAt, _stalePeriod)) {
             return _amountOut;
         }
 
@@ -137,7 +164,7 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingMaxDeviation, UsingStalePe
         (uint256 _amountOutA, uint256 _lastUpdatedAtA) = _quoteTokenToUsd(fallbackProviderA, token_, amountIn_);
 
         // 4. If price from fallback A is OK and there isn't a fallback B, return price from fallback A
-        bool _aPriceOK = _amountOutA > 0 && !_priceIsStale(_lastUpdatedAtA);
+        bool _aPriceOK = _amountOutA > 0 && !_priceIsStale(_lastUpdatedAtA, _stalePeriod);
         if (fallbackProviderB == DataTypes.Provider.NONE) {
             require(_aPriceOK, "fallback-a-failed");
             return _amountOutA;
@@ -147,7 +174,7 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingMaxDeviation, UsingStalePe
         (uint256 _amountOutB, uint256 _lastUpdatedAtB) = _quoteTokenToUsd(fallbackProviderB, token_, amountIn_);
 
         // 6. If only one price from fallbacks is valid, return it
-        bool _bPriceOK = _amountOutB > 0 && !_priceIsStale(_lastUpdatedAtB);
+        bool _bPriceOK = _amountOutB > 0 && !_priceIsStale(_lastUpdatedAtB, _stalePeriod);
         if (!_bPriceOK && _aPriceOK) {
             return _amountOutA;
         } else if (_bPriceOK && !_aPriceOK) {
@@ -167,9 +194,10 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingMaxDeviation, UsingStalePe
         // 1. Get price from chainlink
         uint256 _lastUpdatedAt;
         (_amountOut, _lastUpdatedAt) = _quoteUsdToToken(DataTypes.Provider.CHAINLINK, token_, amountIn_);
+        uint256 _stalePeriod = stalePeriodOf(token_);
 
         // 2. If price from chainlink is OK return it
-        if (_amountOut > 0 && !_priceIsStale(_lastUpdatedAt)) {
+        if (_amountOut > 0 && !_priceIsStale(_lastUpdatedAt, _stalePeriod)) {
             return _amountOut;
         }
 
@@ -177,7 +205,7 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingMaxDeviation, UsingStalePe
         (uint256 _amountOutA, uint256 _lastUpdatedAtA) = _quoteUsdToToken(fallbackProviderA, token_, amountIn_);
 
         // 4. If price from fallback A is OK and there isn't a fallback B, return price from fallback A
-        bool _aPriceOK = _amountOutA > 0 && !_priceIsStale(_lastUpdatedAtA);
+        bool _aPriceOK = _amountOutA > 0 && !_priceIsStale(_lastUpdatedAtA, _stalePeriod);
         if (fallbackProviderB == DataTypes.Provider.NONE) {
             require(_aPriceOK, "fallback-a-failed");
             return _amountOutA;
@@ -187,7 +215,7 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingMaxDeviation, UsingStalePe
         (uint256 _amountOutB, uint256 _lastUpdatedAtB) = _quoteUsdToToken(fallbackProviderB, token_, amountIn_);
 
         // 6. If only one price from fallbacks is valid, return it
-        bool _bPriceOK = _amountOutB > 0 && !_priceIsStale(_lastUpdatedAtB);
+        bool _bPriceOK = _amountOutB > 0 && !_priceIsStale(_lastUpdatedAtB, _stalePeriod);
         if (!_bPriceOK && _aPriceOK) {
             return _amountOutA;
         } else if (_bPriceOK && !_aPriceOK) {
@@ -229,13 +257,24 @@ contract ChainlinkAndFallbacksOracle is IOracle, UsingMaxDeviation, UsingStalePe
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    ) private view returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    )
+        private
+        view
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
         try addressProvider.providersAggregator().quote(provider_, tokenIn_, tokenOut_, amountIn_) returns (
             uint256 __amountOut,
-            uint256 __lastUpdatedAt
+            uint256 __tokenInLastUpdatedAt,
+            uint256 __tokenOutLastUpdatedAt
         ) {
             _amountOut = __amountOut;
-            _lastUpdatedAt = __lastUpdatedAt;
+
+            _tokenInLastUpdatedAt = __tokenInLastUpdatedAt;
+            _tokenOutLastUpdatedAt = __tokenOutLastUpdatedAt;
         } catch {}
     }
 

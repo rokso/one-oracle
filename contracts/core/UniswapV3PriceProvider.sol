@@ -84,7 +84,7 @@ contract UniswapV3PriceProvider is IUniswapV3PriceProvider, Governable, PricePro
         require(address(_stableCoinProvider) != address(0), "stable-coin-not-supported");
 
         uint256 _stableCoinAmount;
-        (_stableCoinAmount, _lastUpdatedAt) = quote(
+        (_stableCoinAmount, _lastUpdatedAt, ) = quote(
             token_,
             _stableCoinProvider.getStableCoinIfPegged(),
             poolFee_,
@@ -100,7 +100,16 @@ contract UniswapV3PriceProvider is IUniswapV3PriceProvider, Governable, PricePro
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    ) external view override(IPriceProvider, PriceProvider) returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    )
+        external
+        view
+        override(IPriceProvider, PriceProvider)
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
         return quote(tokenIn_, tokenOut_, defaultPoolFee, defaultTwapPeriod, amountIn_);
     }
 
@@ -110,7 +119,16 @@ contract UniswapV3PriceProvider is IUniswapV3PriceProvider, Governable, PricePro
         address tokenOut_,
         uint32 twapPeriod_,
         uint256 amountIn_
-    ) external view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    )
+        external
+        view
+        override
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
         return quote(tokenIn_, tokenOut_, defaultPoolFee, twapPeriod_, amountIn_);
     }
 
@@ -120,7 +138,16 @@ contract UniswapV3PriceProvider is IUniswapV3PriceProvider, Governable, PricePro
         address tokenOut_,
         uint24 poolFee_,
         uint256 amountIn_
-    ) external view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    )
+        external
+        view
+        override
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
         return quote(tokenIn_, tokenOut_, poolFee_, defaultTwapPeriod, amountIn_);
     }
 
@@ -131,9 +158,18 @@ contract UniswapV3PriceProvider is IUniswapV3PriceProvider, Governable, PricePro
         uint24 poolFee_,
         uint32 twapPeriod_,
         uint256 amountIn_
-    ) public view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
+    )
+        public
+        view
+        override
+        returns (
+            uint256 _amountOut,
+            uint256 _tokenInLastUpdatedAt,
+            uint256 _tokenOutLastUpdatedAt
+        )
+    {
         if (tokenIn_ == tokenOut_) {
-            return (amountIn_, block.timestamp);
+            return (amountIn_, block.timestamp, block.timestamp);
         }
 
         if (tokenIn_ == crossPoolOracle.nativeToken()) {
@@ -143,7 +179,8 @@ contract UniswapV3PriceProvider is IUniswapV3PriceProvider, Governable, PricePro
         } else {
             _amountOut = crossPoolOracle.assetToAsset(tokenIn_, amountIn_, tokenOut_, poolFee_, twapPeriod_);
         }
-        _lastUpdatedAt = block.timestamp;
+        _tokenInLastUpdatedAt = block.timestamp;
+        _tokenOutLastUpdatedAt = block.timestamp;
     }
 
     /// @inheritdoc IUniswapV3PriceProvider

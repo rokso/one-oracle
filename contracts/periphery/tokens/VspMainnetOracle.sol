@@ -39,7 +39,7 @@ contract VspMainnetOracle is IUpdatableOracle, UsingMaxDeviation, UsingStalePeri
         );
 
         require(
-            _priceInUsd > 0 && _priceInUsd1 > 0 && !_priceIsStale(Math.min(_lastUpdatedAt, _lastUpdatedAt1)),
+            _priceInUsd > 0 && _priceInUsd1 > 0 && !_priceIsStale(_asset, Math.min(_lastUpdatedAt, _lastUpdatedAt1)),
             "one-or-both-prices-invalid"
         );
         require(_isDeviationOK(_priceInUsd, _priceInUsd1), "prices-deviation-too-high");

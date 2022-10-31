@@ -79,22 +79,22 @@ describe('MasterOracle', function () {
       masterOracle = MasterOracle__factory.connect(MasterOracle.address, deployer)
 
       const defaultOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
-      await defaultOracle.updateStalePeriod(ethers.constants.MaxUint256)
+      await defaultOracle.updateDefaultStalePeriod(ethers.constants.MaxUint256)
 
       const stableCoinProvider = StableCoinProvider__factory.connect(StableCoinProvider.address, deployer)
-      await stableCoinProvider.updateStalePeriod(ethers.constants.MaxUint256)
+      await stableCoinProvider.updateDefaultStalePeriod(ethers.constants.MaxUint256)
 
       const alusdTokenMainnetOracle = AlusdTokenMainnetOracle__factory.connect(
         AlusdTokenMainnetOracle.address,
         deployer
       )
-      await alusdTokenMainnetOracle.updateStalePeriod(ethers.constants.MaxUint256)
+      await alusdTokenMainnetOracle.updateDefaultStalePeriod(ethers.constants.MaxUint256)
       await alusdTokenMainnetOracle.update()
       await increaseTime(ethers.BigNumber.from(60 * 60 * 24))
       await alusdTokenMainnetOracle.update()
 
       const bTCPeggedTokenOracle = BTCPeggedTokenOracle__factory.connect(BTCPeggedTokenOracle.address, deployer)
-      await bTCPeggedTokenOracle.updateStalePeriod(ethers.constants.MaxUint256)
+      await bTCPeggedTokenOracle.updateDefaultStalePeriod(ethers.constants.MaxUint256)
     })
 
     describe('getPriceInUsd', function () {
