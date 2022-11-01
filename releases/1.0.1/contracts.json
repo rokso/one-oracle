@@ -64,17 +64,17 @@
     },
     "bsc": {
       "AddressProvider": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
-      "AddressProvider_Implementation": "0x7B970C578B354F0F816Ec0fEf3b236096C11E156",
+      "AddressProvider_Implementation": "0x82cC8D7e322c1C17c4Fc29727833b865C86ECaE8",
       "AddressProvider_Proxy": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
-      "ChainlinkBscPriceProvider": "0xfac3d360835D58AaDc22eac80eE747583D7a9Cf0",
-      "ChainlinkOracle": "0x42c9De8bf891F0bE9dA7dA8078c1f301553CE064",
-      "ChainlinkPriceProvider": "0x7d0DC1ec332512E16Ca5b63A61Db9Ad9Ac9839Dc",
+      "ChainlinkOracle": "0x30a35969AdBb8B437c44C8BdC162501Efa8eE018",
+      "ChainlinkPriceProvider": "0x44D01babbf1b5dA42D3eb0A1d4856A45c8426CC2",
       "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf",
-      "EllipsisLpTokenOracle": "0x3eb916cddCdF072cb292dB8B09616B6f1C11c3F5",
-      "MasterOracle": "0x0aac835162D368F246dc71628AfcD6d2930c47d3",
-      "PriceProvidersAggregator": "0x82611C86d98Bd0730b0460ea7D5Dc5Da327F00eE",
-      "RoutedSwapper": "0x2E99f1b571d1A3D7987f8CaDd9F4C5f2240354e2",
-      "SushiSwapExchange": "0xDAf982c67712780D54C298A91D86788165B701A4"
+      "EllipsisLpTokenOracle": "0xc95C5D237E6fc51F1c4C25734A36965CA73077df",
+      "MasterOracle": "0x5323F445A8665239222b117aE095423a238F5706",
+      "PancakeSwapExchange": "0xC30BBCb018c9554Dc60E8aA235aeA6Ef6435095d",
+      "PriceProvidersAggregator": "0xB6D75A53442844e8F1eed35d7A65225c57B282EB",
+      "RoutedSwapper": "0x6c27484d5f0386cA226bd4672Df4CA6430407883",
+      "SushiSwapExchange": "0x0875D8Fe1F4d80D6B134Df046902f3Ba78BCB7dA"
     }
   }
 }
