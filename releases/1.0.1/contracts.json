@@ -70,6 +70,7 @@
       "ChainlinkOracle": "0x42c9De8bf891F0bE9dA7dA8078c1f301553CE064",
       "ChainlinkPriceProvider": "0x7d0DC1ec332512E16Ca5b63A61Db9Ad9Ac9839Dc",
       "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf",
+      "EllipsisLpTokenOracle": "0x3eb916cddCdF072cb292dB8B09616B6f1C11c3F5",
       "MasterOracle": "0x0aac835162D368F246dc71628AfcD6d2930c47d3",
       "PriceProvidersAggregator": "0x82611C86d98Bd0730b0460ea7D5Dc5Da327F00eE",
       "RoutedSwapper": "0x2E99f1b571d1A3D7987f8CaDd9F4C5f2240354e2",
