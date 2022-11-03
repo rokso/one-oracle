@@ -69,8 +69,20 @@ const customOracles = [
   {token: Address.DOLA, oracle: 'USDPeggedTokenOracle'},
 ]
 
+const customStalePeriods = [
+  {token: Address.USDT, stalePeriod: 60 * 60 * 24},
+  {token: Address.USDC, stalePeriod: 60 * 60 * 24},
+  {token: Address.sUSD, stalePeriod: 60 * 60 * 24},
+]
+
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
-  await setupTokenOracles(hre, {customOracles, chainlinkAggregators, curveLpTokens, curveFactoryLps})
+  await setupTokenOracles(hre, {
+    customOracles,
+    chainlinkAggregators,
+    curveLpTokens,
+    curveFactoryLps,
+    customStalePeriods,
+  })
 }
 
 export default func
