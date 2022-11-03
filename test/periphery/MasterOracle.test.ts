@@ -89,8 +89,7 @@ describe('MasterOracle', function () {
         deployer
       )
       await alusdTokenMainnetOracle.updateDefaultStalePeriod(ethers.constants.MaxUint256)
-      await alusdTokenMainnetOracle.update()
-      await increaseTime(ethers.BigNumber.from(60 * 60 * 24))
+      await increaseTime(ethers.BigNumber.from(60 * 60 * 2))
       await alusdTokenMainnetOracle.update()
 
       const bTCPeggedTokenOracle = BTCPeggedTokenOracle__factory.connect(BTCPeggedTokenOracle.address, deployer)

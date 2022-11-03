@@ -5,16 +5,20 @@ const AlusdTokenMainnetOracle = 'AlusdTokenMainnetOracle'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
-  const {deploy} = deployments
+  const {deploy, execute} = deployments
   const {deployer: from} = await getNamedAccounts()
 
   const stalePeriod = 4 * 60 * 60 // 4h
 
-  await deploy(AlusdTokenMainnetOracle, {
+  const {newlyDeployed} = await deploy(AlusdTokenMainnetOracle, {
     from,
     log: true,
     args: [stalePeriod],
   })
+
+  if (newlyDeployed) {
+    await execute(AlusdTokenMainnetOracle, {from, log: true}, 'update')
+  }
 }
 
 func.tags = [AlusdTokenMainnetOracle]

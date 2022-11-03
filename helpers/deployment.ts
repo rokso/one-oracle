@@ -12,6 +12,7 @@ const MasterOracle = 'MasterOracle'
 const CurveLpTokenOracle = 'CurveLpTokenOracle'
 const CurveFactoryLpTokenOracle = 'CurveFactoryLpTokenOracle'
 const EllipsisLpTokenOracle = 'EllipsisLpTokenOracle'
+const ChainlinkOracle = 'ChainlinkOracle'
 
 const deployAddressProvider = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
@@ -67,11 +68,13 @@ const setupTokenOracles = async (
     chainlinkAggregators,
     curveLpTokens,
     curveFactoryLps = [],
+    customStalePeriods = [],
   }: {
     customOracles?: {token: string; oracle: string}[]
     chainlinkAggregators?: {token: string; aggregator: string}[]
     curveLpTokens?: {token: string; isLending: boolean}[]
     curveFactoryLps?: string[]
+    customStalePeriods?: {token: string; stalePeriod: number}[]
   }
 ) => {
   const {getNamedAccounts, deployments} = hre
@@ -134,6 +137,22 @@ const setupTokenOracles = async (
         if (!alreadyRegistered) {
           await execute(CurveFactoryLpTokenOracle, {from, log: true}, 'registerLp', token)
         }
+      }
+    }
+  }
+
+  // Custom Stale periods
+  if (customStalePeriods) {
+    const {address: chainlinkOracleAddress} = await get(ChainlinkOracle)
+    const defaultOracleAddress = await read(MasterOracle, 'defaultOracle')
+    if (defaultOracleAddress != chainlinkOracleAddress) {
+      throw Error('ChainlinkOracle is not the default oracle')
+    }
+
+    for (const {token, stalePeriod} of customStalePeriods) {
+      const current = await read(ChainlinkOracle, 'stalePeriodOf', token)
+      if (current !== stalePeriod) {
+        await execute(ChainlinkOracle, {from, log: true}, 'updateCustomStalePeriod', token, stalePeriod)
       }
     }
   }
