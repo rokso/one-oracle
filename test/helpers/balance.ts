@@ -9,6 +9,7 @@ const slots = {
   [Address.mainnet.WETH]: 3,
   [Address.mainnet.USDC]: 9,
   [Address.mainnet.WBTC]: 0,
+  [Address.mainnet.MUSD]: 51,
   [Address.mainnet.Chainlink.NOT_ON_CHAINLINK_TOKEN]: 0,
   [Address.avalanche.WAVAX]: 3,
   [Address.avalanche.DAI]: 0,

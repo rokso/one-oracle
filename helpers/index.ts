@@ -24,6 +24,7 @@ enum ExchangeType {
   QUICKSWAP = 4,
   UNISWAP_V3 = 5,
   PANCAKE_SWAP = 6,
+  CURVE = 7,
 }
 
 // Note: See `contracts/libraries/DataTypes.sol`

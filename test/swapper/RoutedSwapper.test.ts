@@ -7,6 +7,8 @@ import {
   UniswapV2LikeExchange__factory,
   UniswapV3Exchange,
   UniswapV3Exchange__factory,
+  CurveExchange,
+  CurveExchange__factory,
   RoutedSwapper,
   RoutedSwapper__factory,
   IERC20,
@@ -17,7 +19,7 @@ import {Address, ExchangeType, SwapType, InitCodeHash} from '../../helpers'
 import {adjustBalance} from '../helpers/balance'
 import {smock} from '@defi-wonderland/smock'
 
-const {WETH, DAI, WBTC, STETH, UNISWAP_V2_FACTORY_ADDRESS} = Address.mainnet
+const {WETH, DAI, WBTC, STETH, MUSD, UNISWAP_V2_FACTORY_ADDRESS, Curve} = Address.mainnet
 const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
 describe('RoutedSwapper @mainnet', function () {
@@ -27,11 +29,13 @@ describe('RoutedSwapper @mainnet', function () {
   let invalidToken: SignerWithAddress
   let uniswapV2Exchange: UniswapV2LikeExchange
   let uniswapV3Exchange: UniswapV3Exchange
+  let curveExchange: CurveExchange
   let swapper: RoutedSwapper
   let weth: IERC20
   let dai: IERC20
   let wbtc: IERC20
   let steth: IERC20
+  let musd: IERC20
 
   beforeEach(async function () {
     // Essentially we are making sure we execute setup once only
@@ -60,17 +64,23 @@ describe('RoutedSwapper @mainnet', function () {
     uniswapV3Exchange = await uniswapV3ExchangeFactory.deploy(WETH)
     await uniswapV3Exchange.deployed()
 
+    const curveExchangeFactory = new CurveExchange__factory(deployer)
+    curveExchange = await curveExchangeFactory.deploy(Curve.ADDRESS_PROVIDER)
+    await curveExchange.deployed()
+
     const swapperFactory = new RoutedSwapper__factory(deployer)
     swapper = await swapperFactory.deploy()
     await swapper.deployed()
 
     await swapper.setExchange(ExchangeType.UNISWAP_V2, uniswapV2Exchange.address)
     await swapper.setExchange(ExchangeType.UNISWAP_V3, uniswapV3Exchange.address)
+    await swapper.setExchange(ExchangeType.CURVE, curveExchange.address)
 
     weth = IERC20__factory.connect(WETH, deployer)
     dai = IERC20__factory.connect(DAI, deployer)
     wbtc = IERC20__factory.connect(WBTC, deployer)
     steth = IERC20__factory.connect(STETH, deployer)
+    musd = IERC20__factory.connect(MUSD, deployer)
 
     await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
@@ -207,6 +217,28 @@ describe('RoutedSwapper @mainnet', function () {
       // stETH will transfer 1 wei less, meaning there is 1 more wei after the swap
       expect(stethAfter).eq(stethBefore.sub(amountIn).add('1'))
       expect(daiAfter).eq(daiBefore.add(amountOut))
+    })
+
+    it('should perform an exact input swap DAI->MUSD using curve exchange', async function () {
+      // given
+      const amountIn = parseEther('100')      
+      const {_path} = await curveExchange.callStatic.getBestAmountOut(DAI, MUSD, amountIn)
+      const [_curvePool] = ethers.utils.defaultAbiCoder.decode(['address', 'address', 'address'], _path)
+      const exchangeType = ExchangeType.CURVE
+      const path = ethers.utils.defaultAbiCoder.encode(['address', 'address', 'address'], [_curvePool, DAI, MUSD])
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, DAI, MUSD, exchangeType, path)
+      const daiBefore = await dai.balanceOf(deployer.address)
+
+      // when
+      await dai.approve(swapper.address, amountIn)
+      await swapper.swapExactInput(DAI, MUSD, amountIn, 1, deployer.address)
+
+      // then
+      const daiAfter = await dai.balanceOf(deployer.address)
+      const musdAfter = await musd.balanceOf(deployer.address)
+
+      expect(daiAfter).eq(daiBefore.sub(amountIn))
+      expect(musdAfter).closeTo(amountIn, parseEther('1'))
     })
   })
 
