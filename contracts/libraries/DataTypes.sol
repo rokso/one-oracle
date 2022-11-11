@@ -27,7 +27,8 @@ library DataTypes {
         PANGOLIN,
         QUICKSWAP,
         UNISWAP_V3,
-        PANCAKE_SWAP
+        PANCAKE_SWAP,
+        CURVE
     }
 
     enum SwapType {

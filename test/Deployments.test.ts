@@ -11,10 +11,12 @@ import {
   PriceProvidersAggregator,
   UniswapV2LikeExchange,
   UniswapV3Exchange,
+  CurveExchange,
   RoutedSwapper,
   RoutedSwapper__factory,
   UniswapV2LikeExchange__factory,
   UniswapV3Exchange__factory,
+  CurveExchange__factory,
   VspMainnetOracle__factory,
   VspMainnetOracle,
   ChainlinkOracle__factory,
@@ -25,7 +27,7 @@ import {
   USDPeggedTokenOracle,
 } from '../typechain-types'
 import {Address, SwapType, Provider, ExchangeType} from '../helpers'
-import {impersonateAccount, increaseTime, parseEther, resetFork, toUSD} from './helpers'
+import {impersonateAccount, increaseTime, parseEther, parseUnits, resetFork, toUSD} from './helpers'
 import {IERC20} from '../typechain-types/@openzeppelin/contracts/token/ERC20'
 import {IERC20__factory} from '../typechain-types/factories/@openzeppelin/contracts/token/ERC20'
 import {adjustBalance} from './helpers/balance'
@@ -196,25 +198,34 @@ describe('Deployments ', function () {
     let uniswapV2Exchange: UniswapV2LikeExchange
     let sushiswapExchange: UniswapV2LikeExchange
     let uniswapV3Exchange: UniswapV3Exchange
+    let curveExchange: CurveExchange
     let routedSwapper: RoutedSwapper
     let weth: IERC20
     let dai: IERC20
     let vspOracle: VspMainnetOracle
 
-    const {WETH, DAI, VSP} = Address.mainnet
+    const {WETH, DAI, VSP, USDC} = Address.mainnet
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
       hre.network.deploy = ['deploy/mainnet']
 
       // eslint-disable-next-line no-shadow
-      const {AddressProvider, UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange, RoutedSwapper, VspOracle} =
-        await deployments.fixture()
+      const {
+        AddressProvider,
+        UniswapV2Exchange,
+        SushiswapExchange,
+        UniswapV3Exchange,
+        RoutedSwapper,
+        VspOracle,
+        CurveExchange,
+      } = await deployments.fixture()
 
       addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
       uniswapV2Exchange = UniswapV2LikeExchange__factory.connect(UniswapV2Exchange.address, deployer)
       sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiswapExchange.address, deployer)
       uniswapV3Exchange = UniswapV3Exchange__factory.connect(UniswapV3Exchange.address, deployer)
+      curveExchange = CurveExchange__factory.connect(CurveExchange.address, deployer)
       routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
       weth = IERC20__factory.connect(WETH, deployer)
       dai = IERC20__factory.connect(DAI, deployer)
@@ -240,6 +251,11 @@ describe('Deployments ', function () {
     it('UniswapV3Exchange', async function () {
       const {_amountOut} = await uniswapV3Exchange.callStatic.getBestAmountOut(WETH, DAI, parseEther('1'))
       expect(_amountOut).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
+    })
+
+    it('CurveExchange', async function () {
+      const {_amountOut} = await curveExchange.callStatic.getBestAmountOut(DAI, USDC, parseEther('1'))
+      expect(_amountOut).closeTo(parseUnits('1', 6), parseUnits('1', 5))
     })
 
     it('RoutedSwapper', async function () {

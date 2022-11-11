@@ -56,7 +56,7 @@ const Quote = {
     vaETH_USD: parseEther('1,388'),
     vastETH_USD: parseEther('1,360'),
     vaWBTC_USD: parseEther('20,328.67'),
-    vaLINK_USD: parseEther('7.87'),
+    vaLINK_USD: parseEther('7.87'),    
   },
   polygon: {
     MATIC_USD: parseEther('0.84'),
