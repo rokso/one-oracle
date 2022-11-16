@@ -2,18 +2,19 @@
   "avalanche": {
     "ATokenOracle": "0x482841410B613b46752C67bc42c51BaF043EFa05",
     "AddressProvider": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
-    "AddressProvider_Implementation": "0x7B970C578B354F0F816Ec0fEf3b236096C11E156",
+    "AddressProvider_Implementation": "0xC5cc7ce1f5C14635f5A6882df13872F3E64995Fa",
     "AddressProvider_Proxy": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
-    "BTCPeggedTokenOracle": "0x47A584a5C10A3BC39b61977411f976f5787663d4",
-    "ChainlinkOracle": "0xA607D7aD77df51E57A8A991538116Dd6D555db38",
-    "ChainlinkPriceProvider": "0xf51aCe69A082eE132c54aBd6eb4b304E20383e93",
-    "CurveLpTokenOracle": "0x42466f82Bb8ba17A320C5C78C180cC3E0abb4Af8",
+    "BTCPeggedTokenOracle": "0x4269d3ed88fa699A625639c494a80b98302047a3",
+    "ChainlinkOracle": "0xbaCbD66071D4549E4dCC0165981B732619F5eB08",
+    "ChainlinkPriceProvider": "0xB702310CB9a3c43bfbC7A609DfC87e694e5a515c",
+    "CurveLpTokenOracle": "0xcCb24458B907e36Faee920F9122B869aC46F78Fb",
     "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf",
-    "MasterOracle": "0xe42e893353448143f36B59E0122fA8F58346611A",
-    "PriceProvidersAggregator": "0x13f1E9BfBf9E9E640813721D54113AFa5eb2d0CC",
-    "RoutedSwapper": "0xA2Fd3Fe1E89c64bC5be11ae8Bc7Dff88D19B65e9",
+    "MasterOracle": "0x5E71EFc852e97124A870B70BA19Cbc96d895DB5E",
+    "PriceProvidersAggregator": "0x022df0ed0386c3180241622741FDc10edf81e4f5",
+    "RoutedSwapper": "0x33bD6d35683Bf29350bf96c687e544376E349439",
     "SynthUsdTokenOracle": "0x5Db1C3B4E0D31B277a6a292B0365162A1100D527",
-    "TraderJoeExchange": "0xB9Aafc7A5dEEd4C705Ce622dB91db30366C010ec"
+    "TraderJoeExchange": "0xeC2d8A84384549Ff3F0234974A50234EeADe425c",
+    "USDPeggedTokenOracle": "0xeFA808ba5496EAFAdbE3EC573ab4f002FE68CDec"
   },
   "bsc": {
     "AddressProvider": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
