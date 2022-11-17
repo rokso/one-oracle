@@ -18,17 +18,18 @@
   },
   "bsc": {
     "AddressProvider": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
-    "AddressProvider_Implementation": "0x82cC8D7e322c1C17c4Fc29727833b865C86ECaE8",
+    "AddressProvider_Implementation": "0xC5cc7ce1f5C14635f5A6882df13872F3E64995Fa",
     "AddressProvider_Proxy": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
-    "ChainlinkOracle": "0x30a35969AdBb8B437c44C8BdC162501Efa8eE018",
-    "ChainlinkPriceProvider": "0x44D01babbf1b5dA42D3eb0A1d4856A45c8426CC2",
+    "ChainlinkOracle": "0x4D7c0f0EcC6FC634131c5020845ab5817c45316f",
+    "ChainlinkPriceProvider": "0xa4B4291E88CB61838406DcA8cD8ac6eA657193fC",
     "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf",
-    "EllipsisLpTokenOracle": "0xc95C5D237E6fc51F1c4C25734A36965CA73077df",
+    "EllipsisLpTokenOracle": "0x9632f99456a632aF27FCdC57c12b309b2C286789",
     "MasterOracle": "0x5323F445A8665239222b117aE095423a238F5706",
-    "PancakeSwapExchange": "0xC30BBCb018c9554Dc60E8aA235aeA6Ef6435095d",
-    "PriceProvidersAggregator": "0xB6D75A53442844e8F1eed35d7A65225c57B282EB",
-    "RoutedSwapper": "0x6c27484d5f0386cA226bd4672Df4CA6430407883",
-    "SushiSwapExchange": "0x0875D8Fe1F4d80D6B134Df046902f3Ba78BCB7dA"
+    "PancakeSwapExchange": "0x59cC44B3D8558b0f8c3Be77453cE51Cf676728Fa",
+    "PriceProvidersAggregator": "0x730c8c2E58e3860268313dEE0Ec787311c3562dA",
+    "RoutedSwapper": "0x64E26Aeb32003aa17CdC20D07b27EC141a3f863d",
+    "SushiSwapExchange": "0xdB073EE93b90FD47a71E3babfA0599291b886B1C",
+    "USDPeggedTokenOracle": "0xDa64Ea66D4fBC785fa348c7A9A6b7121E6883bA9"
   },
   "mainnet": {
     "ATokenOracle": "0x3078742bACdFECBE6F8D9E77f1aAa1000C074FCF",

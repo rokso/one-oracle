@@ -416,6 +416,7 @@ describe('MasterOracle', function () {
       WBNB,
       BUSD,
       Ellipsis: {VAL_3EPS_LP},
+      Synth: {msBNB, msUSD},
     } = Address.bsc
 
     before(async function () {
@@ -453,6 +454,18 @@ describe('MasterOracle', function () {
 
         // then
         expect(price).closeTo(Quote.bsc.BUSD_USD, toUSD('1'))
+      })
+    })
+
+    describe('Synth', function () {
+      it('should get price for msUSD', async function () {
+        const price = await masterOracle.getPriceInUsd(msUSD)
+        expect(price).eq(toUSD('1'))
+      })
+
+      it('should get price for msBNB', async function () {
+        const price = await masterOracle.getPriceInUsd(msBNB)
+        expect(price).closeTo(Quote.bsc.BNB_USD, toUSD('5'))
       })
     })
 
