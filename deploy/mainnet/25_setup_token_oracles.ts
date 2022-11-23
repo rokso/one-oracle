@@ -32,7 +32,12 @@ const curveLpTokens = [
   {token: Address.Curve.FRAX_USDC_LP, isLending: false},
 ]
 
-const curveFactoryLps = [Address.Curve.IBBTC_SBTC_LP, Address.Curve.D3_LP, Address.Curve.DOLA_3CRV_LP]
+const curveFactoryLps = [
+  Address.Curve.IBBTC_SBTC_LP,
+  Address.Curve.D3_LP,
+  Address.Curve.DOLA_3CRV_LP,  
+  Address.Curve.DOLA_FRAXBP_LP
+]
 
 const customOracles = [
   {token: Address.MUSD, oracle: 'MStableTokenOracle'},

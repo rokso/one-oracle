@@ -44,6 +44,7 @@ const Quote = {
     CURVE_PAX_LP_USD: parseEther('1.04'),
     CURVE_Y_LP_USD: parseEther('1.138'),
     CURVE_DOLA_3CRV_LP_USD: parseEther('1.00'),
+    CURVE_DOLA_FRAXBP_LP_USD: parseEther('1.00'),
     CURVE_GUSD_LP_USD: parseEther('1.02'),
     CURVE_REN_LP_USD: parseEther('20,465.96'),
     CURVE_FRAX_USDC_LP_USD: parseEther('1.00'),
