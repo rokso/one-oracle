@@ -5,6 +5,8 @@ import {setupTokenOracles} from '../../helpers/deployment'
 
 const {mainnet: Address} = Addresses
 
+const setupOracles = 'setupOracles'
+
 const chainlinkAggregators = [
   // MakerDAO uses BTC/USD Chainlink feed for renBTC
   // See: https://forum.makerdao.com/t/renbtc-mip6-collateral-application/2971
@@ -78,6 +80,7 @@ const customStalePeriods = [
   {token: Address.USDT, stalePeriod: 60 * 60 * 24},
   {token: Address.USDC, stalePeriod: 60 * 60 * 24},
   {token: Address.sUSD, stalePeriod: 60 * 60 * 24},
+  {token: Address.FRAX, stalePeriod: 60 * 60 * 24},
 ]
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
@@ -90,4 +93,5 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   })
 }
 
+func.tags = [setupOracles]
 export default func
