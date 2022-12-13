@@ -2,37 +2,20 @@
 
 pragma solidity 0.8.9;
 
-import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../access/Governable.sol";
-import "../interfaces/swapper/IRoutedSwapper.sol";
 import "../interfaces/swapper/IExchange.sol";
 import "../libraries/DataTypes.sol";
+import "./RoutedSwapperStorage.sol";
 
 /**
  * @notice Routed Swapper contract
  * This contract execute swaps and quoted using pre-set swap routes
  */
-contract RoutedSwapper is IRoutedSwapper, Governable {
+contract RoutedSwapper is Initializable, Governable, RoutedSwapperStorage {
     using SafeERC20 for IERC20;
     using EnumerableSet for EnumerableSet.AddressSet;
-
-    /**
-     * @notice List of the supported exchanges
-     */
-    EnumerableSet.AddressSet private allExchanges;
-
-    /**
-     * @notice Mapping of exchanges' addresses by type
-     */
-    mapping(DataTypes.ExchangeType => address) public addressOf;
-
-    /**
-     * @notice Default swap routings
-     * @dev Used to save gas by using a preset routing instead of looking for the best
-     */
-    mapping(bytes => bytes) public defaultRoutings;
 
     /// @notice Emitted when an exchange is added
     event ExchangeUpdated(
