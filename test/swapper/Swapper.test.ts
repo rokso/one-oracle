@@ -77,9 +77,10 @@ describe('Swapper @mainnet', function () {
     chainlinkAndFallbacksOracleFake = await smock.fake('ChainlinkAndFallbacksOracle')
 
     const swapperFactory = new Swapper__factory(deployer)
-    swapper = await swapperFactory.deploy(chainlinkAndFallbacksOracleFake.address, MAX_SLIPPAGE)
-    await swapper.deployed()
+    swapper = await swapperFactory.deploy()
 
+    await swapper.deployed()
+    await swapper.initialize(chainlinkAndFallbacksOracleFake.address, MAX_SLIPPAGE)
     await swapper.setExchange(ExchangeType.UNISWAP_V2, uniswapV2Exchange.address)
     await swapper.setExchange(ExchangeType.SUSHISWAP, sushiswapExchange.address)
     await swapper.setExchange(ExchangeType.UNISWAP_V3, uniswapV3Exchange.address)

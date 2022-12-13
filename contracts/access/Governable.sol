@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.9;
 
-import "../core/AddressProvider.sol";
+import "../interfaces/core/IAddressProvider.sol";
 
 /**
  * @notice Contract module which provides access control mechanism, where
