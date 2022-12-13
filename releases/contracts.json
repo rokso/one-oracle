@@ -42,6 +42,7 @@
     "ChainlinkAndFallbacksOracle": "0x60f440B2013Aa8d5CbD389F48E30eA942231449b",
     "ChainlinkOracle": "0x0C102819074dA01f30360676F36b86c8be68A3E7",
     "ChainlinkPriceProvider": "0xDf0425D76ab0E6aBa16b3168353b75D909F0915D",
+    "CurveExchange": "0xB812A730fCe12d3F841Fb6Ca3fD39Bd8F60ddF19",
     "CurveFactoryLpTokenOracle": "0x38636d2B2340Cb0a240EEAB15fe846B65B9C4E61",
     "CurveLpTokenOracle": "0xC7df215D1E819023f6b6c8d0177e5E395f36F682",
     "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf",
