@@ -16,7 +16,9 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy(RoutedSwapper, {
     from,
     log: true,
-    args: [],
+    proxy: {
+      proxyContract: 'OpenZeppelinTransparentProxy',      
+    },
   })
 
   const {address: uniswapV2ExchangeAddress} = await get(UniswapV2Exchange)
