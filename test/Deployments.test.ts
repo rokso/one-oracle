@@ -204,7 +204,7 @@ describe('Deployments ', function () {
     let dai: IERC20
     let vspOracle: VspMainnetOracle
 
-    const {WETH, DAI, VSP, USDC} = Address.mainnet
+    const {WETH, DAI, VSP, Curve} = Address.mainnet
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -254,8 +254,7 @@ describe('Deployments ', function () {
     })
 
     it('CurveExchange', async function () {
-      const {_amountOut} = await curveExchange.callStatic.getBestAmountOut(DAI, USDC, parseEther('1'))
-      expect(_amountOut).closeTo(parseUnits('1', 6), parseUnits('1', 5))
+      expect(await curveExchange.addressProvider()).eq(Curve.ADDRESS_PROVIDER)
     })
 
     it('RoutedSwapper', async function () {
