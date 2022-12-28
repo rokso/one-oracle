@@ -18,8 +18,13 @@ import {parseEther, parseUnits} from '../helpers'
 import {Address, ExchangeType, SwapType, InitCodeHash} from '../../helpers'
 import {adjustBalance} from '../helpers/balance'
 import {smock} from '@defi-wonderland/smock'
+import {CurveSwapRoute, CurveSwapParams} from '../helpers/curve-exchange'
 
-const {WETH, DAI, WBTC, STETH, MUSD, UNISWAP_V2_FACTORY_ADDRESS, Curve} = Address.mainnet
+const {AddressZero} = ethers.constants
+
+const abi = ethers.utils.defaultAbiCoder
+
+const {WETH, DAI, WBTC, STETH, UNISWAP_V2_FACTORY_ADDRESS, Curve, USDC, USDT} = Address.mainnet
 const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
 describe('RoutedSwapper @mainnet', function () {
@@ -35,7 +40,8 @@ describe('RoutedSwapper @mainnet', function () {
   let dai: IERC20
   let wbtc: IERC20
   let steth: IERC20
-  let musd: IERC20
+  let usdc: IERC20
+  let usdt: IERC20
 
   beforeEach(async function () {
     // Essentially we are making sure we execute setup once only
@@ -80,12 +86,14 @@ describe('RoutedSwapper @mainnet', function () {
     dai = IERC20__factory.connect(DAI, deployer)
     wbtc = IERC20__factory.connect(WBTC, deployer)
     steth = IERC20__factory.connect(STETH, deployer)
-    musd = IERC20__factory.connect(MUSD, deployer)
+    usdc = IERC20__factory.connect(USDC, deployer)
+    usdt = IERC20__factory.connect(USDT, deployer)
 
     await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(wbtc.address, deployer.address, parseUnits('1,000,000', 8))
     await adjustBalance(steth.address, deployer.address, parseEther('1,000'))
+    await adjustBalance(usdc.address, deployer.address, parseUnits('1,000', 6))
 
     const uniswapV3defaultPath = ethers.utils.solidityPack(
       ['address', 'uint24', 'address'],
@@ -100,7 +108,7 @@ describe('RoutedSwapper @mainnet', function () {
       WETH,
       DAI,
       ExchangeType.UNISWAP_V2,
-      ethers.utils.defaultAbiCoder.encode(['address[]'], [[WETH, DAI]])
+      abi.encode(['address[]'], [[WETH, DAI]])
     )
 
     await swapper.setDefaultRouting(
@@ -108,7 +116,7 @@ describe('RoutedSwapper @mainnet', function () {
       STETH,
       DAI,
       ExchangeType.UNISWAP_V2,
-      ethers.utils.defaultAbiCoder.encode(['address[]'], [[STETH, WETH, DAI]])
+      abi.encode(['address[]'], [[STETH, WETH, DAI]])
     )
 
     await swapper.setDefaultRouting(
@@ -116,7 +124,7 @@ describe('RoutedSwapper @mainnet', function () {
       STETH,
       DAI,
       ExchangeType.UNISWAP_V2,
-      ethers.utils.defaultAbiCoder.encode(['address[]'], [[STETH, WETH, DAI]])
+      abi.encode(['address[]'], [[STETH, WETH, DAI]])
     )
 
     await swapper.setDefaultRouting(
@@ -124,8 +132,36 @@ describe('RoutedSwapper @mainnet', function () {
       DAI,
       WETH,
       ExchangeType.UNISWAP_V2,
-      ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI, WETH]])
+      abi.encode(['address[]'], [[DAI, WETH]])
     )
+
+    const route: CurveSwapRoute = [
+      USDC,
+      Curve.TRIPOOL_POOL,
+      USDT,
+      AddressZero,
+      AddressZero,
+      AddressZero,
+      AddressZero,
+      AddressZero,
+      AddressZero,
+    ]
+
+    const params: CurveSwapParams = [
+      [1, 2, 1],
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+    ]
+
+    await swapper.setDefaultRouting(
+      SwapType.EXACT_INPUT,
+      USDC,
+      USDT,
+      ExchangeType.CURVE,
+      abi.encode(['address[9]', 'uint256[3][4]'], [route, params])
+    )
+
     // Take snapshot of setup
     snapshotId = await ethers.provider.send('evm_snapshot', [])
   })
@@ -144,7 +180,7 @@ describe('RoutedSwapper @mainnet', function () {
 
     it('should get best amountIn for WETH->DAI', async function () {
       // given
-      const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI, WETH]])
+      const path = abi.encode(['address[]'], [[DAI, WETH]])
       const amountOut = parseEther('3,222')
       const exchangeAmountIn = await uniswapV2Exchange.callStatic['getAmountsIn(uint256,bytes)'](amountOut, path)
 
@@ -215,30 +251,27 @@ describe('RoutedSwapper @mainnet', function () {
       const stethAfter = await steth.balanceOf(deployer.address)
       const daiAfter = await dai.balanceOf(deployer.address)
       // stETH will transfer 1 wei less, meaning there is 1 more wei after the swap
-      expect(stethAfter).eq(stethBefore.sub(amountIn).add('1'))
+      expect(stethAfter).closeTo(stethBefore.sub(amountIn), 1)
       expect(daiAfter).eq(daiBefore.add(amountOut))
     })
 
-    it('should perform an exact input swap DAI->MUSD using curve exchange', async function () {
+    it('should swap USDC->USDT', async function () {
       // given
-      const amountIn = parseEther('100')      
-      const {_path} = await curveExchange.callStatic.getBestAmountOut(DAI, MUSD, amountIn)
-      const [_curvePool] = ethers.utils.defaultAbiCoder.decode(['address', 'address', 'address'], _path)
-      const exchangeType = ExchangeType.CURVE
-      const path = ethers.utils.defaultAbiCoder.encode(['address', 'address', 'address'], [_curvePool, DAI, MUSD])
-      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, DAI, MUSD, exchangeType, path)
-      const daiBefore = await dai.balanceOf(deployer.address)
+      const amountIn = parseUnits('100', 6)
+      const usdcBefore = await usdc.balanceOf(deployer.address)
+      const usdtBefore = await usdt.balanceOf(deployer.address)
 
       // when
-      await dai.approve(swapper.address, amountIn)
-      await swapper.swapExactInput(DAI, MUSD, amountIn, 1, deployer.address)
+      await usdc.approve(swapper.address, amountIn)
+      // Check output of swap using callStatic
+      const amountOut = await swapper.callStatic.swapExactInput(USDC, USDT, amountIn, '1', deployer.address)
+      await swapper.swapExactInput(USDC, USDT, amountIn, '1', deployer.address)
 
       // then
-      const daiAfter = await dai.balanceOf(deployer.address)
-      const musdAfter = await musd.balanceOf(deployer.address)
-
-      expect(daiAfter).eq(daiBefore.sub(amountIn))
-      expect(musdAfter).closeTo(amountIn, parseEther('1'))
+      const usdcAfter = await usdc.balanceOf(deployer.address)
+      const usdtAfter = await usdt.balanceOf(deployer.address)
+      expect(usdcAfter).eq(usdcBefore.sub(amountIn))
+      expect(usdtAfter).eq(usdtBefore.add(amountOut))
     })
   })
 
@@ -382,22 +415,22 @@ describe('RoutedSwapper @mainnet', function () {
 
       // when
       const exchangeType = ExchangeType.UNISWAP_V2
-      const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI, WETH, WBTC]])
+      const path = abi.encode(['address[]'], [[DAI, WETH, WBTC]])
       await swapper.setDefaultRouting(SwapType.EXACT_INPUT, DAI, WBTC, exchangeType, path)
 
       // then
       const after = await swapper.defaultRoutings(key)
-      expect(after).eq(ethers.utils.defaultAbiCoder.encode(['uint8', 'bytes'], [exchangeType, path]))
+      expect(after).eq(abi.encode(['uint8', 'bytes'], [exchangeType, path]))
     })
 
     it('should remove a default routing', async function () {
       // given
       const key = ethers.utils.solidityPack(['uint8', 'address', 'address'], [SwapType.EXACT_INPUT, DAI, WBTC])
       const exchangeType = ExchangeType.UNISWAP_V2
-      const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[DAI, WETH, WBTC]])
+      const path = abi.encode(['address[]'], [[DAI, WETH, WBTC]])
       await swapper.setDefaultRouting(SwapType.EXACT_INPUT, DAI, WBTC, exchangeType, path)
       const before = await swapper.defaultRoutings(key)
-      expect(before).eq(ethers.utils.defaultAbiCoder.encode(['uint8', 'bytes'], [exchangeType, path]))
+      expect(before).eq(abi.encode(['uint8', 'bytes'], [exchangeType, path]))
 
       // when
       await swapper.setDefaultRouting(SwapType.EXACT_INPUT, DAI, WBTC, exchangeType, '0x')
