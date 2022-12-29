@@ -25,16 +25,6 @@ contract CurveExchange is IExchange {
     }
 
     /// @inheritdoc IExchange
-    /// @dev Not properly supported by curve
-    function getBestAmountOut(
-        address /*tokenIn_*/,
-        address /*tokenOut_*/,
-        uint256 /*amountIn_*/
-    ) external pure override returns (uint256 /*_amountOut*/, bytes memory /*_path*/) {
-        revert("not-supported");
-    }
-
-    /// @inheritdoc IExchange
     function getAmountsOut(uint256 amountIn_, bytes memory path_) external view override returns (uint256 _amountOut) {
         (address[9] memory _route, uint256[3][4] memory _params) = abi.decode(path_, (address[9], uint256[3][4]));
         _amountOut = _getSwaps().get_exchange_multiple_amount(_route, _params, amountIn_);
@@ -64,16 +54,6 @@ contract CurveExchange is IExchange {
         _pools[3] = address(0);
 
         _amountOut = _swaps.exchange_multiple(_route, _params, amountIn_, amountOutMin_, _pools, outReceiver_);
-    }
-
-    /// @inheritdoc IExchange
-    /// @dev Not properly supported by curve
-    function getBestAmountIn(
-        address /*tokenIn_*/,
-        address /*tokenOut_*/,
-        uint256 /*amountOut_*/
-    ) external pure override returns (uint256 /*_amountIn*/, bytes memory /*_path*/) {
-        revert("not-supported");
     }
 
     /// @inheritdoc IExchange
