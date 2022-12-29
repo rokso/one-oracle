@@ -42,28 +42,13 @@ contract UniswapV2LikeExchange is IExchange, Governable {
 
     /// @inheritdoc IExchange
     function getAmountsIn(uint256 amountOut_, bytes memory path_) external view override returns (uint256 _amountIn) {
-        _amountIn = getAmountsIn(amountOut_, _decodePath(path_));
+        _amountIn = UniswapV2Library.getAmountsIn(factory, initCodeHash, amountOut_, _decodePath(path_))[0];
     }
 
     /// @inheritdoc IExchange
     function getAmountsOut(uint256 amountIn_, bytes memory path_) external view override returns (uint256 _amountOut) {
-        _amountOut = getAmountsOut(amountIn_, _decodePath(path_));
-    }
-
-    /**
-     * @dev getBestAmountIn require a try/catch version of getAmountsIn and try/catch do not work with internal
-     * library functions, hence wrapped library call in this function so that it can be used in try/catch
-     */
-    function getAmountsIn(uint256 amountOut_, address[] memory path_) public view returns (uint256 _amountIn) {
-        _amountIn = UniswapV2Library.getAmountsIn(factory, initCodeHash, amountOut_, path_)[0];
-    }
-
-    /**
-     * @dev getBestAmountOut require a try/catch version of getAmountsOut and try/catch do not work with internal
-     * library functions, hence wrapped library call in this function so that it can be used in try/catch
-     */
-    function getAmountsOut(uint256 amountIn_, address[] memory path_) public view returns (uint256 _amountOut) {
-        _amountOut = UniswapV2Library.getAmountsOut(factory, initCodeHash, amountIn_, path_)[path_.length - 1];
+        address[] memory _path = _decodePath(path_);
+        _amountOut = UniswapV2Library.getAmountsOut(factory, initCodeHash, amountIn_, _path)[_path.length - 1];
     }
 
     /// @inheritdoc IExchange
@@ -106,27 +91,6 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         if (_remainingAmountIn > 0) {
             _tokenIn.safeTransfer(inSender_, _remainingAmountIn);
         }
-    }
-
-    /// @dev Returns `0` if reverts
-    function _getAmountsIn(uint256 _amountOut, address[] memory _path) internal view returns (uint256 _amountIn) {
-        try this.getAmountsIn(_amountOut, _path) returns (uint256 amountIn) {
-            _amountIn = amountIn;
-        } catch {}
-    }
-
-    /// @dev Returns `0` if reverts
-    function _getAmountsOut(uint256 amountIn_, address[] memory path_) internal view returns (uint256 _amountOut) {
-        try this.getAmountsOut(amountIn_, path_) returns (uint256 amountOut) {
-            _amountOut = amountOut;
-        } catch {}
-    }
-
-    /**
-     * @notice Encode path from `address[]` to `bytes`
-     */
-    function _encodePath(address[] memory path_) private pure returns (bytes memory _path) {
-        return abi.encode(path_);
     }
 
     /**

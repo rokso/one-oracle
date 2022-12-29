@@ -74,7 +74,7 @@ library UniswapV2Library {
         amountIn = (numerator / denominator).add(1);
     }
 
-        // performs chained getAmountOut calculations on any number of pairs
+    // performs chained getAmountOut calculations on any number of pairs
     function getAmountsOut(
         address factory,
         bytes32 initCodeHash,
