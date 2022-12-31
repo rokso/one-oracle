@@ -21,28 +21,6 @@ interface IExchange {
     function getAmountsOut(uint256 amountIn_, bytes memory path_) external returns (uint256 _amountOut);
 
     /**
-     * @notice Get *spot* quote
-     * It will return the swap amount based on the current reserves of the best pair/path found (i.e. spot price)
-     * @dev It shouldn't be used as oracle!!!
-     */
-    function getBestAmountIn(
-        address tokenIn_,
-        address tokenOut_,
-        uint256 amountOut_
-    ) external returns (uint256 _amountIn, bytes memory _path);
-
-    /**
-     * @notice Get *spot* quote
-     * It will return the swap amount based on the current reserves of the best pair/path found (i.e. spot price)
-     * @dev It shouldn't be used as oracle!!!
-     */
-    function getBestAmountOut(
-        address tokenIn_,
-        address tokenOut_,
-        uint256 amountIn_
-    ) external returns (uint256 _amountOut, bytes memory _path);
-
-    /**
      * @notice Perform an exact input swap
      * @dev Should transfer `amountIn_` before performing swap
      */

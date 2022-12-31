@@ -112,13 +112,6 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
         await swapper.setDefaultRouting(SwapType.EXACT_OUTPUT, BTT, WBTC, ExchangeType.UNISWAP_V3, defaultPath)
       })
 
-      it('getBestAmountOut', async function () {
-        const amountIn = parseUnits('0.001', 8)
-        const tx = await swapper.getAmountOut(WBTC, BTT, amountIn)
-        const receipt = await tx.wait()
-        expect(receipt.gasUsed).lte('194349')
-      })
-
       it('swapExactInput', async function () {
         // given
         const amountIn = parseUnits('0.001', 8)
@@ -132,13 +125,6 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
         // then
         expect((await tx1.wait()).gasUsed).lte('240983')
         expect((await tx2.wait()).gasUsed).lte('220578')
-      })
-
-      it('getBestAmountIn', async function () {
-        const amountOut = parseUnits('0.001', 8)
-        const tx = await swapper.getAmountIn(BTT, WBTC, amountOut)
-        const receipt = await tx.wait()
-        expect(receipt.gasUsed).lte('200231')
       })
 
       it('swapExactOutput', async function () {
@@ -170,13 +156,6 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
       await swapper.setDefaultRouting(SwapType.EXACT_OUTPUT, WETH, WBTC, ExchangeType.UNISWAP_V2, weth2btcPath)
     })
 
-    it('getBestAmountOut', async function () {
-      const amountIn = parseUnits('0.001', 8)
-      const tx = await swapper.getAmountOut(WBTC, WETH, amountIn)
-      const receipt = await tx.wait()
-      expect(receipt.gasUsed).lte('58259')
-    })
-
     it('swapExactInput', async function () {
       // given
       const amountIn = parseUnits('0.001', 8)
@@ -190,13 +169,6 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
       // then
       expect((await tx1.wait()).gasUsed).lte('144840')
       expect((await tx2.wait()).gasUsed).lte('144840')
-    })
-
-    it('getBestAmountIn', async function () {
-      const amountOut = parseUnits('0.001', 8)
-      const tx = await swapper.getAmountIn(WETH, WBTC, amountOut)
-      const receipt = await tx.wait()
-      expect(receipt.gasUsed).lte('58287')
     })
 
     it('swapExactOutput', async function () {

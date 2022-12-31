@@ -165,13 +165,13 @@ describe('Deployments ', function () {
     })
 
     it('SushiswapExchange', async function () {
-      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(WBNB, BUSD, parseEther('1'))
-      expect(_amountOut).closeTo(Quote.bsc.BNB_USD_2, toUSD('1'))
+      const wethLike = await sushiswapExchange.wethLike()
+      expect(wethLike).eq(WBNB)
     })
 
     it('PancakeSwapExchange', async function () {
-      const {_amountOut} = await pancakeSwapExchange.callStatic.getBestAmountOut(WBNB, BUSD, parseEther('1'))
-      expect(_amountOut).closeTo(Quote.bsc.BNB_USD, toUSD('1'))
+      const wethLike = await pancakeSwapExchange.wethLike()
+      expect(wethLike).eq(WBNB)
     })
 
     it('RoutedSwapper', async function () {
@@ -239,18 +239,18 @@ describe('Deployments ', function () {
     })
 
     it('UniswapV2Exchange', async function () {
-      const {_amountOut} = await uniswapV2Exchange.callStatic.getBestAmountOut(WETH, DAI, parseEther('1'))
-      expect(_amountOut).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
+      const wethLike = await uniswapV2Exchange.wethLike()
+      expect(wethLike).eq(WETH)
     })
 
     it('SushiswapExchange', async function () {
-      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(WETH, DAI, parseEther('1'))
-      expect(_amountOut).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
+      const wethLike = await sushiswapExchange.wethLike()
+      expect(wethLike).eq(WETH)
     })
 
     it('UniswapV3Exchange', async function () {
-      const {_amountOut} = await uniswapV3Exchange.callStatic.getBestAmountOut(WETH, DAI, parseEther('1'))
-      expect(_amountOut).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
+      const wethLike = await uniswapV3Exchange.wethLike()
+      expect(wethLike).eq(WETH)
     })
 
     it('CurveExchange', async function () {
@@ -316,13 +316,13 @@ describe('Deployments ', function () {
     })
 
     it('QuickSwapExchange', async function () {
-      const {_amountOut} = await quickswapExchange.callStatic.getBestAmountOut(WMATIC, DAI, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('1.39'), parseEther('1'))
+      const wethLike = await quickswapExchange.wethLike()
+      expect(wethLike).eq(WMATIC)
     })
 
     it('SushiswapExchange', async function () {
-      const {_amountOut} = await sushiswapExchange.callStatic.getBestAmountOut(WMATIC, DAI, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('1.39'), parseEther('1'))
+      const wethLike = await sushiswapExchange.wethLike()
+      expect(wethLike).eq(WMATIC)
     })
 
     it('RoutedSwapper', async function () {

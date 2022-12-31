@@ -34,11 +34,7 @@ contract UniswapV2LikeExchange is IExchange, Governable {
     /**
      * @dev Doesn't consider router.WETH() as `wethLike` because isn't guaranteed that it's the most liquid token.
      */
-    constructor(
-        address factory_,
-        bytes32 initCodeHash_,
-        address wethLike_
-    ) {
+    constructor(address factory_, bytes32 initCodeHash_, address wethLike_) {
         factory = factory_;
         initCodeHash = initCodeHash_;
         wethLike = wethLike_;
@@ -46,94 +42,13 @@ contract UniswapV2LikeExchange is IExchange, Governable {
 
     /// @inheritdoc IExchange
     function getAmountsIn(uint256 amountOut_, bytes memory path_) external view override returns (uint256 _amountIn) {
-        _amountIn = getAmountsIn(amountOut_, _decodePath(path_));
+        _amountIn = UniswapV2Library.getAmountsIn(factory, initCodeHash, amountOut_, _decodePath(path_))[0];
     }
 
     /// @inheritdoc IExchange
     function getAmountsOut(uint256 amountIn_, bytes memory path_) external view override returns (uint256 _amountOut) {
-        _amountOut = getAmountsOut(amountIn_, _decodePath(path_));
-    }
-
-    /**
-     * @dev getBestAmountIn require a try/catch version of getAmountsIn and try/catch do not work with internal
-     * library functions, hence wrapped library call in this function so that it can be used in try/catch
-     */
-    function getAmountsIn(uint256 amountOut_, address[] memory path_) public view returns (uint256 _amountIn) {
-        _amountIn = UniswapV2Library.getAmountsIn(factory, initCodeHash, amountOut_, path_)[0];
-    }
-
-    /**
-     * @dev getBestAmountOut require a try/catch version of getAmountsOut and try/catch do not work with internal
-     * library functions, hence wrapped library call in this function so that it can be used in try/catch
-     */
-    function getAmountsOut(uint256 amountIn_, address[] memory path_) public view returns (uint256 _amountOut) {
-        _amountOut = UniswapV2Library.getAmountsOut(factory, initCodeHash, amountIn_, path_)[path_.length - 1];
-    }
-
-    /// @inheritdoc IExchange
-    function getBestAmountIn(
-        address tokenIn_,
-        address tokenOut_,
-        uint256 amountOut_
-    ) external returns (uint256 _amountIn, bytes memory _path) {
-        // 1. Check IN-OUT pair
-        address[] memory _pathA = new address[](2);
-        _pathA[0] = tokenIn_;
-        _pathA[1] = tokenOut_;
-        uint256 _amountInA = _getAmountsIn(amountOut_, _pathA);
-
-        if (tokenIn_ == wethLike || tokenOut_ == wethLike) {
-            // Returns if one of the token is WETH-Like
-            require(_amountInA > 0, "no-path-found");
-            return (_amountInA, _encodePath(_pathA));
-        }
-
-        // 2. Check IN-WETH-OUT path
-        address[] memory _pathB = new address[](3);
-        _pathB[0] = tokenIn_;
-        _pathB[1] = wethLike;
-        _pathB[2] = tokenOut_;
-        uint256 _amountInB = _getAmountsIn(amountOut_, _pathB);
-
-        // 3. Get best route between paths A and B
-        require(_amountInA > 0 || _amountInB > 0, "no-path-found");
-
-        // Returns A if it's valid and better than B or if B isn't valid
-        if ((_amountInA > 0 && _amountInA < _amountInB) || _amountInB == 0) {
-            return (_amountInA, _encodePath(_pathA));
-        }
-        return (_amountInB, _encodePath(_pathB));
-    }
-
-    /// @inheritdoc IExchange
-    function getBestAmountOut(
-        address tokenIn_,
-        address tokenOut_,
-        uint256 amountIn_
-    ) external returns (uint256 _amountOut, bytes memory _path) {
-        // 1. Check IN-OUT pair
-        address[] memory _pathA = new address[](2);
-        _pathA[0] = tokenIn_;
-        _pathA[1] = tokenOut_;
-        uint256 _amountOutA = _getAmountsOut(amountIn_, _pathA);
-
-        if (tokenIn_ == wethLike || tokenOut_ == wethLike) {
-            // Returns if one of the token is WETH-Like
-            require(_amountOutA > 0, "no-path-found");
-            return (_amountOutA, _encodePath(_pathA));
-        }
-
-        // 2. Check IN-WETH-OUT path
-        address[] memory _pathB = new address[](3);
-        _pathB[0] = tokenIn_;
-        _pathB[1] = wethLike;
-        _pathB[2] = tokenOut_;
-        uint256 _amountOutB = _getAmountsOut(amountIn_, _pathB);
-
-        // 3. Get best route between paths A and B
-        require(_amountOutA > 0 || _amountOutB > 0, "no-path-found");
-        if (_amountOutA > _amountOutB) return (_amountOutA, _encodePath(_pathA));
-        return (_amountOutB, _encodePath(_pathB));
+        address[] memory _path = _decodePath(path_);
+        _amountOut = UniswapV2Library.getAmountsOut(factory, initCodeHash, amountIn_, _path)[_path.length - 1];
     }
 
     /// @inheritdoc IExchange
@@ -176,27 +91,6 @@ contract UniswapV2LikeExchange is IExchange, Governable {
         if (_remainingAmountIn > 0) {
             _tokenIn.safeTransfer(inSender_, _remainingAmountIn);
         }
-    }
-
-    /// @dev Returns `0` if reverts
-    function _getAmountsIn(uint256 _amountOut, address[] memory _path) internal view returns (uint256 _amountIn) {
-        try this.getAmountsIn(_amountOut, _path) returns (uint256 amountIn) {
-            _amountIn = amountIn;
-        } catch {}
-    }
-
-    /// @dev Returns `0` if reverts
-    function _getAmountsOut(uint256 amountIn_, address[] memory path_) internal view returns (uint256 _amountOut) {
-        try this.getAmountsOut(amountIn_, path_) returns (uint256 amountOut) {
-            _amountOut = amountOut;
-        } catch {}
-    }
-
-    /**
-     * @notice Encode path from `address[]` to `bytes`
-     */
-    function _encodePath(address[] memory path_) private pure returns (bytes memory _path) {
-        return abi.encode(path_);
     }
 
     /**
