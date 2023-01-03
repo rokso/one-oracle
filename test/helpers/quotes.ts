@@ -23,6 +23,7 @@ const Quote = {
   mainnet: {
     BTC_USD: parseEther('20,058'),
     ETH_USD: parseEther('1,359'),
+    DOGE_USD: parseEther('0.007'),
     BTC_ETH: parseEther('14'),
     USD_ETH: parseEther('0.0007'),
     USD_BTC: parseEther('0.00004'),

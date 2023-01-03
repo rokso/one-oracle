@@ -61,7 +61,7 @@ describe('MasterOracle', function () {
         DOLA_FRAXBP_LP,
       },
       Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK},
-      Synth: {msETH, msUSD},
+      Synth: {msETH, msUSD, msBTC, msDOGE},
     } = Address.mainnet
 
     before(async function () {
@@ -326,6 +326,16 @@ describe('MasterOracle', function () {
       it('should get price for msETH', async function () {
         const price = await masterOracle.getPriceInUsd(msETH)
         expect(price).closeTo(Quote.mainnet.ETH_USD, toUSD('5'))
+      })
+
+      it('should get price for msBTC', async function () {
+        const price = await masterOracle.getPriceInUsd(msBTC)
+        expect(price).closeTo(Quote.mainnet.BTC_USD, toUSD('50'))
+      })
+
+      it('should get price for msDOGE', async function () {
+        const price = await masterOracle.getPriceInUsd(msDOGE)
+        expect(price).closeTo(Quote.mainnet.DOGE_USD, toUSD('1'))
       })
     })
   })

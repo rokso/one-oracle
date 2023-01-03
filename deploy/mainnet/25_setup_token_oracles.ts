@@ -14,6 +14,8 @@ const chainlinkAggregators = [
   // Synthetix uses BTC/USD Chainlink feed for sBTC
   {token: Address.SBTC, aggregator: Address.Chainlink.CHAINLINK_BTC_USD_AGGREGATOR},
   {token: Address.Synth.msETH, aggregator: Address.Chainlink.CHAINLINK_ETH_USD_AGGREGATOR},
+  {token: Address.Synth.msBTC, aggregator: Address.Chainlink.CHAINLINK_BTC_USD_AGGREGATOR},
+  {token: Address.Synth.msDOGE, aggregator: Address.Chainlink.CHAINLINK_DOGE_USD_AGGREGATOR},
 ]
 
 const curveLpTokens = [
