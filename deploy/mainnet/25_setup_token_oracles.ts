@@ -39,8 +39,8 @@ const curveLpTokens = [
 const curveFactoryLps = [
   Address.Curve.IBBTC_SBTC_LP,
   Address.Curve.D3_LP,
-  Address.Curve.DOLA_3CRV_LP,  
-  Address.Curve.DOLA_FRAXBP_LP
+  Address.Curve.DOLA_3CRV_LP,
+  Address.Curve.DOLA_FRAXBP_LP,
 ]
 
 const customOracles = [
@@ -83,6 +83,7 @@ const customStalePeriods = [
   {token: Address.USDC, stalePeriod: 60 * 60 * 24},
   {token: Address.sUSD, stalePeriod: 60 * 60 * 24},
   {token: Address.FRAX, stalePeriod: 60 * 60 * 24},
+  {token: Address.Synth.msDOGE, stalePeriod: 60 * 60 * 24},
 ]
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
