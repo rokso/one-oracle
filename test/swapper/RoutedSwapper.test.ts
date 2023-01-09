@@ -24,7 +24,7 @@ const {AddressZero} = ethers.constants
 
 const abi = ethers.utils.defaultAbiCoder
 
-const {WETH, DAI, WBTC, STETH, UNISWAP_V2_FACTORY_ADDRESS, Curve, USDC, USDT} = Address.mainnet
+const {WETH, DAI, WBTC, STETH, UNISWAP_V2_FACTORY_ADDRESS, Curve, USDC, USDT, STG} = Address.mainnet
 const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
 describe('RoutedSwapper @mainnet', function () {
@@ -42,6 +42,8 @@ describe('RoutedSwapper @mainnet', function () {
   let steth: IERC20
   let usdc: IERC20
   let usdt: IERC20
+  let stg: IERC20
+  
 
   beforeEach(async function () {
     // Essentially we are making sure we execute setup once only
@@ -88,12 +90,14 @@ describe('RoutedSwapper @mainnet', function () {
     steth = IERC20__factory.connect(STETH, deployer)
     usdc = IERC20__factory.connect(USDC, deployer)
     usdt = IERC20__factory.connect(USDT, deployer)
+    stg = IERC20__factory.connect(STG, deployer)
 
     await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(wbtc.address, deployer.address, parseUnits('1,000,000', 8))
     await adjustBalance(steth.address, deployer.address, parseEther('1,000'))
     await adjustBalance(usdc.address, deployer.address, parseUnits('1,000', 6))
+    await adjustBalance(stg.address, deployer.address, parseUnits('1,000', 18))
 
     const uniswapV3defaultPath = ethers.utils.solidityPack(
       ['address', 'uint24', 'address'],
@@ -272,6 +276,53 @@ describe('RoutedSwapper @mainnet', function () {
       const usdtAfter = await usdt.balanceOf(deployer.address)
       expect(usdcAfter).eq(usdcBefore.sub(amountIn))
       expect(usdtAfter).eq(usdtBefore.add(amountOut))
+    })
+
+    it('should swap STG->USDC', async function () {
+      // add default route
+      const routeStg2Usdc: CurveSwapRoute = [
+        STG,
+        Curve.STG_USDC_POOL,
+        USDC,
+        AddressZero,
+        AddressZero,
+        AddressZero,
+        AddressZero,
+        AddressZero,
+        AddressZero,
+      ]
+  
+      const paramsStg2Usdc: CurveSwapParams = [
+        [0, 1, 4],
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+      ]
+  
+      await swapper.setDefaultRouting(
+        SwapType.EXACT_INPUT,
+        STG,
+        USDC,
+        ExchangeType.CURVE,
+        abi.encode(['address[9]', 'uint256[3][4]'], [routeStg2Usdc, paramsStg2Usdc])
+      )
+  
+      // given
+      const amountIn = parseUnits('100', 18)
+      const stgBefore = await stg.balanceOf(deployer.address)
+      const usdcBefore = await usdc.balanceOf(deployer.address)
+
+      // when
+      await stg.approve(swapper.address, amountIn)
+      // Check output of swap using callStatic
+      const amountOut = await swapper.callStatic.swapExactInput(STG, USDC, amountIn, '1', deployer.address)
+      await swapper.swapExactInput(STG, USDC, amountIn, '1', deployer.address)
+
+      // then
+      const stgAfter = await stg.balanceOf(deployer.address)
+      const usdcAfter = await usdc.balanceOf(deployer.address)
+      expect(stgAfter).eq(stgBefore.sub(amountIn))
+      expect(usdcAfter).eq(usdcBefore.add(amountOut))
     })
   })
 
