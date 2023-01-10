@@ -24,7 +24,7 @@ const {AddressZero} = ethers.constants
 
 const abi = ethers.utils.defaultAbiCoder
 
-const {WETH, DAI, WBTC, STETH, UNISWAP_V2_FACTORY_ADDRESS, Curve, USDC, USDT, STG} = Address.mainnet
+const {WETH, DAI, WBTC, STETH, UNISWAP_V2_FACTORY_ADDRESS, Curve, USDC, USDT, STG, FRAX} = Address.mainnet
 const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
 describe('RoutedSwapper @mainnet', function () {
@@ -43,6 +43,7 @@ describe('RoutedSwapper @mainnet', function () {
   let usdc: IERC20
   let usdt: IERC20
   let stg: IERC20
+  let frax: IERC20
   
 
   beforeEach(async function () {
@@ -91,6 +92,7 @@ describe('RoutedSwapper @mainnet', function () {
     usdc = IERC20__factory.connect(USDC, deployer)
     usdt = IERC20__factory.connect(USDT, deployer)
     stg = IERC20__factory.connect(STG, deployer)
+    frax = IERC20__factory.connect(FRAX, deployer)
 
     await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
@@ -98,6 +100,7 @@ describe('RoutedSwapper @mainnet', function () {
     await adjustBalance(steth.address, deployer.address, parseEther('1,000'))
     await adjustBalance(usdc.address, deployer.address, parseUnits('1,000', 6))
     await adjustBalance(stg.address, deployer.address, parseUnits('1,000', 18))
+    await adjustBalance(frax.address, deployer.address, parseUnits('1,000', 18))
 
     const uniswapV3defaultPath = ethers.utils.solidityPack(
       ['address', 'uint24', 'address'],
@@ -257,6 +260,60 @@ describe('RoutedSwapper @mainnet', function () {
       // stETH will transfer 1 wei less, meaning there is 1 more wei after the swap
       expect(stethAfter).closeTo(stethBefore.sub(amountIn), 1)
       expect(daiAfter).eq(daiBefore.add(amountOut))
+    })
+
+    it('should swap FRAX->USDC->WETH', async function () {
+      const uniswapV3Path = ethers.utils.solidityPack(
+        ['address', 'uint24', 'address','uint24', 'address'],
+        [FRAX, 100, USDC, 500, WETH]
+      )
+      
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, FRAX, WETH, ExchangeType.UNISWAP_V3, uniswapV3Path)
+
+      // given
+      const amountIn = '1000000000000000000000'
+      const fraxBefore = await frax.balanceOf(deployer.address)
+      const wethBefore = await weth.balanceOf(deployer.address)
+
+      // when
+      await frax.approve(swapper.address, amountIn)
+      // Check output of swap using callStatic
+      const amountOut = await swapper.callStatic.swapExactInput(FRAX, WETH, amountIn, '1', deployer.address)
+      await swapper.swapExactInput(FRAX, WETH, amountIn, '1', deployer.address)
+
+      // then
+      const fraxAfter = await frax.balanceOf(deployer.address)
+      const wethAfter = await weth.balanceOf(deployer.address)
+      
+      expect(fraxAfter).closeTo(fraxBefore.sub(amountIn), 1)
+      expect(wethAfter).eq(wethBefore.add(amountOut))
+    })
+
+    it('should swap WETH->USDC->FRAX', async function () {
+      const uniswapV3Path = ethers.utils.solidityPack(
+        ['address', 'uint24', 'address','uint24', 'address'],
+        [WETH, 500, USDC, 100, FRAX]
+      )
+      
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, WETH, FRAX, ExchangeType.UNISWAP_V3, uniswapV3Path)
+
+      // given
+      const amountIn = '10000000000000000000'
+      const fraxBefore = await frax.balanceOf(deployer.address)
+      const wethBefore = await weth.balanceOf(deployer.address)
+
+      // when
+      await weth.approve(swapper.address, amountIn)
+      // Check output of swap using callStatic
+      const amountOut = await swapper.callStatic.swapExactInput(WETH, FRAX, amountIn, '1', deployer.address)
+      await swapper.swapExactInput(WETH, FRAX, amountIn, '1', deployer.address)
+
+      // then
+      const fraxAfter = await frax.balanceOf(deployer.address)
+      const wethAfter = await weth.balanceOf(deployer.address)
+      
+      expect(wethAfter).closeTo(wethBefore.sub(amountIn), 1)
+      expect(fraxAfter).eq(fraxBefore.add(amountOut))
     })
 
     it('should swap USDC->USDT', async function () {
