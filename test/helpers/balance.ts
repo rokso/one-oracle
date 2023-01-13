@@ -14,6 +14,7 @@ const slots = {
   [Address.mainnet.STG]: 0,
   [Address.mainnet.FRAX]: 0,
   [Address.mainnet.Frax.frxETH]: 0,
+  [Address.mainnet.CVX]: 0,  
   [Address.avalanche.WAVAX]: 3,
   [Address.avalanche.DAI]: 0,
   [Address.avalanche.WETH]: 0,
@@ -27,6 +28,7 @@ const slots = {
 // there is no clear balanceOf storage so using whale address for adjusting balance
 const whales = {
   [Address.mainnet.STETH]: '0x1982b2F5814301d4e9a8b0201555376e62F82428',
+  [Address.mainnet.CRV]: '0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2',  // slot id is 3 but not working so using whale
   [Address.bsc.WBNB]: '0x0ed7e52944161450477ee417de9cd3a859b14fd0',
 }
 
