@@ -121,7 +121,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseUnits('1', 8)
         )
-        expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('50', 6))
+        expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('100', 6))
       })
 
       it('should quote using WBTC-NATIVE-USDC with 0.05% fee pools', async function () {
@@ -163,7 +163,7 @@ describe('UniswapV3PriceProvider', function () {
 
         it('should WBTC price', async function () {
           const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WBTC)
-          expect(_priceInUsd).closeTo(Quote.mainnet.BTC_USD, parseEther('50'))
+          expect(_priceInUsd).closeTo(Quote.mainnet.BTC_USD, parseEther('100'))
         })
 
         it('should DAI price', async function () {

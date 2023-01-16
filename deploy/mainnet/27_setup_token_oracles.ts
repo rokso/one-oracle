@@ -76,6 +76,8 @@ const customOracles = [
   {token: Address.Yearn.yTUSD, oracle: 'YEarnTokenOracle'},
   {token: Address.Synth.msUSD, oracle: 'USDPeggedTokenOracle'},
   {token: Address.DOLA, oracle: 'USDPeggedTokenOracle'},
+  // Frax sFraxETH
+  {token: Address.Frax.sFrxETH, oracle: 'SFraxEthTokenOracle'},
 ]
 
 const customStalePeriods = [

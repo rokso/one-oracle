@@ -13,6 +13,7 @@ const slots = {
   [Address.mainnet.Chainlink.NOT_ON_CHAINLINK_TOKEN]: 0,
   [Address.mainnet.STG]: 0,
   [Address.mainnet.FRAX]: 0,
+  [Address.mainnet.Frax.frxETH]: 0,
   [Address.avalanche.WAVAX]: 3,
   [Address.avalanche.DAI]: 0,
   [Address.avalanche.WETH]: 0,
