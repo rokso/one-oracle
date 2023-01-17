@@ -365,6 +365,7 @@ describe('MasterOracle', function () {
 
           // then
           expect(price).eq(basePrice)
+          expect(price).closeTo(Quote.mainnet.ETH_USD, toUSD('30'))
         })
 
         it('should not be able to manipulate sFrxETH price (1)', async function () {
