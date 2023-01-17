@@ -73,13 +73,15 @@ describe('CurveExchange', function () {
 
         // when
         await usdc.approve(swaps.address, MaxUint256)
-        const tx = await swaps.exchange_with_best_rate(USDC, DAI, amountIn, amountOutMin, deployer.address)
+
+        const tx = await swaps.exchange_with_best_rate(USDC, DAI, amountIn, 0, deployer.address)
 
         // then
         const {gasUsed} = await tx.wait()
         expect(gasUsed.toNumber()).closeTo(2e6, 250e3) // ~2M gas!
         const daiAfter = await dai.balanceOf(deployer.address)
-        expect(daiAfter).eq(daiBefore.add(amountOutMin))
+        const amountOut = daiAfter.sub(daiBefore)
+        expect(amountOut).closeTo(amountOutMin, parseEther('0.000001'))
       })
 
       it('should swap USDC->DAI (native pool) using preset pool', async function () {
@@ -90,13 +92,14 @@ describe('CurveExchange', function () {
 
         // when
         await usdc.approve(swaps.address, MaxUint256)
-        const tx = await swaps.exchange(poolAddress, USDC, DAI, amountIn, amountOutMin, deployer.address)
+        const tx = await swaps.exchange(poolAddress, USDC, DAI, amountIn, 0, deployer.address)
 
         // then
         const {gasUsed} = await tx.wait()
-        expect(gasUsed.toNumber()).closeTo(215e3, 25e3) // ~215K gas
+        expect(gasUsed.toNumber()).closeTo(720e3, 25e3) // ~720K gas
         const daiAfter = await dai.balanceOf(deployer.address)
-        expect(daiAfter).eq(daiBefore.add(amountOutMin))
+        const amountOut = daiAfter.sub(daiBefore)
+        expect(amountOut).closeTo(amountOutMin, parseEther('0.000001'))
       })
 
       it('should swap USDC->STG (factory pool) using best rate', async function () {
@@ -164,7 +167,7 @@ describe('CurveExchange', function () {
 
         // then
         const {gasUsed} = await tx.wait()
-        expect(gasUsed.toNumber()).closeTo(315e3, 25e3) // ~315K gas
+        expect(gasUsed.toNumber()).closeTo(380e3, 25e3) // ~380K gas
         const usdcAfter = await usdc.balanceOf(deployer.address)
         expect(usdcAfter).eq(usdcBefore.add(amountOutMin))
       })

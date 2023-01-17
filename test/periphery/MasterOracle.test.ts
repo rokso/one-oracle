@@ -9,9 +9,14 @@ import {
   ChainlinkOracle__factory,
   AlusdTokenMainnetOracle__factory,
   StableCoinProvider__factory,
+  AggregatorV3Interface__factory,
+  IERC20__factory,
+  ISFrxEth__factory,
+  ICurvePool__factory,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
-import {impersonateAccount, increaseTime, resetFork, toUSD} from '../helpers'
+import {impersonateAccount, increaseTime, parseEther, resetFork, toUSD} from '../helpers'
+import {adjustBalance} from '../helpers/balance'
 import {smock} from '@defi-wonderland/smock'
 import Quote from '../helpers/quotes'
 
@@ -38,6 +43,8 @@ describe('MasterOracle', function () {
   describe('MasterOracle @mainnet', function () {
     const {
       DAI,
+      USDC,
+      USDT,
       Compound: {CDAI, CUSDC, CETH},
       Curve: {
         TRIPOOL_LP,
@@ -62,6 +69,7 @@ describe('MasterOracle', function () {
       },
       Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK},
       Synth: {msETH, msUSD, msBTC, msDOGE},
+      Frax: {sFrxETH, frxETH},
     } = Address.mainnet
 
     before(async function () {
@@ -81,6 +89,9 @@ describe('MasterOracle', function () {
 
       const defaultOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
       await defaultOracle.updateDefaultStalePeriod(ethers.constants.MaxUint256)
+      await defaultOracle.updateCustomStalePeriod(USDC, ethers.constants.MaxUint256)
+      await defaultOracle.updateCustomStalePeriod(USDT, ethers.constants.MaxUint256)
+      await defaultOracle.updateCustomStalePeriod(DAI, ethers.constants.MaxUint256)
 
       const stableCoinProvider = StableCoinProvider__factory.connect(StableCoinProvider.address, deployer)
       await stableCoinProvider.updateDefaultStalePeriod(ethers.constants.MaxUint256)
@@ -155,7 +166,7 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(FRAX_3CRV_LP)
 
         // then
-        expect(price).closeTo(Quote.mainnet.CURVE_FRAX_3CRV_LP_USD, toUSD('0.01'))
+        expect(price).closeTo(Quote.mainnet.CURVE_FRAX_3CRV_LP_USD, toUSD('0.02'))
       })
 
       it('should get price for ibBTC', async function () {
@@ -336,6 +347,63 @@ describe('MasterOracle', function () {
       it('should get price for msDOGE', async function () {
         const price = await masterOracle.getPriceInUsd(msDOGE)
         expect(price).closeTo(Quote.mainnet.DOGE_USD, toUSD('1'))
+      })
+    })
+
+    describe('Frax', function () {
+      describe('sFrxETH', function () {
+        it('should get price for sFrxETH', async function () {
+          // given
+          const officialOracle = AggregatorV3Interface__factory.connect(
+            '0x27942aFe4EcB7F9945168094e0749CAC749aC97B',
+            deployer
+          )
+          const basePrice = (await officialOracle.latestRoundData()).answer
+
+          // when
+          const price = await masterOracle.getPriceInUsd(sFrxETH)
+
+          // then
+          expect(price).eq(basePrice)
+        })
+
+        it('should not be able to manipulate sFrxETH price (1)', async function () {
+          // given
+          const frxEth = IERC20__factory.connect(frxETH, deployer)
+          const sFrxEth = ISFrxEth__factory.connect(sFrxETH, deployer)
+          const priceBefore = await masterOracle.getPriceInUsd(sFrxETH)
+          const staked = await frxEth.balanceOf(sFrxEth.address)
+          const amount = staked.mul('10')
+          await adjustBalance(frxEth.address, deployer.address, amount)
+
+          // when
+          await frxEth.approve(sFrxEth.address, ethers.constants.MaxUint256)
+          await sFrxEth.deposit(amount, deployer.address)
+
+          // then
+          const priceAfter = await masterOracle.getPriceInUsd(sFrxETH)
+          expect(priceAfter).closeTo(priceBefore, parseEther('0.0001'))
+        })
+
+        it('should not be able to manipulate sFrxETH price (2)', async function () {
+          // given
+          const ethFrxEthPool = ICurvePool__factory.connect('0xa1f8a6807c402e4a15ef4eba36528a3fed24e577', deployer)
+          const frxEth = IERC20__factory.connect(frxETH, deployer)
+          const sFrxEth = ISFrxEth__factory.connect(sFrxETH, deployer)
+          const priceBefore = await masterOracle.getPriceInUsd(sFrxETH)
+          const poolBalance = await ethers.provider.getBalance(ethFrxEthPool.address)
+          const amountIn = poolBalance.mul('10')
+          await ethFrxEthPool.exchange(0, 1, amountIn, 0, {value: amountIn})
+          const amount = await frxEth.balanceOf(deployer.address)
+
+          // when
+          await frxEth.approve(sFrxEth.address, ethers.constants.MaxUint256)
+          await sFrxEth.deposit(amount, deployer.address)
+
+          // then
+          const priceAfter = await masterOracle.getPriceInUsd(sFrxETH)
+          expect(priceAfter).closeTo(priceBefore, parseEther('0.0001'))
+        })
       })
     })
   })

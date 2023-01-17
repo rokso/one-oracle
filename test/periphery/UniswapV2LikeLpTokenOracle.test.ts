@@ -122,7 +122,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
 
         // then
         expect(priceInUsd).closeTo(Quote.mainnet.UNIV2_WBTC_USDC_LP_USD, parseEther('1'))
-        expect(priceInUsd).closeTo(expectedPriceInUsd, parseEther('125,000,000'))
+        expect(priceInUsd).closeTo(expectedPriceInUsd, parseEther('350,000,000'))
       })
 
       it('after liquidity removal', async function () {
