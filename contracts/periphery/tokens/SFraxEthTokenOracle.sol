@@ -13,6 +13,7 @@ import "../../interfaces/periphery/ITokenOracle.sol";
  */
 contract SFraxEthTokenOracle is ITokenOracle {
     uint256 public constant MAX_FRXETH_PRICE = 1e18;
+    uint256 public constant MIN_FRXETH_PRICE = 0.9e18;
     address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     IFrxEthStableSwap public constant ETH_FRXETH_CURVE_POOL =
         IFrxEthStableSwap(0xa1F8A6807c402E4A15ef4EBa36528A3FED24E577);
@@ -20,15 +21,19 @@ contract SFraxEthTokenOracle is ITokenOracle {
 
     /// @inheritdoc ITokenOracle
     function getPriceInUsd(address) external view override returns (uint256 _priceInUsd) {
+        // ETH/USD price from Chainlink
         uint256 _ethPriceInUsd = IOracle(msg.sender).getPriceInUsd(WETH);
 
-        // Note: price oracle gives token1 price in terms of token0 units
+        // FrxETH/ETH price
         uint256 _frxEthPriceInEth = ETH_FRXETH_CURVE_POOL.price_oracle();
 
         if (_frxEthPriceInEth > MAX_FRXETH_PRICE) {
             _frxEthPriceInEth = MAX_FRXETH_PRICE;
+        } else if (_frxEthPriceInEth < MIN_FRXETH_PRICE) {
+            _frxEthPriceInEth = MIN_FRXETH_PRICE;
         }
 
+        // sFrxETH/FrxETH price from `pricePerShare`
         return ((SFRXETH.pricePerShare() * _frxEthPriceInEth * _ethPriceInUsd) / (1e36));
     }
 }
