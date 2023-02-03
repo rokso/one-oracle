@@ -24,7 +24,8 @@ const {AddressZero} = ethers.constants
 
 const abi = ethers.utils.defaultAbiCoder
 
-const {WETH, DAI, WBTC, STETH, UNISWAP_V2_FACTORY_ADDRESS, Curve, USDC, USDT, STG, FRAX} = Address.mainnet
+const {WETH, DAI, WBTC, STETH, UNISWAP_V2_FACTORY_ADDRESS, Curve, USDC, USDT, STG, FRAX, ETH, CVX, CRV, CVXCRV, MUSD} =
+  Address.mainnet
 const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
 describe('RoutedSwapper @mainnet', function () {
@@ -44,7 +45,9 @@ describe('RoutedSwapper @mainnet', function () {
   let usdt: IERC20
   let stg: IERC20
   let frax: IERC20
-  
+  let musd: IERC20
+  let cvx: IERC20
+  let crv: IERC20
 
   beforeEach(async function () {
     // Essentially we are making sure we execute setup once only
@@ -93,6 +96,9 @@ describe('RoutedSwapper @mainnet', function () {
     usdt = IERC20__factory.connect(USDT, deployer)
     stg = IERC20__factory.connect(STG, deployer)
     frax = IERC20__factory.connect(FRAX, deployer)
+    cvx = IERC20__factory.connect(CVX, deployer)
+    crv = IERC20__factory.connect(CRV, deployer)
+    musd = IERC20__factory.connect(MUSD, deployer)
 
     await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
@@ -101,6 +107,9 @@ describe('RoutedSwapper @mainnet', function () {
     await adjustBalance(usdc.address, deployer.address, parseUnits('1,000', 6))
     await adjustBalance(stg.address, deployer.address, parseUnits('1,000', 18))
     await adjustBalance(frax.address, deployer.address, parseUnits('1,000', 18))
+    await adjustBalance(cvx.address, deployer.address, parseUnits('1,000', 18))
+    await adjustBalance(crv.address, deployer.address, parseUnits('1,000', 18))
+    await adjustBalance(musd.address, deployer.address, parseUnits('1,000', 18))
 
     const uniswapV3defaultPath = ethers.utils.solidityPack(
       ['address', 'uint24', 'address'],
@@ -264,10 +273,10 @@ describe('RoutedSwapper @mainnet', function () {
 
     it('should swap FRAX->USDC->WETH', async function () {
       const uniswapV3Path = ethers.utils.solidityPack(
-        ['address', 'uint24', 'address','uint24', 'address'],
+        ['address', 'uint24', 'address', 'uint24', 'address'],
         [FRAX, 100, USDC, 500, WETH]
       )
-      
+
       await swapper.setDefaultRouting(SwapType.EXACT_INPUT, FRAX, WETH, ExchangeType.UNISWAP_V3, uniswapV3Path)
 
       // given
@@ -284,17 +293,17 @@ describe('RoutedSwapper @mainnet', function () {
       // then
       const fraxAfter = await frax.balanceOf(deployer.address)
       const wethAfter = await weth.balanceOf(deployer.address)
-      
+
       expect(fraxAfter).closeTo(fraxBefore.sub(amountIn), 1)
       expect(wethAfter).eq(wethBefore.add(amountOut))
     })
 
     it('should swap WETH->USDC->FRAX', async function () {
       const uniswapV3Path = ethers.utils.solidityPack(
-        ['address', 'uint24', 'address','uint24', 'address'],
+        ['address', 'uint24', 'address', 'uint24', 'address'],
         [WETH, 500, USDC, 100, FRAX]
       )
-      
+
       await swapper.setDefaultRouting(SwapType.EXACT_INPUT, WETH, FRAX, ExchangeType.UNISWAP_V3, uniswapV3Path)
 
       // given
@@ -311,7 +320,7 @@ describe('RoutedSwapper @mainnet', function () {
       // then
       const fraxAfter = await frax.balanceOf(deployer.address)
       const wethAfter = await weth.balanceOf(deployer.address)
-      
+
       expect(wethAfter).closeTo(wethBefore.sub(amountIn), 1)
       expect(fraxAfter).eq(fraxBefore.add(amountOut))
     })
@@ -348,14 +357,14 @@ describe('RoutedSwapper @mainnet', function () {
         AddressZero,
         AddressZero,
       ]
-  
+
       const paramsStg2Usdc: CurveSwapParams = [
         [0, 1, 4],
         [0, 0, 0],
         [0, 0, 0],
         [0, 0, 0],
       ]
-  
+
       await swapper.setDefaultRouting(
         SwapType.EXACT_INPUT,
         STG,
@@ -363,7 +372,7 @@ describe('RoutedSwapper @mainnet', function () {
         ExchangeType.CURVE,
         abi.encode(['address[9]', 'uint256[3][4]'], [routeStg2Usdc, paramsStg2Usdc])
       )
-  
+
       // given
       const amountIn = parseUnits('100', 18)
       const stgBefore = await stg.balanceOf(deployer.address)
@@ -380,6 +389,204 @@ describe('RoutedSwapper @mainnet', function () {
       const usdcAfter = await usdc.balanceOf(deployer.address)
       expect(stgAfter).eq(stgBefore.sub(amountIn))
       expect(usdcAfter).eq(usdcBefore.add(amountOut))
+    })
+
+    it('should swap CVX->FRAX using CurveExchange', async function () {
+      // add default route
+      const routeCvx2Frax: CurveSwapRoute = [
+        CVX,
+        Curve.CVX_ETH_POOL,
+        ETH,
+        Curve.ETH_USDT_POOL,
+        USDT,
+        Curve.FRAX_3CRV_LP,
+        FRAX,
+        AddressZero,
+        AddressZero,
+      ]
+
+      const paramsCvx2Frax: CurveSwapParams = [
+        [1, 0, 3],
+        [2, 0, 3],
+        [3, 0, 2],
+        [0, 0, 0],
+      ]
+
+      await swapper.setDefaultRouting(
+        SwapType.EXACT_INPUT,
+        CVX,
+        FRAX,
+        ExchangeType.CURVE,
+        abi.encode(['address[9]', 'uint256[3][4]'], [routeCvx2Frax, paramsCvx2Frax])
+      )
+
+      // given
+      const amountIn = parseUnits('100', 18)
+      const cvxBefore = await cvx.balanceOf(deployer.address)
+      const fraxBefore = await frax.balanceOf(deployer.address)
+
+      // when
+      await cvx.approve(swapper.address, amountIn)
+      // Check output of swap using callStatic
+      const amountOut = await swapper.callStatic.swapExactInput(CVX, FRAX, amountIn, '1', deployer.address)
+      await swapper.swapExactInput(CVX, FRAX, amountIn, '1', deployer.address)
+
+      // then
+      const cvxAfter = await cvx.balanceOf(deployer.address)
+      const fraxAfter = await frax.balanceOf(deployer.address)
+      expect(cvxAfter).eq(cvxBefore.sub(amountIn))
+      expect(fraxAfter).eq(fraxBefore.add(amountOut))
+    })
+
+    it('should swap CRV->FRAX using UniV3', async function () {
+      const tokenIn = CRV
+      const tokenOut = FRAX
+      const uniswapV3Path = ethers.utils.solidityPack(
+        ['address', 'uint24', 'address', 'uint24', 'address', 'uint24', 'address'],
+        [tokenIn, 3000, WETH, 500, USDC, 100, tokenOut]
+      )
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, tokenIn, tokenOut, ExchangeType.UNISWAP_V3, uniswapV3Path)
+
+      // given
+      const amountIn = parseUnits('100', 18)
+      const crvBefore = await crv.balanceOf(deployer.address)
+      const fraxBefore = await frax.balanceOf(deployer.address)
+      // when
+      await crv.approve(swapper.address, amountIn)
+      // Check output of swap using callStatic
+      const amountOut = await swapper.callStatic.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
+      const tx = await swapper.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
+      expect((await tx.wait()).gasUsed).lt(330000)
+
+      // then
+      const crvAfter = await crv.balanceOf(deployer.address)
+      const fraxAfter = await frax.balanceOf(deployer.address)
+      expect(crvAfter).eq(crvBefore.sub(amountIn))
+      expect(fraxAfter).eq(fraxBefore.add(amountOut))
+    })
+
+    it('should swap CVX->FRAX using UniV3', async function () {
+      const tokenIn = CVX
+      const tokenOut = FRAX
+      const uniswapV3Path = ethers.utils.solidityPack(
+        ['address', 'uint24', 'address', 'uint24', 'address', 'uint24', 'address'],
+        [tokenIn, 10000, WETH, 500, USDC, 100, tokenOut]
+      )
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, tokenIn, tokenOut, ExchangeType.UNISWAP_V3, uniswapV3Path)
+
+      // given
+      const amountIn = parseUnits('100', 18)
+      const cvxBefore = await cvx.balanceOf(deployer.address)
+      const fraxBefore = await frax.balanceOf(deployer.address)
+      // when
+      await cvx.approve(swapper.address, amountIn)
+      // Check output of swap using callStatic
+      const amountOut = await swapper.callStatic.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
+      const tx = await swapper.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
+      expect((await tx.wait()).gasUsed).lt(331000)
+
+      // then
+      const cvxAfter = await cvx.balanceOf(deployer.address)
+      const fraxAfter = await frax.balanceOf(deployer.address)
+      expect(cvxAfter).eq(cvxBefore.sub(amountIn))
+      expect(fraxAfter).eq(fraxBefore.add(amountOut))
+    })
+
+    it('should swap CRV->MUSD using CurveExchange', async function () {
+      const tokenIn = CRV
+      const tokenOut = MUSD
+      const routeCrv2MUSD: CurveSwapRoute = [
+        CRV,
+        Curve.CRV_ETH_POOL,
+        ETH,
+        Curve.ETH_USDT_POOL,
+        USDT,
+        Curve.MUSD_POOL,
+        tokenOut,
+        AddressZero,
+        AddressZero,
+      ]
+      const paramsCrv2musd: CurveSwapParams = [
+        [1, 0, 3],
+        [2, 0, 3],
+        [3, 0, 2],
+        [0, 0, 0],
+      ]
+
+      await swapper.setDefaultRouting(
+        SwapType.EXACT_INPUT,
+        tokenIn,
+        tokenOut,
+        ExchangeType.CURVE,
+        abi.encode(['address[9]', 'uint256[3][4]'], [routeCrv2MUSD, paramsCrv2musd])
+      )
+
+      // given
+      const amountIn = parseUnits('1000', 18)
+      const crvBefore = await crv.balanceOf(deployer.address)
+      const musdBefore = await musd.balanceOf(deployer.address)
+
+      // when
+      await crv.approve(swapper.address, amountIn)
+      // Check output of swap using callStatic
+      const amountOut = await swapper.callStatic.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
+      const tx = await swapper.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
+      expect((await tx.wait()).gasUsed).lt(920000)
+
+      // then
+      const crvAfter = await crv.balanceOf(deployer.address)
+      const musdAfter = await musd.balanceOf(deployer.address)
+      expect(crvAfter).eq(crvBefore.sub(amountIn))
+      expect(musdAfter).eq(musdBefore.add(amountOut))
+    })
+
+    it('should swap CVX->MUSD using CurveExchange', async function () {
+      const tokenIn = CVX
+      const tokenOut = MUSD
+      const routeCvx2Musd: CurveSwapRoute = [
+        tokenIn,
+        Curve.CVX_ETH_POOL,
+        ETH,
+        Curve.ETH_USDT_POOL,
+        USDT,
+        Curve.MUSD_POOL,
+        tokenOut,
+        AddressZero,
+        AddressZero,
+      ]
+
+      const paramsCvx2Musd: CurveSwapParams = [
+        [1, 0, 3],
+        [2, 0, 3],
+        [3, 0, 2],
+        [0, 0, 0],
+      ]
+
+      await swapper.setDefaultRouting(
+        SwapType.EXACT_INPUT,
+        tokenIn,
+        tokenOut,
+        ExchangeType.CURVE,
+        abi.encode(['address[9]', 'uint256[3][4]'], [routeCvx2Musd, paramsCvx2Musd])
+      )
+
+      // given
+      const amountIn = parseUnits('100', 18)
+      const cvxBefore = await cvx.balanceOf(deployer.address)
+      const musdBefore = await musd.balanceOf(deployer.address)
+
+      // when
+      await cvx.approve(swapper.address, amountIn)
+      // Check output of swap using callStatic
+      const amountOut = await swapper.callStatic.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
+      const tx = await swapper.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
+      expect((await tx.wait()).gasUsed).lt(1020000)
+      
+      // then
+      const cvxAfter = await cvx.balanceOf(deployer.address)
+      const musdAfter = await musd.balanceOf(deployer.address)
+      expect(cvxAfter).eq(cvxBefore.sub(amountIn))
+      expect(musdAfter).eq(musdBefore.add(amountOut))
     })
   })
 
