@@ -567,4 +567,32 @@ describe('MasterOracle', function () {
       })
     })
   })
+
+  describe('MasterOracle @optimism', function () {
+    const {
+      DAI,      
+    } = Address.optimism
+
+    before(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/optimism']
+
+      // eslint-disable-next-line no-shadow
+      const {MasterOracle} = await deployments.fixture()
+
+      masterOracle = MasterOracle__factory.connect(MasterOracle.address, deployer)
+    })
+
+    describe('getPriceInUsd', function () {
+      it('should revert if token oracle returns 0', async function () {
+        // given
+        const daiFakeOracle = await smock.fake('ITokenOracle')
+        daiFakeOracle.getPriceInUsd.returns(0)
+        await masterOracle.updateTokenOracle(DAI, daiFakeOracle.address)
+
+        // when-then
+        expect(masterOracle.getPriceInUsd(DAI)).to.revertedWith('invalid-token-price')
+      })
+    })    
+  })
 })
