@@ -24,7 +24,7 @@ const {AddressZero} = ethers.constants
 
 const abi = ethers.utils.defaultAbiCoder
 
-const {WETH, DAI, WBTC, STETH, UNISWAP_V2_FACTORY_ADDRESS, Curve, USDC, USDT, STG, FRAX, ETH, CVX, CRV, CVXCRV, MUSD} =
+const {WETH, DAI, WBTC, STETH, UNISWAP_V2_FACTORY_ADDRESS, Curve, USDC, USDT, STG, FRAX, ETH, CVX, CRV, RETH, MUSD} =
   Address.mainnet
 const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
@@ -48,6 +48,7 @@ describe('RoutedSwapper @mainnet', function () {
   let musd: IERC20
   let cvx: IERC20
   let crv: IERC20
+  let reth: IERC20
 
   beforeEach(async function () {
     // Essentially we are making sure we execute setup once only
@@ -99,6 +100,7 @@ describe('RoutedSwapper @mainnet', function () {
     cvx = IERC20__factory.connect(CVX, deployer)
     crv = IERC20__factory.connect(CRV, deployer)
     musd = IERC20__factory.connect(MUSD, deployer)
+    reth = IERC20__factory.connect(RETH, deployer)
 
     await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
@@ -587,6 +589,33 @@ describe('RoutedSwapper @mainnet', function () {
       const musdAfter = await musd.balanceOf(deployer.address)
       expect(cvxAfter).eq(cvxBefore.sub(amountIn))
       expect(musdAfter).eq(musdBefore.add(amountOut))
+    })
+
+    it('should swap DAI->rETH using UniV3', async function () {
+      const tokenIn = DAI
+      const tokenOut = RETH
+      const uniswapV3Path = ethers.utils.solidityPack(
+        ['address', 'uint24', 'address', 'uint24', 'address'],
+        [tokenIn, 500, WETH, 500, tokenOut]
+      )
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, tokenIn, tokenOut, ExchangeType.UNISWAP_V3, uniswapV3Path)
+
+      // given
+      const amountIn = parseUnits('100', 18)
+      const daiBefore = await dai.balanceOf(deployer.address)
+      const rethBefore = await reth.balanceOf(deployer.address)
+      // when
+      await dai.approve(swapper.address, amountIn)
+      // Check output of swap using callStatic
+      const amountOut = await swapper.callStatic.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
+      const tx = await swapper.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
+      expect((await tx.wait()).gasUsed).lt(270000)
+
+      // then
+      const daiAfter = await dai.balanceOf(deployer.address)
+      const rethAfter = await reth.balanceOf(deployer.address)
+      expect(daiAfter).eq(daiBefore.sub(amountIn))
+      expect(rethAfter).eq(rethBefore.add(amountOut))
     })
   })
 
