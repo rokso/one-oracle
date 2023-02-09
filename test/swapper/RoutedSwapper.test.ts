@@ -393,6 +393,54 @@ describe('RoutedSwapper @mainnet', function () {
       expect(usdcAfter).eq(usdcBefore.add(amountOut))
     })
 
+    it('should swap STG->DAI', async function () {
+      // add default route
+      const routeStg2Dai: CurveSwapRoute = [
+        STG,
+        Curve.STG_USDC_POOL,
+        USDC,
+        Curve.TRIPOOL_POOL,
+        DAI,
+        AddressZero,
+        AddressZero,
+        AddressZero,
+        AddressZero,
+      ]
+
+      const paramsStg2Dai: CurveSwapParams = [
+        [0, 1, 4],
+        [1, 0, 1],
+        [0, 0, 0],
+        [0, 0, 0],
+      ]
+
+      await swapper.setDefaultRouting(
+        SwapType.EXACT_INPUT,
+        STG,
+        DAI,
+        ExchangeType.CURVE,
+        abi.encode(['address[9]', 'uint256[3][4]'], [routeStg2Dai, paramsStg2Dai])
+      )
+
+      // given
+      const amountIn = parseUnits('100', 18)
+      const stgBefore = await stg.balanceOf(deployer.address)
+      const daiBefore = await dai.balanceOf(deployer.address)
+
+      // when
+      await stg.approve(swapper.address, amountIn)
+      // Check output of swap using callStatic
+      const amountOut = await swapper.callStatic.swapExactInput(STG, DAI, amountIn, '1', deployer.address)
+      const tx = await swapper.swapExactInput(STG, DAI, amountIn, '1', deployer.address)
+      expect((await tx.wait()).gasUsed).lt(600000)
+
+      // then
+      const stgAfter = await stg.balanceOf(deployer.address)
+      const daiAfter = await dai.balanceOf(deployer.address)
+      expect(stgAfter).eq(stgBefore.sub(amountIn))
+      expect(daiAfter).eq(daiBefore.add(amountOut))
+    })
+
     it('should swap CVX->FRAX using CurveExchange', async function () {
       // add default route
       const routeCvx2Frax: CurveSwapRoute = [
