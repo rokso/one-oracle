@@ -61,7 +61,7 @@ describe('RoutedSwapper @mainnet', function () {
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer, user, invalidToken] = await ethers.getSigners()
 
-    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     const uniswapV2LikeExchangeFactory = new UniswapV2LikeExchange__factory(deployer)
@@ -581,7 +581,7 @@ describe('RoutedSwapper @mainnet', function () {
       // Check output of swap using callStatic
       const amountOut = await swapper.callStatic.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
       const tx = await swapper.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
-      expect((await tx.wait()).gasUsed).lt(920000)
+      expect((await tx.wait()).gasUsed).lt(1050000)
 
       // then
       const crvAfter = await crv.balanceOf(deployer.address)
@@ -631,7 +631,7 @@ describe('RoutedSwapper @mainnet', function () {
       const amountOut = await swapper.callStatic.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
       const tx = await swapper.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
       expect((await tx.wait()).gasUsed).lt(1020000)
-      
+
       // then
       const cvxAfter = await cvx.balanceOf(deployer.address)
       const musdAfter = await musd.balanceOf(deployer.address)

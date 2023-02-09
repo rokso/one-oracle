@@ -34,7 +34,7 @@ describe('StableCoinProvider @mainnet', function () {
     stableCoinProvider = await stableCoinProviderFactory.deploy(DAI, USDC, STALE_PERIOD, MAX_DEVIATION)
     await stableCoinProvider.deployed()
 
-    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
     addressProvider.providersAggregator.returns(providersAggregator.address)
   })

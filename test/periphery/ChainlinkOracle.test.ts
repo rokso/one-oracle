@@ -28,7 +28,7 @@ describe('ChainlinkOracle @mainnet', function () {
     oracle = await oracleProvider.deploy(STALE_PERIOD)
     await oracle.deployed()
 
-    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
     // addressProvider.governor.returns(deployer.address)
     addressProvider.providersAggregator.returns(aggregator.address)
   })

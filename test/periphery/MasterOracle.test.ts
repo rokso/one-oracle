@@ -13,6 +13,7 @@ import {
   IERC20__factory,
   ISFrxEth__factory,
   ICurvePool__factory,
+  AddressProviderMock__factory,
 } from '../../typechain-types'
 import Address from '../../helpers/address'
 import {impersonateAccount, increaseTime, parseEther, resetFork, toUSD} from '../helpers'
@@ -79,11 +80,15 @@ describe('MasterOracle', function () {
       const {
         // eslint-disable-next-line no-shadow
         MasterOracle,
+        PriceProvidersAggregator,
         ChainlinkOracle,
         AlusdTokenMainnetOracle,
         StableCoinProvider,
         BTCPeggedTokenOracle,
       } = await deployments.fixture()
+
+      const addressProvider = AddressProviderMock__factory.connect(Address.ADDRESS_PROVIDER, deployer)
+      await addressProvider.updateProvidersAggregator(PriceProvidersAggregator.address)
 
       masterOracle = MasterOracle__factory.connect(MasterOracle.address, deployer)
 
@@ -421,7 +426,10 @@ describe('MasterOracle', function () {
       hre.network.deploy = ['deploy/avalanche']
 
       // eslint-disable-next-line no-shadow
-      const {MasterOracle} = await deployments.fixture()
+      const {MasterOracle, PriceProvidersAggregator} = await deployments.fixture()
+
+      const addressProvider = AddressProviderMock__factory.connect(Address.ADDRESS_PROVIDER, deployer)
+      await addressProvider.updateProvidersAggregator(PriceProvidersAggregator.address)
 
       masterOracle = MasterOracle__factory.connect(MasterOracle.address, deployer)
     })
@@ -512,7 +520,10 @@ describe('MasterOracle', function () {
       hre.network.deploy = ['deploy/bsc']
 
       // eslint-disable-next-line no-shadow
-      const {MasterOracle} = await deployments.fixture()
+      const {MasterOracle, PriceProvidersAggregator} = await deployments.fixture()
+
+      const addressProvider = AddressProviderMock__factory.connect(Address.ADDRESS_PROVIDER, deployer)
+      await addressProvider.updateProvidersAggregator(PriceProvidersAggregator.address)
 
       masterOracle = MasterOracle__factory.connect(MasterOracle.address, deployer)
     })

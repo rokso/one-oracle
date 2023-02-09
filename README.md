@@ -76,13 +76,6 @@ The `one-oracle` repository has two modules, the `OneOracle` and the `Swapper`.
      └────────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Address Provider
-
-The `one-oracle` module counts on an `AddressProvider` contract that makes address changes easier (for instance, when governor address is updated we need to do that in one place only).
-The `AddressProvider` must have the same address across all chains where its deployed, to achieve that we're using the [`safe-singleton-factory`](https://github.com/safe-global/safe-singleton-factory) solution that provides a `create2` deployment factory.
-In summary we can ensure the same contract address by following the same 1) deployer address, and 2) contracts (proxy + implementation) code.
-See more: [https://github.com/bloqpriv/one-oracle/blob/main/helpers/deployment.ts](https://github.com/bloqpriv/one-oracle/blob/main/helpers/deployment.ts)
-
 ## Install
 
 ```sh

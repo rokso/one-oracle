@@ -42,7 +42,7 @@ describe('PriceProvidersAggregator @mainnet', function () {
     wbtc = IERC20__factory.connect(WBTC, deployer)
     usdc = IERC20__factory.connect(USDC, deployer)
 
-    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)

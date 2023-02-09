@@ -37,7 +37,7 @@ describe('ChainlinkFeedPriceProvider @mainnet', function () {
     weth = IERC20__factory.connect(WETH, deployer)
     wbtc = IERC20__factory.connect(WBTC, deployer)
 
-    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     const priceProviderFactory = new ChainlinkFeedPriceProvider__factory(deployer)
