@@ -21,13 +21,11 @@ import {
   VspMainnetOracle,
   ChainlinkOracle__factory,
   ChainlinkOracle,
-  AddressProvider__factory,
-  AddressProvider,
   USDPeggedTokenOracle__factory,
   USDPeggedTokenOracle,
 } from '../typechain-types'
 import {Address, SwapType, Provider, ExchangeType} from '../helpers'
-import {impersonateAccount, increaseTime, parseEther, parseUnits, resetFork, toUSD} from './helpers'
+import {impersonateAccount, increaseTime, parseEther, resetFork, toUSD} from './helpers'
 import {IERC20} from '../typechain-types/@openzeppelin/contracts/token/ERC20'
 import {IERC20__factory} from '../typechain-types/factories/@openzeppelin/contracts/token/ERC20'
 import {adjustBalance} from './helpers/balance'
@@ -52,7 +50,6 @@ describe('Deployments ', function () {
   })
 
   describe('@avalanche', function () {
-    let addressProvider: AddressProvider
     let chainlinkPriceProvider: ChainlinkAvalanchePriceProvider
     let priceProvidersAggregator: PriceProvidersAggregator
     let chainlinkOracle: ChainlinkOracle
@@ -65,10 +62,9 @@ describe('Deployments ', function () {
       hre.network.deploy = ['deploy/avalanche']
 
       // eslint-disable-next-line no-shadow
-      const {AddressProvider, ChainlinkPriceProvider, PriceProvidersAggregator, ChainlinkOracle, USDPeggedTokenOracle} =
+      const {ChainlinkPriceProvider, PriceProvidersAggregator, ChainlinkOracle, USDPeggedTokenOracle} =
         await deployments.fixture()
 
-      addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
       chainlinkPriceProvider = ChainlinkAvalanchePriceProvider__factory.connect(
         ChainlinkPriceProvider.address,
         deployer
@@ -76,10 +72,6 @@ describe('Deployments ', function () {
       priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
       chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
       msUsdOracle = USDPeggedTokenOracle__factory.connect(USDPeggedTokenOracle.address, deployer)
-    })
-
-    it('AddressProvider', async function () {
-      expect(await addressProvider.governor()).eq(deployer.address)
     })
 
     it('ChainlinkPriceProvider', async function () {
@@ -105,7 +97,6 @@ describe('Deployments ', function () {
   })
 
   describe('@bsc', function () {
-    let addressProvider: AddressProvider
     let chainlinkPriceProvider: ChainlinkBscPriceProvider
     let priceProvidersAggregator: PriceProvidersAggregator
     let chainlinkOracle: ChainlinkOracle
@@ -123,7 +114,6 @@ describe('Deployments ', function () {
 
       /* eslint-disable no-shadow */
       const {
-        AddressProvider,
         ChainlinkPriceProvider,
         PriceProvidersAggregator,
         ChainlinkOracle,
@@ -133,7 +123,6 @@ describe('Deployments ', function () {
       } = await deployments.fixture()
       /* eslint-enable no-shadow */
 
-      addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
       chainlinkPriceProvider = ChainlinkBscPriceProvider__factory.connect(ChainlinkPriceProvider.address, deployer)
       priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
       chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
@@ -143,10 +132,6 @@ describe('Deployments ', function () {
       pancakeSwapExchange = UniswapV2LikeExchange__factory.connect(PancakeSwapExchange.address, deployer)
       routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
       await adjustBalance(WBNB, deployer.address, parseEther('1000'))
-    })
-
-    it('AddressProvider', async function () {
-      expect(await addressProvider.governor()).eq(deployer.address)
     })
 
     it('ChainlinkPriceProvider', async function () {
@@ -194,7 +179,6 @@ describe('Deployments ', function () {
   })
 
   describe('@mainnet', function () {
-    let addressProvider: AddressProvider
     let uniswapV2Exchange: UniswapV2LikeExchange
     let sushiswapExchange: UniswapV2LikeExchange
     let uniswapV3Exchange: UniswapV3Exchange
@@ -211,17 +195,9 @@ describe('Deployments ', function () {
       hre.network.deploy = ['deploy/mainnet']
 
       // eslint-disable-next-line no-shadow
-      const {
-        AddressProvider,
-        UniswapV2Exchange,
-        SushiswapExchange,
-        UniswapV3Exchange,
-        RoutedSwapper,
-        VspOracle,
-        CurveExchange,
-      } = await deployments.fixture()
+      const {UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange, RoutedSwapper, VspOracle, CurveExchange} =
+        await deployments.fixture()
 
-      addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
       uniswapV2Exchange = UniswapV2LikeExchange__factory.connect(UniswapV2Exchange.address, deployer)
       sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiswapExchange.address, deployer)
       uniswapV3Exchange = UniswapV3Exchange__factory.connect(UniswapV3Exchange.address, deployer)
@@ -232,10 +208,6 @@ describe('Deployments ', function () {
       vspOracle = VspMainnetOracle__factory.connect(VspOracle.address, deployer)
 
       await adjustBalance(WETH, deployer.address, parseEther('1000'))
-    })
-
-    it('AddressProvider', async function () {
-      expect(await addressProvider.governor()).eq(deployer.address)
     })
 
     it('UniswapV2Exchange', async function () {
@@ -287,7 +259,6 @@ describe('Deployments ', function () {
   })
 
   describe('@polygon', function () {
-    let addressProvider: AddressProvider
     let quickswapExchange: UniswapV2LikeExchange
     let sushiswapExchange: UniswapV2LikeExchange
     let routedSwapper: RoutedSwapper
@@ -300,19 +271,14 @@ describe('Deployments ', function () {
       hre.network.deploy = ['deploy/polygon']
 
       // eslint-disable-next-line no-shadow
-      const {AddressProvider, QuickSwapExchange, SushiSwapExchange, RoutedSwapper} = await deployments.fixture()
+      const {QuickSwapExchange, SushiSwapExchange, RoutedSwapper} = await deployments.fixture()
 
-      addressProvider = AddressProvider__factory.connect(AddressProvider.address, deployer)
       quickswapExchange = UniswapV2LikeExchange__factory.connect(QuickSwapExchange.address, deployer)
       sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiSwapExchange.address, deployer)
       routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
       wmatic = IERC20__factory.connect(WMATIC, deployer)
 
       await adjustBalance(WMATIC, deployer.address, parseEther('1000'))
-    })
-
-    it('AddressProvider', async function () {
-      expect(await addressProvider.governor()).eq(deployer.address)
     })
 
     it('QuickSwapExchange', async function () {

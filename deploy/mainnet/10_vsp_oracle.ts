@@ -4,7 +4,6 @@ import {parseEther} from '@ethersproject/units'
 
 const VspMainnetOracle = 'VspMainnetOracle'
 const VspOracle = 'VspOracle'
-const AddressProvider = 'AddressProvider'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
@@ -22,6 +21,5 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   })
 }
 
-func.dependencies = [AddressProvider]
 func.tags = [VspOracle]
 export default func

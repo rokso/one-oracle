@@ -52,7 +52,7 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer] = await ethers.getSigners()
 
-    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     weth = IERC20__factory.connect(WETH, deployer)

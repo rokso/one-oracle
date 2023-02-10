@@ -43,7 +43,7 @@ describe('VspMainnetOracle @mainnet', function () {
     vspOracle = await vspMainnetOracleFactory.deploy(MAX_DEVIATION, STALE_PERIOD)
     await vspOracle.deployed()
 
-    const addressProvider = await smock.fake('AddressProvider', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
     addressProvider.stableCoinProvider.returns(stableCoinProvider.address)
     addressProvider.providersAggregator.returns(aggregator.address)
   })

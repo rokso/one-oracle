@@ -4,7 +4,6 @@ import {Address, Provider} from '../../helpers'
 
 const {WBNB} = Address.bsc
 
-const AddressProvider = 'AddressProvider'
 const ChainlinkPriceProvider = 'ChainlinkPriceProvider'
 const PriceProvidersAggregator = 'PriceProvidersAggregator'
 
@@ -13,7 +12,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {deploy, get, read, execute} = deployments
   const {deployer: from} = await getNamedAccounts()
 
-  const {address: priceProviderAggregatorAddress} = await deploy(PriceProvidersAggregator, {
+  await deploy(PriceProvidersAggregator, {
     from,
     log: true,
     args: [WBNB],
@@ -24,12 +23,8 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   if ((await read(PriceProvidersAggregator, 'priceProviders', [Provider.CHAINLINK])) !== chainlinkAddress) {
     await execute(PriceProvidersAggregator, {from, log: true}, 'setPriceProvider', Provider.CHAINLINK, chainlinkAddress)
   }
-
-  if ((await read(AddressProvider, 'providersAggregator')) !== priceProviderAggregatorAddress) {
-    await execute(AddressProvider, {from, log: true}, 'updateProvidersAggregator', priceProviderAggregatorAddress)
-  }
 }
 
-func.dependencies = [AddressProvider, ChainlinkPriceProvider]
+func.dependencies = [ChainlinkPriceProvider]
 func.tags = [PriceProvidersAggregator]
 export default func

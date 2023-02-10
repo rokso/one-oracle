@@ -5,7 +5,7 @@ pragma solidity 0.8.9;
 import "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 import "../interfaces/core/IAddressProvider.sol";
 
-contract AddressProvider is IAddressProvider, Initializable {
+contract AddressProviderMock is IAddressProvider, Initializable {
     /// @notice The governor account
     address public governor;
 
