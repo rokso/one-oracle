@@ -31,6 +31,8 @@ import {IERC20__factory} from '../typechain-types/factories/@openzeppelin/contra
 import {adjustBalance} from './helpers/balance'
 import Quote from './helpers/quotes'
 
+const AddressProvider = 'IAddressProvider'
+
 describe('Deployments ', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
@@ -305,6 +307,87 @@ describe('Deployments ', function () {
 
       // then
       expect(after.sub(before)).closeTo(Quote.polygon.MATIC_USD, parseEther('10'))
+    })
+  })
+
+  describe('@optimism', function () {
+    let uniswapV3Exchange: UniswapV3Exchange
+    let routedSwapper: RoutedSwapper
+    let weth: IERC20
+    let dai: IERC20
+    let priceProvidersAggregator: PriceProvidersAggregator
+    let chainlinkOracle: ChainlinkOracle
+    let msUsdOracle: USDPeggedTokenOracle
+
+    const {WETH, DAI} = Address.optimism
+
+    beforeEach(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/optimism']
+
+      // eslint-disable-next-line no-shadow
+      const {PriceProvidersAggregator, ChainlinkOracle, USDPeggedTokenOracle} = await deployments.fixture()
+
+      priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
+      chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
+      msUsdOracle = USDPeggedTokenOracle__factory.connect(USDPeggedTokenOracle.address, deployer)
+
+      // eslint-disable-next-line no-shadow
+      const {UniswapV3Exchange, RoutedSwapper} = await deployments.fixture()
+
+      uniswapV3Exchange = UniswapV3Exchange__factory.connect(UniswapV3Exchange.address, deployer)
+      routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
+      weth = IERC20__factory.connect(WETH, deployer)
+      dai = IERC20__factory.connect(DAI, deployer)
+
+      // AddressProvider governor can update priceProvidersAggregator if not already set.  
+      const addressProvider = await ethers.getContractAt(AddressProvider, Address.ADDRESS_PROVIDER)
+      if (
+        (await addressProvider.governor()) === Address.DEPLOYER &&
+        (await addressProvider.providersAggregator()) !== priceProvidersAggregator.address
+      ) {
+        await addressProvider.connect(deployer).updateProvidersAggregator(priceProvidersAggregator.address)
+      }
+
+      await adjustBalance(WETH, deployer.address, parseEther('1000'))
+    })
+
+    it('UniswapV3Exchange', async function () {
+      const wethLike = await uniswapV3Exchange.wethLike()
+      expect(wethLike).eq(WETH)
+    })
+
+    it('PriceProvidersAggregator', async function () {
+      const {_priceInUsd: priceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, WETH)
+      expect(priceInUsd).closeTo(Quote.optimism.ETH_USD, toUSD('1'))
+    })
+
+    it('ChainlinkOracle', async function () {
+      const priceInUsd = await chainlinkOracle.getPriceInUsd(WETH)
+      expect(priceInUsd).closeTo(Quote.optimism.ETH_USD, toUSD('1'))
+    })
+
+    it('USDPeggedTokenOracle', async function () {
+      // Should always return 1 USD no matter the address given
+      const priceInUsd = await msUsdOracle.getPriceInUsd(ethers.constants.AddressZero)
+      expect(priceInUsd).eq(toUSD('1'))
+    })
+
+    it('RoutedSwapper', async function () {
+      // given
+      const defaultPoolFee = await uniswapV3Exchange.defaultPoolFee()
+      const path = ethers.utils.solidityPack(['address', 'uint24', 'address'], [WETH, defaultPoolFee, DAI])
+      await routedSwapper.setDefaultRouting(SwapType.EXACT_INPUT, WETH, DAI, ExchangeType.UNISWAP_V3, path)
+      await weth.approve(routedSwapper.address, ethers.constants.MaxUint256)
+
+      // when
+      const amountIn = parseEther('1')
+      const before = await dai.balanceOf(deployer.address)
+      await routedSwapper.swapExactInput(WETH, DAI, amountIn, 0, deployer.address)
+      const after = await dai.balanceOf(deployer.address)
+
+      // then
+      expect(after.sub(before)).closeTo(Quote.optimism.ETH_USD, parseEther('10'))
     })
   })
 })

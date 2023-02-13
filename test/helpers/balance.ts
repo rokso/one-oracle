@@ -22,6 +22,7 @@ const slots = {
   [Address.avalanche.WBTC]: 0,
   [Address.bsc.Umbrella.UMB]: 1,
   [Address.polygon.WMATIC]: 3,
+  [Address.optimism.WETH]: 3,
 }
 
 // Some tokens, specially rebase tokens, uses dynamic storage or multi storage hence

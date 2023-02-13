@@ -11,4 +11,6 @@ interface IAddressProvider {
     function providersAggregator() external view returns (IPriceProvidersAggregator);
 
     function stableCoinProvider() external view returns (IStableCoinProvider);
+
+    function updateProvidersAggregator(IPriceProvidersAggregator providersAggregator_) external;
 }

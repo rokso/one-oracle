@@ -77,5 +77,11 @@
     "QuickSwapExchange": "0x9fddEEc5E3BeD310C28cE29b2571Bf17E0Bd634C",
     "RoutedSwapper": "0xa74E8dbB6970f78C368cD1CdfDd509D16b88b11A",
     "SushiSwapExchange": "0xd1B6CEFC02c25BF6b07d7F86b25b06d93F326Bec"
+  },
+  "optimism": {
+    "AddressProvider": "0x1c9C77964B74BC612A57059680E1A09041f58a1f",
+    "AddressProvider_Implementation": "0xC5cc7ce1f5C14635f5A6882df13872F3E64995Fa",
+    "AddressProvider_Proxy": "0x1c9C77964B74BC612A57059680E1A09041f58a1f",
+    "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf"
   }
 }
