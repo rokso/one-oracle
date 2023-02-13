@@ -76,6 +76,9 @@ const Quote = {
   mumbai: {MATIC_USD: parseEther('0.84'), ETH_USD: parseEther('1,359')},
   optimism: {
     ETH_USD: parseEther('1,543'),
+    USDC_USD: parseEther('1'),
+    DAI_USD: parseEther('1'),
+    OP_USD: parseEther('2.3'),
   }
 }
 export default Quote
