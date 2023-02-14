@@ -319,7 +319,7 @@ describe('Deployments ', function () {
     let chainlinkOracle: ChainlinkOracle
     let msUsdOracle: USDPeggedTokenOracle
 
-    const {WETH, DAI} = Address.optimism
+    const {WETH, DAI, USDC, OP} = Address.optimism
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -360,11 +360,30 @@ describe('Deployments ', function () {
     it('PriceProvidersAggregator', async function () {
       const {_priceInUsd: priceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, WETH)
       expect(priceInUsd).closeTo(Quote.optimism.ETH_USD, toUSD('1'))
+      
+      const {_priceInUsd: usdcPriceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, USDC)
+      expect(usdcPriceInUsd).closeTo(Quote.optimism.USDC_USD, toUSD('0.1'))
+
+      const {_priceInUsd: daiPriceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, DAI)
+      expect(daiPriceInUsd).closeTo(Quote.optimism.DAI_USD, toUSD('0.1'))
+
+      const {_priceInUsd: opPriceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, OP)
+      expect(opPriceInUsd).closeTo(Quote.optimism.OP_USD, toUSD('0.1'))
     })
 
     it('ChainlinkOracle', async function () {
       const priceInUsd = await chainlinkOracle.getPriceInUsd(WETH)
       expect(priceInUsd).closeTo(Quote.optimism.ETH_USD, toUSD('1'))
+
+      const usdcPriceInUsd = await chainlinkOracle.getPriceInUsd(USDC)
+      expect(usdcPriceInUsd).closeTo(Quote.optimism.USDC_USD, toUSD('0.1'))
+
+      const daiPriceInUsd = await chainlinkOracle.getPriceInUsd(DAI)
+      expect(daiPriceInUsd).closeTo(Quote.optimism.DAI_USD, toUSD('0.1'))
+      
+      const opPriceInUsd = await chainlinkOracle.getPriceInUsd(OP)
+      expect(opPriceInUsd).closeTo(Quote.optimism.OP_USD, toUSD('0.1'))
+
     })
 
     it('USDPeggedTokenOracle', async function () {

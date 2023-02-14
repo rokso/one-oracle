@@ -1,0 +1,469 @@
+{
+  "address": "0x99866a6074ADb027f09c9AF31929dB5941D36DA7",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "nativeToken_",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "enum DataTypes.Provider",
+          "name": "provider",
+          "type": "uint8"
+        },
+        {
+          "indexed": false,
+          "internalType": "contract IPriceProvider",
+          "name": "oldPriceProvider",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "contract IPriceProvider",
+          "name": "newPriceProvider",
+          "type": "address"
+        }
+      ],
+      "name": "PriceProviderUpdated",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "addressProvider",
+      "outputs": [
+        {
+          "internalType": "contract IAddressProvider",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum DataTypes.Provider",
+          "name": "provider_",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "token_",
+          "type": "address"
+        }
+      ],
+      "name": "getPriceInUsd",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_priceInUsd",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_lastUpdatedAt",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nativeToken",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum DataTypes.Provider",
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "name": "priceProviders",
+      "outputs": [
+        {
+          "internalType": "contract IPriceProvider",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum DataTypes.Provider",
+          "name": "provider_",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenIn_",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenOut_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn_",
+          "type": "uint256"
+        }
+      ],
+      "name": "quote",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountOut",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_tokenInLastUpdatedAt",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_tokenOutLastUpdatedAt",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum DataTypes.Provider",
+          "name": "providerIn_",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenIn_",
+          "type": "address"
+        },
+        {
+          "internalType": "enum DataTypes.Provider",
+          "name": "providerOut_",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenOut_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn_",
+          "type": "uint256"
+        }
+      ],
+      "name": "quote",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountOut",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_tokenInLastUpdatedAt",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_nativeTokenLastUpdatedAt",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_tokenOutLastUpdatedAt",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum DataTypes.Provider",
+          "name": "provider_",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "token_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn_",
+          "type": "uint256"
+        }
+      ],
+      "name": "quoteTokenToUsd",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "amountOut_",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_lastUpdatedAt",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum DataTypes.Provider",
+          "name": "provider_",
+          "type": "uint8"
+        },
+        {
+          "internalType": "address",
+          "name": "token_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn_",
+          "type": "uint256"
+        }
+      ],
+      "name": "quoteUsdToToken",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountOut",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_lastUpdatedAt",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "enum DataTypes.Provider",
+          "name": "provider_",
+          "type": "uint8"
+        },
+        {
+          "internalType": "contract IPriceProvider",
+          "name": "priceProvider_",
+          "type": "address"
+        }
+      ],
+      "name": "setPriceProvider",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x9691d44dd5709cbf350a5f1f5859b4613f4dbab77316d2f669b564c9c59c9a41",
+  "receipt": {
+    "to": null,
+    "from": "0x76d266DFD3754f090488ae12F6Bd115cD7E77eBD",
+    "contractAddress": "0x99866a6074ADb027f09c9AF31929dB5941D36DA7",
+    "transactionIndex": 0,
+    "gasUsed": "968506",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x28acdd7a38f9fda2fc76217f52e660193e05fb26b400340236c863f65c10c55c",
+    "transactionHash": "0x9691d44dd5709cbf350a5f1f5859b4613f4dbab77316d2f669b564c9c59c9a41",
+    "logs": [],
+    "blockNumber": 74149408,
+    "cumulativeGasUsed": "968506",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x4200000000000000000000000000000000000006"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "6560b70d562cf6c2a7aadabeef5e4dc6",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.9+commit.e5eed63a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"nativeToken_\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"enum DataTypes.Provider\",\"name\":\"provider\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"contract IPriceProvider\",\"name\":\"oldPriceProvider\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"contract IPriceProvider\",\"name\":\"newPriceProvider\",\"type\":\"address\"}],\"name\":\"PriceProviderUpdated\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"addressProvider\",\"outputs\":[{\"internalType\":\"contract IAddressProvider\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum DataTypes.Provider\",\"name\":\"provider_\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"token_\",\"type\":\"address\"}],\"name\":\"getPriceInUsd\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_priceInUsd\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_lastUpdatedAt\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"nativeToken\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum DataTypes.Provider\",\"name\":\"\",\"type\":\"uint8\"}],\"name\":\"priceProviders\",\"outputs\":[{\"internalType\":\"contract IPriceProvider\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum DataTypes.Provider\",\"name\":\"provider_\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"tokenIn_\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountIn_\",\"type\":\"uint256\"}],\"name\":\"quote\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountOut\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_tokenInLastUpdatedAt\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_tokenOutLastUpdatedAt\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum DataTypes.Provider\",\"name\":\"providerIn_\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"tokenIn_\",\"type\":\"address\"},{\"internalType\":\"enum DataTypes.Provider\",\"name\":\"providerOut_\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"tokenOut_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountIn_\",\"type\":\"uint256\"}],\"name\":\"quote\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountOut\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_tokenInLastUpdatedAt\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_nativeTokenLastUpdatedAt\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_tokenOutLastUpdatedAt\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum DataTypes.Provider\",\"name\":\"provider_\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"token_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountIn_\",\"type\":\"uint256\"}],\"name\":\"quoteTokenToUsd\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"amountOut_\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_lastUpdatedAt\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum DataTypes.Provider\",\"name\":\"provider_\",\"type\":\"uint8\"},{\"internalType\":\"address\",\"name\":\"token_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountIn_\",\"type\":\"uint256\"}],\"name\":\"quoteUsdToToken\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountOut\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_lastUpdatedAt\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enum DataTypes.Provider\",\"name\":\"provider_\",\"type\":\"uint8\"},{\"internalType\":\"contract IPriceProvider\",\"name\":\"priceProvider_\",\"type\":\"address\"}],\"name\":\"setPriceProvider\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getPriceInUsd(uint8,address)\":{\"params\":{\"provider_\":\"The price provider to get quote from\",\"token_\":\"The address of asset\"},\"returns\":{\"_lastUpdatedAt\":\"Last updated timestamp\",\"_priceInUsd\":\"The USD price\"}},\"quote(uint8,address,address,uint256)\":{\"params\":{\"amountIn_\":\"Amount of input token\",\"provider_\":\"The price provider to get quote from\",\"tokenIn_\":\"The address of assetIn\",\"tokenOut_\":\"The address of assetOut\"},\"returns\":{\"_amountOut\":\"Amount out\",\"_tokenInLastUpdatedAt\":\"Last updated timestamp of `tokenIn_`\",\"_tokenOutLastUpdatedAt\":\"Last updated timestamp of `tokenOut_`\"}},\"quote(uint8,address,uint8,address,uint256)\":{\"details\":\"If providers aren't the same, uses native token as \\\"bridge\\\"\",\"params\":{\"amountIn_\":\"Amount of input token\",\"providerIn_\":\"The price provider to get quote for the tokenIn\",\"providerOut_\":\"The price provider to get quote for the tokenOut\",\"tokenIn_\":\"The address of assetIn\",\"tokenOut_\":\"The address of assetOut\"},\"returns\":{\"_amountOut\":\"Amount out\",\"_nativeTokenLastUpdatedAt\":\"Last updated timestamp of native token (i.e. WETH) used when providers aren't the same\",\"_tokenInLastUpdatedAt\":\"Last updated timestamp of `tokenIn_`\",\"_tokenOutLastUpdatedAt\":\"Last updated timestamp of `tokenOut_`\"}},\"quoteTokenToUsd(uint8,address,uint256)\":{\"params\":{\"amountIn_\":\"Amount of input token.\",\"provider_\":\"The price provider to get quote from\",\"token_\":\"The address of assetIn\"},\"returns\":{\"_lastUpdatedAt\":\"Last updated timestamp\",\"amountOut_\":\"Amount in USD\"}},\"quoteUsdToToken(uint8,address,uint256)\":{\"params\":{\"amountIn_\":\"Input amount in USD\",\"provider_\":\"The price provider to get quote from\",\"token_\":\"The address of assetOut\"},\"returns\":{\"_amountOut\":\"Output amount of token\",\"_lastUpdatedAt\":\"Last updated timestamp\"}},\"setPriceProvider(uint8,address)\":{\"details\":\"Administrative function\",\"params\":{\"priceProvider_\":\"The price provider contract\",\"provider_\":\"The provider (from enum)\"}}},\"stateVariables\":{\"nativeToken\":{\"details\":\"Is used when getting quote from two price providers\"}},\"title\":\"Price Providers Aggregator\",\"version\":1},\"userdoc\":{\"events\":{\"PriceProviderUpdated(uint8,address,address)\":{\"notice\":\"Emitted when an price provider is updated\"}},\"kind\":\"user\",\"methods\":{\"getPriceInUsd(uint8,address)\":{\"notice\":\"Get USD (or equivalent) price of an asset\"},\"nativeToken()\":{\"notice\":\"The native token (usually the most liquid asset in the chain)\"},\"priceProviders(uint8)\":{\"notice\":\"Price providers map\"},\"quote(uint8,address,address,uint256)\":{\"notice\":\"Get quote\"},\"quote(uint8,address,uint8,address,uint256)\":{\"notice\":\"Get quote\"},\"quoteTokenToUsd(uint8,address,uint256)\":{\"notice\":\"Get quote in USD (or equivalent) amount\"},\"quoteUsdToToken(uint8,address,uint256)\":{\"notice\":\"Get quote from USD (or equivalent) amount to amount of token\"},\"setPriceProvider(uint8,address)\":{\"notice\":\"Set a price provider\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/core/PriceProvidersAggregator.sol\":\"PriceProvidersAggregator\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":5000},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/utils/math/Math.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.5.0) (utils/math/Math.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Standard math utilities missing in the Solidity language.\\n */\\nlibrary Math {\\n    /**\\n     * @dev Returns the largest of two numbers.\\n     */\\n    function max(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a >= b ? a : b;\\n    }\\n\\n    /**\\n     * @dev Returns the smallest of two numbers.\\n     */\\n    function min(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a < b ? a : b;\\n    }\\n\\n    /**\\n     * @dev Returns the average of two numbers. The result is rounded towards\\n     * zero.\\n     */\\n    function average(uint256 a, uint256 b) internal pure returns (uint256) {\\n        // (a + b) / 2 can overflow.\\n        return (a & b) + (a ^ b) / 2;\\n    }\\n\\n    /**\\n     * @dev Returns the ceiling of the division of two numbers.\\n     *\\n     * This differs from standard division with `/` in that it rounds up instead\\n     * of rounding down.\\n     */\\n    function ceilDiv(uint256 a, uint256 b) internal pure returns (uint256) {\\n        // (a + b - 1) / b can overflow on addition, so we distribute.\\n        return a / b + (a % b == 0 ? 0 : 1);\\n    }\\n}\\n\",\"keccak256\":\"0xc995bddbca1ae19788db9f8b61e63385edd3fddf89693b612d5abd1a275974d2\",\"license\":\"MIT\"},\"contracts/access/Governable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"../interfaces/core/IAddressProvider.sol\\\";\\n\\n/**\\n * @notice Contract module which provides access control mechanism, where\\n * the governor account is granted with exclusive access to specific functions.\\n * @dev Uses the AddressProvider to get the governor\\n */\\nabstract contract Governable {\\n    IAddressProvider public constant addressProvider = IAddressProvider(0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A);\\n\\n    /// @dev Throws if called by any account other than the governor.\\n    modifier onlyGovernor() {\\n        require(msg.sender == addressProvider.governor(), \\\"not-governor\\\");\\n        _;\\n    }\\n}\\n\",\"keccak256\":\"0x9fcc955db07cc6517e7456517eae374a3910d557b7d16f9372154188290d3da0\",\"license\":\"MIT\"},\"contracts/core/PriceProvidersAggregator.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"@openzeppelin/contracts/utils/math/Math.sol\\\";\\nimport \\\"../interfaces/core/IPriceProvidersAggregator.sol\\\";\\nimport \\\"../access/Governable.sol\\\";\\n\\n/**\\n * @title Price Providers Aggregator\\n */\\ncontract PriceProvidersAggregator is IPriceProvidersAggregator, Governable {\\n    /**\\n     * The native token (usually the most liquid asset in the chain)\\n     * @dev Is used when getting quote from two price providers\\n     */\\n    address public immutable nativeToken;\\n\\n    /**\\n     * @notice Price providers map\\n     */\\n    mapping(DataTypes.Provider => IPriceProvider) public override priceProviders;\\n\\n    /// Emitted when an price provider is updated\\n    event PriceProviderUpdated(\\n        DataTypes.Provider provider,\\n        IPriceProvider oldPriceProvider,\\n        IPriceProvider newPriceProvider\\n    );\\n\\n    constructor(address nativeToken_) {\\n        require(nativeToken_ != address(0), \\\"native-token-is-null\\\");\\n        nativeToken = nativeToken_;\\n    }\\n\\n    /// @inheritdoc IPriceProvidersAggregator\\n    function getPriceInUsd(DataTypes.Provider provider_, address token_)\\n        external\\n        view\\n        override\\n        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)\\n    {\\n        IPriceProvider _provider = priceProviders[provider_];\\n        require(address(_provider) != address(0), \\\"provider-not-set\\\");\\n        return _provider.getPriceInUsd(token_);\\n    }\\n\\n    /// @inheritdoc IPriceProvidersAggregator\\n    function quote(\\n        DataTypes.Provider provider_,\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    )\\n        external\\n        view\\n        override\\n        returns (\\n            uint256 _amountOut,\\n            uint256 _tokenInLastUpdatedAt,\\n            uint256 _tokenOutLastUpdatedAt\\n        )\\n    {\\n        IPriceProvider _provider = priceProviders[provider_];\\n        require(address(_provider) != address(0), \\\"provider-not-set\\\");\\n        return _provider.quote(tokenIn_, tokenOut_, amountIn_);\\n    }\\n\\n    /// @inheritdoc IPriceProvidersAggregator\\n    function quote(\\n        DataTypes.Provider providerIn_,\\n        address tokenIn_,\\n        DataTypes.Provider providerOut_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    )\\n        public\\n        view\\n        override\\n        returns (\\n            uint256 _amountOut,\\n            uint256 _tokenInLastUpdatedAt,\\n            uint256 _nativeTokenLastUpdatedAt,\\n            uint256 _tokenOutLastUpdatedAt\\n        )\\n    {\\n        IPriceProvider _providerIn = priceProviders[providerIn_];\\n        require(address(_providerIn) != address(0), \\\"provider-in-not-set\\\");\\n\\n        if (providerIn_ == providerOut_) {\\n            (_amountOut, _tokenInLastUpdatedAt, _tokenOutLastUpdatedAt) = _providerIn.quote(\\n                tokenIn_,\\n                tokenOut_,\\n                amountIn_\\n            );\\n            _nativeTokenLastUpdatedAt = block.timestamp;\\n            return (_amountOut, _tokenInLastUpdatedAt, _nativeTokenLastUpdatedAt, _tokenOutLastUpdatedAt);\\n        }\\n\\n        IPriceProvider _providerOut = priceProviders[providerOut_];\\n        require(address(_providerOut) != address(0), \\\"provider-out-not-set\\\");\\n\\n        uint256 _nativeTokenLastUpdatedAt0;\\n        uint256 _nativeTokenLastUpdatedAt1;\\n        (_amountOut, _tokenInLastUpdatedAt, _nativeTokenLastUpdatedAt0) = _providerIn.quote(\\n            tokenIn_,\\n            nativeToken,\\n            amountIn_\\n        );\\n        (_amountOut, _nativeTokenLastUpdatedAt1, _tokenOutLastUpdatedAt) = _providerOut.quote(\\n            nativeToken,\\n            tokenOut_,\\n            _amountOut\\n        );\\n        _nativeTokenLastUpdatedAt = Math.min(_nativeTokenLastUpdatedAt0, _nativeTokenLastUpdatedAt1);\\n    }\\n\\n    /// @inheritdoc IPriceProvidersAggregator\\n    function quoteTokenToUsd(\\n        DataTypes.Provider provider_,\\n        address token_,\\n        uint256 amountIn_\\n    ) external view override returns (uint256 amountOut_, uint256 _lastUpdatedAt) {\\n        IPriceProvider _provider = priceProviders[provider_];\\n        require(address(_provider) != address(0), \\\"provider-not-set\\\");\\n        return _provider.quoteTokenToUsd(token_, amountIn_);\\n    }\\n\\n    /// @inheritdoc IPriceProvidersAggregator\\n    function quoteUsdToToken(\\n        DataTypes.Provider provider_,\\n        address token_,\\n        uint256 amountIn_\\n    ) external view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {\\n        IPriceProvider _provider = priceProviders[provider_];\\n        require(address(_provider) != address(0), \\\"provider-not-set\\\");\\n        return _provider.quoteUsdToToken(token_, amountIn_);\\n    }\\n\\n    /// @inheritdoc IPriceProvidersAggregator\\n    function setPriceProvider(DataTypes.Provider provider_, IPriceProvider priceProvider_)\\n        external\\n        override\\n        onlyGovernor\\n    {\\n        require(provider_ != DataTypes.Provider.NONE, \\\"invalid-provider\\\");\\n        IPriceProvider _current = priceProviders[provider_];\\n        require(priceProvider_ != _current, \\\"same-as-current\\\");\\n\\n        emit PriceProviderUpdated(provider_, _current, priceProvider_);\\n\\n        priceProviders[provider_] = priceProvider_;\\n    }\\n}\\n\",\"keccak256\":\"0xdf871ad29de7647c99ec0772c6ffac36cc39d902bd8c116951642bedf5ecfd75\",\"license\":\"MIT\"},\"contracts/interfaces/core/IAddressProvider.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"./IStableCoinProvider.sol\\\";\\nimport \\\"./IPriceProvidersAggregator.sol\\\";\\n\\ninterface IAddressProvider {\\n    function governor() external view returns (address);\\n\\n    function providersAggregator() external view returns (IPriceProvidersAggregator);\\n\\n    function stableCoinProvider() external view returns (IStableCoinProvider);\\n\\n    function updateProvidersAggregator(IPriceProvidersAggregator providersAggregator_) external;\\n}\\n\",\"keccak256\":\"0x133c36faf973cdef1639bdbc837c21368240146875b5aa28e533bb1769b84329\",\"license\":\"MIT\"},\"contracts/interfaces/core/IPriceProvider.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface IPriceProvider {\\n    /**\\n     * @notice Get USD (or equivalent) price of an asset\\n     * @param token_ The address of asset\\n     * @return _priceInUsd The USD price\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function getPriceInUsd(address token_) external view returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);\\n\\n    /**\\n     * @notice Get quote\\n     * @param tokenIn_ The address of assetIn\\n     * @param tokenOut_ The address of assetOut\\n     * @param amountIn_ Amount of input token\\n     * @return _amountOut Amount out\\n     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`\\n     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`\\n     */\\n    function quote(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    )\\n        external\\n        view\\n        returns (\\n            uint256 _amountOut,\\n            uint256 _tokenInLastUpdatedAt,\\n            uint256 _tokenOutLastUpdatedAt\\n        );\\n\\n    /**\\n     * @notice Get quote in USD (or equivalent) amount\\n     * @param token_ The address of assetIn\\n     * @param amountIn_ Amount of input token.\\n     * @return amountOut_ Amount in USD\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function quoteTokenToUsd(address token_, uint256 amountIn_)\\n        external\\n        view\\n        returns (uint256 amountOut_, uint256 _lastUpdatedAt);\\n\\n    /**\\n     * @notice Get quote from USD (or equivalent) amount to amount of token\\n     * @param token_ The address of assetOut\\n     * @param amountIn_ Input amount in USD\\n     * @return _amountOut Output amount of token\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function quoteUsdToToken(address token_, uint256 amountIn_)\\n        external\\n        view\\n        returns (uint256 _amountOut, uint256 _lastUpdatedAt);\\n}\\n\",\"keccak256\":\"0x188c27728bd50b187944ef217b58751efd7b8ec3f1ef0d923be82298b2b0af0e\",\"license\":\"MIT\"},\"contracts/interfaces/core/IPriceProvidersAggregator.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"../../libraries/DataTypes.sol\\\";\\nimport \\\"./IPriceProvider.sol\\\";\\n\\n/**\\n * @notice PriceProvidersAggregator interface\\n * @dev Worth noting that the `_lastUpdatedAt` logic depends on the underlying price provider. In summary:\\n * ChainLink: returns the last updated date from the aggregator\\n * UniswapV2: returns the date of the latest pair oracle update\\n * UniswapV3: assumes that the price is always updated (returns block.timestamp)\\n * Flux: returns the last updated date from the aggregator\\n * Umbrella (FCD): returns the last updated date returned from their oracle contract\\n * Umbrella (Passport): returns the date of the latest pallet submission\\n * Anytime that a quote performs more than one query, it uses the oldest date as the `_lastUpdatedAt`.\\n * See more: https://github.com/bloqpriv/one-oracle/issues/64\\n */\\ninterface IPriceProvidersAggregator {\\n    /**\\n     * @notice Get USD (or equivalent) price of an asset\\n     * @param provider_ The price provider to get quote from\\n     * @param token_ The address of asset\\n     * @return _priceInUsd The USD price\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function getPriceInUsd(DataTypes.Provider provider_, address token_)\\n        external\\n        view\\n        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);\\n\\n    /**\\n     * @notice Provider Providers' mapping\\n     */\\n    function priceProviders(DataTypes.Provider provider_) external view returns (IPriceProvider _priceProvider);\\n\\n    /**\\n     * @notice Get quote\\n     * @param provider_ The price provider to get quote from\\n     * @param tokenIn_ The address of assetIn\\n     * @param tokenOut_ The address of assetOut\\n     * @param amountIn_ Amount of input token\\n     * @return _amountOut Amount out\\n     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`\\n     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`\\n     */\\n    function quote(\\n        DataTypes.Provider provider_,\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    )\\n        external\\n        view\\n        returns (\\n            uint256 _amountOut,\\n            uint256 _tokenInLastUpdatedAt,\\n            uint256 _tokenOutLastUpdatedAt\\n        );\\n\\n    /**\\n     * @notice Get quote\\n     * @dev If providers aren't the same, uses native token as \\\"bridge\\\"\\n     * @param providerIn_ The price provider to get quote for the tokenIn\\n     * @param tokenIn_ The address of assetIn\\n     * @param providerOut_ The price provider to get quote for the tokenOut\\n     * @param tokenOut_ The address of assetOut\\n     * @param amountIn_ Amount of input token\\n     * @return _amountOut Amount out\\n     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`\\n     * @return _nativeTokenLastUpdatedAt Last updated timestamp of native token (i.e. WETH) used when providers aren't the same\\n     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`\\n     */\\n    function quote(\\n        DataTypes.Provider providerIn_,\\n        address tokenIn_,\\n        DataTypes.Provider providerOut_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    )\\n        external\\n        view\\n        returns (\\n            uint256 _amountOut,\\n            uint256 _tokenInLastUpdatedAt,\\n            uint256 _nativeTokenLastUpdatedAt,\\n            uint256 _tokenOutLastUpdatedAt\\n        );\\n\\n    /**\\n     * @notice Get quote in USD (or equivalent) amount\\n     * @param provider_ The price provider to get quote from\\n     * @param token_ The address of assetIn\\n     * @param amountIn_ Amount of input token.\\n     * @return amountOut_ Amount in USD\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function quoteTokenToUsd(\\n        DataTypes.Provider provider_,\\n        address token_,\\n        uint256 amountIn_\\n    ) external view returns (uint256 amountOut_, uint256 _lastUpdatedAt);\\n\\n    /**\\n     * @notice Get quote from USD (or equivalent) amount to amount of token\\n     * @param provider_ The price provider to get quote from\\n     * @param token_ The address of assetOut\\n     * @param amountIn_ Input amount in USD\\n     * @return _amountOut Output amount of token\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function quoteUsdToToken(\\n        DataTypes.Provider provider_,\\n        address token_,\\n        uint256 amountIn_\\n    ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);\\n\\n    /**\\n     * @notice Set a price provider\\n     * @dev Administrative function\\n     * @param provider_ The provider (from enum)\\n     * @param priceProvider_ The price provider contract\\n     */\\n    function setPriceProvider(DataTypes.Provider provider_, IPriceProvider priceProvider_) external;\\n}\\n\",\"keccak256\":\"0xbd791bd564866a61c6aac64171095a9134dfe9c5173a0ddbe22312a9bdfc9c19\",\"license\":\"MIT\"},\"contracts/interfaces/core/IStableCoinProvider.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface IStableCoinProvider {\\n    /**\\n     * @notice Return the stable coin if pegged\\n     * @dev Check price relation between both stable coins and revert if peg is too loose\\n     * @return _stableCoin The primary stable coin if pass all checks\\n     */\\n    function getStableCoinIfPegged() external view returns (address _stableCoin);\\n\\n    /**\\n     * @notice Convert given amount of stable coin to USD representation (18 decimals)\\n     */\\n    function toUsdRepresentation(uint256 stableCoinAmount_) external view returns (uint256 _usdAmount);\\n}\\n\",\"keccak256\":\"0x57121c0faef63ea2d06b05048054ffa78d4d3c5734c2dabc1aaa4c5032e194c5\",\"license\":\"MIT\"},\"contracts/libraries/DataTypes.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nlibrary DataTypes {\\n    /**\\n     * @notice Price providers enumeration\\n     */\\n    enum Provider {\\n        NONE,\\n        CHAINLINK,\\n        UNISWAP_V3,\\n        UNISWAP_V2,\\n        SUSHISWAP,\\n        TRADERJOE,\\n        PANGOLIN,\\n        QUICKSWAP,\\n        UMBRELLA_FIRST_CLASS,\\n        UMBRELLA_PASSPORT,\\n        FLUX\\n    }\\n\\n    enum ExchangeType {\\n        UNISWAP_V2,\\n        SUSHISWAP,\\n        TRADERJOE,\\n        PANGOLIN,\\n        QUICKSWAP,\\n        UNISWAP_V3,\\n        PANCAKE_SWAP,\\n        CURVE\\n    }\\n\\n    enum SwapType {\\n        EXACT_INPUT,\\n        EXACT_OUTPUT\\n    }\\n}\\n\",\"keccak256\":\"0x95f2896f7ec6df99ed860b7682fd2801477b4517a27dd3f7bb111c879f43f847\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x60a060405234801561001057600080fd5b5060405161118c38038061118c83398101604081905261002f9161009a565b6001600160a01b0381166100895760405162461bcd60e51b815260206004820152601460248201527f6e61746976652d746f6b656e2d69732d6e756c6c000000000000000000000000604482015260640160405180910390fd5b6001600160a01b03166080526100ca565b6000602082840312156100ac57600080fd5b81516001600160a01b03811681146100c357600080fd5b9392505050565b6080516110996100f3600039600081816101ec015281816109fd0152610ac801526110996000f3fe608060405234801561001057600080fd5b50600436106100a35760003560e01c8063769e8e3f11610076578063828509481161005b578063828509481461019e578063c6222eba146101b1578063e1758bd8146101e757600080fd5b8063769e8e3f14610158578063777f1be91461018b57600080fd5b8063037c696a146100a85780630fd01228146100db5780632954018c146100f05780632b041e3a14610130575b600080fd5b6100bb6100b6366004610e1f565b61020e565b604080519384526020840192909252908201526060015b60405180910390f35b6100ee6100e9366004610e6e565b610374565b005b61010b73fba0816a81bcabbf3829bed28618177a2bf0e82a81565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020016100d2565b61014361013e366004610ea5565b610639565b604080519283526020830191909152016100d2565b61016b610166366004610ee4565b61078d565b6040805194855260208501939093529183015260608201526080016100d2565b610143610199366004610ea5565b610b87565b6101436101ac366004610e6e565b610c83565b61010b6101bf366004610f44565b60006020819052908152604090205473ffffffffffffffffffffffffffffffffffffffff1681565b61010b7f000000000000000000000000000000000000000000000000000000000000000081565b60008060008060008089600a81111561022957610229610f5f565b600a81111561023a5761023a610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff169050806102b55760405162461bcd60e51b815260206004820152601060248201527f70726f76696465722d6e6f742d7365740000000000000000000000000000000060448201526064015b60405180910390fd5b6040517fb646638400000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff888116600483015287811660248301526044820187905282169063b64663849060640160606040518083038186803b15801561032b57600080fd5b505afa15801561033f573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906103639190610f8e565b935093509350509450945094915050565b73fba0816a81bcabbf3829bed28618177a2bf0e82a73ffffffffffffffffffffffffffffffffffffffff16630c340a246040518163ffffffff1660e01b815260040160206040518083038186803b1580156103ce57600080fd5b505afa1580156103e2573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906104069190610fbc565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16146104805760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016102ac565b600082600a81111561049457610494610f5f565b14156104e25760405162461bcd60e51b815260206004820152601060248201527f696e76616c69642d70726f76696465720000000000000000000000000000000060448201526064016102ac565b600080600084600a8111156104f9576104f9610f5f565b600a81111561050a5761050a610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff908116915082168114156105865760405162461bcd60e51b815260206004820152600f60248201527f73616d652d61732d63757272656e74000000000000000000000000000000000060448201526064016102ac565b7f6d8522a73cf263ee8c1097d5bd32695416c18e9df8cfc47b646f465297177f8e8382846040516105b993929190610fd9565b60405180910390a18160008085600a8111156105d7576105d7610f5f565b600a8111156105e8576105e8610f5f565b815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505050565b600080600080600087600a81111561065357610653610f5f565b600a81111561066457610664610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff169050806106da5760405162461bcd60e51b815260206004820152601060248201527f70726f76696465722d6e6f742d7365740000000000000000000000000000000060448201526064016102ac565b6040517f8d0dba0000000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff868116600483015260248201869052821690638d0dba00906044015b604080518083038186803b15801561074857600080fd5b505afa15801561075c573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610780919061103f565b9250925050935093915050565b60008060008060008060008b600a8111156107aa576107aa610f5f565b600a8111156107bb576107bb610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff169050806108315760405162461bcd60e51b815260206004820152601360248201527f70726f76696465722d696e2d6e6f742d7365740000000000000000000000000060448201526064016102ac565b87600a81111561084357610843610f5f565b8a600a81111561085557610855610f5f565b141561091a576040517fb646638400000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff8a8116600483015288811660248301526044820188905282169063b64663849060640160606040518083038186803b1580156108d157600080fd5b505afa1580156108e5573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906109099190610f8e565b91965094504293509150610b7b9050565b60008060008a600a81111561093157610931610f5f565b600a81111561094257610942610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff169050806109b85760405162461bcd60e51b815260206004820152601460248201527f70726f76696465722d6f75742d6e6f742d73657400000000000000000000000060448201526064016102ac565b6040517fb646638400000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff8b811660048301527f00000000000000000000000000000000000000000000000000000000000000008116602483015260448201899052600091829185169063b64663849060640160606040518083038186803b158015610a5357600080fd5b505afa158015610a67573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610a8b9190610f8e565b6040517fb646638400000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000000000000000000000000000000000000000000000811660048301528e8116602483015260448201859052939b5091995093509084169063b64663849060640160606040518083038186803b158015610b2a57600080fd5b505afa158015610b3e573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610b629190610f8e565b9199509095509050610b748282610dce565b9550505050505b95509550955095915050565b600080600080600087600a811115610ba157610ba1610f5f565b600a811115610bb257610bb2610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff16905080610c285760405162461bcd60e51b815260206004820152601060248201527f70726f76696465722d6e6f742d7365740000000000000000000000000000000060448201526064016102ac565b6040517fb5e9bef500000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff86811660048301526024820186905282169063b5e9bef590604401610731565b600080600080600086600a811115610c9d57610c9d610f5f565b600a811115610cae57610cae610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff16905080610d245760405162461bcd60e51b815260206004820152601060248201527f70726f76696465722d6e6f742d7365740000000000000000000000000000000060448201526064016102ac565b6040517f07ee40bf00000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff85811660048301528216906307ee40bf90602401604080518083038186803b158015610d8a57600080fd5b505afa158015610d9e573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610dc2919061103f565b92509250509250929050565b6000818310610ddd5781610ddf565b825b9392505050565b8035600b8110610df557600080fd5b919050565b73ffffffffffffffffffffffffffffffffffffffff81168114610e1c57600080fd5b50565b60008060008060808587031215610e3557600080fd5b610e3e85610de6565b93506020850135610e4e81610dfa565b92506040850135610e5e81610dfa565b9396929550929360600135925050565b60008060408385031215610e8157600080fd5b610e8a83610de6565b91506020830135610e9a81610dfa565b809150509250929050565b600080600060608486031215610eba57600080fd5b610ec384610de6565b92506020840135610ed381610dfa565b929592945050506040919091013590565b600080600080600060a08688031215610efc57600080fd5b610f0586610de6565b94506020860135610f1581610dfa565b9350610f2360408701610de6565b92506060860135610f3381610dfa565b949793965091946080013592915050565b600060208284031215610f5657600080fd5b610ddf82610de6565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052602160045260246000fd5b600080600060608486031215610fa357600080fd5b8351925060208401519150604084015190509250925092565b600060208284031215610fce57600080fd5b8151610ddf81610dfa565b60608101600b8510611014577f4e487b7100000000000000000000000000000000000000000000000000000000600052602160045260246000fd5b93815273ffffffffffffffffffffffffffffffffffffffff9283166020820152911660409091015290565b6000806040838503121561105257600080fd5b50508051602090910151909290915056fea264697066735822122010c92c15102f4ad88aa7953dfffc320aa61c7bd9bc22ccab0c1a4c58f92ed29e64736f6c63430008090033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100a35760003560e01c8063769e8e3f11610076578063828509481161005b578063828509481461019e578063c6222eba146101b1578063e1758bd8146101e757600080fd5b8063769e8e3f14610158578063777f1be91461018b57600080fd5b8063037c696a146100a85780630fd01228146100db5780632954018c146100f05780632b041e3a14610130575b600080fd5b6100bb6100b6366004610e1f565b61020e565b604080519384526020840192909252908201526060015b60405180910390f35b6100ee6100e9366004610e6e565b610374565b005b61010b73fba0816a81bcabbf3829bed28618177a2bf0e82a81565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020016100d2565b61014361013e366004610ea5565b610639565b604080519283526020830191909152016100d2565b61016b610166366004610ee4565b61078d565b6040805194855260208501939093529183015260608201526080016100d2565b610143610199366004610ea5565b610b87565b6101436101ac366004610e6e565b610c83565b61010b6101bf366004610f44565b60006020819052908152604090205473ffffffffffffffffffffffffffffffffffffffff1681565b61010b7f000000000000000000000000000000000000000000000000000000000000000081565b60008060008060008089600a81111561022957610229610f5f565b600a81111561023a5761023a610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff169050806102b55760405162461bcd60e51b815260206004820152601060248201527f70726f76696465722d6e6f742d7365740000000000000000000000000000000060448201526064015b60405180910390fd5b6040517fb646638400000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff888116600483015287811660248301526044820187905282169063b64663849060640160606040518083038186803b15801561032b57600080fd5b505afa15801561033f573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906103639190610f8e565b935093509350509450945094915050565b73fba0816a81bcabbf3829bed28618177a2bf0e82a73ffffffffffffffffffffffffffffffffffffffff16630c340a246040518163ffffffff1660e01b815260040160206040518083038186803b1580156103ce57600080fd5b505afa1580156103e2573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906104069190610fbc565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff16146104805760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f72000000000000000000000000000000000000000060448201526064016102ac565b600082600a81111561049457610494610f5f565b14156104e25760405162461bcd60e51b815260206004820152601060248201527f696e76616c69642d70726f76696465720000000000000000000000000000000060448201526064016102ac565b600080600084600a8111156104f9576104f9610f5f565b600a81111561050a5761050a610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff908116915082168114156105865760405162461bcd60e51b815260206004820152600f60248201527f73616d652d61732d63757272656e74000000000000000000000000000000000060448201526064016102ac565b7f6d8522a73cf263ee8c1097d5bd32695416c18e9df8cfc47b646f465297177f8e8382846040516105b993929190610fd9565b60405180910390a18160008085600a8111156105d7576105d7610f5f565b600a8111156105e8576105e8610f5f565b815260200190815260200160002060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505050565b600080600080600087600a81111561065357610653610f5f565b600a81111561066457610664610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff169050806106da5760405162461bcd60e51b815260206004820152601060248201527f70726f76696465722d6e6f742d7365740000000000000000000000000000000060448201526064016102ac565b6040517f8d0dba0000000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff868116600483015260248201869052821690638d0dba00906044015b604080518083038186803b15801561074857600080fd5b505afa15801561075c573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610780919061103f565b9250925050935093915050565b60008060008060008060008b600a8111156107aa576107aa610f5f565b600a8111156107bb576107bb610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff169050806108315760405162461bcd60e51b815260206004820152601360248201527f70726f76696465722d696e2d6e6f742d7365740000000000000000000000000060448201526064016102ac565b87600a81111561084357610843610f5f565b8a600a81111561085557610855610f5f565b141561091a576040517fb646638400000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff8a8116600483015288811660248301526044820188905282169063b64663849060640160606040518083038186803b1580156108d157600080fd5b505afa1580156108e5573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906109099190610f8e565b91965094504293509150610b7b9050565b60008060008a600a81111561093157610931610f5f565b600a81111561094257610942610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff169050806109b85760405162461bcd60e51b815260206004820152601460248201527f70726f76696465722d6f75742d6e6f742d73657400000000000000000000000060448201526064016102ac565b6040517fb646638400000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff8b811660048301527f00000000000000000000000000000000000000000000000000000000000000008116602483015260448201899052600091829185169063b64663849060640160606040518083038186803b158015610a5357600080fd5b505afa158015610a67573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610a8b9190610f8e565b6040517fb646638400000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000000000000000000000000000000000000000000000811660048301528e8116602483015260448201859052939b5091995093509084169063b64663849060640160606040518083038186803b158015610b2a57600080fd5b505afa158015610b3e573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610b629190610f8e565b9199509095509050610b748282610dce565b9550505050505b95509550955095915050565b600080600080600087600a811115610ba157610ba1610f5f565b600a811115610bb257610bb2610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff16905080610c285760405162461bcd60e51b815260206004820152601060248201527f70726f76696465722d6e6f742d7365740000000000000000000000000000000060448201526064016102ac565b6040517fb5e9bef500000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff86811660048301526024820186905282169063b5e9bef590604401610731565b600080600080600086600a811115610c9d57610c9d610f5f565b600a811115610cae57610cae610f5f565b815260208101919091526040016000205473ffffffffffffffffffffffffffffffffffffffff16905080610d245760405162461bcd60e51b815260206004820152601060248201527f70726f76696465722d6e6f742d7365740000000000000000000000000000000060448201526064016102ac565b6040517f07ee40bf00000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff85811660048301528216906307ee40bf90602401604080518083038186803b158015610d8a57600080fd5b505afa158015610d9e573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610dc2919061103f565b92509250509250929050565b6000818310610ddd5781610ddf565b825b9392505050565b8035600b8110610df557600080fd5b919050565b73ffffffffffffffffffffffffffffffffffffffff81168114610e1c57600080fd5b50565b60008060008060808587031215610e3557600080fd5b610e3e85610de6565b93506020850135610e4e81610dfa565b92506040850135610e5e81610dfa565b9396929550929360600135925050565b60008060408385031215610e8157600080fd5b610e8a83610de6565b91506020830135610e9a81610dfa565b809150509250929050565b600080600060608486031215610eba57600080fd5b610ec384610de6565b92506020840135610ed381610dfa565b929592945050506040919091013590565b600080600080600060a08688031215610efc57600080fd5b610f0586610de6565b94506020860135610f1581610dfa565b9350610f2360408701610de6565b92506060860135610f3381610dfa565b949793965091946080013592915050565b600060208284031215610f5657600080fd5b610ddf82610de6565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052602160045260246000fd5b600080600060608486031215610fa357600080fd5b8351925060208401519150604084015190509250925092565b600060208284031215610fce57600080fd5b8151610ddf81610dfa565b60608101600b8510611014577f4e487b7100000000000000000000000000000000000000000000000000000000600052602160045260246000fd5b93815273ffffffffffffffffffffffffffffffffffffffff9283166020820152911660409091015290565b6000806040838503121561105257600080fd5b50508051602090910151909290915056fea264697066735822122010c92c15102f4ad88aa7953dfffc320aa61c7bd9bc22ccab0c1a4c58f92ed29e64736f6c63430008090033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "getPriceInUsd(uint8,address)": {
+        "params": {
+          "provider_": "The price provider to get quote from",
+          "token_": "The address of asset"
+        },
+        "returns": {
+          "_lastUpdatedAt": "Last updated timestamp",
+          "_priceInUsd": "The USD price"
+        }
+      },
+      "quote(uint8,address,address,uint256)": {
+        "params": {
+          "amountIn_": "Amount of input token",
+          "provider_": "The price provider to get quote from",
+          "tokenIn_": "The address of assetIn",
+          "tokenOut_": "The address of assetOut"
+        },
+        "returns": {
+          "_amountOut": "Amount out",
+          "_tokenInLastUpdatedAt": "Last updated timestamp of `tokenIn_`",
+          "_tokenOutLastUpdatedAt": "Last updated timestamp of `tokenOut_`"
+        }
+      },
+      "quote(uint8,address,uint8,address,uint256)": {
+        "details": "If providers aren't the same, uses native token as \"bridge\"",
+        "params": {
+          "amountIn_": "Amount of input token",
+          "providerIn_": "The price provider to get quote for the tokenIn",
+          "providerOut_": "The price provider to get quote for the tokenOut",
+          "tokenIn_": "The address of assetIn",
+          "tokenOut_": "The address of assetOut"
+        },
+        "returns": {
+          "_amountOut": "Amount out",
+          "_nativeTokenLastUpdatedAt": "Last updated timestamp of native token (i.e. WETH) used when providers aren't the same",
+          "_tokenInLastUpdatedAt": "Last updated timestamp of `tokenIn_`",
+          "_tokenOutLastUpdatedAt": "Last updated timestamp of `tokenOut_`"
+        }
+      },
+      "quoteTokenToUsd(uint8,address,uint256)": {
+        "params": {
+          "amountIn_": "Amount of input token.",
+          "provider_": "The price provider to get quote from",
+          "token_": "The address of assetIn"
+        },
+        "returns": {
+          "_lastUpdatedAt": "Last updated timestamp",
+          "amountOut_": "Amount in USD"
+        }
+      },
+      "quoteUsdToToken(uint8,address,uint256)": {
+        "params": {
+          "amountIn_": "Input amount in USD",
+          "provider_": "The price provider to get quote from",
+          "token_": "The address of assetOut"
+        },
+        "returns": {
+          "_amountOut": "Output amount of token",
+          "_lastUpdatedAt": "Last updated timestamp"
+        }
+      },
+      "setPriceProvider(uint8,address)": {
+        "details": "Administrative function",
+        "params": {
+          "priceProvider_": "The price provider contract",
+          "provider_": "The provider (from enum)"
+        }
+      }
+    },
+    "stateVariables": {
+      "nativeToken": {
+        "details": "Is used when getting quote from two price providers"
+      }
+    },
+    "title": "Price Providers Aggregator",
+    "version": 1
+  },
+  "userdoc": {
+    "events": {
+      "PriceProviderUpdated(uint8,address,address)": {
+        "notice": "Emitted when an price provider is updated"
+      }
+    },
+    "kind": "user",
+    "methods": {
+      "getPriceInUsd(uint8,address)": {
+        "notice": "Get USD (or equivalent) price of an asset"
+      },
+      "nativeToken()": {
+        "notice": "The native token (usually the most liquid asset in the chain)"
+      },
+      "priceProviders(uint8)": {
+        "notice": "Price providers map"
+      },
+      "quote(uint8,address,address,uint256)": {
+        "notice": "Get quote"
+      },
+      "quote(uint8,address,uint8,address,uint256)": {
+        "notice": "Get quote"
+      },
+      "quoteTokenToUsd(uint8,address,uint256)": {
+        "notice": "Get quote in USD (or equivalent) amount"
+      },
+      "quoteUsdToToken(uint8,address,uint256)": {
+        "notice": "Get quote from USD (or equivalent) amount to amount of token"
+      },
+      "setPriceProvider(uint8,address)": {
+        "notice": "Set a price provider"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 8625,
+        "contract": "contracts/core/PriceProvidersAggregator.sol:PriceProvidersAggregator",
+        "label": "priceProviders",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_enum(Provider)14011,t_contract(IPriceProvider)12415)"
+      }
+    ],
+    "types": {
+      "t_contract(IPriceProvider)12415": {
+        "encoding": "inplace",
+        "label": "contract IPriceProvider",
+        "numberOfBytes": "20"
+      },
+      "t_enum(Provider)14011": {
+        "encoding": "inplace",
+        "label": "enum DataTypes.Provider",
+        "numberOfBytes": "1"
+      },
+      "t_mapping(t_enum(Provider)14011,t_contract(IPriceProvider)12415)": {
+        "encoding": "mapping",
+        "key": "t_enum(Provider)14011",
+        "label": "mapping(enum DataTypes.Provider => contract IPriceProvider)",
+        "numberOfBytes": "32",
+        "value": "t_contract(IPriceProvider)12415"
+      }
+    }
+  }
+}
