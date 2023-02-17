@@ -81,6 +81,8 @@
   "optimism": {
     "ChainlinkOracle": "0x42c9De8bf891F0bE9dA7dA8078c1f301553CE064",
     "ChainlinkPriceProvider": "0x873E7b4b49922d0e412fDd50A4b7889EfC73ecAA",
+    "CurveFactoryLpTokenOracle": "0x522040e6738Ac009da4FC11b2aE25aD4C4079ca9",
+    "CurveLpTokenOracle": "0xFdcb4cc4a75235f53Db7a3dF3e0e839f421c072f",
     "DefaultProxyAdmin": "0x8b08adEac560f764D2828361C5DD4Fe5BEF53dc6",
     "MasterOracle": "0x0aac835162D368F246dc71628AfcD6d2930c47d3",
     "PriceProvidersAggregator": "0x99866a6074ADb027f09c9AF31929dB5941D36DA7",

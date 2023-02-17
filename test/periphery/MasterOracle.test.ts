@@ -581,7 +581,7 @@ describe('MasterOracle', function () {
 
   describe('MasterOracle @optimism', function () {
     const {
-      DAI,      
+      DAI, Curve
     } = Address.optimism
 
     before(async function () {
@@ -604,6 +604,15 @@ describe('MasterOracle', function () {
         // when-then
         expect(masterOracle.getPriceInUsd(DAI)).to.revertedWith('invalid-token-price')
       })
-    })    
+    })  
+    describe('Curve LP Tokens', function () {
+      it('should get price for SETH ETH LP', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(Curve.SETH_ETH_LP)
+
+        // then
+        expect(price).closeTo(Quote.optimism.ETH_USD, toUSD('1'))
+      })      
+    })     
   })
 })
