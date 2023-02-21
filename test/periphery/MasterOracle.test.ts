@@ -612,7 +612,15 @@ describe('MasterOracle', function () {
 
         // then
         expect(price).closeTo(Quote.optimism.ETH_USD, toUSD('1'))
-      })      
+      })
+
+      it('should get price for SUSD LP', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(Curve.SUSD_LP)
+
+        // then
+        expect(price).closeTo(Quote.optimism.USDC_USD, toUSD('0.1'))
+      })
     })     
   })
 })

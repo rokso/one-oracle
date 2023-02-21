@@ -7,7 +7,8 @@ const {optimism: Address} = Addresses
 const setupOracles = 'setupOracles'
 
 const chainlinkAggregators = [  
-  {token: Address.Curve.SETH_ETH_LP, aggregator: Address.Chainlink.CHAINLINK_ETH_USD_AGGREGATOR},  
+  {token: Address.Curve.SETH_ETH_LP, aggregator: Address.Chainlink.CHAINLINK_ETH_USD_AGGREGATOR},
+  {token: Address.Curve.SUSD_LP, aggregator: Address.Chainlink.CHAINLINK_USDC_USD_AGGREGATOR},
 ]
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
