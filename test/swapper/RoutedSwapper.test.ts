@@ -41,6 +41,7 @@ const {
   RETH,
   MUSD,
   CBETH,
+  EUL
 } = Address.mainnet
 const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
@@ -66,6 +67,7 @@ describe('RoutedSwapper @mainnet', function () {
   let crv: IERC20
   let reth: IERC20
   let cbeth: IERC20
+  let eul: IERC20
 
   beforeEach(async function () {
     // Essentially we are making sure we execute setup once only
@@ -119,6 +121,7 @@ describe('RoutedSwapper @mainnet', function () {
     musd = IERC20__factory.connect(MUSD, deployer)
     reth = IERC20__factory.connect(RETH, deployer)
     cbeth = IERC20__factory.connect(CBETH, deployer)
+    eul = IERC20__factory.connect(EUL, deployer)
 
     await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
@@ -131,6 +134,7 @@ describe('RoutedSwapper @mainnet', function () {
     await adjustBalance(crv.address, deployer.address, parseUnits('1,000', 18))
     await adjustBalance(musd.address, deployer.address, parseUnits('1,000', 18))
     await adjustBalance(cbeth.address, deployer.address, parseUnits('1,000', 18))
+    await adjustBalance(eul.address, deployer.address, parseUnits('1,000', 18))
 
     const uniswapV3defaultPath = ethers.utils.solidityPack(
       ['address', 'uint24', 'address'],
@@ -710,6 +714,33 @@ describe('RoutedSwapper @mainnet', function () {
       const usdcAfter = await usdc.balanceOf(deployer.address)
       expect(cbethAfter).eq(cbethBefore.sub(amountIn))
       expect(usdcAfter).eq(usdcBefore.add(amountOut))
+    })
+
+    it('should swap EUL->cbETH using UniV3', async function () {
+      const tokenIn = EUL
+      const tokenOut = CBETH
+      const uniswapV3Path = ethers.utils.solidityPack(
+        ['address', 'uint24', 'address', 'uint24', 'address'],
+        [tokenIn, 10000, WETH, 500, tokenOut]
+      )
+      await swapper.setDefaultRouting(SwapType.EXACT_INPUT, tokenIn, tokenOut, ExchangeType.UNISWAP_V3, uniswapV3Path)
+
+      // given
+      const amountIn = parseUnits('100', 18)
+      const tokenOutBefore = await cbeth.balanceOf(deployer.address)
+      const tokenInBefore = await eul.balanceOf(deployer.address)
+      // when
+      await eul.approve(swapper.address, amountIn)
+      // Check output of swap using callStatic
+      const amountOut = await swapper.callStatic.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
+      const tx = await swapper.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
+      expect((await tx.wait()).gasUsed).lt(300000)
+
+      // then
+      const tokenOutAfter = await cbeth.balanceOf(deployer.address)
+      const tokenInAfter = await eul.balanceOf(deployer.address)
+      expect(tokenOutAfter).eq(tokenOutBefore.add(amountOut))
+      expect(tokenInAfter).eq(tokenInBefore.sub(amountIn))
     })
   })
 
