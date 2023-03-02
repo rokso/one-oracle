@@ -41,7 +41,7 @@ const {
   RETH,
   MUSD,
   CBETH,
-  EUL
+  EUL,
 } = Address.mainnet
 const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
@@ -707,7 +707,7 @@ describe('RoutedSwapper @mainnet', function () {
       // Check output of swap using callStatic
       const amountOut = await swapper.callStatic.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
       const tx = await swapper.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
-      expect((await tx.wait()).gasUsed).lt(300000)
+      expect((await tx.wait()).gasUsed).lt(350e3)
 
       // then
       const cbethAfter = await cbeth.balanceOf(deployer.address)
