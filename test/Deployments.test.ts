@@ -30,6 +30,7 @@ import {IERC20} from '../typechain-types/@openzeppelin/contracts/token/ERC20'
 import {IERC20__factory} from '../typechain-types/factories/@openzeppelin/contracts/token/ERC20'
 import {adjustBalance} from './helpers/balance'
 import Quote from './helpers/quotes'
+import {smock} from '@defi-wonderland/smock'
 
 const AddressProvider = 'IAddressProvider'
 
@@ -326,21 +327,18 @@ describe('Deployments ', function () {
       hre.network.deploy = ['deploy/optimism']
 
       // eslint-disable-next-line no-shadow
-      const {PriceProvidersAggregator, ChainlinkOracle, USDPeggedTokenOracle} = await deployments.fixture()
+      const {PriceProvidersAggregator, ChainlinkOracle, USDPeggedTokenOracle, UniswapV3Exchange, RoutedSwapper} =
+        await deployments.fixture()
 
       priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
       chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
       msUsdOracle = USDPeggedTokenOracle__factory.connect(USDPeggedTokenOracle.address, deployer)
-
-      // eslint-disable-next-line no-shadow
-      const {UniswapV3Exchange, RoutedSwapper} = await deployments.fixture()
-
       uniswapV3Exchange = UniswapV3Exchange__factory.connect(UniswapV3Exchange.address, deployer)
       routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
       weth = IERC20__factory.connect(WETH, deployer)
       dai = IERC20__factory.connect(DAI, deployer)
 
-      // AddressProvider governor can update priceProvidersAggregator if not already set.  
+      // AddressProvider governor can update priceProvidersAggregator if not already set.
       const addressProvider = await ethers.getContractAt(AddressProvider, Address.ADDRESS_PROVIDER)
       if (
         (await addressProvider.governor()) === Address.DEPLOYER &&
@@ -360,7 +358,7 @@ describe('Deployments ', function () {
     it('PriceProvidersAggregator', async function () {
       const {_priceInUsd: priceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, WETH)
       expect(priceInUsd).closeTo(Quote.optimism.ETH_USD, toUSD('1'))
-      
+
       const {_priceInUsd: usdcPriceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, USDC)
       expect(usdcPriceInUsd).closeTo(Quote.optimism.USDC_USD, toUSD('0.1'))
 
@@ -380,10 +378,9 @@ describe('Deployments ', function () {
 
       const daiPriceInUsd = await chainlinkOracle.getPriceInUsd(DAI)
       expect(daiPriceInUsd).closeTo(Quote.optimism.DAI_USD, toUSD('0.1'))
-      
+
       const opPriceInUsd = await chainlinkOracle.getPriceInUsd(OP)
       expect(opPriceInUsd).closeTo(Quote.optimism.OP_USD, toUSD('0.1'))
-
     })
 
     it('USDPeggedTokenOracle', async function () {
@@ -407,6 +404,54 @@ describe('Deployments ', function () {
 
       // then
       expect(after.sub(before)).closeTo(Quote.optimism.ETH_USD, parseEther('10'))
+    })
+  })
+
+  describe('@arbitrum', function () {
+    let priceProvidersAggregator: PriceProvidersAggregator
+    let chainlinkOracle: ChainlinkOracle
+
+    const {WETH, DAI, USDC} = Address.arbitrum
+
+    beforeEach(async function () {
+      // TODO: Remove this mock after having `AddressProvider` contract deployed to the arbitrum chain
+      const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+      addressProvider.governor.returns(deployer.address)
+      // Note: Address 'Transaction reverted: function call to a non-contract account' error
+      await hre.network.provider.send('hardhat_setCode', [Address.ADDRESS_PROVIDER, '0x01'])
+
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/arbitrum']
+
+      // eslint-disable-next-line no-shadow
+      const {PriceProvidersAggregator, ChainlinkOracle} = await deployments.fixture()
+
+      priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
+      chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
+
+      addressProvider.providersAggregator.returns(priceProvidersAggregator.address)
+    })
+
+    it('PriceProvidersAggregator', async function () {
+      const {_priceInUsd: priceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, WETH)
+      expect(priceInUsd).closeTo(Quote.arbitrum.ETH_USD, toUSD('1'))
+
+      const {_priceInUsd: usdcPriceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, USDC)
+      expect(usdcPriceInUsd).closeTo(Quote.arbitrum.USDC_USD, toUSD('0.1'))
+
+      const {_priceInUsd: daiPriceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, DAI)
+      expect(daiPriceInUsd).closeTo(Quote.arbitrum.DAI_USD, toUSD('0.1'))
+    })
+
+    it('ChainlinkOracle', async function () {
+      const priceInUsd = await chainlinkOracle.getPriceInUsd(WETH)
+      expect(priceInUsd).closeTo(Quote.arbitrum.ETH_USD, toUSD('1'))
+
+      const usdcPriceInUsd = await chainlinkOracle.getPriceInUsd(USDC)
+      expect(usdcPriceInUsd).closeTo(Quote.arbitrum.USDC_USD, toUSD('0.1'))
+
+      const daiPriceInUsd = await chainlinkOracle.getPriceInUsd(DAI)
+      expect(daiPriceInUsd).closeTo(Quote.arbitrum.DAI_USD, toUSD('0.1'))
     })
   })
 })

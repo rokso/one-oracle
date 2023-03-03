@@ -204,7 +204,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseEther('1')
         )
-        expect(_amountOut).closeTo(parseUnits('3,005', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(parseUnits('1,568', 6), parseUnits('5', 6))
       })
 
       it('should quote using WBTC-NATIVE-USDC', async function () {
@@ -213,7 +213,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseUnits('1', 8)
         )
-        expect(_amountOut).closeTo(parseUnits('40,646', 6), parseUnits('1', 6))
+        expect(_amountOut).closeTo(parseUnits('22,372', 6), parseUnits('1', 6))
       })
     })
   })

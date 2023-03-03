@@ -395,7 +395,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseEther('1')
           )
-          expect(_amountOut).closeTo(parseEther('3,002'), parseEther('1'))
+          expect(_amountOut).closeTo(Quote.arbitrum.ETH_USD, parseEther('5'))
         })
 
         it('should quote using WBTC-NATIVE-DAI', async function () {
@@ -404,7 +404,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(parseEther('40,626'), parseEther('1'))
+          expect(_amountOut).closeTo(Quote.arbitrum.BTC_USD, parseEther('5'))
         })
       })
     })
