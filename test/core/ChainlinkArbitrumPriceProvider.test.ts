@@ -5,6 +5,7 @@ import {ethers} from 'hardhat'
 import {ChainlinkArbitrumPriceProvider, ChainlinkArbitrumPriceProvider__factory} from '../../typechain-types'
 import Address from '../../helpers/address'
 import {parseEther} from '../helpers'
+import Quote from '../helpers/quotes'
 
 const {DAI, WETH} = Address.arbitrum
 
@@ -29,7 +30,7 @@ describe('ChainlinkArbitrumPriceProvider @arbitrum', function () {
   describe('quote', function () {
     it('should quote WETH to DAI', async function () {
       const {_amountOut} = await priceProvider.quote(WETH, DAI, parseEther('1'))
-      expect(_amountOut).closeTo(parseEther('3,020'), parseEther('1'))
+      expect(_amountOut).closeTo(Quote.arbitrum.ETH_USD, parseEther('1'))
     })
   })
 })

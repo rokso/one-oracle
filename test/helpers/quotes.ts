@@ -7,8 +7,10 @@ import {parseEther} from '.'
  */
 const Quote = {
   arbitrum: {
-    // Since the Arbitrum Nitro launch, `hardhat` isn't supporting forking from it anymore
-    // See: https://github.com/NomicFoundation/hardhat/issues/2995
+    ETH_USD: parseEther('1,565'),
+    USDC_USD: parseEther('1'),
+    DAI_USD: parseEther('1'),
+    BTC_USD: parseEther('22,321'),
   },
   avalanche: {
     BTC_USD: parseEther('20,058'),
@@ -79,6 +81,6 @@ const Quote = {
     USDC_USD: parseEther('1'),
     DAI_USD: parseEther('1'),
     OP_USD: parseEther('2.5'),
-  }
+  },
 }
 export default Quote
