@@ -1,23 +1,23 @@
-import { HardhatRuntimeEnvironment } from 'hardhat/types'
-import { DeployFunction } from 'hardhat-deploy/types'
-import { Address } from '../../helpers'
+import {HardhatRuntimeEnvironment} from 'hardhat/types'
+import {DeployFunction} from 'hardhat-deploy/types'
+import {Addresses} from '../../helpers'
 
 const VTokenFraxLendOracle = 'VTokenFraxLendOracle'
 
 const {
-  Vesper: { vaDAI, vaETH, vaUSDC, vastETH },
+  Vesper: {vaDAI, vaETH, vaUSDC, vastETH},
   Chainlink: {
     CHAINLINK_USDC_USD_AGGREGATOR,
     CHAINLINK_DAI_USD_AGGREGATOR,
     CHAINLINK_ETH_USD_AGGREGATOR,
     CHAINLINK_STETH_USD_AGGREGATOR,
   },
-} = Address.mainnet
+} = Addresses.mainnet
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
-  const { getNamedAccounts, deployments } = hre
-  const { deploy } = deployments
-  const { deployer } = await getNamedAccounts()
+  const {getNamedAccounts, deployments} = hre
+  const {deploy} = deployments
+  const {deployer} = await getNamedAccounts()
 
   await deploy('VTokenFraxLendOracle_vaUSDC', {
     contract: VTokenFraxLendOracle,
@@ -25,7 +25,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     log: true,
     args: [CHAINLINK_USDC_USD_AGGREGATOR, vaUSDC],
   })
-  
+
   await deploy('VTokenFraxLendOracle_vaDAI', {
     contract: VTokenFraxLendOracle,
     from: deployer,

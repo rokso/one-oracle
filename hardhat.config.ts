@@ -1,6 +1,5 @@
 import {HardhatUserConfig} from 'hardhat/types'
-import '@nomiclabs/hardhat-waffle'
-import '@nomiclabs/hardhat-ethers'
+import '@nomicfoundation/hardhat-toolbox'
 import 'solidity-coverage'
 import 'hardhat-deploy'
 import 'hardhat-log-remover'
@@ -8,37 +7,38 @@ import 'hardhat-gas-reporter'
 import 'hardhat-contract-sizer'
 import '@typechain/hardhat'
 import 'hardhat-spdx-license-identifier'
-import '@nomiclabs/hardhat-etherscan'
 import dotenv from 'dotenv'
 import './tasks/create-release'
-import Address from './helpers/address'
+import './tasks/impersonate-deployer'
 
 dotenv.config()
 
-function resolveChainId() {
+function getChainConfig() {
   const {FORK_NODE_URL} = process.env
+
   if (FORK_NODE_URL!.includes('eth.connect')) {
-    return 1
+    return {chainId: 1, deploy: ['deploy/mainnet']}
   }
   if (FORK_NODE_URL!.includes('avax')) {
-    return 43114
+    return {chainId: 43114, deploy: ['deploy/avalanche']}
   }
   if (FORK_NODE_URL!.includes('polygon-mainnet')) {
-    return 137
+    return {chainId: 137, deploy: ['deploy/polygon']}
   }
   if (FORK_NODE_URL!.includes('arb-mainnet')) {
-    return 42161
+    return {chainId: 42161, deploy: ['deploy/arbitrum']}
   }
-  if (FORK_NODE_URL!.includes('bsc')) {
-    return 56
+  if (FORK_NODE_URL!.includes('bsc') || FORK_NODE_URL!.includes('binance')) {
+    return {chainId: 56, deploy: ['deploy/bsc']}
   }
   if (FORK_NODE_URL!.includes('optimism')) {
-    return 10
+    return {chainId: 10, deploy: ['deploy/optimism']}
   }
-  return 31337
+
+  return {chainId: 31337, deploy: ['deploy/mainnet']}
 }
 
-const chainId = resolveChainId()
+const {chainId, deploy} = getChainConfig()
 const accounts = process.env.MNEMONIC ? {mnemonic: process.env.MNEMONIC} : undefined
 
 const config: HardhatUserConfig = {
@@ -46,6 +46,9 @@ const config: HardhatUserConfig = {
   networks: {
     localhost: {
       saveDeployments: true,
+      autoImpersonate: true,
+      chainId,
+      deploy,
     },
     hardhat: {
       chainId,
@@ -148,7 +151,7 @@ const config: HardhatUserConfig = {
     },
   },
   namedAccounts: {
-    deployer: process.env.DEPLOYER || Address.DEPLOYER,
+    deployer: process.env.DEPLOYER || 0,
   },
   contractSizer: {
     alphaSort: true,

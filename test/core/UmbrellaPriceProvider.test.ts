@@ -3,7 +3,7 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {UmbrellaPriceProvider, UmbrellaPriceProvider__factory} from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {parseEther} from '../helpers'
 import {encodeKey} from '../helpers/umbrella'
 import {smock} from '@defi-wonderland/smock'
@@ -15,7 +15,7 @@ const {
   WBTC,
   Compound: {CDAI},
   Umbrella: {UMB_ADDRESS, UMBRELLA_REGISTRY},
-} = Address.mainnet
+} = Addresses.mainnet
 
 describe('UmbrellaPriceProvider @mainnet', function () {
   let snapshotId: string
@@ -27,7 +27,7 @@ describe('UmbrellaPriceProvider @mainnet', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     const priceProviderFactory = new UmbrellaPriceProvider__factory(deployer)

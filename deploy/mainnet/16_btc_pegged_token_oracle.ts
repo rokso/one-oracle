@@ -1,10 +1,10 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address} from '../../helpers'
+import {Addresses} from '../../helpers'
 
 const {
   Chainlink: {CHAINLINK_BTC_USD_AGGREGATOR},
-} = Address.mainnet
+} = Addresses.mainnet
 
 const BTCPeggedTokenOracle = 'BTCPeggedTokenOracle'
 

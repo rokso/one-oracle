@@ -9,7 +9,7 @@ import {
   IERC20,
   IERC20__factory,
 } from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {HOUR, impersonateAccount, MINUTE, parseEther} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
 import {ABI} from '@umb-network/toolbox'
@@ -22,7 +22,7 @@ const {
   Umbrella: {UMBRELLA_REGISTRY, UMB},
   WETH,
   USDC,
-} = Address.bsc
+} = Addresses.bsc
 
 const HEARTBEAT_TIMESTAMP = HOUR.mul(24)
 const DEVIATION_THRESHOLD = parseEther('0.01') // 1%
@@ -45,7 +45,7 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice, funder] = await ethers.getSigners()
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     umb = IERC20__factory.connect(UMB, funder)

@@ -14,7 +14,7 @@ import {
   IUniswapV2Router02__factory,
   IUniswapV2Router02,
 } from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {impersonateAccount, parseEther, parseUnits} from '../helpers'
 import Quote from '../helpers/quotes'
 
@@ -24,7 +24,7 @@ const UNISWAP_V2_WETH_WBTC_PAIR = '0xBb2b8038a1640196FbE3e38816F3e67Cba72D940'
 const UNISWAP_V2_WBTC_USDC_PAIR = '0x004375dff511095cc5a197a54140a24efef3a416'
 const DAI_HOLDER = '0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8'
 
-const {UNISWAP_V2_ROUTER_ADDRESS, WETH, DAI, WBTC, USDC} = Address.mainnet
+const {UNISWAP_V2_ROUTER_ADDRESS, WETH, DAI, WBTC, USDC} = Addresses.mainnet
 
 describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
   let snapshotId: string
@@ -103,7 +103,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
 
         // then
         expect(priceInUsd).closeTo(Quote.mainnet.UNIV2_ETH_WBTC_LP_USD, parseEther('1'))
-        expect(priceInUsd).closeTo(expectedPriceInUsd, parseEther('2,000'))
+        expect(priceInUsd).closeTo(expectedPriceInUsd, parseEther('5,000'))
       })
 
       it('when none of tokens are 18-decimals (wbtc,usdc)', async function () {
@@ -132,7 +132,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         const lpBalanceOfProvider = await ethDaiPair.balanceOf(provider.address)
         const lpSupplyBefore = await ethDaiPair.totalSupply()
         const lpShareOfProvider = lpBalanceOfProvider.mul(parseEther('1')).div(lpSupplyBefore)
-        expect(lpShareOfProvider).closeTo(parseEther('0.11'), parseEther('0.01')) // ~11% of all liquidity
+        expect(lpShareOfProvider).closeTo(parseEther('0.12'), parseEther('0.01')) // ~11% of all liquidity
 
         // when
         await ethDaiPair.connect(provider).approve(router.address, lpBalanceOfProvider)

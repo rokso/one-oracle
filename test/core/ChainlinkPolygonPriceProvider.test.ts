@@ -3,11 +3,11 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {ChainlinkPolygonPriceProvider, ChainlinkPolygonPriceProvider__factory} from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {parseEther} from '../helpers'
 import Quote from '../helpers/quotes'
 
-const {DAI, WETH} = Address.polygon
+const {DAI, WETH} = Addresses.polygon
 
 describe('ChainlinkPolygonPriceProvider @polygon', function () {
   let snapshotId: string

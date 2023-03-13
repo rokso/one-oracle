@@ -3,10 +3,10 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {PriceProviderMock, PriceProviderMock__factory} from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits, toUSD} from '../helpers'
 
-const {USDC, WETH, WBTC, DAI} = Address.mainnet
+const {USDC, WETH, WBTC, DAI} = Addresses.mainnet
 
 describe('PriceProvider @mainnet', function () {
   let snapshotId: string

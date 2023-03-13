@@ -3,7 +3,7 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {ChainlinkAndFallbacksOracle, ChainlinkAndFallbacksOracle__factory} from '../../typechain-types'
-import {Address, Provider} from '../../helpers'
+import {Addresses, Provider} from '../../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {parseEther, timestampFromLatestBlock} from '../helpers'
 import {BigNumber} from 'ethers'
@@ -11,7 +11,7 @@ import {BigNumber} from 'ethers'
 const STALE_PERIOD = ethers.constants.MaxUint256
 const MAX_DEVIATION = parseEther('0.1') // 10%
 
-const {WETH, DAI} = Address.mainnet
+const {WETH, DAI} = Addresses.mainnet
 
 // Note: No need to cover all chains on this test
 describe('ChainlinkAndFallbacksOracle @mainnet', function () {
@@ -36,7 +36,7 @@ describe('ChainlinkAndFallbacksOracle @mainnet', function () {
     )
     await chainlinkAndFallbacksOracle.deployed()
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
     addressProvider.providersAggregator.returns(aggregator.address)
   })

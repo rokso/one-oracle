@@ -9,7 +9,7 @@ import {
   IERC20,
   IERC20__factory,
 } from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits, HOUR} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {BigNumber} from 'ethers'
@@ -32,7 +32,7 @@ describe('UniswapV3PriceProvider', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
 
-    addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
   })
 
@@ -41,7 +41,7 @@ describe('UniswapV3PriceProvider', function () {
   })
 
   describe('UniswapV3PriceProvider @mainnet', function () {
-    const {USDC, WETH, WBTC} = Address.mainnet
+    const {USDC, WETH, WBTC} = Addresses.mainnet
 
     beforeEach(async function () {
       usdc = IERC20__factory.connect(USDC, deployer)
@@ -175,7 +175,7 @@ describe('UniswapV3PriceProvider', function () {
   })
 
   describe('UniswapV3PriceProvider @arbitrum', function () {
-    const {USDC, WETH, WBTC} = Address.arbitrum
+    const {USDC, WETH, WBTC} = Addresses.arbitrum
 
     beforeEach(async function () {
       usdc = IERC20__factory.connect(USDC, deployer)
@@ -219,7 +219,7 @@ describe('UniswapV3PriceProvider', function () {
   })
 
   describe('UniswapV3PriceProvider @polygon', function () {
-    const {USDC, WETH, WBTC} = Address.polygon
+    const {USDC, WETH, WBTC} = Addresses.polygon
 
     beforeEach(async function () {
       usdc = IERC20__factory.connect(USDC, deployer)

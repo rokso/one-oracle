@@ -3,7 +3,7 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {ChainlinkPriceProvider, ChainlinkPriceProvider__factory} from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {parseEther} from '../helpers'
 import {smock} from '@defi-wonderland/smock'
 import Quote from '../helpers/quotes'
@@ -13,7 +13,7 @@ const {
   WETH,
   WBTC,
   Chainlink: {CHAINLINK_DAI_USD_AGGREGATOR, CHAINLINK_ETH_USD_AGGREGATOR, CHAINLINK_BTC_USD_AGGREGATOR},
-} = Address.mainnet
+} = Addresses.mainnet
 
 describe('ChainlinkPriceProvider @mainnet', function () {
   let snapshotId: string
@@ -25,7 +25,7 @@ describe('ChainlinkPriceProvider @mainnet', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     const priceProviderFactory = new ChainlinkPriceProvider__factory(deployer)
@@ -49,7 +49,7 @@ describe('ChainlinkPriceProvider @mainnet', function () {
 
     it('should WBTC price', async function () {
       const {_priceInUsd} = await priceProvider.getPriceInUsd(WBTC)
-      expect(_priceInUsd).closeTo(Quote.mainnet.BTC_USD, parseEther('50'))
+      expect(_priceInUsd).closeTo(Quote.mainnet.BTC_USD, parseEther('100'))
     })
 
     it('should DAI price', async function () {

@@ -1,8 +1,8 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address} from '../../helpers'
+import {Addresses} from '../../helpers'
 
-const {SUSHISWAP_FACTORY_ADDRESS, WETH} = Address.mainnet
+const {SUSHISWAP_FACTORY_ADDRESS, WETH} = Addresses.mainnet
 
 const UniswapV2LikePriceProvider = 'UniswapV2LikePriceProvider'
 const SushiswapPriceProvider = 'SushiswapPriceProvider'

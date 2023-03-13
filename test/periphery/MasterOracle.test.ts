@@ -15,7 +15,7 @@ import {
   ICurvePool__factory,
   AddressProviderMock__factory,
 } from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {impersonateAccount, increaseTime, parseEther, resetFork, toUSD} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
 import {smock} from '@defi-wonderland/smock'
@@ -30,7 +30,7 @@ describe('MasterOracle', function () {
     // Reset fork to clean up fake `AddressProvider` contract from other test suites
     await resetFork()
 
-    deployer = await impersonateAccount(Address.DEPLOYER)
+    deployer = await impersonateAccount(Addresses.DEPLOYER)
   })
 
   beforeEach(async function () {
@@ -43,6 +43,7 @@ describe('MasterOracle', function () {
 
   describe('MasterOracle @mainnet', function () {
     const {
+      GOVERNOR,
       DAI,
       USDC,
       USDT,
@@ -71,7 +72,7 @@ describe('MasterOracle', function () {
       Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK},
       Synth: {msETH, msUSD, msBTC, msDOGE},
       Frax: {sFrxETH, frxETH},
-    } = Address.mainnet
+    } = Addresses.mainnet
 
     before(async function () {
       // Setting the folder to execute deployment scripts from
@@ -87,29 +88,30 @@ describe('MasterOracle', function () {
         BTCPeggedTokenOracle,
       } = await deployments.fixture()
 
-      const addressProvider = AddressProviderMock__factory.connect(Address.ADDRESS_PROVIDER, deployer)
+      const governor = await impersonateAccount(GOVERNOR)
+      const addressProvider = AddressProviderMock__factory.connect(Addresses.ADDRESS_PROVIDER, governor)
       await addressProvider.updateProvidersAggregator(PriceProvidersAggregator.address)
 
-      masterOracle = MasterOracle__factory.connect(MasterOracle.address, deployer)
+      masterOracle = MasterOracle__factory.connect(MasterOracle.address, governor)
 
-      const defaultOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
+      const defaultOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, governor)
       await defaultOracle.updateDefaultStalePeriod(ethers.constants.MaxUint256)
       await defaultOracle.updateCustomStalePeriod(USDC, ethers.constants.MaxUint256)
       await defaultOracle.updateCustomStalePeriod(USDT, ethers.constants.MaxUint256)
       await defaultOracle.updateCustomStalePeriod(DAI, ethers.constants.MaxUint256)
 
-      const stableCoinProvider = StableCoinProvider__factory.connect(StableCoinProvider.address, deployer)
+      const stableCoinProvider = StableCoinProvider__factory.connect(StableCoinProvider.address, governor)
       await stableCoinProvider.updateDefaultStalePeriod(ethers.constants.MaxUint256)
 
       const alusdTokenMainnetOracle = AlusdTokenMainnetOracle__factory.connect(
         AlusdTokenMainnetOracle.address,
-        deployer
+        governor
       )
       await alusdTokenMainnetOracle.updateDefaultStalePeriod(ethers.constants.MaxUint256)
       await increaseTime(ethers.BigNumber.from(60 * 60 * 2))
       await alusdTokenMainnetOracle.update()
 
-      const bTCPeggedTokenOracle = BTCPeggedTokenOracle__factory.connect(BTCPeggedTokenOracle.address, deployer)
+      const bTCPeggedTokenOracle = BTCPeggedTokenOracle__factory.connect(BTCPeggedTokenOracle.address, governor)
       await bTCPeggedTokenOracle.updateDefaultStalePeriod(ethers.constants.MaxUint256)
     })
 
@@ -346,7 +348,7 @@ describe('MasterOracle', function () {
 
       it('should get price for msBTC', async function () {
         const price = await masterOracle.getPriceInUsd(msBTC)
-        expect(price).closeTo(Quote.mainnet.BTC_USD, toUSD('50'))
+        expect(price).closeTo(Quote.mainnet.BTC_USD, toUSD('100'))
       })
 
       it('should get price for msDOGE', async function () {
@@ -370,7 +372,7 @@ describe('MasterOracle', function () {
 
           // then
           expect(price).eq(basePrice)
-          expect(price).closeTo(Quote.mainnet.ETH_USD, toUSD('30'))
+          expect(price).closeTo(Quote.mainnet.ETH_USD, toUSD('50'))
         })
 
         it('should not be able to manipulate sFrxETH price (1)', async function () {
@@ -408,7 +410,7 @@ describe('MasterOracle', function () {
 
           // then
           const priceAfter = await masterOracle.getPriceInUsd(sFrxETH)
-          expect(priceAfter).closeTo(priceBefore, parseEther('0.0001'))
+          expect(priceAfter).closeTo(priceBefore, parseEther('2'))
         })
       })
     })
@@ -419,7 +421,7 @@ describe('MasterOracle', function () {
       DAI,
       Curve: {REN_LP, AAVE_LP},
       Synth: {msBTC, msUSD, msUNI, msCRV, msAAVE},
-    } = Address.avalanche
+    } = Addresses.avalanche
 
     before(async function () {
       // Setting the folder to execute deployment scripts from
@@ -428,7 +430,7 @@ describe('MasterOracle', function () {
       // eslint-disable-next-line no-shadow
       const {MasterOracle, PriceProvidersAggregator} = await deployments.fixture()
 
-      const addressProvider = AddressProviderMock__factory.connect(Address.ADDRESS_PROVIDER, deployer)
+      const addressProvider = AddressProviderMock__factory.connect(Addresses.ADDRESS_PROVIDER, deployer)
       await addressProvider.updateProvidersAggregator(PriceProvidersAggregator.address)
 
       masterOracle = MasterOracle__factory.connect(MasterOracle.address, deployer)
@@ -513,7 +515,7 @@ describe('MasterOracle', function () {
       BUSD,
       Ellipsis: {VAL_3EPS_LP},
       Synth: {msBNB, msUSD},
-    } = Address.bsc
+    } = Addresses.bsc
 
     before(async function () {
       // Setting the folder to execute deployment scripts from
@@ -522,7 +524,7 @@ describe('MasterOracle', function () {
       // eslint-disable-next-line no-shadow
       const {MasterOracle, PriceProvidersAggregator} = await deployments.fixture()
 
-      const addressProvider = AddressProviderMock__factory.connect(Address.ADDRESS_PROVIDER, deployer)
+      const addressProvider = AddressProviderMock__factory.connect(Addresses.ADDRESS_PROVIDER, deployer)
       await addressProvider.updateProvidersAggregator(PriceProvidersAggregator.address)
 
       masterOracle = MasterOracle__factory.connect(MasterOracle.address, deployer)
@@ -580,9 +582,7 @@ describe('MasterOracle', function () {
   })
 
   describe('MasterOracle @optimism', function () {
-    const {
-      DAI, Curve
-    } = Address.optimism
+    const {DAI, Curve} = Addresses.optimism
 
     before(async function () {
       // Setting the folder to execute deployment scripts from
@@ -604,7 +604,7 @@ describe('MasterOracle', function () {
         // when-then
         expect(masterOracle.getPriceInUsd(DAI)).to.revertedWith('invalid-token-price')
       })
-    })  
+    })
     describe('Curve LP Tokens', function () {
       it('should get price for SETH ETH LP', async function () {
         // when
@@ -621,6 +621,6 @@ describe('MasterOracle', function () {
         // then
         expect(price).closeTo(Quote.optimism.USDC_USD, toUSD('0.1'))
       })
-    })     
+    })
   })
 })

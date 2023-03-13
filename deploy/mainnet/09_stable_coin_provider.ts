@@ -1,9 +1,9 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address} from '../../helpers'
+import {Addresses} from '../../helpers'
 import {parseEther} from '@ethersproject/units'
 
-const {DAI, USDC} = Address.mainnet
+const {DAI, USDC} = Addresses.mainnet
 
 const StableCoinProvider = 'StableCoinProvider'
 const PriceProvidersAggregator = 'PriceProvidersAggregator'

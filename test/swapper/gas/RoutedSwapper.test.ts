@@ -12,7 +12,7 @@ import {
   UniswapV2LikeExchange__factory,
   UniswapV3Exchange__factory,
 } from '../../../typechain-types'
-import {Address, ExchangeType, SwapType, InitCodeHash} from '../../../helpers'
+import {Addresses, ExchangeType, SwapType, InitCodeHash} from '../../../helpers'
 import {parseEther, parseUnits} from '../../helpers'
 import {adjustBalance} from '../../helpers/balance'
 import {smock} from '@defi-wonderland/smock'
@@ -24,7 +24,7 @@ const {
   USDC,
   Chainlink: {NOT_ON_CHAINLINK_TOKEN: BTT},
   UNISWAP_V2_FACTORY_ADDRESS,
-} = Address.mainnet
+} = Addresses.mainnet
 
 const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
@@ -52,7 +52,7 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer] = await ethers.getSigners()
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     weth = IERC20__factory.connect(WETH, deployer)

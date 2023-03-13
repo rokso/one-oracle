@@ -17,6 +17,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   })
 
   if (newlyDeployed) {
+    // Note: Anyone can call `update()`
     await execute(AlusdTokenMainnetOracle, {from, log: true}, 'update')
   }
 }

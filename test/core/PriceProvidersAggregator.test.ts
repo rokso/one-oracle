@@ -13,7 +13,7 @@ import {
   ChainlinkMainnetPriceProvider__factory,
   ChainlinkMainnetPriceProvider,
 } from '../../typechain-types'
-import {Address, Provider} from '../../helpers'
+import {Addresses, Provider} from '../../helpers'
 import {parseEther, parseUnits, HOUR} from '../helpers'
 import {smock} from '@defi-wonderland/smock'
 import Quote from '../helpers/quotes'
@@ -21,7 +21,7 @@ import Quote from '../helpers/quotes'
 const DEFAULT_TWAP_PERIOD = HOUR
 const DEFAULT_POOLS_FEE = 3000 // 0.3%
 
-const {WETH, WBTC, USDC} = Address.mainnet
+const {WETH, WBTC, USDC} = Addresses.mainnet
 
 // Note: No need to cover all chains on this test
 describe('PriceProvidersAggregator @mainnet', function () {
@@ -42,7 +42,7 @@ describe('PriceProvidersAggregator @mainnet', function () {
     wbtc = IERC20__factory.connect(WBTC, deployer)
     usdc = IERC20__factory.connect(USDC, deployer)
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)

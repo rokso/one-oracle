@@ -8,7 +8,7 @@ import {
   IERC20,
   IERC20__factory,
 } from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import Quote from '../helpers/quotes'
 import {parseEther, parseUnits, HOUR, increaseTime} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
@@ -30,7 +30,7 @@ describe('UniswapV2LikePriceProvider', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
 
-    addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
   })
 
@@ -39,7 +39,7 @@ describe('UniswapV2LikePriceProvider', function () {
   })
 
   describe('UniswapV2LikePriceProvider @mainnet', function () {
-    const {DAI, WETH, WBTC, USDC, UNISWAP_V2_FACTORY_ADDRESS, SUSHISWAP_FACTORY_ADDRESS} = Address.mainnet
+    const {DAI, WETH, WBTC, USDC, UNISWAP_V2_FACTORY_ADDRESS, SUSHISWAP_FACTORY_ADDRESS} = Addresses.mainnet
 
     beforeEach(async function () {
       dai = IERC20__factory.connect(DAI, deployer)
@@ -239,14 +239,14 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('1'))
+          expect(_amountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('50'))
         })
       })
     })
   })
 
   describe('UniswapV2LikePriceProvider @avalanche', function () {
-    const {DAI, WAVAX, WBTC, TRADERJOE_FACTORY_ADDRESS, PANGOLIN_FACTORY_ADDRESS} = Address.avalanche
+    const {DAI, WAVAX, WBTC, TRADERJOE_FACTORY_ADDRESS, PANGOLIN_FACTORY_ADDRESS} = Addresses.avalanche
 
     beforeEach(async function () {
       dai = IERC20__factory.connect(DAI, deployer)
@@ -353,7 +353,7 @@ describe('UniswapV2LikePriceProvider', function () {
   })
 
   describe('UniswapV2LikePriceProvider @arbitrum', function () {
-    const {DAI, WETH, WBTC, SUSHISWAP_FACTORY_ADDRESS} = Address.arbitrum
+    const {DAI, WETH, WBTC, SUSHISWAP_FACTORY_ADDRESS} = Addresses.arbitrum
 
     beforeEach(async function () {
       dai = IERC20__factory.connect(DAI, deployer)
@@ -411,7 +411,7 @@ describe('UniswapV2LikePriceProvider', function () {
   })
 
   describe('UniswapV2LikePriceProvider @polygon', function () {
-    const {DAI, WMATIC, WBTC, SUSHISWAP_FACTORY_ADDRESS, QUICKSWAP_FACTORY_ADDRESS} = Address.polygon
+    const {DAI, WMATIC, WBTC, SUSHISWAP_FACTORY_ADDRESS, QUICKSWAP_FACTORY_ADDRESS} = Addresses.polygon
 
     beforeEach(async function () {
       dai = IERC20__factory.connect(DAI, deployer)

@@ -4,13 +4,13 @@ import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {ChainlinkOracle, ChainlinkOracle__factory} from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {parseEther} from '../helpers'
 import Quote from '../helpers/quotes'
 
 const STALE_PERIOD = ethers.constants.MaxUint256
 
-const {DAI, WETH, WBTC} = Address.mainnet
+const {DAI, WETH, WBTC} = Addresses.mainnet
 
 describe('ChainlinkOracle @mainnet', function () {
   let snapshotId: string
@@ -28,7 +28,7 @@ describe('ChainlinkOracle @mainnet', function () {
     oracle = await oracleProvider.deploy(STALE_PERIOD)
     await oracle.deployed()
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     // addressProvider.governor.returns(deployer.address)
     addressProvider.providersAggregator.returns(aggregator.address)
   })
