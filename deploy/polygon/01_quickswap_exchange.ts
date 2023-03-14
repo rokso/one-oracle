@@ -1,8 +1,8 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address, InitCodeHash} from '../../helpers'
+import {Addresses, InitCodeHash} from '../../helpers'
 
-const {QUICKSWAP_FACTORY_ADDRESS, WMATIC} = Address.polygon
+const {QUICKSWAP_FACTORY_ADDRESS, WMATIC} = Addresses.polygon
 const QUICK_SWAP_INIT_CODE_HASH = InitCodeHash[QUICKSWAP_FACTORY_ADDRESS]
 
 const UniswapV2LikeExchange = 'UniswapV2LikeExchange'
@@ -13,7 +13,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {deploy} = deployments
   const {deployer: from} = await getNamedAccounts()
 
-  if(!QUICK_SWAP_INIT_CODE_HASH) throw new Error('Swap init code hash is missing')
+  if (!QUICK_SWAP_INIT_CODE_HASH) throw new Error('Swap init code hash is missing')
 
   await deploy(QuickSwapExchange, {
     contract: UniswapV2LikeExchange,

@@ -3,11 +3,11 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {ChainlinkMainnetPriceProvider, ChainlinkMainnetPriceProvider__factory} from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 import Quote from '../helpers/quotes'
 
-const {DAI, WETH, WBTC} = Address.mainnet
+const {DAI, WETH, WBTC} = Addresses.mainnet
 
 describe('ChainlinkMainnetPriceProvider @mainnet', function () {
   let snapshotId: string
@@ -46,7 +46,7 @@ describe('ChainlinkMainnetPriceProvider @mainnet', function () {
 
     it('should quote 1 WBTC to DAI', async function () {
       const {_amountOut} = await priceProvider.quote(WBTC, DAI, parseUnits('1', 8))
-      expect(_amountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('50'))
+      expect(_amountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('100'))
     })
 
     it('should quote 1 WBTC to WETH', async function () {

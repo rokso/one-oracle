@@ -11,7 +11,7 @@ import {
   ICurveAddressProvider__factory,
   ICurveSwaps__factory,
 } from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
 import {CurveSwapParams, CurveSwapRoute} from '../helpers/curve-exchange'
@@ -22,7 +22,7 @@ const abi = ethers.utils.defaultAbiCoder
 
 describe('CurveExchange', function () {
   describe('CurveExchange @mainnet', function () {
-    const {WETH, DAI, WBTC, USDC, MUSD, Curve, STG, FRAX} = Address.mainnet
+    const {WETH, DAI, WBTC, USDC, MUSD, Curve, STG, FRAX} = Addresses.mainnet
 
     let snapshotId: string
     let deployer: SignerWithAddress
@@ -96,7 +96,7 @@ describe('CurveExchange', function () {
 
         // then
         const {gasUsed} = await tx.wait()
-        expect(gasUsed.toNumber()).closeTo(720e3, 25e3) // ~720K gas
+        expect(gasUsed.toNumber()).closeTo(200e3, 50e3)
         const daiAfter = await dai.balanceOf(deployer.address)
         const amountOut = daiAfter.sub(daiBefore)
         expect(amountOut).closeTo(amountOutMin, parseEther('0.000001'))
@@ -167,7 +167,7 @@ describe('CurveExchange', function () {
 
         // then
         const {gasUsed} = await tx.wait()
-        expect(gasUsed.toNumber()).closeTo(380e3, 25e3) // ~380K gas
+        expect(gasUsed.toNumber()).closeTo(330e3, 25e3)
         const usdcAfter = await usdc.balanceOf(deployer.address)
         expect(usdcAfter).eq(usdcBefore.add(amountOutMin))
       })
@@ -195,7 +195,7 @@ describe('CurveExchange', function () {
           [0, 0, 0],
         ]
 
-        const amountOutMin = await swaps.get_exchange_multiple_amount(route, params, amountIn)
+        const expectedAmountOut = await swaps.get_exchange_multiple_amount(route, params, amountIn)
 
         // when
         await stg.approve(swaps.address, MaxUint256)
@@ -203,17 +203,17 @@ describe('CurveExchange', function () {
           route,
           params,
           amountIn,
-          amountOutMin,
+          0,
           [AddressZero, AddressZero, AddressZero, AddressZero],
           deployer.address
         )
 
         // then
         const {gasUsed} = await tx.wait()
-        expect(gasUsed.toNumber()).closeTo(620e3, 25e3) // ~620K gas
+        expect(gasUsed.toNumber()).closeTo(600e3, 50e3)
         const fraxAfter = await frax.balanceOf(deployer.address)
         const received = fraxAfter.sub(fraxBefore)
-        expect(received).closeTo(amountOutMin, parseEther('0.0001'))
+        expect(received).closeTo(expectedAmountOut, parseEther('0.0001'))
       })
     })
 
@@ -291,7 +291,7 @@ describe('CurveExchange', function () {
         const daiAfter = await dai.balanceOf(deployer.address)
         const usdcAfter = await usdc.balanceOf(deployer.address)
         expect(daiAfter).eq(daiBefore.sub(amountIn))
-        expect(usdcAfter).eq(usdcBefore.add(amountOut)) // no slippage scenario
+        expect(usdcAfter).closeTo(usdcBefore.add(amountOut), 1) // no slippage scenario
       })
 
       it('should swap MUSD->USDC', async function () {

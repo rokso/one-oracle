@@ -3,7 +3,7 @@ import {smock} from '@defi-wonderland/smock'
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {Address} from '../../helpers'
+import {Addresses} from '../../helpers'
 import {UsingStalePeriodMock, UsingStalePeriodMock__factory} from '../../typechain-types'
 import {HOUR, timestampFromLatestBlock} from '../helpers'
 
@@ -19,7 +19,7 @@ describe('UsingStalePeriod @mainnet', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     const usingStalePeriodFactory = new UsingStalePeriodMock__factory(deployer)
@@ -64,28 +64,28 @@ describe('UsingStalePeriod @mainnet', function () {
 
     it('should update stale period', async function () {
       // given
-      const before = await usingStalePeriod.stalePeriodOf(Address.mainnet.USDT)
+      const before = await usingStalePeriod.stalePeriodOf(Addresses.mainnet.USDT)
       expect(before).eq(DEFAULT_STALE_PERIOD)
 
       // when
-      await usingStalePeriod.updateCustomStalePeriod(Address.mainnet.USDT, 1)
+      await usingStalePeriod.updateCustomStalePeriod(Addresses.mainnet.USDT, 1)
 
       // then
-      const after = await usingStalePeriod.stalePeriodOf(Address.mainnet.USDT)
+      const after = await usingStalePeriod.stalePeriodOf(Addresses.mainnet.USDT)
       expect(after).eq(1)
     })
 
     it('should clean stale period', async function () {
       // given
-      await usingStalePeriod.updateCustomStalePeriod(Address.mainnet.USDT, 1)
-      const before = await usingStalePeriod.stalePeriodOf(Address.mainnet.USDT)
+      await usingStalePeriod.updateCustomStalePeriod(Addresses.mainnet.USDT, 1)
+      const before = await usingStalePeriod.stalePeriodOf(Addresses.mainnet.USDT)
       expect(before).eq(1)
 
       // when
-      await usingStalePeriod.updateCustomStalePeriod(Address.mainnet.USDT, 0)
+      await usingStalePeriod.updateCustomStalePeriod(Addresses.mainnet.USDT, 0)
 
       // then
-      const after = await usingStalePeriod.stalePeriodOf(Address.mainnet.USDT)
+      const after = await usingStalePeriod.stalePeriodOf(Addresses.mainnet.USDT)
       expect(after).eq(DEFAULT_STALE_PERIOD)
     })
   })

@@ -2,10 +2,10 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {VTokenFraxLendOracle, VTokenFraxLendOracle__factory} from '../../typechain-types'
-import {Address} from '../../helpers'
+import {VTokenFraxLendOracle__factory} from '../../typechain-types'
+import {Addresses} from '../../helpers'
 import Quote from '../helpers/quotes'
-import {parseUnits, toUSD} from '../helpers'
+import {parseUnits} from '../helpers'
 
 const {
   Vesper: {vaDAI, vaETH, vaFRAX, vaLINK, vaUSDC, vaWBTC, vastETH},
@@ -18,7 +18,7 @@ const {
     CHAINLINK_LINK_USD_AGGREGATOR,
     CHAINLINK_STETH_USD_AGGREGATOR,
   },
-} = Address.mainnet
+} = Addresses.mainnet
 
 describe('VTokenFraxLendOracle @mainnet', function () {
   let snapshotId: string

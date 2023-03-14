@@ -3,7 +3,7 @@ import {smock} from '@defi-wonderland/smock'
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {Address} from '../../helpers'
+import {Addresses} from '../../helpers'
 import {UsingMaxDeviationMock, UsingMaxDeviationMock__factory} from '../../typechain-types'
 
 import {parseEther} from '../helpers'
@@ -20,7 +20,7 @@ describe('UsingMaxDeviation @mainnet', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     const usingMaxDeviationFactory = new UsingMaxDeviationMock__factory(deployer)

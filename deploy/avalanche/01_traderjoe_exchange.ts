@@ -1,8 +1,8 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address, InitCodeHash} from '../../helpers'
+import {Addresses, InitCodeHash} from '../../helpers'
 
-const {TRADERJOE_FACTORY_ADDRESS, WAVAX: WAVAX_ADDRESS} = Address.avalanche
+const {TRADERJOE_FACTORY_ADDRESS, WAVAX: WAVAX_ADDRESS} = Addresses.avalanche
 const TRADER_JOE_INIT_CODE_HASH = InitCodeHash[TRADERJOE_FACTORY_ADDRESS]
 
 const UniswapV2LikeExchange = 'UniswapV2LikeExchange'
@@ -13,7 +13,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {deploy} = deployments
   const {deployer: from} = await getNamedAccounts()
 
-  if(!TRADER_JOE_INIT_CODE_HASH) throw new Error('Swap init code hash is missing')
+  if (!TRADER_JOE_INIT_CODE_HASH) throw new Error('Swap init code hash is missing')
 
   await deploy(TraderJoeExchange, {
     contract: UniswapV2LikeExchange,

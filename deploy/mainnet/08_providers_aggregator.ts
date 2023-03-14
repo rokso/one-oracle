@@ -1,8 +1,9 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address, Provider} from '../../helpers'
+import {Addresses, Provider} from '../../helpers'
+import {saveGovernorExecutionForMultiSigBatch} from '../../helpers/deployment'
 
-const {WETH} = Address.mainnet
+const {WETH} = Addresses.mainnet
 const {CHAINLINK, UNISWAP_V2, SUSHISWAP} = Provider
 
 const ChainlinkPriceProvider = 'ChainlinkPriceProvider'
@@ -12,7 +13,7 @@ const PriceProvidersAggregator = 'PriceProvidersAggregator'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
-  const {deploy, execute, get, read} = deployments
+  const {deploy, get, read} = deployments
   const {deployer: from} = await getNamedAccounts()
 
   await deploy(PriceProvidersAggregator, {
@@ -26,15 +27,33 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {address: sushiswapAddress} = await get(SushiswapPriceProvider)
 
   if ((await read(PriceProvidersAggregator, 'priceProviders', [CHAINLINK])) !== chainlinkAddress) {
-    await execute(PriceProvidersAggregator, {from, log: true}, 'setPriceProvider', CHAINLINK, chainlinkAddress)
+    await saveGovernorExecutionForMultiSigBatch(
+      hre,
+      PriceProvidersAggregator,
+      'setPriceProvider',
+      CHAINLINK,
+      chainlinkAddress
+    )
   }
 
   if ((await read(PriceProvidersAggregator, 'priceProviders', [UNISWAP_V2])) !== uniswapV2Address) {
-    await execute(PriceProvidersAggregator, {from, log: true}, 'setPriceProvider', UNISWAP_V2, uniswapV2Address)
+    await saveGovernorExecutionForMultiSigBatch(
+      hre,
+      PriceProvidersAggregator,
+      'setPriceProvider',
+      UNISWAP_V2,
+      uniswapV2Address
+    )
   }
 
   if ((await read(PriceProvidersAggregator, 'priceProviders', [SUSHISWAP])) !== sushiswapAddress) {
-    await execute(PriceProvidersAggregator, {from, log: true}, 'setPriceProvider', SUSHISWAP, sushiswapAddress)
+    await saveGovernorExecutionForMultiSigBatch(
+      hre,
+      PriceProvidersAggregator,
+      'setPriceProvider',
+      SUSHISWAP,
+      sushiswapAddress
+    )
   }
 }
 

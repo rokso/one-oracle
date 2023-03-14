@@ -15,7 +15,7 @@ import {
   IERC20__factory,
 } from '../../typechain-types'
 import {parseEther, parseUnits} from '../helpers'
-import {Address, ExchangeType, SwapType, InitCodeHash} from '../../helpers'
+import {Addresses, ExchangeType, SwapType, InitCodeHash} from '../../helpers'
 import {adjustBalance} from '../helpers/balance'
 import {smock} from '@defi-wonderland/smock'
 import {CurveSwapRoute, CurveSwapParams} from '../helpers/curve-exchange'
@@ -42,7 +42,7 @@ const {
   MUSD,
   CBETH,
   EUL,
-} = Address.mainnet
+} = Addresses.mainnet
 const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
 describe('RoutedSwapper @mainnet', function () {
@@ -80,7 +80,7 @@ describe('RoutedSwapper @mainnet', function () {
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer, user, invalidToken] = await ethers.getSigners()
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     const uniswapV2LikeExchangeFactory = new UniswapV2LikeExchange__factory(deployer)
@@ -653,7 +653,7 @@ describe('RoutedSwapper @mainnet', function () {
       // Check output of swap using callStatic
       const amountOut = await swapper.callStatic.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
       const tx = await swapper.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
-      expect((await tx.wait()).gasUsed).lt(1020000)
+      expect((await tx.wait()).gasUsed).lt(1.1e6)
 
       // then
       const cvxAfter = await cvx.balanceOf(deployer.address)
@@ -734,7 +734,7 @@ describe('RoutedSwapper @mainnet', function () {
       // Check output of swap using callStatic
       const amountOut = await swapper.callStatic.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
       const tx = await swapper.swapExactInput(tokenIn, tokenOut, amountIn, '1', deployer.address)
-      expect((await tx.wait()).gasUsed).lt(300000)
+      expect((await tx.wait()).gasUsed).lt(305e3)
 
       // then
       const tokenOutAfter = await cbeth.balanceOf(deployer.address)

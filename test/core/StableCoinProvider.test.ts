@@ -3,11 +3,11 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {StableCoinProvider, StableCoinProvider__factory} from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {HOUR, parseEther, parseUnits, timestampFromLatestBlock, toUSD} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 
-const {DAI, USDC, USDT} = Address.mainnet
+const {DAI, USDC, USDT} = Addresses.mainnet
 const {AddressZero} = ethers.constants
 
 const STALE_PERIOD = HOUR
@@ -34,7 +34,7 @@ describe('StableCoinProvider @mainnet', function () {
     stableCoinProvider = await stableCoinProviderFactory.deploy(DAI, USDC, STALE_PERIOD, MAX_DEVIATION)
     await stableCoinProvider.deployed()
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
     addressProvider.providersAggregator.returns(providersAggregator.address)
   })

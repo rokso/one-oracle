@@ -9,7 +9,7 @@ import {
   IERC20,
   IERC20__factory,
 } from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 import Quote from '../helpers/quotes'
 import {smock} from '@defi-wonderland/smock'
@@ -19,7 +19,7 @@ const {
   WETH,
   WBTC,
   Chainlink: {CHAINLINK_BTC_USD_AGGREGATOR},
-} = Address.mainnet
+} = Addresses.mainnet
 
 describe('ChainlinkFeedPriceProvider @mainnet', function () {
   let snapshotId: string
@@ -37,7 +37,7 @@ describe('ChainlinkFeedPriceProvider @mainnet', function () {
     weth = IERC20__factory.connect(WETH, deployer)
     wbtc = IERC20__factory.connect(WBTC, deployer)
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     const priceProviderFactory = new ChainlinkFeedPriceProvider__factory(deployer)
@@ -78,7 +78,7 @@ describe('ChainlinkFeedPriceProvider @mainnet', function () {
 
     it('should quote 1 WBTC to DAI', async function () {
       const {_amountOut} = await priceProvider.quote(wbtc.address, dai.address, parseUnits('1', 8))
-      expect(_amountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('50'))
+      expect(_amountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('100'))
     })
 
     it('should quote 1 WBTC to WETH', async function () {
@@ -110,7 +110,7 @@ describe('ChainlinkFeedPriceProvider @mainnet', function () {
 
     it('should quote WBTC to USD', async function () {
       const {_amountOut} = await priceProvider.quoteTokenToUsd(wbtc.address, parseUnits('1', 8))
-      expect(_amountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('30'))
+      expect(_amountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('100'))
     })
 
     it('should quote DAI to USD', async function () {

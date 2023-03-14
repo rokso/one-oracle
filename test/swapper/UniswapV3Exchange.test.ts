@@ -3,11 +3,11 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {IERC20, IERC20__factory, UniswapV3Exchange, UniswapV3Exchange__factory} from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
 
-const {WETH, DAI, WBTC, USDC} = Address.mainnet
+const {WETH, DAI, WBTC, USDC} = Addresses.mainnet
 
 describe('UniswapV3Exchange @mainnet', function () {
   let snapshotId: string

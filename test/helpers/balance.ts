@@ -1,38 +1,38 @@
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {ethers} from 'hardhat'
 import {BigNumber} from 'ethers'
 const {hexlify, solidityKeccak256, zeroPad, getAddress, hexStripZeros} = ethers.utils
 
 // Slot number mapping for a token. Prepared using utility https://github.com/kendricktan/slot20
 const slots = {
-  [Address.mainnet.DAI]: 2,
-  [Address.mainnet.WETH]: 3,
-  [Address.mainnet.USDC]: 9,
-  [Address.mainnet.WBTC]: 0,
-  [Address.mainnet.MUSD]: 51,
-  [Address.mainnet.Chainlink.NOT_ON_CHAINLINK_TOKEN]: 0,
-  [Address.mainnet.STG]: 0,
-  [Address.mainnet.FRAX]: 0,
-  [Address.mainnet.Frax.frxETH]: 0,
-  [Address.mainnet.CVX]: 0,
-  [Address.avalanche.WAVAX]: 3,
-  [Address.avalanche.DAI]: 0,
-  [Address.avalanche.WETH]: 0,
-  [Address.avalanche.USDC]: 0,
-  [Address.avalanche.WBTC]: 0,
-  [Address.bsc.Umbrella.UMB]: 1,
-  [Address.polygon.WMATIC]: 3,
-  [Address.optimism.WETH]: 3,
+  [Addresses.mainnet.DAI]: 2,
+  [Addresses.mainnet.WETH]: 3,
+  [Addresses.mainnet.USDC]: 9,
+  [Addresses.mainnet.WBTC]: 0,
+  [Addresses.mainnet.MUSD]: 51,
+  [Addresses.mainnet.Chainlink.NOT_ON_CHAINLINK_TOKEN]: 0,
+  [Addresses.mainnet.STG]: 0,
+  [Addresses.mainnet.FRAX]: 0,
+  [Addresses.mainnet.Frax.frxETH]: 0,
+  [Addresses.mainnet.CVX]: 0,
+  [Addresses.avalanche.WAVAX]: 3,
+  [Addresses.avalanche.DAI]: 0,
+  [Addresses.avalanche.WETH]: 0,
+  [Addresses.avalanche.USDC]: 0,
+  [Addresses.avalanche.WBTC]: 0,
+  [Addresses.bsc.Umbrella.UMB]: 1,
+  [Addresses.polygon.WMATIC]: 3,
+  [Addresses.optimism.WETH]: 3,
 }
 
 // Some tokens, specially rebase tokens, uses dynamic storage or multi storage hence
 // there is no clear balanceOf storage so using whale address for adjusting balance
 const whales = {
-  [Address.mainnet.STETH]: '0x1982b2F5814301d4e9a8b0201555376e62F82428',
-  [Address.mainnet.CRV]: '0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2', // slot id is 3 but not working so using whale
-  [Address.mainnet.CBETH]: '0xFA11D91e74fdD98F79E01582B9664143E1036931',
-  [Address.mainnet.EUL]: '0x7597851F3fD386a13b5784677AE8a569bdB33A95',
-  [Address.bsc.WBNB]: '0x0ed7e52944161450477ee417de9cd3a859b14fd0',
+  [Addresses.mainnet.STETH]: '0x1982b2F5814301d4e9a8b0201555376e62F82428',
+  [Addresses.mainnet.CRV]: '0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2', // slot id is 3 but not working so using whale
+  [Addresses.mainnet.CBETH]: '0xFA11D91e74fdD98F79E01582B9664143E1036931',
+  [Addresses.mainnet.EUL]: '0x7597851F3fD386a13b5784677AE8a569bdB33A95',
+  [Addresses.bsc.WBNB]: '0x0ed7e52944161450477ee417de9cd3a859b14fd0',
 }
 
 /**

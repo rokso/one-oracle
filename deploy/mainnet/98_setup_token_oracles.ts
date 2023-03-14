@@ -1,6 +1,6 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import Addresses from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {setupTokenOracles} from '../../helpers/deployment'
 
 const {mainnet: Address} = Addresses

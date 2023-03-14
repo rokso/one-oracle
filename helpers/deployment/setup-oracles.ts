@@ -1,6 +1,8 @@
 /* eslint-disable complexity */
 /* eslint-disable camelcase */
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
+import {saveGovernorExecutionForMultiSigBatch} from '../../helpers/deployment/'
+import {BigNumber} from 'ethers'
 
 const ChainlinkPriceProvider = 'ChainlinkPriceProvider'
 const MasterOracle = 'MasterOracle'
@@ -9,7 +11,7 @@ const CurveFactoryLpTokenOracle = 'CurveFactoryLpTokenOracle'
 const EllipsisLpTokenOracle = 'EllipsisLpTokenOracle'
 const ChainlinkOracle = 'ChainlinkOracle'
 
-const setupTokenOracles = async (
+export const setupTokenOracles = async (
   hre: HardhatRuntimeEnvironment,
   {
     customOracles,
@@ -35,7 +37,7 @@ const setupTokenOracles = async (
       const {address: oracleAddress} = await get(oracle)
       const current = await read(MasterOracle, 'oracles', token)
       if (current !== oracleAddress) {
-        await execute(MasterOracle, {from, log: true}, 'updateTokenOracle', token, oracleAddress)
+        await saveGovernorExecutionForMultiSigBatch(hre, MasterOracle, 'updateTokenOracle', token, oracleAddress)
       }
     }
   }
@@ -45,7 +47,7 @@ const setupTokenOracles = async (
     for (const {token, aggregator} of chainlinkAggregators) {
       const current = await read(ChainlinkPriceProvider, 'aggregators', token)
       if (current !== aggregator) {
-        await execute(ChainlinkPriceProvider, {from, log: true}, 'updateAggregator', token, aggregator)
+        await saveGovernorExecutionForMultiSigBatch(hre, ChainlinkPriceProvider, 'updateAggregator', token, aggregator)
       }
     }
   }
@@ -62,11 +64,11 @@ const setupTokenOracles = async (
     for (const {token, isLending} of curveLpTokens) {
       const current = await read(MasterOracle, 'oracles', token)
       if (current !== curveLpOracleAddress) {
-        await execute(MasterOracle, {from, log: true}, 'updateTokenOracle', token, curveLpOracleAddress)
+        await saveGovernorExecutionForMultiSigBatch(hre, MasterOracle, 'updateTokenOracle', token, curveLpOracleAddress)
         if (isLending) {
-          await execute(CurveLikeLpTokenOracle, {from, log: true}, 'registerLendingLp', token)
+          await saveGovernorExecutionForMultiSigBatch(hre, CurveLikeLpTokenOracle, 'registerLendingLp', token)
         } else {
-          await execute(CurveLikeLpTokenOracle, {from, log: true}, 'registerLp', token)
+          await saveGovernorExecutionForMultiSigBatch(hre, CurveLikeLpTokenOracle, 'registerLp', token)
         }
       }
     }
@@ -79,10 +81,17 @@ const setupTokenOracles = async (
     for (const token of curveFactoryLps) {
       const current = await read(MasterOracle, 'oracles', token)
       if (current !== curveFactoryLpOracleAddress) {
-        await execute(MasterOracle, {from, log: true}, 'updateTokenOracle', token, curveFactoryLpOracleAddress)
+        await saveGovernorExecutionForMultiSigBatch(
+          hre,
+          MasterOracle,
+          'updateTokenOracle',
+          token,
+          curveFactoryLpOracleAddress
+        )
 
         const alreadyRegistered = await read(CurveFactoryLpTokenOracle, 'isLpRegistered', token)
         if (!alreadyRegistered) {
+          // Note: No governor required for the `CurveFactoryLpTokenOracle` contract
           await execute(CurveFactoryLpTokenOracle, {from, log: true}, 'registerLp', token)
         }
       }
@@ -98,12 +107,10 @@ const setupTokenOracles = async (
     }
 
     for (const {token, stalePeriod} of customStalePeriods) {
-      const current = await read(ChainlinkOracle, 'stalePeriodOf', token)
-      if (current !== stalePeriod) {
-        await execute(ChainlinkOracle, {from, log: true}, 'updateCustomStalePeriod', token, stalePeriod)
+      const current: BigNumber = await read(ChainlinkOracle, 'stalePeriodOf', token)
+      if (current.toNumber() !== stalePeriod) {
+        await saveGovernorExecutionForMultiSigBatch(hre, ChainlinkOracle, 'updateCustomStalePeriod', token, stalePeriod)
       }
     }
   }
 }
-
-export {setupTokenOracles}

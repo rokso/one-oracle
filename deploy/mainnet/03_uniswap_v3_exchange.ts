@@ -1,8 +1,8 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address} from '../../helpers/index'
+import {Addresses} from '../../helpers/index'
 
-const {WETH} = Address.mainnet
+const {WETH} = Addresses.mainnet
 
 const UniswapV3Exchange = 'UniswapV3Exchange'
 

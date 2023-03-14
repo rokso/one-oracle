@@ -3,7 +3,7 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {VspMainnetOracle, VspMainnetOracle__factory} from '../../typechain-types'
-import {Address, Provider} from '../../helpers'
+import {Addresses, Provider} from '../../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {parseEther, timestampFromLatestBlock, HOUR, parseUnits} from '../helpers'
 import {BigNumber} from 'ethers'
@@ -11,7 +11,7 @@ import {BigNumber} from 'ethers'
 const STALE_PERIOD = HOUR
 const MAX_DEVIATION = parseEther('0.1') // 10%
 
-const {DAI, VSP} = Address.mainnet
+const {DAI, VSP} = Addresses.mainnet
 
 describe('VspMainnetOracle @mainnet', function () {
   let snapshotId: string
@@ -43,7 +43,7 @@ describe('VspMainnetOracle @mainnet', function () {
     vspOracle = await vspMainnetOracleFactory.deploy(MAX_DEVIATION, STALE_PERIOD)
     await vspOracle.deployed()
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.stableCoinProvider.returns(stableCoinProvider.address)
     addressProvider.providersAggregator.returns(aggregator.address)
   })

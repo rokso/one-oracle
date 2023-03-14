@@ -8,7 +8,7 @@ import {
   FluxPriceProvider,
   FluxPriceProvider__factory,
 } from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import Quote from '../helpers/quotes'
@@ -18,7 +18,7 @@ const {
   WETH,
   WMATIC,
   Flux: {FLUX_USDC_USD_AGGREGATOR, FLUX_ETH_USD_AGGREGATOR, FLUX_MATIC_USD_AGGREGATOR},
-} = Address.mumbai
+} = Addresses.mumbai
 
 const MAX_DEVIATION = parseEther('0.01') // 1%
 
@@ -32,7 +32,7 @@ describe('FluxPriceProvider @mumbai', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
 
-    const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+    const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
     const priceProviderFactory = new FluxPriceProvider__factory(deployer)

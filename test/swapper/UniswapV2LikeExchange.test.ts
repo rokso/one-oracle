@@ -3,7 +3,7 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {UniswapV2LikeExchange, UniswapV2LikeExchange__factory, IERC20__factory, IERC20} from '../../typechain-types'
-import Address from '../../helpers/address'
+import {Addresses} from '../../helpers/address'
 import {InitCodeHash} from '../../helpers/index'
 import {parseEther, parseUnits} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
@@ -12,7 +12,7 @@ const abi = ethers.utils.defaultAbiCoder
 
 describe('UniswapV2LikeExchange', function () {
   describe('UniswapV2LikeExchange @mainnet', function () {
-    const {WETH, DAI, WBTC, STETH, USDC, UNISWAP_V2_FACTORY_ADDRESS} = Address.mainnet
+    const {WETH, DAI, WBTC, STETH, USDC, UNISWAP_V2_FACTORY_ADDRESS} = Addresses.mainnet
     const UNISWAP_INIT_CODE_HASH = InitCodeHash[UNISWAP_V2_FACTORY_ADDRESS]
 
     let snapshotId: string
@@ -159,7 +159,7 @@ describe('UniswapV2LikeExchange', function () {
   })
 
   describe('UniswapV2LikeExchange @avalanche', function () {
-    const {WAVAX, DAI, WBTC, USDC, PANGOLIN_FACTORY_ADDRESS} = Address.avalanche
+    const {WAVAX, DAI, WBTC, USDC, PANGOLIN_FACTORY_ADDRESS} = Addresses.avalanche
     const PANGOLIN_INIT_CODE_HASH = InitCodeHash[PANGOLIN_FACTORY_ADDRESS]
     let snapshotId: string
     let deployer: SignerWithAddress

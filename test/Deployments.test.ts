@@ -24,7 +24,7 @@ import {
   USDPeggedTokenOracle__factory,
   USDPeggedTokenOracle,
 } from '../typechain-types'
-import {Address, SwapType, Provider, ExchangeType} from '../helpers'
+import {Addresses, SwapType, Provider, ExchangeType} from '../helpers'
 import {impersonateAccount, increaseTime, parseEther, resetFork, toUSD} from './helpers'
 import {IERC20} from '../typechain-types/@openzeppelin/contracts/token/ERC20'
 import {IERC20__factory} from '../typechain-types/factories/@openzeppelin/contracts/token/ERC20'
@@ -45,7 +45,7 @@ describe('Deployments ', function () {
 
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
-    deployer = await impersonateAccount(Address.DEPLOYER)
+    deployer = await impersonateAccount(Addresses.DEPLOYER)
   })
 
   afterEach(async function () {
@@ -58,7 +58,7 @@ describe('Deployments ', function () {
     let chainlinkOracle: ChainlinkOracle
     let msUsdOracle: USDPeggedTokenOracle
 
-    const {WETH} = Address.avalanche
+    const {WETH} = Addresses.avalanche
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -109,7 +109,7 @@ describe('Deployments ', function () {
     let pancakeSwapExchange: UniswapV2LikeExchange
     let routedSwapper: RoutedSwapper
 
-    const {WBNB, BUSD} = Address.bsc
+    const {WBNB, BUSD} = Addresses.bsc
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -191,7 +191,7 @@ describe('Deployments ', function () {
     let dai: IERC20
     let vspOracle: VspMainnetOracle
 
-    const {WETH, DAI, VSP, Curve} = Address.mainnet
+    const {WETH, DAI, VSP, Curve} = Addresses.mainnet
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -235,7 +235,10 @@ describe('Deployments ', function () {
     it('RoutedSwapper', async function () {
       // given
       const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[WETH, DAI]])
-      await routedSwapper.setDefaultRouting(SwapType.EXACT_INPUT, WETH, DAI, ExchangeType.UNISWAP_V2, path)
+      const governor = await impersonateAccount(Addresses.mainnet.GNOSIS_SAFE)
+      await routedSwapper
+        .connect(governor)
+        .setDefaultRouting(SwapType.EXACT_INPUT, WETH, DAI, ExchangeType.UNISWAP_V2, path)
       await weth.approve(routedSwapper.address, ethers.constants.MaxUint256)
 
       // when
@@ -267,7 +270,7 @@ describe('Deployments ', function () {
     let routedSwapper: RoutedSwapper
     let wmatic: IERC20
 
-    const {WMATIC, DAI} = Address.polygon
+    const {WMATIC, DAI} = Addresses.polygon
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -320,7 +323,7 @@ describe('Deployments ', function () {
     let chainlinkOracle: ChainlinkOracle
     let msUsdOracle: USDPeggedTokenOracle
 
-    const {WETH, DAI, USDC, OP} = Address.optimism
+    const {WETH, DAI, USDC, OP} = Addresses.optimism
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -339,9 +342,9 @@ describe('Deployments ', function () {
       dai = IERC20__factory.connect(DAI, deployer)
 
       // AddressProvider governor can update priceProvidersAggregator if not already set.
-      const addressProvider = await ethers.getContractAt(AddressProvider, Address.ADDRESS_PROVIDER)
+      const addressProvider = await ethers.getContractAt(AddressProvider, Addresses.ADDRESS_PROVIDER)
       if (
-        (await addressProvider.governor()) === Address.DEPLOYER &&
+        (await addressProvider.governor()) === Addresses.DEPLOYER &&
         (await addressProvider.providersAggregator()) !== priceProvidersAggregator.address
       ) {
         await addressProvider.connect(deployer).updateProvidersAggregator(priceProvidersAggregator.address)
@@ -411,14 +414,14 @@ describe('Deployments ', function () {
     let priceProvidersAggregator: PriceProvidersAggregator
     let chainlinkOracle: ChainlinkOracle
 
-    const {WETH, DAI, USDC} = Address.arbitrum
+    const {WETH, DAI, USDC} = Addresses.arbitrum
 
     beforeEach(async function () {
       // TODO: Remove this mock after having `AddressProvider` contract deployed to the arbitrum chain
-      const addressProvider = await smock.fake('AddressProviderMock', {address: Address.ADDRESS_PROVIDER})
+      const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
       addressProvider.governor.returns(deployer.address)
       // Note: Address 'Transaction reverted: function call to a non-contract account' error
-      await hre.network.provider.send('hardhat_setCode', [Address.ADDRESS_PROVIDER, '0x01'])
+      await hre.network.provider.send('hardhat_setCode', [Addresses.ADDRESS_PROVIDER, '0x01'])
 
       // Setting the folder to execute deployment scripts from
       hre.network.deploy = ['deploy/arbitrum']

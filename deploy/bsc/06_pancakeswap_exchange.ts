@@ -1,8 +1,8 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Address, InitCodeHash} from '../../helpers'
+import {Addresses, InitCodeHash} from '../../helpers'
 
-const {PANCAKE_SWAP_FACTORY_ADDRESS, WBNB} = Address.bsc
+const {PANCAKE_SWAP_FACTORY_ADDRESS, WBNB} = Addresses.bsc
 const PANCAKE_SWAP_INIT_CODE_HASH = InitCodeHash[PANCAKE_SWAP_FACTORY_ADDRESS]
 
 const UniswapV2LikeExchange = 'UniswapV2LikeExchange'
