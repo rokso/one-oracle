@@ -329,7 +329,7 @@ describe('MasterOracle', function () {
 
       it('should get price for vastETH', async function () {
         const price = await masterOracle.getPriceInUsd(vastETH)
-        expect(price).closeTo(Quote.mainnet.vastETH_USD, toUSD('1'))
+        expect(price).closeTo(Quote.mainnet.vastETH_USD, toUSD('5'))
       })
 
       it('should get price for varETH', async function () {

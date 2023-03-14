@@ -90,8 +90,7 @@ const customStalePeriods = [
 ]
 
 const chainlinkEthOnly = [
-  // Note: For now, we're using the stETH/USD from the feed contract
-  // {token: Address.stETH, ethFeed: Address.Chainlink.CHAINLINK_STETH_ETH_AGGREGATOR},
+  {token: Address.stETH, ethFeed: Address.Chainlink.CHAINLINK_STETH_ETH_AGGREGATOR},
   {token: Address.rETH, ethFeed: Address.Chainlink.CHAINLINK_RETH_ETH_AGGREGATOR},
 ]
 
