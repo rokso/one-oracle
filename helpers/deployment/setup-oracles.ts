@@ -10,6 +10,7 @@ const CurveLpTokenOracle = 'CurveLpTokenOracle'
 const CurveFactoryLpTokenOracle = 'CurveFactoryLpTokenOracle'
 const EllipsisLpTokenOracle = 'EllipsisLpTokenOracle'
 const ChainlinkOracle = 'ChainlinkOracle'
+const ChainlinkEthOnlyTokenOracle = 'ChainlinkEthOnlyTokenOracle'
 
 export const setupTokenOracles = async (
   hre: HardhatRuntimeEnvironment,
@@ -19,12 +20,14 @@ export const setupTokenOracles = async (
     curveLpTokens,
     curveFactoryLps = [],
     customStalePeriods = [],
+    chainlinkEthOnly = [],
   }: {
     customOracles?: {token: string; oracle: string}[]
     chainlinkAggregators?: {token: string; aggregator: string}[]
     curveLpTokens?: {token: string; isLending: boolean}[]
     curveFactoryLps?: string[]
     customStalePeriods?: {token: string; stalePeriod: number}[]
+    chainlinkEthOnly?: {token: string; ethFeed: string}[]
   }
 ) => {
   const {getNamedAccounts, deployments} = hre
@@ -99,7 +102,7 @@ export const setupTokenOracles = async (
   }
 
   // Custom Stale periods
-  if (customStalePeriods) {
+  if (customStalePeriods.length > 0) {
     const {address: chainlinkOracleAddress} = await get(ChainlinkOracle)
     const defaultOracleAddress = await read(MasterOracle, 'defaultOracle')
     if (defaultOracleAddress != chainlinkOracleAddress) {
@@ -110,6 +113,28 @@ export const setupTokenOracles = async (
       const current: BigNumber = await read(ChainlinkOracle, 'stalePeriodOf', token)
       if (current.toNumber() !== stalePeriod) {
         await saveGovernorExecutionForMultiSigBatch(hre, ChainlinkOracle, 'updateCustomStalePeriod', token, stalePeriod)
+      }
+    }
+  }
+
+  // Chainlink ETH-Only
+  if (chainlinkEthOnly.length > 0) {
+    const {address: chainlinkEthOnlyOracleAddress} = await get(ChainlinkEthOnlyTokenOracle)
+    for (const {token, ethFeed} of chainlinkEthOnly) {
+      const current = await read(MasterOracle, 'oracles', token)
+      if (current !== chainlinkEthOnlyOracleAddress) {
+        await saveGovernorExecutionForMultiSigBatch(
+          hre,
+          MasterOracle,
+          'updateTokenOracle',
+          token,
+          chainlinkEthOnlyOracleAddress
+        )
+
+        const currentFeed: string = await read(ChainlinkEthOnlyTokenOracle, 'ethFeedOf', token)
+        if (currentFeed !== ethFeed) {
+          await saveGovernorExecutionForMultiSigBatch(hre, ChainlinkEthOnlyTokenOracle, 'updateEthFeed', token, ethFeed)
+        }
       }
     }
   }
