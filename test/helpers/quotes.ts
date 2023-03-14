@@ -59,6 +59,7 @@ const Quote = {
     vaFRAX_USD: parseEther('1.04'),
     vaETH_USD: parseEther('1,582'),
     vastETH_USD: parseEther('1,578'),
+    varETH_USD: parseEther('1,643'),
     vaWBTC_USD: parseEther('22,201'),
     vaLINK_USD: parseEther('6.80'),
   },

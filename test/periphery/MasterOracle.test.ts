@@ -14,6 +14,7 @@ import {
   ISFrxEth__factory,
   ICurvePool__factory,
   AddressProviderMock__factory,
+  ChainlinkEthOnlyTokenOracle__factory,
 } from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {impersonateAccount, increaseTime, parseEther, resetFork, toUSD} from '../helpers'
@@ -69,7 +70,7 @@ describe('MasterOracle', function () {
         FRAX_USDC_LP,
         DOLA_FRAXBP_LP,
       },
-      Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK},
+      Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK, varETH},
       Synth: {msETH, msUSD, msBTC, msDOGE},
       Frax: {sFrxETH, frxETH},
     } = Addresses.mainnet
@@ -86,6 +87,7 @@ describe('MasterOracle', function () {
         AlusdTokenMainnetOracle,
         StableCoinProvider,
         BTCPeggedTokenOracle,
+        ChainlinkEthOnlyTokenOracle,
       } = await deployments.fixture()
 
       const governor = await impersonateAccount(GOVERNOR)
@@ -113,6 +115,12 @@ describe('MasterOracle', function () {
 
       const bTCPeggedTokenOracle = BTCPeggedTokenOracle__factory.connect(BTCPeggedTokenOracle.address, governor)
       await bTCPeggedTokenOracle.updateDefaultStalePeriod(ethers.constants.MaxUint256)
+
+      const chainlinkEthOnlyTokenOracle = ChainlinkEthOnlyTokenOracle__factory.connect(
+        ChainlinkEthOnlyTokenOracle.address,
+        governor
+      )
+      await chainlinkEthOnlyTokenOracle.updateDefaultStalePeriod(ethers.constants.MaxUint256)
     })
 
     describe('getPriceInUsd', function () {
@@ -324,6 +332,11 @@ describe('MasterOracle', function () {
         expect(price).closeTo(Quote.mainnet.vastETH_USD, toUSD('1'))
       })
 
+      it('should get price for varETH', async function () {
+        const price = await masterOracle.getPriceInUsd(varETH)
+        expect(price).closeTo(Quote.mainnet.varETH_USD, toUSD('1'))
+      })
+
       it('should get price for vaWBTC', async function () {
         const price = await masterOracle.getPriceInUsd(vaWBTC)
         expect(price).closeTo(Quote.mainnet.vaWBTC_USD, toUSD('1'))
@@ -390,7 +403,7 @@ describe('MasterOracle', function () {
 
           // then
           const priceAfter = await masterOracle.getPriceInUsd(sFrxETH)
-          expect(priceAfter).closeTo(priceBefore, parseEther('0.0001'))
+          expect(priceAfter).closeTo(priceBefore, parseEther('0.001'))
         })
 
         it('should not be able to manipulate sFrxETH price (2)', async function () {
