@@ -40,6 +40,7 @@
     "BTCPeggedTokenOracle": "0x54525f751b71e1eA58A558649f0057451E4946b4",
     "CTokenOracle": "0x7C3085721aa6F36081ee5E00583Da5526d57a87e",
     "ChainlinkAndFallbacksOracle": "0x60f440B2013Aa8d5CbD389F48E30eA942231449b",
+    "ChainlinkEthOnlyTokenOracle": "0x7b8A1D28Ef8d09b442c6070316D92401fBAD36BF",
     "ChainlinkOracle": "0x0C102819074dA01f30360676F36b86c8be68A3E7",
     "ChainlinkPriceProvider": "0xDf0425D76ab0E6aBa16b3168353b75D909F0915D",
     "CurveExchange": "0x024cE630ff4A267FEab8Bb2AdEcC5c02e311DB0e",
