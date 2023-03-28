@@ -61,6 +61,7 @@ const customOracles = [
   {token: Address.Vesper.vaWBTC, oracle: 'VPoolTokenOracle'},
   {token: Address.Vesper.vaLINK, oracle: 'VPoolTokenOracle'},
   {token: Address.Vesper.varETH, oracle: 'VPoolTokenOracle'},
+  {token: Address.Vesper.vacbETH, oracle: 'VPoolTokenOracle'},
   // Curve busd pool (yDAI+yUSDC+yUSDT+yBUSD)
   {token: Address.Yearn.yDAIv3, oracle: 'YEarnTokenOracle'},
   {token: Address.Yearn.yUSDCv3, oracle: 'YEarnTokenOracle'},
@@ -92,6 +93,7 @@ const customStalePeriods = [
 const chainlinkEthOnly = [
   {token: Address.stETH, ethFeed: Address.Chainlink.CHAINLINK_STETH_ETH_AGGREGATOR},
   {token: Address.rETH, ethFeed: Address.Chainlink.CHAINLINK_RETH_ETH_AGGREGATOR},
+  {token: Address.CBETH, ethFeed: Address.Chainlink.CHAINLINK_CBETH_ETH_AGGREGATOR},
 ]
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {

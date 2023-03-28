@@ -2,7 +2,7 @@ name: Tests @ bsc
 on:
   pull_request:
     paths:
-      - "test/*.js"
+      - "test/**/*.ts"
       - "contracts/**/*.sol"
       - package*.json
 
