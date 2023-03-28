@@ -70,7 +70,7 @@ describe('MasterOracle', function () {
         FRAX_USDC_LP,
         DOLA_FRAXBP_LP,
       },
-      Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK, varETH},
+      Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK, varETH, vacbETH},
       Synth: {msETH, msUSD, msBTC, msDOGE},
       Frax: {sFrxETH, frxETH},
     } = Addresses.mainnet
@@ -345,6 +345,11 @@ describe('MasterOracle', function () {
       it('should get price for vaLINK', async function () {
         const price = await masterOracle.getPriceInUsd(vaLINK)
         expect(price).closeTo(Quote.mainnet.vaLINK_USD, toUSD('0.1'))
+      })
+
+      it('should get price for vaCbETH', async function () {
+        const price = await masterOracle.getPriceInUsd(vacbETH)
+        expect(price).closeTo(Quote.mainnet.vacbETH_USD, toUSD('1'))
       })
     })
 
