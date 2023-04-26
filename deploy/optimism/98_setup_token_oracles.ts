@@ -11,9 +11,15 @@ const chainlinkAggregators = [
   {token: Address.Curve.SUSD_LP, aggregator: Address.Chainlink.CHAINLINK_USDC_USD_AGGREGATOR},
 ]
 
+const curveLpTokens = [
+  {token: Address.Curve.WSTETH_ETH_LP, isLending: false},
+  {token: Address.Curve.FRAXBP_USDC_LP, isLending: false},
+]
+
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await setupTokenOracles(hre, {
     chainlinkAggregators,
+    curveLpTokens,
   })
 }
 

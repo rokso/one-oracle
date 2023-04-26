@@ -9,10 +9,11 @@ import "./CurveLpTokenOracle.sol";
  * @title Oracle for Ellipsis LP tokens
  */
 contract EllipsisLpTokenOracle is CurveLpTokenOracle {
-    constructor(ICurveAddressProvider addressProvider_) CurveLpTokenOracle(addressProvider_) {}
+    constructor(ICurveAddressProvider addressProvider_, address weth_) CurveLpTokenOracle(addressProvider_, weth_) {}
 
     /// @notice Register LP token data
     function _registerLp(address lpToken_, bool isLending_) internal override {
+        require(!isLpRegistered(lpToken_), "lp-already-registered");
         IEllipsisRegistry _registry = IEllipsisRegistry(registry);
         address _pool = _registry.get_pool_from_lp_token(lpToken_);
         require(_pool != address(0), "invalid-non-factory-lp");

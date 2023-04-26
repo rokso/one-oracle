@@ -1,5 +1,8 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
+import {Addresses} from '../../helpers/address'
+
+const {mainnet: Address} = Addresses
 
 const CurveFactoryLpTokenOracle = 'CurveFactoryLpTokenOracle'
 
@@ -11,7 +14,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy(CurveFactoryLpTokenOracle, {
     from: deployer,
     log: true,
-    args: [],
+    args: [Address.WETH],
   })
 }
 

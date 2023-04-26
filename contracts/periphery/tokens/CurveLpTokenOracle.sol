@@ -18,6 +18,10 @@ contract CurveLpTokenOracle is ITokenOracle, Governable {
     /// @notice Registry contract
     address public immutable registry;
 
+    address internal constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+
+    address internal immutable weth;
+
     /// @notice LP token => coins mapping
     mapping(address => address[]) public underlyingTokens;
 
@@ -27,10 +31,12 @@ contract CurveLpTokenOracle is ITokenOracle, Governable {
     /// @notice Emitted when a token is registered
     event LpRegistered(address indexed lpToken, bool isLending);
 
-    constructor(ICurveAddressProvider curveAddressProvider_) {
+    constructor(ICurveAddressProvider curveAddressProvider_, address weth_) {
         require(address(curveAddressProvider_) != address(0), "null-address-provider");
+        require(weth_ != address(0), "null-weth");
         curveAddressProvider = curveAddressProvider_;
         registry = curveAddressProvider.get_registry();
+        weth = weth_;
     }
 
     /// @inheritdoc ITokenOracle
@@ -54,6 +60,11 @@ contract CurveLpTokenOracle is ITokenOracle, Governable {
         return (_min * ICurvePool(_pool).get_virtual_price()) / 1e18;
     }
 
+    /// @notice Check if a token is already registered
+    function isLpRegistered(address lpToken_) public view returns (bool) {
+        return underlyingTokens[lpToken_].length > 0;
+    }
+
     /// @notice Register LP token data
     function registerLp(address lpToken_) external onlyGovernor {
         _registerLp(lpToken_, false);
@@ -66,6 +77,7 @@ contract CurveLpTokenOracle is ITokenOracle, Governable {
 
     /// @notice Register LP token data
     function _registerLp(address lpToken_, bool isLending_) internal virtual {
+        require(!isLpRegistered(lpToken_), "lp-already-registered");
         ICurveRegistry _registry = ICurveRegistry(registry);
         address _pool = _registry.get_pool_from_lp_token(lpToken_);
         require(_pool != address(0), "invalid-non-factory-lp");
@@ -86,7 +98,11 @@ contract CurveLpTokenOracle is ITokenOracle, Governable {
 
         uint256 _n = _registry.get_n_coins(_pool);
         for (uint256 i; i < _n; i++) {
-            underlyingTokens[lpToken_].push(_tokens[i]);
+            if (_tokens[i] == ETH) {
+                underlyingTokens[lpToken_].push(weth);
+            } else {
+                underlyingTokens[lpToken_].push(_tokens[i]);
+            }
         }
 
         emit LpRegistered(lpToken_, isLending_);
