@@ -68,6 +68,10 @@ export const setupTokenOracles = async (
       const current = await read(MasterOracle, 'oracles', token)
       if (current !== curveLpOracleAddress) {
         await saveGovernorExecutionForMultiSigBatch(hre, MasterOracle, 'updateTokenOracle', token, curveLpOracleAddress)
+      }
+
+      const isLpRegistered = await read(CurveLpTokenOracle, 'isLpRegistered', token)
+      if (!isLpRegistered) {
         if (isLending) {
           await saveGovernorExecutionForMultiSigBatch(hre, CurveLikeLpTokenOracle, 'registerLendingLp', token)
         } else {
