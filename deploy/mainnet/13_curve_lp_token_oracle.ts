@@ -14,7 +14,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy(CurveLpTokenOracle, {
     from: deployer,
     log: true,
-    args: [Address.Curve.ADDRESS_PROVIDER],
+    args: [Address.Curve.ADDRESS_PROVIDER, Address.WETH],
   })
 }
 

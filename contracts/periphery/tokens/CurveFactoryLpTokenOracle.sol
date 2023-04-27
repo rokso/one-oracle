@@ -19,13 +19,19 @@ contract CurveFactoryLpTokenOracle is ITokenOracle {
     /// @notice Factory Registry contract
     ICurveFactoryRegistry public immutable registry;
 
+    address private constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+
+    address private immutable weth;
+
     /// @notice LP token => coins mapping
     mapping(address => address[]) public underlyingTokens;
 
     /// @notice Emitted when a token is registered
     event LpRegistered(address indexed lpToken);
 
-    constructor() {
+    constructor(address weth_) {
+        require(weth_ != address(0), "null-weth");
+        weth = weth_;
         registry = ICurveFactoryRegistry(addressProvider.get_address(3));
     }
 
@@ -63,7 +69,11 @@ contract CurveFactoryLpTokenOracle is ITokenOracle {
 
         address[4] memory _tokens = registry.get_coins(lpToken_);
         for (uint256 i; i < _n; i++) {
-            underlyingTokens[lpToken_].push(_tokens[i]);
+            if (_tokens[i] == ETH) {
+                underlyingTokens[lpToken_].push(weth);
+            } else {
+                underlyingTokens[lpToken_].push(_tokens[i]);
+            }
         }
 
         emit LpRegistered(lpToken_);

@@ -14,7 +14,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy(EllipsisLpTokenOracle, {
     from: deployer,
     log: true,
-    args: [Address.Ellipsis.ADDRESS_PROVIDER],
+    args: [Address.Ellipsis.ADDRESS_PROVIDER, Address.WETH],
   })
 }
 
