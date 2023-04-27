@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {saveForMultiSigBatchExecution, executeUsingMultiSig} from './multisig-helpers'
 import {setupTokenOracles} from './setup-oracles'
-import {Address} from '../address'
 
 export const saveGovernorExecutionForMultiSigBatch = async (
   hre: HardhatRuntimeEnvironment,
@@ -9,13 +9,12 @@ export const saveGovernorExecutionForMultiSigBatch = async (
   methodName: string,
   ...args: any[]
 ) => {
-  const {deployments, getNamedAccounts} = hre
-  const {execute, catchUnknownSigner} = deployments
-  const {deployer} = await getNamedAccounts()
+  const {deployments} = hre
+  const {execute, catchUnknownSigner, read} = deployments
 
   const log = hre.network.name == 'hardhat' ? false : true
 
-  const governor = Address.GOVERNOR || deployer
+  const governor = await read(contract, 'governor')
   const multiSigTx = await catchUnknownSigner(execute(contract, {from: governor, log}, methodName, ...args), {
     log,
   })
@@ -31,13 +30,12 @@ export const executeFromGovernorMultiSig = async (
   methodName: string,
   ...args: any[]
 ) => {
-  const {deployments, getNamedAccounts} = hre
-  const {execute, catchUnknownSigner} = deployments
-  const {deployer} = await getNamedAccounts()
+  const {deployments} = hre
+  const {execute, catchUnknownSigner, read} = deployments
 
   const log = hre.network.name == 'hardhat' ? false : true
 
-  const governor = Address.GOVERNOR || deployer
+  const governor = await read(contract, 'governor')
   const multiSigTx = await catchUnknownSigner(execute(contract, {from: governor, log}, methodName, ...args), {
     log,
   })
