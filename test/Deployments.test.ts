@@ -317,23 +317,18 @@ describe('Deployments ', function () {
   })
 
   describe('@optimism', function () {
-    let uniswapV3Exchange: UniswapV3Exchange
-    let routedSwapper: RoutedSwapper
-    let weth: IERC20
-    let dai: IERC20
     let priceProvidersAggregator: PriceProvidersAggregator
     let chainlinkOracle: ChainlinkOracle
     let msUsdOracle: USDPeggedTokenOracle
 
-    const {WETH, DAI, USDC, OP, GOVERNOR} = Addresses.optimism
+    const {WETH, DAI, USDC, OP} = Addresses.optimism
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
       hre.network.deploy = ['deploy/optimism']
 
       // eslint-disable-next-line no-shadow
-      const {PriceProvidersAggregator, ChainlinkOracle, USDPeggedTokenOracle, UniswapV3Exchange, RoutedSwapper} =
-        await deployments.fixture()
+      const {PriceProvidersAggregator, ChainlinkOracle, USDPeggedTokenOracle} = await deployments.fixture()
 
       priceProvidersAggregator = await ethers.getContractAt(
         'PriceProvidersAggregator',
@@ -342,10 +337,6 @@ describe('Deployments ', function () {
       )
       chainlinkOracle = await ethers.getContractAt('ChainlinkOracle', ChainlinkOracle.address, deployer)
       msUsdOracle = await ethers.getContractAt('USDPeggedTokenOracle', USDPeggedTokenOracle.address, deployer)
-      uniswapV3Exchange = await ethers.getContractAt('UniswapV3Exchange', UniswapV3Exchange.address, deployer)
-      routedSwapper = await ethers.getContractAt('RoutedSwapper', RoutedSwapper.address, deployer)
-      weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
-      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
 
       // AddressProvider governor can update priceProvidersAggregator if not already set.
       const addressProvider = await ethers.getContractAt(AddressProvider, Addresses.ADDRESS_PROVIDER)
@@ -357,11 +348,6 @@ describe('Deployments ', function () {
       }
 
       await adjustBalance(WETH, deployer.address, parseEther('1000'))
-    })
-
-    it('UniswapV3Exchange', async function () {
-      const wethLike = await uniswapV3Exchange.wethLike()
-      expect(wethLike).eq(WETH)
     })
 
     it('PriceProvidersAggregator', async function () {
@@ -396,26 +382,6 @@ describe('Deployments ', function () {
       // Should always return 1 USD no matter the address given
       const priceInUsd = await msUsdOracle.getPriceInUsd(ethers.constants.AddressZero)
       expect(priceInUsd).eq(toUSD('1'))
-    })
-
-    it('RoutedSwapper', async function () {
-      // given
-      const defaultPoolFee = await uniswapV3Exchange.defaultPoolFee()
-      const path = ethers.utils.solidityPack(['address', 'uint24', 'address'], [WETH, defaultPoolFee, DAI])
-      const governor = await impersonateAccount(GOVERNOR)
-      await routedSwapper
-        .connect(governor)
-        .setDefaultRouting(SwapType.EXACT_INPUT, WETH, DAI, ExchangeType.UNISWAP_V3, path)
-      await weth.approve(routedSwapper.address, ethers.constants.MaxUint256)
-
-      // when
-      const amountIn = parseEther('1')
-      const before = await dai.balanceOf(deployer.address)
-      await routedSwapper.swapExactInput(WETH, DAI, amountIn, 0, deployer.address)
-      const after = await dai.balanceOf(deployer.address)
-
-      // then
-      expect(after.sub(before)).closeTo(Quote.optimism.ETH_USD, parseEther('10'))
     })
   })
 
