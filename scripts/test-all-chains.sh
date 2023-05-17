@@ -6,7 +6,7 @@
 
 THIS=`dirname $0`
 
-for chain in mainnet avalanche polygon bsc mumbai arbitrum;
+for chain in mainnet avalanche polygon bsc mumbai arbitrum optimism;
 do
     cp $THIS/../.github/$chain.env.properties $THIS/../.env
     npx hardhat test --grep @$chain

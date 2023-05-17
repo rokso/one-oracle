@@ -2,7 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {IERC20, IERC20__factory, UniswapV3Exchange, UniswapV3Exchange__factory} from '../../typechain-types'
+import {IERC20, UniswapV3Exchange} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
@@ -30,15 +30,15 @@ describe('UniswapV3Exchange @mainnet', function () {
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;[deployer] = await ethers.getSigners()
 
-    const dexFactory = new UniswapV3Exchange__factory(deployer)
+    const dexFactory = await ethers.getContractFactory('UniswapV3Exchange', deployer)
     dex = await dexFactory.deploy(WETH)
     await dex.deployed()
     defaultPoolFee = await dex.defaultPoolFee()
 
-    weth = IERC20__factory.connect(WETH, deployer)
-    dai = IERC20__factory.connect(DAI, deployer)
-    wbtc = IERC20__factory.connect(WBTC, deployer)
-    usdc = IERC20__factory.connect(USDC, deployer)
+    weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+    dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+    wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+    usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
 
     await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))

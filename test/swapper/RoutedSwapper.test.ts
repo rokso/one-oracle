@@ -2,18 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {
-  UniswapV2LikeExchange,
-  UniswapV2LikeExchange__factory,
-  UniswapV3Exchange,
-  UniswapV3Exchange__factory,
-  CurveExchange,
-  CurveExchange__factory,
-  RoutedSwapper,
-  RoutedSwapper__factory,
-  IERC20,
-  IERC20__factory,
-} from '../../typechain-types'
+import {UniswapV2LikeExchange, UniswapV3Exchange, CurveExchange, RoutedSwapper, IERC20} from '../../typechain-types'
 import {parseEther, parseUnits} from '../helpers'
 import {Addresses, ExchangeType, SwapType, InitCodeHash} from '../../helpers'
 import {adjustBalance} from '../helpers/balance'
@@ -83,7 +72,7 @@ describe('RoutedSwapper @mainnet', function () {
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    const uniswapV2LikeExchangeFactory = new UniswapV2LikeExchange__factory(deployer)
+    const uniswapV2LikeExchangeFactory = await ethers.getContractFactory('UniswapV2LikeExchange', deployer)
 
     uniswapV2Exchange = await uniswapV2LikeExchangeFactory.deploy(
       UNISWAP_V2_FACTORY_ADDRESS,
@@ -92,15 +81,15 @@ describe('RoutedSwapper @mainnet', function () {
     )
     await uniswapV2Exchange.deployed()
 
-    const uniswapV3ExchangeFactory = new UniswapV3Exchange__factory(deployer)
+    const uniswapV3ExchangeFactory = await ethers.getContractFactory('UniswapV3Exchange', deployer)
     uniswapV3Exchange = await uniswapV3ExchangeFactory.deploy(WETH)
     await uniswapV3Exchange.deployed()
 
-    const curveExchangeFactory = new CurveExchange__factory(deployer)
+    const curveExchangeFactory = await ethers.getContractFactory('CurveExchange', deployer)
     curveExchange = await curveExchangeFactory.deploy(Curve.ADDRESS_PROVIDER)
     await curveExchange.deployed()
 
-    const swapperFactory = new RoutedSwapper__factory(deployer)
+    const swapperFactory = await ethers.getContractFactory('RoutedSwapper', deployer)
     swapper = await swapperFactory.deploy()
     await swapper.deployed()
 
@@ -108,20 +97,20 @@ describe('RoutedSwapper @mainnet', function () {
     await swapper.setExchange(ExchangeType.UNISWAP_V3, uniswapV3Exchange.address)
     await swapper.setExchange(ExchangeType.CURVE, curveExchange.address)
 
-    weth = IERC20__factory.connect(WETH, deployer)
-    dai = IERC20__factory.connect(DAI, deployer)
-    wbtc = IERC20__factory.connect(WBTC, deployer)
-    steth = IERC20__factory.connect(STETH, deployer)
-    usdc = IERC20__factory.connect(USDC, deployer)
-    usdt = IERC20__factory.connect(USDT, deployer)
-    stg = IERC20__factory.connect(STG, deployer)
-    frax = IERC20__factory.connect(FRAX, deployer)
-    cvx = IERC20__factory.connect(CVX, deployer)
-    crv = IERC20__factory.connect(CRV, deployer)
-    musd = IERC20__factory.connect(MUSD, deployer)
-    reth = IERC20__factory.connect(RETH, deployer)
-    cbeth = IERC20__factory.connect(CBETH, deployer)
-    eul = IERC20__factory.connect(EUL, deployer)
+    weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+    dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+    wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+    steth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', STETH, deployer)
+    usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
+    usdt = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDT, deployer)
+    stg = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', STG, deployer)
+    frax = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', FRAX, deployer)
+    cvx = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', CVX, deployer)
+    crv = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', CRV, deployer)
+    musd = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', MUSD, deployer)
+    reth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', RETH, deployer)
+    cbeth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', CBETH, deployer)
+    eul = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', EUL, deployer)
 
     await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))

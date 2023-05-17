@@ -4,7 +4,7 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {Addresses} from '../../helpers'
-import {UsingMaxDeviationMock, UsingMaxDeviationMock__factory} from '../../typechain-types'
+import {UsingMaxDeviationMock} from '../../typechain-types'
 
 import {parseEther} from '../helpers'
 
@@ -23,7 +23,7 @@ describe('UsingMaxDeviation @mainnet', function () {
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    const usingMaxDeviationFactory = new UsingMaxDeviationMock__factory(deployer)
+    const usingMaxDeviationFactory = await ethers.getContractFactory('UsingMaxDeviationMock', deployer)
     usingMaxDeviation = await usingMaxDeviationFactory.deploy(MAX_DEVIATION)
     await usingMaxDeviation.deployed()
   })

@@ -2,7 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {ChainlinkMainnetPriceProvider, ChainlinkMainnetPriceProvider__factory} from '../../typechain-types'
+import {ChainlinkMainnetPriceProvider} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 import Quote from '../helpers/quotes'
@@ -18,7 +18,7 @@ describe('ChainlinkMainnetPriceProvider @mainnet', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer] = await ethers.getSigners()
 
-    const priceProviderFactory = new ChainlinkMainnetPriceProvider__factory(deployer)
+    const priceProviderFactory = await ethers.getContractFactory('ChainlinkMainnetPriceProvider', deployer)
     priceProvider = await priceProviderFactory.deploy()
     await priceProvider.deployed()
   })

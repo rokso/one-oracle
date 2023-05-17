@@ -2,7 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {VspMainnetOracle, VspMainnetOracle__factory} from '../../typechain-types'
+import {VspMainnetOracle} from '../../typechain-types'
 import {Addresses, Provider} from '../../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
 import {parseEther, timestampFromLatestBlock, HOUR, parseUnits} from '../helpers'
@@ -39,7 +39,7 @@ describe('VspMainnetOracle @mainnet', function () {
     stableCoinProvider = await smock.fake('StableCoinProvider')
     stableCoinProvider.getStableCoinIfPegged.returns(DAI)
 
-    const vspMainnetOracleFactory = new VspMainnetOracle__factory(deployer)
+    const vspMainnetOracleFactory = await ethers.getContractFactory('VspMainnetOracle', deployer)
     vspOracle = await vspMainnetOracleFactory.deploy(MAX_DEVIATION, STALE_PERIOD)
     await vspOracle.deployed()
 

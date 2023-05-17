@@ -2,7 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {StableCoinProvider, StableCoinProvider__factory} from '../../typechain-types'
+import {StableCoinProvider} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {HOUR, parseEther, parseUnits, timestampFromLatestBlock, toUSD} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
@@ -30,7 +30,7 @@ describe('StableCoinProvider @mainnet', function () {
 
     providersAggregator.priceProviders.returns(() => priceProvider.address)
 
-    const stableCoinProviderFactory = new StableCoinProvider__factory(deployer)
+    const stableCoinProviderFactory = await ethers.getContractFactory('StableCoinProvider', deployer)
     stableCoinProvider = await stableCoinProviderFactory.deploy(DAI, USDC, STALE_PERIOD, MAX_DEVIATION)
     await stableCoinProvider.deployed()
 

@@ -3,31 +3,20 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import hre, {deployments, ethers} from 'hardhat'
 import {
-  ChainlinkAvalanchePriceProvider__factory,
-  PriceProvidersAggregator__factory,
   ChainlinkAvalanchePriceProvider,
-  ChainlinkBscPriceProvider__factory,
   ChainlinkBscPriceProvider,
   PriceProvidersAggregator,
   UniswapV2LikeExchange,
   UniswapV3Exchange,
   CurveExchange,
   RoutedSwapper,
-  RoutedSwapper__factory,
-  UniswapV2LikeExchange__factory,
-  UniswapV3Exchange__factory,
-  CurveExchange__factory,
-  VspMainnetOracle__factory,
   VspMainnetOracle,
-  ChainlinkOracle__factory,
   ChainlinkOracle,
-  USDPeggedTokenOracle__factory,
   USDPeggedTokenOracle,
+  IERC20,
 } from '../typechain-types'
 import {Addresses, SwapType, Provider, ExchangeType} from '../helpers'
 import {impersonateAccount, increaseTime, parseEther, resetFork, toUSD} from './helpers'
-import {IERC20} from '../typechain-types/@openzeppelin/contracts/token/ERC20'
-import {IERC20__factory} from '../typechain-types/factories/@openzeppelin/contracts/token/ERC20'
 import {adjustBalance} from './helpers/balance'
 import Quote from './helpers/quotes'
 import {smock} from '@defi-wonderland/smock'
@@ -68,13 +57,18 @@ describe('Deployments ', function () {
       const {ChainlinkPriceProvider, PriceProvidersAggregator, ChainlinkOracle, USDPeggedTokenOracle} =
         await deployments.fixture()
 
-      chainlinkPriceProvider = ChainlinkAvalanchePriceProvider__factory.connect(
+      chainlinkPriceProvider = await ethers.getContractAt(
+        'ChainlinkAvalanchePriceProvider',
         ChainlinkPriceProvider.address,
         deployer
       )
-      priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
-      chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
-      msUsdOracle = USDPeggedTokenOracle__factory.connect(USDPeggedTokenOracle.address, deployer)
+      priceProvidersAggregator = await ethers.getContractAt(
+        'PriceProvidersAggregator',
+        PriceProvidersAggregator.address,
+        deployer
+      )
+      chainlinkOracle = await ethers.getContractAt('ChainlinkOracle', ChainlinkOracle.address, deployer)
+      msUsdOracle = await ethers.getContractAt('USDPeggedTokenOracle', USDPeggedTokenOracle.address, deployer)
     })
 
     it('ChainlinkPriceProvider', async function () {
@@ -126,14 +120,22 @@ describe('Deployments ', function () {
       } = await deployments.fixture()
       /* eslint-enable no-shadow */
 
-      chainlinkPriceProvider = ChainlinkBscPriceProvider__factory.connect(ChainlinkPriceProvider.address, deployer)
-      priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
-      chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
-      wbnb = IERC20__factory.connect(WBNB, deployer)
-      busd = IERC20__factory.connect(BUSD, deployer)
-      sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiSwapExchange.address, deployer)
-      pancakeSwapExchange = UniswapV2LikeExchange__factory.connect(PancakeSwapExchange.address, deployer)
-      routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
+      chainlinkPriceProvider = await ethers.getContractAt(
+        'ChainlinkBscPriceProvider',
+        ChainlinkPriceProvider.address,
+        deployer
+      )
+      priceProvidersAggregator = await ethers.getContractAt(
+        'PriceProvidersAggregator',
+        PriceProvidersAggregator.address,
+        deployer
+      )
+      chainlinkOracle = await ethers.getContractAt('ChainlinkOracle', ChainlinkOracle.address, deployer)
+      wbnb = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBNB, deployer)
+      busd = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', BUSD, deployer)
+      sushiswapExchange = await ethers.getContractAt('UniswapV2LikeExchange', SushiSwapExchange.address, deployer)
+      pancakeSwapExchange = await ethers.getContractAt('UniswapV2LikeExchange', PancakeSwapExchange.address, deployer)
+      routedSwapper = await ethers.getContractAt('RoutedSwapper', RoutedSwapper.address, deployer)
       await adjustBalance(WBNB, deployer.address, parseEther('1000'))
     })
 
@@ -201,14 +203,14 @@ describe('Deployments ', function () {
       const {UniswapV2Exchange, SushiswapExchange, UniswapV3Exchange, RoutedSwapper, VspOracle, CurveExchange} =
         await deployments.fixture()
 
-      uniswapV2Exchange = UniswapV2LikeExchange__factory.connect(UniswapV2Exchange.address, deployer)
-      sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiswapExchange.address, deployer)
-      uniswapV3Exchange = UniswapV3Exchange__factory.connect(UniswapV3Exchange.address, deployer)
-      curveExchange = CurveExchange__factory.connect(CurveExchange.address, deployer)
-      routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
-      weth = IERC20__factory.connect(WETH, deployer)
-      dai = IERC20__factory.connect(DAI, deployer)
-      vspOracle = VspMainnetOracle__factory.connect(VspOracle.address, deployer)
+      uniswapV2Exchange = await ethers.getContractAt('UniswapV2LikeExchange', UniswapV2Exchange.address, deployer)
+      sushiswapExchange = await ethers.getContractAt('UniswapV2LikeExchange', SushiswapExchange.address, deployer)
+      uniswapV3Exchange = await ethers.getContractAt('UniswapV3Exchange', UniswapV3Exchange.address, deployer)
+      curveExchange = await ethers.getContractAt('CurveExchange', CurveExchange.address, deployer)
+      routedSwapper = await ethers.getContractAt('RoutedSwapper', RoutedSwapper.address, deployer)
+      weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+      vspOracle = await ethers.getContractAt('VspMainnetOracle', VspOracle.address, deployer)
 
       await adjustBalance(WETH, deployer.address, parseEther('1000'))
     })
@@ -279,10 +281,10 @@ describe('Deployments ', function () {
       // eslint-disable-next-line no-shadow
       const {QuickSwapExchange, SushiSwapExchange, RoutedSwapper} = await deployments.fixture()
 
-      quickswapExchange = UniswapV2LikeExchange__factory.connect(QuickSwapExchange.address, deployer)
-      sushiswapExchange = UniswapV2LikeExchange__factory.connect(SushiSwapExchange.address, deployer)
-      routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
-      wmatic = IERC20__factory.connect(WMATIC, deployer)
+      quickswapExchange = await ethers.getContractAt('UniswapV2LikeExchange', QuickSwapExchange.address, deployer)
+      sushiswapExchange = await ethers.getContractAt('UniswapV2LikeExchange', SushiSwapExchange.address, deployer)
+      routedSwapper = await ethers.getContractAt('RoutedSwapper', RoutedSwapper.address, deployer)
+      wmatic = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WMATIC, deployer)
 
       await adjustBalance(WMATIC, deployer.address, parseEther('1000'))
     })
@@ -323,7 +325,7 @@ describe('Deployments ', function () {
     let chainlinkOracle: ChainlinkOracle
     let msUsdOracle: USDPeggedTokenOracle
 
-    const {WETH, DAI, USDC, OP} = Addresses.optimism
+    const {WETH, DAI, USDC, OP, GOVERNOR} = Addresses.optimism
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -333,13 +335,17 @@ describe('Deployments ', function () {
       const {PriceProvidersAggregator, ChainlinkOracle, USDPeggedTokenOracle, UniswapV3Exchange, RoutedSwapper} =
         await deployments.fixture()
 
-      priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
-      chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
-      msUsdOracle = USDPeggedTokenOracle__factory.connect(USDPeggedTokenOracle.address, deployer)
-      uniswapV3Exchange = UniswapV3Exchange__factory.connect(UniswapV3Exchange.address, deployer)
-      routedSwapper = RoutedSwapper__factory.connect(RoutedSwapper.address, deployer)
-      weth = IERC20__factory.connect(WETH, deployer)
-      dai = IERC20__factory.connect(DAI, deployer)
+      priceProvidersAggregator = await ethers.getContractAt(
+        'PriceProvidersAggregator',
+        PriceProvidersAggregator.address,
+        deployer
+      )
+      chainlinkOracle = await ethers.getContractAt('ChainlinkOracle', ChainlinkOracle.address, deployer)
+      msUsdOracle = await ethers.getContractAt('USDPeggedTokenOracle', USDPeggedTokenOracle.address, deployer)
+      uniswapV3Exchange = await ethers.getContractAt('UniswapV3Exchange', UniswapV3Exchange.address, deployer)
+      routedSwapper = await ethers.getContractAt('RoutedSwapper', RoutedSwapper.address, deployer)
+      weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
 
       // AddressProvider governor can update priceProvidersAggregator if not already set.
       const addressProvider = await ethers.getContractAt(AddressProvider, Addresses.ADDRESS_PROVIDER)
@@ -396,7 +402,10 @@ describe('Deployments ', function () {
       // given
       const defaultPoolFee = await uniswapV3Exchange.defaultPoolFee()
       const path = ethers.utils.solidityPack(['address', 'uint24', 'address'], [WETH, defaultPoolFee, DAI])
-      await routedSwapper.setDefaultRouting(SwapType.EXACT_INPUT, WETH, DAI, ExchangeType.UNISWAP_V3, path)
+      const governor = await impersonateAccount(GOVERNOR)
+      await routedSwapper
+        .connect(governor)
+        .setDefaultRouting(SwapType.EXACT_INPUT, WETH, DAI, ExchangeType.UNISWAP_V3, path)
       await weth.approve(routedSwapper.address, ethers.constants.MaxUint256)
 
       // when
@@ -429,8 +438,12 @@ describe('Deployments ', function () {
       // eslint-disable-next-line no-shadow
       const {PriceProvidersAggregator, ChainlinkOracle} = await deployments.fixture()
 
-      priceProvidersAggregator = PriceProvidersAggregator__factory.connect(PriceProvidersAggregator.address, deployer)
-      chainlinkOracle = ChainlinkOracle__factory.connect(ChainlinkOracle.address, deployer)
+      priceProvidersAggregator = await ethers.getContractAt(
+        'PriceProvidersAggregator',
+        PriceProvidersAggregator.address,
+        deployer
+      )
+      chainlinkOracle = await ethers.getContractAt('ChainlinkOracle', ChainlinkOracle.address, deployer)
 
       addressProvider.providersAggregator.returns(priceProvidersAggregator.address)
     })

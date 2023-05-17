@@ -2,15 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {
-  CurveExchange,
-  IERC20__factory,
-  IERC20,
-  CurveExchange__factory,
-  ICurveSwaps,
-  ICurveAddressProvider__factory,
-  ICurveSwaps__factory,
-} from '../../typechain-types'
+import {CurveExchange, IERC20, ICurveSwaps} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
@@ -40,20 +32,20 @@ describe('CurveExchange', function () {
       snapshotId = await ethers.provider.send('evm_snapshot', [])
       ;[deployer] = await ethers.getSigners()
 
-      const _dexFactory = new CurveExchange__factory(deployer)
+      const _dexFactory = await ethers.getContractFactory('CurveExchange', deployer)
       dex = await _dexFactory.deploy(Curve.ADDRESS_PROVIDER)
       await dex.deployed()
 
-      weth = IERC20__factory.connect(WETH, deployer)
-      dai = IERC20__factory.connect(DAI, deployer)
-      wbtc = IERC20__factory.connect(WBTC, deployer)
-      usdc = IERC20__factory.connect(USDC, deployer)
-      musd = IERC20__factory.connect(MUSD, deployer)
-      stg = IERC20__factory.connect(STG, deployer)
-      frax = IERC20__factory.connect(FRAX, deployer)
+      weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+      usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
+      musd = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', MUSD, deployer)
+      stg = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', STG, deployer)
+      frax = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', FRAX, deployer)
 
-      const addressProvider = ICurveAddressProvider__factory.connect(Curve.ADDRESS_PROVIDER, deployer)
-      swaps = ICurveSwaps__factory.connect(await addressProvider.get_address(2), deployer)
+      const addressProvider = await ethers.getContractAt('ICurveAddressProvider', Curve.ADDRESS_PROVIDER, deployer)
+      swaps = await ethers.getContractAt('ICurveSwaps', await addressProvider.get_address(2), deployer)
 
       await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
       await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))

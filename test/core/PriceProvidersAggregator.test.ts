@@ -4,13 +4,8 @@ import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {
   UniswapV3PriceProvider,
-  UniswapV3PriceProvider__factory,
   IERC20,
-  IERC20__factory,
   PriceProvidersAggregator,
-  PriceProvidersAggregator__factory,
-  UniswapV3CrossPoolOracle__factory,
-  ChainlinkMainnetPriceProvider__factory,
   ChainlinkMainnetPriceProvider,
 } from '../../typechain-types'
 import {Addresses, Provider} from '../../helpers'
@@ -38,18 +33,18 @@ describe('PriceProvidersAggregator @mainnet', function () {
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
-    weth = IERC20__factory.connect(WETH, deployer)
-    wbtc = IERC20__factory.connect(WBTC, deployer)
-    usdc = IERC20__factory.connect(USDC, deployer)
+    weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+    wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+    usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
 
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
+    const crossPoolOracleFactory = await ethers.getContractFactory('UniswapV3CrossPoolOracle', deployer)
     const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
     await crossPoolOracle.deployed()
 
-    const uniswapV3ProviderFactory = new UniswapV3PriceProvider__factory(deployer)
+    const uniswapV3ProviderFactory = await ethers.getContractFactory('UniswapV3PriceProvider', deployer)
     uniswapV3Provider = await uniswapV3ProviderFactory.deploy(
       crossPoolOracle.address,
       DEFAULT_TWAP_PERIOD,
@@ -57,11 +52,11 @@ describe('PriceProvidersAggregator @mainnet', function () {
     )
     await uniswapV3Provider.deployed()
 
-    const chainlinkProviderFactory = new ChainlinkMainnetPriceProvider__factory(deployer)
+    const chainlinkProviderFactory = await ethers.getContractFactory('ChainlinkMainnetPriceProvider', deployer)
     chainlinkProvider = await chainlinkProviderFactory.deploy()
     await chainlinkProvider.deployed()
 
-    const aggregatorProviderFactory = new PriceProvidersAggregator__factory(deployer)
+    const aggregatorProviderFactory = await ethers.getContractFactory('PriceProvidersAggregator', deployer)
     aggregator = await aggregatorProviderFactory.deploy(WETH)
     await aggregator.deployed()
 

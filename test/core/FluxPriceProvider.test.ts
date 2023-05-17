@@ -2,12 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {
-  AggregatorV3Interface,
-  AggregatorV3Interface__factory,
-  FluxPriceProvider,
-  FluxPriceProvider__factory,
-} from '../../typechain-types'
+import {AggregatorV3Interface, FluxPriceProvider} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
@@ -35,7 +30,7 @@ describe('FluxPriceProvider @mumbai', function () {
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    const priceProviderFactory = new FluxPriceProvider__factory(deployer)
+    const priceProviderFactory = await ethers.getContractFactory('FluxPriceProvider', deployer)
     priceProvider = await priceProviderFactory.deploy(MAX_DEVIATION)
     await priceProvider.deployed()
 
@@ -71,7 +66,7 @@ describe('FluxPriceProvider @mumbai', function () {
       let secondAggregator: FakeContract
 
       beforeEach(async function () {
-        firstAggregator = AggregatorV3Interface__factory.connect(FLUX_ETH_USD_AGGREGATOR, deployer)
+        firstAggregator = await ethers.getContractAt('AggregatorV3Interface', FLUX_ETH_USD_AGGREGATOR, deployer)
         secondAggregator = await smock.fake('AggregatorV3Interface')
         secondAggregator.decimals.returns(() => 8)
         await priceProvider.addAggregator(WETH, secondAggregator.address)
