@@ -611,7 +611,8 @@ describe('MasterOracle', function () {
       GOVERNOR,
       DAI,
       Curve,
-      Vesper: {vaUSDC, vaOP, vaETH, vastETH},
+      Vesper: {vaUSDC, vaOP, vaETH, vawstETH},
+      Synth: {msUSD, msETH, msOP},
     } = Addresses.optimism
 
     before(async function () {
@@ -655,31 +656,25 @@ describe('MasterOracle', function () {
       })
     })
 
-    // TODO: Use real tokens after Synth deployment
+    // TODO
     describe.skip('Synth', function () {
       it('should get price for msUSD', async function () {
-        const tokenFactory = await ethers.getContractFactory('ERC20Mock', deployer)
-        const msUSD = await tokenFactory.deploy('msUSD', 'msUSD')
-        const price = await masterOracle.getPriceInUsd(msUSD.address)
+        const price = await masterOracle.getPriceInUsd(msUSD)
         expect(price).eq(toUSD('1'))
       })
 
       it('should get price for msOP', async function () {
-        const tokenFactory = await ethers.getContractFactory('ERC20Mock', deployer)
-        const msOP = await tokenFactory.deploy('msOP', 'msOP')
-        const price = await masterOracle.getPriceInUsd(msOP.address)
+        const price = await masterOracle.getPriceInUsd(msOP)
         expect(price).closeTo(Quote.optimism.OP_USD, toUSD('5'))
       })
 
       it('should get price for msETH', async function () {
-        const tokenFactory = await ethers.getContractFactory('ERC20Mock', deployer)
-        const msETH = await tokenFactory.deploy('msETH', 'msETH')
-        const price = await masterOracle.getPriceInUsd(msETH.address)
+        const price = await masterOracle.getPriceInUsd(msETH)
         expect(price).closeTo(Quote.optimism.ETH_USD, toUSD('5'))
       })
     })
 
-    describe.skip('VPool tokens', function () {
+    describe('VPool tokens', function () {
       it('should get price for vaUSDC', async function () {
         const price = await masterOracle.getPriceInUsd(vaUSDC)
         expect(price).closeTo(Quote.optimism.vaUSDC_USD, toUSD('0.01'))
@@ -690,15 +685,14 @@ describe('MasterOracle', function () {
         expect(price).closeTo(Quote.optimism.vaETH_USD, toUSD('1'))
       })
 
-      // TODO
-      it.skip('should get price for vastETH', async function () {
-        const price = await masterOracle.getPriceInUsd(vastETH)
+      it('should get price for vawstETH', async function () {
+        const price = await masterOracle.getPriceInUsd(vawstETH)
         expect(price).closeTo(Quote.optimism.vastETH_USD, toUSD('5'))
       })
 
       it('should get price for vaOP', async function () {
         const price = await masterOracle.getPriceInUsd(vaOP)
-        expect(price).closeTo(Quote.optimism.vaDAI_USD, toUSD('0.01'))
+        expect(price).closeTo(Quote.optimism.vaOP_USD, toUSD('0.01'))
       })
     })
   })

@@ -83,10 +83,10 @@ const Quote = {
     USDC_USD: parseEther('1'),
     DAI_USD: parseEther('1'),
     OP_USD: parseEther('1.7'),
-    vaUSDC_USD: 0,
-    vaETH_USD: 0,
-    vastETH_USD: 0,
-    vaDAI_USD: 0,
+    vaUSDC_USD: parseEther('1'),
+    vaETH_USD: parseEther('1,800'),
+    vastETH_USD: parseEther('2,022'),
+    vaOP_USD: parseEther('1.7'),
   },
 }
 export default Quote
