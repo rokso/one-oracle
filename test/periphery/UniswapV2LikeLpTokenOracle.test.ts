@@ -4,14 +4,9 @@ import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {
   UniswapV2LikeLpTokenOracle,
-  UniswapV2LikeLpTokenOracle__factory,
-  ChainlinkMainnetPriceProvider__factory,
   ChainlinkMainnetPriceProvider,
   IUniswapV2Pair,
-  IUniswapV2Pair__factory,
   IERC20,
-  IERC20__factory,
-  IUniswapV2Router02__factory,
   IUniswapV2Router02,
 } from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
@@ -44,22 +39,22 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer] = await ethers.getSigners()
 
-    const chainlinkProviderFactory = new ChainlinkMainnetPriceProvider__factory(deployer)
+    const chainlinkProviderFactory = await ethers.getContractFactory('ChainlinkMainnetPriceProvider', deployer)
     underlyingOracle = await chainlinkProviderFactory.deploy()
     await underlyingOracle.deployed()
 
-    const lpOracleFactory = new UniswapV2LikeLpTokenOracle__factory(deployer)
+    const lpOracleFactory = await ethers.getContractFactory('UniswapV2LikeLpTokenOracle', deployer)
     lpOracle = await lpOracleFactory.deploy(underlyingOracle.address)
     await lpOracle.deployed()
 
-    router = IUniswapV2Router02__factory.connect(UNISWAP_V2_ROUTER_ADDRESS, deployer)
-    ethDaiPair = IUniswapV2Pair__factory.connect(UNISWAP_V2_WETH_DAI_PAIR, deployer)
-    ethWbtcPair = IUniswapV2Pair__factory.connect(UNISWAP_V2_WETH_WBTC_PAIR, deployer)
-    wbtcUsdcPair = IUniswapV2Pair__factory.connect(UNISWAP_V2_WBTC_USDC_PAIR, deployer)
-    weth = IERC20__factory.connect(WETH, deployer)
-    dai = IERC20__factory.connect(DAI, deployer)
-    wbtc = IERC20__factory.connect(WBTC, deployer)
-    usdc = IERC20__factory.connect(USDC, deployer)
+    router = await ethers.getContractAt('IUniswapV2Router02', UNISWAP_V2_ROUTER_ADDRESS, deployer)
+    ethDaiPair = await ethers.getContractAt('IUniswapV2Pair', UNISWAP_V2_WETH_DAI_PAIR, deployer)
+    ethWbtcPair = await ethers.getContractAt('IUniswapV2Pair', UNISWAP_V2_WETH_WBTC_PAIR, deployer)
+    wbtcUsdcPair = await ethers.getContractAt('IUniswapV2Pair', UNISWAP_V2_WBTC_USDC_PAIR, deployer)
+    weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+    dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+    wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+    usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
   })
 
   afterEach(async function () {

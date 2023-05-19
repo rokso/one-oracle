@@ -2,13 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {
-  UmbrellaPassportPriceProvider,
-  UmbrellaPassportPriceProvider__factory,
-  IRegistry__factory,
-  IERC20,
-  IERC20__factory,
-} from '../../typechain-types'
+import {UmbrellaPassportPriceProvider, IERC20} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {HOUR, impersonateAccount, MINUTE, parseEther} from '../helpers'
 import {adjustBalance} from '../helpers/balance'
@@ -48,14 +42,18 @@ describe('UmbrellaPassportPriceProvider @bsc', function () {
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    umb = IERC20__factory.connect(UMB, funder)
+    umb = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', UMB, funder)
     await adjustBalance(UMB, funder.address, parseEther('1,000,000'))
 
-    const datumReceiverFactory = new UmbrellaPassportPriceProvider__factory(deployer)
+    const datumReceiverFactory = await ethers.getContractFactory('UmbrellaPassportPriceProvider', deployer)
     priceProvider = await datumReceiverFactory.deploy(UMBRELLA_REGISTRY, HEARTBEAT_TIMESTAMP, DEVIATION_THRESHOLD)
     await priceProvider.deployed()
 
-    const umbrellaRegistry = IRegistry__factory.connect(UMBRELLA_REGISTRY, deployer)
+    const umbrellaRegistry = await ethers.getContractAt(
+      'contracts/dependencies/@umb-network/IRegistry.sol:IRegistry',
+      UMBRELLA_REGISTRY,
+      deployer
+    )
     const datumRegistryAddress = await umbrellaRegistry.getAddressByString('DatumRegistry')
     expect(datumRegistryAddress).not.eq(ethers.constants.AddressZero)
     datumRegistry = new ethers.Contract(datumRegistryAddress, ABI.datumRegistryAbi, funder)

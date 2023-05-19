@@ -2,16 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {
-  UniswapV2LikeExchange,
-  UniswapV3Exchange,
-  RoutedSwapper,
-  RoutedSwapper__factory,
-  IERC20,
-  IERC20__factory,
-  UniswapV2LikeExchange__factory,
-  UniswapV3Exchange__factory,
-} from '../../../typechain-types'
+import {UniswapV2LikeExchange, UniswapV3Exchange, RoutedSwapper, IERC20} from '../../../typechain-types'
 import {Addresses, ExchangeType, SwapType, InitCodeHash} from '../../../helpers'
 import {parseEther, parseUnits} from '../../helpers'
 import {adjustBalance} from '../../helpers/balance'
@@ -55,11 +46,11 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    weth = IERC20__factory.connect(WETH, deployer)
-    dai = IERC20__factory.connect(DAI, deployer)
-    wbtc = IERC20__factory.connect(WBTC, deployer)
-    usdc = IERC20__factory.connect(USDC, deployer)
-    btt = IERC20__factory.connect(BTT, deployer)
+    weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+    dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+    wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+    usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
+    btt = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', BTT, deployer)
 
     await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
     await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
@@ -67,7 +58,7 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
     await adjustBalance(usdc.address, deployer.address, parseUnits('1,000,000', 6))
     await adjustBalance(btt.address, deployer.address, parseEther('1,000,000,000,000'))
 
-    const uniswapV2LikeExchangeFactory = new UniswapV2LikeExchange__factory(deployer)
+    const uniswapV2LikeExchangeFactory = await ethers.getContractFactory('UniswapV2LikeExchange', deployer)
 
     uniswapV2Exchange = await uniswapV2LikeExchangeFactory.deploy(
       UNISWAP_V2_FACTORY_ADDRESS,
@@ -76,7 +67,7 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
     )
     await uniswapV2Exchange.deployed()
 
-    const uniswapV3ExchangeFactory = new UniswapV3Exchange__factory(deployer)
+    const uniswapV3ExchangeFactory = await ethers.getContractFactory('UniswapV3Exchange', deployer)
     uniswapV3Exchange = await uniswapV3ExchangeFactory.deploy(WETH)
     await uniswapV3Exchange.deployed()
     uniswapV3DefaultPoolFee = await uniswapV3Exchange.defaultPoolFee()
@@ -84,7 +75,7 @@ describe('GasUsage:RoutedSwapper @mainnet', function () {
     //
     // Swapper Setup
     //
-    const swapperFactory = new RoutedSwapper__factory(deployer)
+    const swapperFactory = await ethers.getContractFactory('RoutedSwapper', deployer)
     swapper = await swapperFactory.deploy()
     await swapper.deployed()
 

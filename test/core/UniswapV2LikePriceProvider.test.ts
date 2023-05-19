@@ -2,12 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {
-  UniswapV2LikePriceProvider,
-  UniswapV2LikePriceProvider__factory,
-  IERC20,
-  IERC20__factory,
-} from '../../typechain-types'
+import {UniswapV2LikePriceProvider, IERC20} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import Quote from '../helpers/quotes'
 import {parseEther, parseUnits, HOUR, increaseTime} from '../helpers'
@@ -42,17 +37,17 @@ describe('UniswapV2LikePriceProvider', function () {
     const {DAI, WETH, WBTC, USDC, UNISWAP_V2_FACTORY_ADDRESS, SUSHISWAP_FACTORY_ADDRESS} = Addresses.mainnet
 
     beforeEach(async function () {
-      dai = IERC20__factory.connect(DAI, deployer)
-      nativeToken = IERC20__factory.connect(WETH, deployer)
-      wbtc = IERC20__factory.connect(WBTC, deployer)
-      usdc = IERC20__factory.connect(USDC, deployer)
+      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+      nativeToken = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+      usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
     })
 
     describe('UniswapV2', function () {
       let priceProvider: UniswapV2LikePriceProvider
 
       beforeEach(async function () {
-        const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
+        const priceProviderFactory = await ethers.getContractFactory('UniswapV2LikePriceProvider', deployer)
         priceProvider = await priceProviderFactory.deploy(UNISWAP_V2_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WETH)
         await priceProvider.deployed()
 
@@ -200,7 +195,7 @@ describe('UniswapV2LikePriceProvider', function () {
       let priceProvider: UniswapV2LikePriceProvider
 
       beforeEach(async function () {
-        const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
+        const priceProviderFactory = await ethers.getContractFactory('UniswapV2LikePriceProvider', deployer)
         priceProvider = await priceProviderFactory.deploy(SUSHISWAP_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WETH)
         await priceProvider.deployed()
 
@@ -249,16 +244,16 @@ describe('UniswapV2LikePriceProvider', function () {
     const {DAI, WAVAX, WBTC, TRADERJOE_FACTORY_ADDRESS, PANGOLIN_FACTORY_ADDRESS} = Addresses.avalanche
 
     beforeEach(async function () {
-      dai = IERC20__factory.connect(DAI, deployer)
-      nativeToken = IERC20__factory.connect(WAVAX, deployer)
-      wbtc = IERC20__factory.connect(WBTC, deployer)
+      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+      nativeToken = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WAVAX, deployer)
+      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
     })
 
     describe('TraderJoe', function () {
       let priceProvider: UniswapV2LikePriceProvider
 
       beforeEach(async function () {
-        const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
+        const priceProviderFactory = await ethers.getContractFactory('UniswapV2LikePriceProvider', deployer)
         priceProvider = await priceProviderFactory.deploy(TRADERJOE_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WAVAX)
         await priceProvider.deployed()
 
@@ -306,7 +301,7 @@ describe('UniswapV2LikePriceProvider', function () {
       let priceProvider: UniswapV2LikePriceProvider
 
       beforeEach(async function () {
-        const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
+        const priceProviderFactory = await ethers.getContractFactory('UniswapV2LikePriceProvider', deployer)
         priceProvider = await priceProviderFactory.deploy(PANGOLIN_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WAVAX)
         await priceProvider.deployed()
 
@@ -356,16 +351,16 @@ describe('UniswapV2LikePriceProvider', function () {
     const {DAI, WETH, WBTC, SUSHISWAP_FACTORY_ADDRESS} = Addresses.arbitrum
 
     beforeEach(async function () {
-      dai = IERC20__factory.connect(DAI, deployer)
-      nativeToken = IERC20__factory.connect(WETH, deployer)
-      wbtc = IERC20__factory.connect(WBTC, deployer)
+      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+      nativeToken = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
     })
 
     describe('Sushiswap', function () {
       let priceProvider: UniswapV2LikePriceProvider
 
       beforeEach(async function () {
-        const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
+        const priceProviderFactory = await ethers.getContractFactory('UniswapV2LikePriceProvider', deployer)
         priceProvider = await priceProviderFactory.deploy(SUSHISWAP_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WETH)
         await priceProvider.deployed()
 
@@ -414,16 +409,20 @@ describe('UniswapV2LikePriceProvider', function () {
     const {DAI, WMATIC, WBTC, SUSHISWAP_FACTORY_ADDRESS, QUICKSWAP_FACTORY_ADDRESS} = Addresses.polygon
 
     beforeEach(async function () {
-      dai = IERC20__factory.connect(DAI, deployer)
-      nativeToken = IERC20__factory.connect(WMATIC, deployer)
-      wbtc = IERC20__factory.connect(WBTC, deployer)
+      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+      nativeToken = await ethers.getContractAt(
+        '@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20',
+        WMATIC,
+        deployer
+      )
+      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
     })
 
     describe('Sushiswap', function () {
       let priceProvider: UniswapV2LikePriceProvider
 
       beforeEach(async function () {
-        const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
+        const priceProviderFactory = await ethers.getContractFactory('UniswapV2LikePriceProvider', deployer)
         priceProvider = await priceProviderFactory.deploy(SUSHISWAP_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WMATIC)
         await priceProvider.deployed()
 
@@ -471,7 +470,7 @@ describe('UniswapV2LikePriceProvider', function () {
       let priceProvider: UniswapV2LikePriceProvider
 
       beforeEach(async function () {
-        const priceProviderFactory = new UniswapV2LikePriceProvider__factory(deployer)
+        const priceProviderFactory = await ethers.getContractFactory('UniswapV2LikePriceProvider', deployer)
         priceProvider = await priceProviderFactory.deploy(QUICKSWAP_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WMATIC)
         await priceProvider.deployed()
 

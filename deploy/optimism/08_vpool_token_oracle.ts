@@ -1,22 +1,19 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
-import {Addresses} from '../../helpers/index'
 
-const {WETH} = Addresses.optimism
-
-const UniswapV3Exchange = 'UniswapV3Exchange'
+const VPoolTokenOracle = 'VPoolTokenOracle'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy} = deployments
-  const {deployer: from} = await getNamedAccounts()
+  const {deployer} = await getNamedAccounts()
 
-  await deploy(UniswapV3Exchange, {
-    from,
+  await deploy(VPoolTokenOracle, {
+    from: deployer,
     log: true,
-    args: [WETH],
+    args: [],
   })
 }
 
-func.tags = [UniswapV3Exchange]
 export default func
+func.tags = [VPoolTokenOracle]

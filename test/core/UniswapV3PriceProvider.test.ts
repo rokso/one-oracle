@@ -2,13 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {
-  UniswapV3CrossPoolOracle__factory,
-  UniswapV3PriceProvider,
-  UniswapV3PriceProvider__factory,
-  IERC20,
-  IERC20__factory,
-} from '../../typechain-types'
+import {UniswapV3PriceProvider, IERC20} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits, HOUR} from '../helpers'
 import {FakeContract, smock} from '@defi-wonderland/smock'
@@ -44,15 +38,15 @@ describe('UniswapV3PriceProvider', function () {
     const {USDC, WETH, WBTC} = Addresses.mainnet
 
     beforeEach(async function () {
-      usdc = IERC20__factory.connect(USDC, deployer)
-      weth = IERC20__factory.connect(WETH, deployer)
-      wbtc = IERC20__factory.connect(WBTC, deployer)
+      usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
+      weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
 
-      const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
+      const crossPoolOracleFactory = await ethers.getContractFactory('UniswapV3CrossPoolOracle', deployer)
       const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
       await crossPoolOracle.deployed()
 
-      const priceProviderFactory = new UniswapV3PriceProvider__factory(deployer)
+      const priceProviderFactory = await ethers.getContractFactory('UniswapV3PriceProvider', deployer)
       priceProvider = await priceProviderFactory.deploy(crossPoolOracle.address, DEFAULT_TWAP_PERIOD, DEFAULT_POOLS_FEE)
       await priceProvider.deployed()
     })
@@ -178,15 +172,15 @@ describe('UniswapV3PriceProvider', function () {
     const {USDC, WETH, WBTC} = Addresses.arbitrum
 
     beforeEach(async function () {
-      usdc = IERC20__factory.connect(USDC, deployer)
-      weth = IERC20__factory.connect(WETH, deployer)
-      wbtc = IERC20__factory.connect(WBTC, deployer)
+      usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
+      weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
 
-      const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
+      const crossPoolOracleFactory = await ethers.getContractFactory('UniswapV3CrossPoolOracle', deployer)
       const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
       await crossPoolOracle.deployed()
 
-      const priceProviderFactory = new UniswapV3PriceProvider__factory(deployer)
+      const priceProviderFactory = await ethers.getContractFactory('UniswapV3PriceProvider', deployer)
       priceProvider = await priceProviderFactory.deploy(crossPoolOracle.address, DEFAULT_TWAP_PERIOD, DEFAULT_POOLS_FEE)
       await priceProvider.deployed()
     })
@@ -222,16 +216,16 @@ describe('UniswapV3PriceProvider', function () {
     const {USDC, WETH, WBTC} = Addresses.polygon
 
     beforeEach(async function () {
-      usdc = IERC20__factory.connect(USDC, deployer)
+      usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
       // WETH has more liquid pools than WMATIC
-      weth = IERC20__factory.connect(WETH, deployer)
-      wbtc = IERC20__factory.connect(WBTC, deployer)
+      weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
 
-      const crossPoolOracleFactory = new UniswapV3CrossPoolOracle__factory(deployer)
+      const crossPoolOracleFactory = await ethers.getContractFactory('UniswapV3CrossPoolOracle', deployer)
       const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
       await crossPoolOracle.deployed()
 
-      const priceProviderFactory = new UniswapV3PriceProvider__factory(deployer)
+      const priceProviderFactory = await ethers.getContractFactory('UniswapV3PriceProvider', deployer)
       priceProvider = await priceProviderFactory.deploy(crossPoolOracle.address, DEFAULT_TWAP_PERIOD, DEFAULT_POOLS_FEE)
       await priceProvider.deployed()
     })

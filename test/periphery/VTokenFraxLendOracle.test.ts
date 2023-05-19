@@ -28,7 +28,7 @@ describe('VTokenFraxLendOracle @mainnet', function () {
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer] = await ethers.getSigners()
-    oracleFactory = new VTokenFraxLendOracle__factory(deployer)
+    oracleFactory = await ethers.getContractFactory('VTokenFraxLendOracle', deployer)
   })
 
   afterEach(async function () {

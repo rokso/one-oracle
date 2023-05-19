@@ -2,7 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {UniswapV2LikeExchange, UniswapV2LikeExchange__factory, IERC20__factory, IERC20} from '../../typechain-types'
+import {UniswapV2LikeExchange, IERC20} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {InitCodeHash} from '../../helpers/index'
 import {parseEther, parseUnits} from '../helpers'
@@ -28,15 +28,15 @@ describe('UniswapV2LikeExchange', function () {
       snapshotId = await ethers.provider.send('evm_snapshot', [])
       ;[deployer] = await ethers.getSigners()
 
-      const dexFactory = new UniswapV2LikeExchange__factory(deployer)
+      const dexFactory = await ethers.getContractFactory('UniswapV2LikeExchange', deployer)
       dex = await dexFactory.deploy(UNISWAP_V2_FACTORY_ADDRESS, UNISWAP_INIT_CODE_HASH, WETH)
       await dex.deployed()
 
-      weth = IERC20__factory.connect(WETH, deployer)
-      dai = IERC20__factory.connect(DAI, deployer)
-      wbtc = IERC20__factory.connect(WBTC, deployer)
-      usdc = IERC20__factory.connect(USDC, deployer)
-      steth = IERC20__factory.connect(STETH, deployer)
+      weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+      usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
+      steth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', STETH, deployer)
 
       await adjustBalance(weth.address, deployer.address, parseEther('1,000,000'))
       await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))
@@ -180,14 +180,14 @@ describe('UniswapV2LikeExchange', function () {
       // eslint-disable-next-line @typescript-eslint/no-extra-semi
       ;[deployer] = await ethers.getSigners()
 
-      const dexFactory = new UniswapV2LikeExchange__factory(deployer)
+      const dexFactory = await ethers.getContractFactory('UniswapV2LikeExchange', deployer)
       dex = await dexFactory.deploy(PANGOLIN_FACTORY_ADDRESS, PANGOLIN_INIT_CODE_HASH, WAVAX)
       await dex.deployed()
 
-      wavax = IERC20__factory.connect(WAVAX, deployer)
-      dai = IERC20__factory.connect(DAI, deployer)
-      wbtc = IERC20__factory.connect(WBTC, deployer)
-      usdc = IERC20__factory.connect(USDC, deployer)
+      wavax = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WAVAX, deployer)
+      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+      usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
 
       await adjustBalance(wavax.address, deployer.address, parseEther('1,000,000'))
       await adjustBalance(dai.address, deployer.address, parseEther('1,000,000'))

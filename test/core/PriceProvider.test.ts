@@ -2,7 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {PriceProviderMock, PriceProviderMock__factory} from '../../typechain-types'
+import {PriceProviderMock} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits, toUSD} from '../helpers'
 
@@ -17,7 +17,7 @@ describe('PriceProvider @mainnet', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer] = await ethers.getSigners()
 
-    const priceProviderFactory = new PriceProviderMock__factory(deployer)
+    const priceProviderFactory = await ethers.getContractFactory('PriceProviderMock', deployer)
     priceProvider = await priceProviderFactory.deploy()
     await priceProvider.deployed()
 

@@ -3,7 +3,7 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {FakeContract, smock} from '@defi-wonderland/smock'
-import {ChainlinkOracle, ChainlinkOracle__factory} from '../../typechain-types'
+import {ChainlinkOracle} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {parseEther} from '../helpers'
 import Quote from '../helpers/quotes'
@@ -24,7 +24,7 @@ describe('ChainlinkOracle @mainnet', function () {
 
     aggregator = await smock.fake('PriceProvidersAggregator')
 
-    const oracleProvider = new ChainlinkOracle__factory(deployer)
+    const oracleProvider = await ethers.getContractFactory('ChainlinkOracle', deployer)
     oracle = await oracleProvider.deploy(STALE_PERIOD)
     await oracle.deployed()
 

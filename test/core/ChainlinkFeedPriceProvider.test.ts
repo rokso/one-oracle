@@ -2,13 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {
-  ChainlinkFeedPriceProvider,
-  ChainlinkFeedPriceProvider__factory,
-  ERC20Mock__factory,
-  IERC20,
-  IERC20__factory,
-} from '../../typechain-types'
+import {ChainlinkFeedPriceProvider, IERC20} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {parseEther, parseUnits} from '../helpers'
 import Quote from '../helpers/quotes'
@@ -33,14 +27,14 @@ describe('ChainlinkFeedPriceProvider @mainnet', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer] = await ethers.getSigners()
 
-    dai = IERC20__factory.connect(DAI, deployer)
-    weth = IERC20__factory.connect(WETH, deployer)
-    wbtc = IERC20__factory.connect(WBTC, deployer)
+    dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
+    weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
+    wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
 
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    const priceProviderFactory = new ChainlinkFeedPriceProvider__factory(deployer)
+    const priceProviderFactory = await ethers.getContractFactory('ChainlinkFeedPriceProvider', deployer)
     priceProvider = await priceProviderFactory.deploy()
     await priceProvider.deployed()
   })
@@ -51,7 +45,7 @@ describe('ChainlinkFeedPriceProvider @mainnet', function () {
 
   describe('getPriceInUsd', function () {
     it('should get price for custom token', async function () {
-      const erc20MockFactory = new ERC20Mock__factory(deployer)
+      const erc20MockFactory = await ethers.getContractFactory('ERC20Mock', deployer)
       const btcPegged = await erc20MockFactory.deploy('BTC Pegged', 'BTCp')
       await priceProvider.updateAggregator(btcPegged.address, CHAINLINK_BTC_USD_AGGREGATOR)
       const {_priceInUsd} = await priceProvider.getPriceInUsd(btcPegged.address)

@@ -4,7 +4,7 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {Addresses} from '../../helpers'
-import {UsingStalePeriodMock, UsingStalePeriodMock__factory} from '../../typechain-types'
+import {UsingStalePeriodMock} from '../../typechain-types'
 import {HOUR, timestampFromLatestBlock} from '../helpers'
 
 const DEFAULT_STALE_PERIOD = HOUR
@@ -22,7 +22,7 @@ describe('UsingStalePeriod @mainnet', function () {
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    const usingStalePeriodFactory = new UsingStalePeriodMock__factory(deployer)
+    const usingStalePeriodFactory = await ethers.getContractFactory('UsingStalePeriodMock', deployer)
     usingStalePeriod = await usingStalePeriodFactory.deploy(DEFAULT_STALE_PERIOD)
     await usingStalePeriod.deployed()
   })

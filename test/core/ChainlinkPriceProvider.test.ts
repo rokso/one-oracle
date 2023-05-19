@@ -2,7 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {ChainlinkPriceProvider, ChainlinkPriceProvider__factory} from '../../typechain-types'
+import {ChainlinkPriceProvider} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {parseEther} from '../helpers'
 import {smock} from '@defi-wonderland/smock'
@@ -28,7 +28,7 @@ describe('ChainlinkPriceProvider @mainnet', function () {
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    const priceProviderFactory = new ChainlinkPriceProvider__factory(deployer)
+    const priceProviderFactory = await ethers.getContractFactory('ChainlinkPriceProvider', deployer)
     priceProvider = await priceProviderFactory.deploy()
     await priceProvider.deployed()
 

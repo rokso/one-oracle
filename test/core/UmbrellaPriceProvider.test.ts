@@ -2,7 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {UmbrellaPriceProvider, UmbrellaPriceProvider__factory} from '../../typechain-types'
+import {UmbrellaPriceProvider} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {parseEther} from '../helpers'
 import {encodeKey} from '../helpers/umbrella'
@@ -30,7 +30,7 @@ describe('UmbrellaPriceProvider @mainnet', function () {
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    const priceProviderFactory = new UmbrellaPriceProvider__factory(deployer)
+    const priceProviderFactory = await ethers.getContractFactory('UmbrellaPriceProvider', deployer)
     priceProvider = await priceProviderFactory.deploy(UMBRELLA_REGISTRY)
     await priceProvider.deployed()
 
