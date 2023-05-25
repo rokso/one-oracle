@@ -620,9 +620,12 @@ describe('MasterOracle', function () {
       hre.network.deploy = ['deploy/optimism']
 
       // eslint-disable-next-line no-shadow
-      const {MasterOracle} = await deployments.fixture()
+      const {MasterOracle, PriceProvidersAggregator} = await deployments.fixture()
 
       const governor = await impersonateAccount(GOVERNOR)
+      const addressProvider = await ethers.getContractAt('AddressProviderMock', Addresses.ADDRESS_PROVIDER, governor)
+      await addressProvider.updateProvidersAggregator(PriceProvidersAggregator.address)
+
       masterOracle = await ethers.getContractAt('MasterOracle', MasterOracle.address, governor)
     })
 
@@ -656,8 +659,7 @@ describe('MasterOracle', function () {
       })
     })
 
-    // TODO
-    describe.skip('Synth', function () {
+    describe('Synth', function () {
       it('should get price for msUSD', async function () {
         const price = await masterOracle.getPriceInUsd(msUSD)
         expect(price).eq(toUSD('1'))

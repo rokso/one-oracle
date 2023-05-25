@@ -79,14 +79,14 @@ const Quote = {
   },
   mumbai: {MATIC_USD: parseEther('0.84'), ETH_USD: parseEther('1,359')},
   optimism: {
-    ETH_USD: parseEther('1,793'),
+    ETH_USD: parseEther('1,786'),
     USDC_USD: parseEther('1'),
     DAI_USD: parseEther('1'),
     OP_USD: parseEther('1.7'),
     vaUSDC_USD: parseEther('1'),
-    vaETH_USD: parseEther('1,800'),
-    vastETH_USD: parseEther('2,022'),
-    vaOP_USD: parseEther('1.7'),
+    vaETH_USD: parseEther('1,796'),
+    vastETH_USD: parseEther('2,011'),
+    vaOP_USD: parseEther('1.61'),
   },
 }
 export default Quote
