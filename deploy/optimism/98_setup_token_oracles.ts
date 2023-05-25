@@ -10,6 +10,8 @@ const chainlinkAggregators = [
   {token: Address.Curve.SETH_ETH_LP, aggregator: Address.Chainlink.CHAINLINK_ETH_USD_AGGREGATOR},
   {token: Address.Curve.SUSD_LP, aggregator: Address.Chainlink.CHAINLINK_USDC_USD_AGGREGATOR},
   {token: Address.WSTETH, aggregator: Address.Chainlink.CHAINLINK_WSTETH_USD_AGGREGATOR},
+  {token: Address.Synth.msETH, aggregator: Address.Chainlink.CHAINLINK_ETH_USD_AGGREGATOR},
+  {token: Address.Synth.msOP, aggregator: Address.Chainlink.CHAINLINK_OP_USD_AGGREGATOR},
 ]
 
 const curveLpTokens = [
@@ -22,6 +24,7 @@ const customOracles = [
   {token: Address.Vesper.vaETH, oracle: 'VPoolTokenOracle'},
   {token: Address.Vesper.vaOP, oracle: 'VPoolTokenOracle'},
   {token: Address.Vesper.vawstETH, oracle: 'VPoolTokenOracle'},
+  {token: Address.Synth.msUSD, oracle: 'USDPeggedTokenOracle'},
 ]
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {

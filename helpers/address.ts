@@ -289,9 +289,9 @@ export const Addresses: {[key: string]: any} = {
       vawstETH: '0xdd63ae655b388Cd782681b7821Be37fdB6d0E78d',
     },
     Synth: {
-      msUSD: '', // TODO
-      msETH: '', // TODO
-      msOP: '', // TODO
+      msUSD: '0x9dAbAE7274D28A45F0B65Bf8ED201A5731492ca0',
+      msETH: '0x1610e3c85dd44Af31eD7f33a63642012Dca0C5A5',
+      msOP: '0x33bCa143d9b41322479E8d26072a00a352404721',
     },
   },
 }
