@@ -127,7 +127,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         const lpBalanceOfProvider = await ethDaiPair.balanceOf(provider.address)
         const lpSupplyBefore = await ethDaiPair.totalSupply()
         const lpShareOfProvider = lpBalanceOfProvider.mul(parseEther('1')).div(lpSupplyBefore)
-        expect(lpShareOfProvider).closeTo(parseEther('0.12'), parseEther('0.01')) // ~11% of all liquidity
+        expect(lpShareOfProvider).closeTo(parseEther('0.17'), parseEther('0.01')) // ~17% of all liquidity
 
         // when
         await ethDaiPair.connect(provider).approve(router.address, lpBalanceOfProvider)

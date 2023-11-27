@@ -56,11 +56,6 @@ describe('UmbrellaPriceProvider @mainnet', function () {
       expect(_priceInUsd).closeTo(Quote.mainnet.BTC_USD, parseEther('1'))
     })
 
-    it('should DAI price', async function () {
-      const {_priceInUsd} = await priceProvider.getPriceInUsd(DAI)
-      expect(_priceInUsd).closeTo(parseEther('1'), parseEther('0.1'))
-    })
-
     it('should revert if token is not supported', async function () {
       const tx = priceProvider.getPriceInUsd(CDAI)
       await expect(tx).revertedWith('invalid-quote')

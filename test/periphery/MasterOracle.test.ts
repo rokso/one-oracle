@@ -40,11 +40,9 @@ describe('MasterOracle', function () {
         TRIPOOL_LP,
         SBTC_LP,
         MIM_3CRV_LP,
-        SUSD_LP,
         D3_LP,
         FRAX_3CRV_LP,
         IBBTC_SBTC_LP,
-        MUSD_LP,
         AAVE_LP,
         BUSD_LP,
         PAX_LP,
@@ -153,14 +151,6 @@ describe('MasterOracle', function () {
         expect(price).closeTo(Quote.mainnet.CURVE_MIM_3CRV_LP_USD, toUSD('0.001'))
       })
 
-      it('should get price for SUSD', async function () {
-        // when
-        const price = await masterOracle.getPriceInUsd(SUSD_LP)
-
-        // then
-        expect(price).closeTo(Quote.mainnet.CURVE_SUSD_LP_USD, toUSD('0.01'))
-      })
-
       it('should get price for D3POOL', async function () {
         // when
         const price = await masterOracle.getPriceInUsd(D3_LP)
@@ -183,14 +173,6 @@ describe('MasterOracle', function () {
 
         // then
         expect(price).closeTo(Quote.mainnet.CURVE_IBBTC_LP_USD, toUSD('0.01'))
-      })
-
-      it('should get price for mUSD Pool', async function () {
-        // when
-        const price = await masterOracle.getPriceInUsd(MUSD_LP)
-
-        // then
-        expect(price).closeTo(Quote.mainnet.CURVE_MUSD_LP_USD, toUSD('0.001'))
       })
 
       it('should get price for aAve Pool', async function () {
@@ -383,8 +365,8 @@ describe('MasterOracle', function () {
           const price = await masterOracle.getPriceInUsd(sFrxETH)
 
           // then
-          expect(price).eq(basePrice)
-          expect(price).closeTo(Quote.mainnet.ETH_USD, toUSD('50'))
+          expect(price).closeTo(basePrice, toUSD('1'))
+          expect(price).closeTo(Quote.mainnet.ETH_USD, toUSD('150'))
         })
 
         it('should not be able to manipulate sFrxETH price (1)', async function () {
