@@ -28,9 +28,6 @@ function getChainConfig() {
   if (FORK_NODE_URL!.includes('arb-mainnet')) {
     return {chainId: 42161, deploy: ['deploy/arbitrum']}
   }
-  if (FORK_NODE_URL!.includes('bsc') || FORK_NODE_URL!.includes('binance')) {
-    return {chainId: 56, deploy: ['deploy/bsc']}
-  }
   if (FORK_NODE_URL!.includes('optimism')) {
     return {chainId: 10, deploy: ['deploy/optimism']}
   }
@@ -79,14 +76,6 @@ const config: HardhatUserConfig = {
       gas: 8000000,
       verify: {etherscan: {apiKey: process.env.AVALANCHE_ETHERSCAN_API_KEY}},
       deploy: ['deploy/avalanche'],
-      accounts,
-    },
-    bsc: {
-      url: process.env.BSC_NODE_URL || '',
-      chainId: 56,
-      gas: 8000000,
-      verify: {etherscan: {apiKey: process.env.BSCSCAN_API_KEY}},
-      deploy: ['deploy/bsc'],
       accounts,
     },
     optimism: {

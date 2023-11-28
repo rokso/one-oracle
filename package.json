@@ -23,7 +23,6 @@
     "test:arbitrum": "cp .github/arbitrum.env.properties .env && npm t -- --grep @arbitrum",
     "test:polygon": "cp .github/polygon.env.properties .env && npm t -- --grep @polygon",
     "test:avalanche": "cp .github/avalanche.env.properties .env && npm t -- --grep @avalanche",
-    "test:bsc": "cp .github/bsc.env.properties .env && npm t -- --grep @bsc",
     "test:optimism": "cp .github/optimism.env.properties .env && npm t -- --grep @optimism",
     "test:all": "./scripts/test-all-chains.sh",
     "verify": "hardhat etherscan-verify",

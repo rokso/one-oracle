@@ -4,7 +4,6 @@ import {expect} from 'chai'
 import hre, {deployments, ethers} from 'hardhat'
 import {
   ChainlinkAvalanchePriceProvider,
-  ChainlinkBscPriceProvider,
   PriceProvidersAggregator,
   UniswapV2LikeExchange,
   UniswapV3Exchange,
@@ -90,96 +89,6 @@ describe('Deployments ', function () {
       // Should always return 1 USD no matter the address given
       const priceInUsd = await msUsdOracle.getPriceInUsd(ethers.constants.AddressZero)
       expect(priceInUsd).eq(toUSD('1'))
-    })
-  })
-
-  describe('@bsc', function () {
-    let chainlinkPriceProvider: ChainlinkBscPriceProvider
-    let priceProvidersAggregator: PriceProvidersAggregator
-    let chainlinkOracle: ChainlinkOracle
-    let wbnb: IERC20
-    let busd: IERC20
-    let sushiswapExchange: UniswapV2LikeExchange
-    let pancakeSwapExchange: UniswapV2LikeExchange
-    let routedSwapper: RoutedSwapper
-
-    const {WBNB, BUSD} = Addresses.bsc
-
-    beforeEach(async function () {
-      // Setting the folder to execute deployment scripts from
-      hre.network.deploy = ['deploy/bsc']
-
-      /* eslint-disable no-shadow */
-      const {
-        ChainlinkPriceProvider,
-        PriceProvidersAggregator,
-        ChainlinkOracle,
-        SushiSwapExchange,
-        PancakeSwapExchange,
-        RoutedSwapper,
-      } = await deployments.fixture()
-      /* eslint-enable no-shadow */
-
-      chainlinkPriceProvider = await ethers.getContractAt(
-        'ChainlinkBscPriceProvider',
-        ChainlinkPriceProvider.address,
-        deployer
-      )
-      priceProvidersAggregator = await ethers.getContractAt(
-        'PriceProvidersAggregator',
-        PriceProvidersAggregator.address,
-        deployer
-      )
-      chainlinkOracle = await ethers.getContractAt('ChainlinkOracle', ChainlinkOracle.address, deployer)
-      wbnb = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBNB, deployer)
-      busd = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', BUSD, deployer)
-      sushiswapExchange = await ethers.getContractAt('UniswapV2LikeExchange', SushiSwapExchange.address, deployer)
-      pancakeSwapExchange = await ethers.getContractAt('UniswapV2LikeExchange', PancakeSwapExchange.address, deployer)
-      routedSwapper = await ethers.getContractAt('RoutedSwapper', RoutedSwapper.address, deployer)
-      await adjustBalance(WBNB, deployer.address, parseEther('1000'))
-    })
-
-    it('ChainlinkPriceProvider', async function () {
-      const {_priceInUsd: price} = await chainlinkPriceProvider.getPriceInUsd(WBNB)
-      expect(price).closeTo(Quote.bsc.BNB_USD, toUSD('1'))
-    })
-
-    it('PriceProvidersAggregator', async function () {
-      const {_priceInUsd: priceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, WBNB)
-      expect(priceInUsd).closeTo(Quote.bsc.BNB_USD, toUSD('1'))
-    })
-
-    it('ChainlinkOracle', async function () {
-      const priceInUsd = await chainlinkOracle.getPriceInUsd(WBNB)
-      expect(priceInUsd).closeTo(Quote.bsc.BNB_USD, toUSD('1'))
-    })
-
-    it('SushiswapExchange', async function () {
-      const wethLike = await sushiswapExchange.wethLike()
-      expect(wethLike).eq(WBNB)
-    })
-
-    it('PancakeSwapExchange', async function () {
-      const wethLike = await pancakeSwapExchange.wethLike()
-      expect(wethLike).eq(WBNB)
-    })
-
-    it('RoutedSwapper', async function () {
-      // given
-      const path = ethers.utils.defaultAbiCoder.encode(['address[]'], [[WBNB, BUSD]])
-      await routedSwapper.setDefaultRouting(SwapType.EXACT_INPUT, WBNB, BUSD, ExchangeType.PANCAKE_SWAP, path)
-      await wbnb.approve(routedSwapper.address, ethers.constants.MaxUint256)
-
-      // when
-      const amountIn = parseEther('1')
-      expect(await wbnb.balanceOf(deployer.address), 'insufficient amountIn').gt(amountIn)
-      const before = await busd.balanceOf(deployer.address)
-
-      await routedSwapper.swapExactInput(WBNB, BUSD, amountIn, 0, deployer.address)
-      const after = await busd.balanceOf(deployer.address)
-
-      // then
-      expect(after.sub(before)).closeTo(Quote.bsc.BNB_USD, parseEther('10'))
     })
   })
 

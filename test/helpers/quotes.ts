@@ -69,14 +69,6 @@ const Quote = {
     BTC_USD: parseEther('20,060'),
     ETH_USD: parseEther('1,359'),
   },
-  bsc: {
-    BTC_USD: parseEther('20,058'),
-    ETH_USD: parseEther('1,359'),
-    BNB_USD: parseEther('266'),
-    BNB_USD_2: parseEther('253'),
-    BUSD_USD: parseEther('1'),
-    ELLIPSIS_VAL_3EPS: parseEther('1.003'),
-  },
   optimism: {
     ETH_USD: parseEther('1,786'),
     USDC_USD: parseEther('1'),
