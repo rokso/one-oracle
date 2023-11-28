@@ -6,12 +6,6 @@ import {parseEther} from '.'
  * Unlike other use cases, it's important to fix block when forking to having precise prices assertions
  */
 const Quote = {
-  arbitrum: {
-    ETH_USD: parseEther('1,565'),
-    USDC_USD: parseEther('1'),
-    DAI_USD: parseEther('1'),
-    BTC_USD: parseEther('22,321'),
-  },
   avalanche: {
     BTC_USD: parseEther('20,058'),
     ETH_USD: parseEther('1,359'),
@@ -69,15 +63,6 @@ const Quote = {
     BTC_USD: parseEther('20,060'),
     ETH_USD: parseEther('1,359'),
   },
-  bsc: {
-    BTC_USD: parseEther('20,058'),
-    ETH_USD: parseEther('1,359'),
-    BNB_USD: parseEther('266'),
-    BNB_USD_2: parseEther('253'),
-    BUSD_USD: parseEther('1'),
-    ELLIPSIS_VAL_3EPS: parseEther('1.003'),
-  },
-  mumbai: {MATIC_USD: parseEther('0.84'), ETH_USD: parseEther('1,359')},
   optimism: {
     ETH_USD: parseEther('1,786'),
     USDC_USD: parseEther('1'),

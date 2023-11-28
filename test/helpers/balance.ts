@@ -20,7 +20,6 @@ const slots = {
   [Addresses.avalanche.WETH]: 0,
   [Addresses.avalanche.USDC]: 0,
   [Addresses.avalanche.WBTC]: 0,
-  [Addresses.bsc.Umbrella.UMB]: 1,
   [Addresses.polygon.WMATIC]: 3,
   [Addresses.optimism.WETH]: 3,
 }
@@ -32,7 +31,6 @@ const whales = {
   [Addresses.mainnet.CRV]: '0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2', // slot id is 3 but not working so using whale
   [Addresses.mainnet.CBETH]: '0xFA11D91e74fdD98F79E01582B9664143E1036931',
   [Addresses.mainnet.EUL]: '0x7597851F3fD386a13b5784677AE8a569bdB33A95',
-  [Addresses.bsc.WBNB]: '0x0ed7e52944161450477ee417de9cd3a859b14fd0',
 }
 
 /**

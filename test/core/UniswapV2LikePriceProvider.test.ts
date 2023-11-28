@@ -347,64 +347,6 @@ describe('UniswapV2LikePriceProvider', function () {
     })
   })
 
-  describe('UniswapV2LikePriceProvider @arbitrum', function () {
-    const {DAI, WETH, WBTC, SUSHISWAP_FACTORY_ADDRESS} = Addresses.arbitrum
-
-    beforeEach(async function () {
-      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
-      nativeToken = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
-      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
-    })
-
-    describe('Sushiswap', function () {
-      let priceProvider: UniswapV2LikePriceProvider
-
-      beforeEach(async function () {
-        const priceProviderFactory = await ethers.getContractFactory('UniswapV2LikePriceProvider', deployer)
-        priceProvider = await priceProviderFactory.deploy(SUSHISWAP_FACTORY_ADDRESS, DEFAULT_TWAP_PERIOD, WETH)
-        await priceProvider.deployed()
-
-        await priceProvider['updateOrAdd(address,address)'](DAI, WETH)
-        await priceProvider['updateOrAdd(address,address)'](WBTC, WETH)
-
-        await increaseTime(DEFAULT_TWAP_PERIOD)
-
-        await priceProvider['updateOrAdd(address,address)'](DAI, WETH)
-        await priceProvider['updateOrAdd(address,address)'](WBTC, WETH)
-      })
-
-      describe('quote', function () {
-        it('should quote same token to same token', async function () {
-          const amountIn = parseEther('100')
-          const {_amountOut} = await priceProvider['quote(address,address,uint256)'](
-            nativeToken.address,
-            nativeToken.address,
-            amountIn
-          )
-          expect(_amountOut).eq(amountIn)
-        })
-
-        it('should quote using NATIVE-DAI path', async function () {
-          const {_amountOut} = await priceProvider['quote(address,address,uint256)'](
-            nativeToken.address,
-            dai.address,
-            parseEther('1')
-          )
-          expect(_amountOut).closeTo(Quote.arbitrum.ETH_USD, parseEther('5'))
-        })
-
-        it('should quote using WBTC-NATIVE-DAI', async function () {
-          const {_amountOut} = await priceProvider['quote(address,address,uint256)'](
-            wbtc.address,
-            dai.address,
-            parseUnits('1', 8)
-          )
-          expect(_amountOut).closeTo(Quote.arbitrum.BTC_USD, parseEther('5'))
-        })
-      })
-    })
-  })
-
   describe('UniswapV2LikePriceProvider @polygon', function () {
     const {DAI, WMATIC, WBTC, SUSHISWAP_FACTORY_ADDRESS, QUICKSWAP_FACTORY_ADDRESS} = Addresses.polygon
 

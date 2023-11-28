@@ -15,33 +15,4 @@ enum Provider {
   FLUX = 10,
 }
 
-// Note: See `contracts/libraries/DataTypes.sol`
-enum ExchangeType {
-  UNISWAP_V2 = 0,
-  SUSHISWAP = 1,
-  TRADERJOE = 2,
-  PANGOLIN = 3,
-  QUICKSWAP = 4,
-  UNISWAP_V3 = 5,
-  PANCAKE_SWAP = 6,
-  CURVE = 7,
-}
-
-// Note: See `contracts/libraries/DataTypes.sol`
-enum SwapType {
-  EXACT_INPUT = 0,
-  EXACT_OUTPUT = 1,
-}
-
-const InitCodeHash = {
-  [Addresses.mainnet.UNISWAP_V2_FACTORY_ADDRESS]: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f',
-  [Addresses.mainnet.SUSHISWAP_FACTORY_ADDRESS]: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
-  [Addresses.avalanche.TRADERJOE_FACTORY_ADDRESS]: '0x0bbca9af0511ad1a1da383135cf3a8d2ac620e549ef9f6ae3a4c33c2fed0af91',
-  [Addresses.avalanche.PANGOLIN_FACTORY_ADDRESS]: '0x40231f6b438bce0797c9ada29b718a87ea0a5cea3fe9a771abdd76bd41a3e545',
-  [Addresses.polygon.QUICKSWAP_FACTORY_ADDRESS]: '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f',
-  [Addresses.polygon.SUSHISWAP_FACTORY_ADDRESS]: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
-  [Addresses.bsc.SUSHISWAP_FACTORY_ADDRESS]: '0xe18a34eb0e04b04f7a0ac29a6e80748dca96319b42c54d679cb821dca90c6303',
-  [Addresses.bsc.PANCAKE_SWAP_FACTORY_ADDRESS]: '0x00fb7f630766e6a796048ea87d01acd3068e8ff67d078148a3fa3f4a84f69bd5',
-}
-
-export {Addresses, Provider, ExchangeType, SwapType, InitCodeHash}
+export {Addresses, Provider}

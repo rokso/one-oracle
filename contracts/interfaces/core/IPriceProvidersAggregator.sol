@@ -11,7 +11,6 @@ import "./IPriceProvider.sol";
  * ChainLink: returns the last updated date from the aggregator
  * UniswapV2: returns the date of the latest pair oracle update
  * UniswapV3: assumes that the price is always updated (returns block.timestamp)
- * Flux: returns the last updated date from the aggregator
  * Umbrella (FCD): returns the last updated date returned from their oracle contract
  * Umbrella (Passport): returns the date of the latest pallet submission
  * Anytime that a quote performs more than one query, it uses the oldest date as the `_lastUpdatedAt`.
@@ -25,10 +24,10 @@ interface IPriceProvidersAggregator {
      * @return _priceInUsd The USD price
      * @return _lastUpdatedAt Last updated timestamp
      */
-    function getPriceInUsd(DataTypes.Provider provider_, address token_)
-        external
-        view
-        returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);
+    function getPriceInUsd(
+        DataTypes.Provider provider_,
+        address token_
+    ) external view returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);
 
     /**
      * @notice Provider Providers' mapping
@@ -50,14 +49,7 @@ interface IPriceProvidersAggregator {
         address tokenIn_,
         address tokenOut_,
         uint256 amountIn_
-    )
-        external
-        view
-        returns (
-            uint256 _amountOut,
-            uint256 _tokenInLastUpdatedAt,
-            uint256 _tokenOutLastUpdatedAt
-        );
+    ) external view returns (uint256 _amountOut, uint256 _tokenInLastUpdatedAt, uint256 _tokenOutLastUpdatedAt);
 
     /**
      * @notice Get quote

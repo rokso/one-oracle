@@ -16,23 +16,6 @@ library DataTypes {
         PANGOLIN,
         QUICKSWAP,
         UMBRELLA_FIRST_CLASS,
-        UMBRELLA_PASSPORT,
-        FLUX
-    }
-
-    enum ExchangeType {
-        UNISWAP_V2,
-        SUSHISWAP,
-        TRADERJOE,
-        PANGOLIN,
-        QUICKSWAP,
-        UNISWAP_V3,
-        PANCAKE_SWAP,
-        CURVE
-    }
-
-    enum SwapType {
-        EXACT_INPUT,
-        EXACT_OUTPUT
+        UMBRELLA_PASSPORT
     }
 }
