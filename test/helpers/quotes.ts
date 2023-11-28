@@ -77,7 +77,6 @@ const Quote = {
     BUSD_USD: parseEther('1'),
     ELLIPSIS_VAL_3EPS: parseEther('1.003'),
   },
-  mumbai: {MATIC_USD: parseEther('0.84'), ETH_USD: parseEther('1,359')},
   optimism: {
     ETH_USD: parseEther('1,786'),
     USDC_USD: parseEther('1'),

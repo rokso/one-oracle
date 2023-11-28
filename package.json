@@ -25,7 +25,6 @@
     "test:avalanche": "cp .github/avalanche.env.properties .env && npm t -- --grep @avalanche",
     "test:bsc": "cp .github/bsc.env.properties .env && npm t -- --grep @bsc",
     "test:optimism": "cp .github/optimism.env.properties .env && npm t -- --grep @optimism",
-    "test:mumbai": "cp .github/mumbai.env.properties .env && npm t -- --grep @mumbai",
     "test:all": "./scripts/test-all-chains.sh",
     "verify": "hardhat etherscan-verify",
     "size-contract": "hardhat size-contracts",

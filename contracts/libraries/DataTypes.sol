@@ -17,7 +17,6 @@ library DataTypes {
         QUICKSWAP,
         UMBRELLA_FIRST_CLASS,
         UMBRELLA_PASSPORT,
-        FLUX
     }
 
     enum ExchangeType {
