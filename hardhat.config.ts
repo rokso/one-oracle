@@ -25,9 +25,6 @@ function getChainConfig() {
   if (FORK_NODE_URL!.includes('polygon-mainnet')) {
     return {chainId: 137, deploy: ['deploy/polygon']}
   }
-  if (FORK_NODE_URL!.includes('arb-mainnet')) {
-    return {chainId: 42161, deploy: ['deploy/arbitrum']}
-  }
   if (FORK_NODE_URL!.includes('optimism')) {
     return {chainId: 10, deploy: ['deploy/optimism']}
   }
