@@ -29,7 +29,7 @@ const slots = {
 const whales = {
   [Addresses.mainnet.STETH]: '0x1982b2F5814301d4e9a8b0201555376e62F82428',
   [Addresses.mainnet.CRV]: '0x5f3b5DfEb7B28CDbD7FAba78963EE202a494e2A2', // slot id is 3 but not working so using whale
-  [Addresses.mainnet.CBETH]: '0xFA11D91e74fdD98F79E01582B9664143E1036931',
+  [Addresses.mainnet.CBETH]: '0xED1F7bb04D2BA2b6EbE087026F03C96Ea2c357A8',
   [Addresses.mainnet.EUL]: '0x7597851F3fD386a13b5784677AE8a569bdB33A95',
 }
 
