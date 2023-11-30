@@ -16,7 +16,7 @@ dotenv.config()
 function getChainConfig() {
   const {FORK_NODE_URL} = process.env
 
-  if (FORK_NODE_URL!.includes('eth.connect')) {
+  if (FORK_NODE_URL!.includes('eth.connect') || FORK_NODE_URL.includes('eth-mainnet')) {
     return {chainId: 1, deploy: ['deploy/mainnet']}
   }
   if (FORK_NODE_URL!.includes('avax')) {
