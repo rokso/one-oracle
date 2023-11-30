@@ -41,6 +41,7 @@ const curveFactoryLps = [
   Address.Curve.D3_LP,
   Address.Curve.DOLA_3CRV_LP,
   Address.Curve.DOLA_FRAXBP_LP,
+  Address.Curve.EUSD_FRAXBP_POOL,
 ]
 
 const customOracles = [
@@ -78,6 +79,7 @@ const customOracles = [
   {token: Address.Yearn.yTUSD, oracle: 'YEarnTokenOracle'},
   {token: Address.Synth.msUSD, oracle: 'USDPeggedTokenOracle'},
   {token: Address.DOLA, oracle: 'USDPeggedTokenOracle'},
+  {token: Address.eUSD, oracle: 'USDPeggedTokenOracle'},
   // Frax sFraxETH
   {token: Address.Frax.sFrxETH, oracle: 'SFraxEthTokenOracle'},
 ]
