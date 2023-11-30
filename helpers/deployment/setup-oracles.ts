@@ -70,7 +70,15 @@ export const setupTokenOracles = async (
         await saveGovernorExecutionForMultiSigBatch(hre, MasterOracle, 'updateTokenOracle', token, curveLpOracleAddress)
       }
 
-      const isLpRegistered = await read(CurveLpTokenOracle, 'isLpRegistered', token)
+      // The deployed contract hasn't the `isLpRegistered()` yet (https://github.com/bloqpriv/one-oracle/issues/404)
+      // const isLpRegistered = await read(CurveLpTokenOracle, 'isLpRegistered', token)
+      let isLpRegistered = false
+      try {
+        await read(CurveLpTokenOracle, 'underlyingTokens', token, 0)
+        isLpRegistered = true
+        // eslint-disable-next-line no-empty
+      } catch {}
+
       if (!isLpRegistered) {
         if (isLending) {
           await saveGovernorExecutionForMultiSigBatch(hre, CurveLikeLpTokenOracle, 'registerLendingLp', token)
