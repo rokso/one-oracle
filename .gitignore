@@ -12,7 +12,7 @@ build
 # Eslint
 .eslintcache
 
-# Hard hat
+# Hardhat
 artifacts
 cache
 typechain-types
@@ -26,3 +26,7 @@ coverage.json
 
 *.iml
 .idea
+
+# Foundry
+forge-cache
+out
