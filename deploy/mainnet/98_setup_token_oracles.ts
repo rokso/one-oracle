@@ -82,6 +82,8 @@ const customOracles = [
   {token: Address.eUSD, oracle: 'USDPeggedTokenOracle'},
   // Frax sFraxETH
   {token: Address.Frax.sFrxETH, oracle: 'SFraxEthTokenOracle'},
+  // TBY
+  {token: Address.Bloom.TBY_MAR24_A, oracle: 'TBYOracle'},
 ]
 
 const customStalePeriods = [
