@@ -58,6 +58,7 @@ describe('MasterOracle', function () {
       Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK, varETH, vacbETH},
       Synth: {msETH, msUSD, msBTC, msDOGE},
       Frax: {sFrxETH, frxETH},
+      Bloom: {TBY_MAR24_A},
     } = Addresses.mainnet
 
     before(async function () {
@@ -419,6 +420,11 @@ describe('MasterOracle', function () {
           expect(priceAfter).closeTo(priceBefore, parseEther('2'))
         })
       })
+    })
+
+    it('should get price for TBY', async function () {
+      const price = await masterOracle.getPriceInUsd(TBY_MAR24_A)
+      expect(price).closeTo(toUSD('1.01'), toUSD('0.01'))
     })
   })
 
