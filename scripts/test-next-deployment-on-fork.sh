@@ -18,5 +18,5 @@ fi
 cp -r deployments/$network deployments/localhost
 
 # Deployment
-npx hardhat deploy --network localhost --tags SFraxEthTokenOracle,setupOracles,MultiSigTxs #> DEPLOYMENT_TEST_OUTPUT.log
+npx hardhat deploy --network localhost --tags TBYOracle,setupOracles,MultiSigTxs #> DEPLOYMENT_TEST_OUTPUT.log
 
