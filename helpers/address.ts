@@ -250,6 +250,23 @@ export const Addresses: {[key: string]: any} = {
       msOP: '0x33bCa143d9b41322479E8d26072a00a352404721',
     },
   },
+  base: {
+    USDC: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    WETH: '0x4200000000000000000000000000000000000006',
+    WBTC: '0x3932FBCB64859BA68cD3eA5B2a2694Fe1daF4F03',
+    DAI: '0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb',
+    GOVERNOR: '0xdf826ff6518e609E4cEE86299d40611C148099d5',
+    GNOSIS_SAFE: '0x0000000000000000000000000000000000000000',
+    Chainlink: {
+      CHAINLINK_ETH_USD_AGGREGATOR: '0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70',
+      CHAINLINK_USDC_USD_AGGREGATOR: '0x7e860098F58bBFC8648a4311b374B1D669a2bc6B',
+      CHAINLINK_WBTC_USD_AGGREGATOR: '0xCCADC697c55bbB68dc5bCdf8d3CBe83CdD4E071E',
+    },
+    Synth: {
+      msUSD: '0x526728DBc96689597F85ae4cd716d4f7fCcBAE9d',
+      msETH: '0x7Ba6F01772924a82D9626c126347A28299E98c98',
+    },
+  },
 }
 
 const getChain = (): string => {
@@ -273,6 +290,10 @@ const getChain = (): string => {
 
   if (chainId === 10) {
     return 'optimism'
+  }
+
+  if (chainId === 8453) {
+    return 'base'
   }
 
   throw Error(`No address setup for chainId ${chainId}`)

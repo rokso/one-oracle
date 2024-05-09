@@ -28,6 +28,9 @@ function getChainConfig() {
   if (FORK_NODE_URL!.includes('optimism')) {
     return {chainId: 10, deploy: ['deploy/optimism']}
   }
+  if (FORK_NODE_URL!.includes('base')) {
+    return {chainId: 8453, deploy: ['deploy/base']}
+  }
 
   return {chainId: 31337, deploy: ['deploy/mainnet']}
 }
@@ -83,6 +86,30 @@ const config: HardhatUserConfig = {
       deploy: ['deploy/optimism'],
       accounts,
     },
+    base: {
+      url: process.env.BASE_NODE_URL || '',
+      chainId: 8453,
+      gas: 8000000,
+      verify: {etherscan: {apiKey: process.env.BASE_ETHERSCAN_API_KEY}},
+      deploy: ['deploy/base'],
+      accounts,
+    },
+  },
+  etherscan: {
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_API_KEY || '',
+      base: process.env.BASE_ETHERSCAN_API_KEY || '',
+    },
+    customChains: [
+      {
+        network: 'base',
+        chainId: 8453,
+        urls: {
+          apiURL: 'https://api.basescan.org',
+          browserURL: 'https://basescan.org/',
+        },
+      },
+    ],
   },
   // Note: Using factories from Safe
   // See more: https://github.com/safe-global/safe-singleton-factory/tree/main/artifacts
@@ -134,6 +161,14 @@ const config: HardhatUserConfig = {
       signedTx:
         //  eslint-disable-next-line max-len
         '0xf8a380831e8480830186a08080b853604580600e600039806000f350fe7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf337a0c6fc93309f4116e2c72c18acd099f46d8a821ed5f74de864d39b33475f7e6371a002796a1795a7cb6313e082d92d489e4a68c57bf495dd72c7762463e3a9d9b677',
+    },
+    '8453': {
+      factory: '0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7',
+      deployer: '0xE1CB04A0fA36DdD16a06ea828007E35e1a3cBC37',
+      signedTx:
+        //  eslint-disable-next-line max-len
+        '0xf8a380831e8480830186a08080b853604580600e600039806000f350fe7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe03601600081602082378035828234f58015156039578182fd5b8082525050506014600cf337a0c6fc93309f4116e2c72c18acd099f46d8a821ed5f74de864d39b33475f7e6371a002796a1795a7cb6313e082d92d489e4a68c57bf495dd72c7762463e3a9d9b677',
+      funding: '1000000000000000',
     },
   },
   namedAccounts: {

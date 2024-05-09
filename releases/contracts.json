@@ -93,5 +93,12 @@
     "RoutedSwapper_Proxy": "0xDAf982c67712780D54C298A91D86788165B701A4",
     "USDPeggedTokenOracle": "0x28b3214684Dc4044e4Eaf7248FbB384192256BB5",
     "UniswapV3Exchange": "0x7d0DC1ec332512E16Ca5b63A61Db9Ad9Ac9839Dc"
+  },
+  "base": {
+    "ChainlinkOracle": "0x82611C86d98Bd0730b0460ea7D5Dc5Da327F00eE",
+    "ChainlinkPriceProvider": "0xAcE2e5Fd6096FE0b35dCBc53182839cc9234a4e6",
+    "MasterOracle": "0x99866a6074ADb027f09c9AF31929dB5941D36DA7",
+    "PriceProvidersAggregator": "0x873E7b4b49922d0e412fDd50A4b7889EfC73ecAA",
+    "USDPeggedTokenOracle": "0x42c9De8bf891F0bE9dA7dA8078c1f301553CE064"
   }
 }
