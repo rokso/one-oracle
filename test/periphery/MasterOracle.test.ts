@@ -613,4 +613,48 @@ describe('MasterOracle', function () {
       })
     })
   })
+
+  describe('MasterOracle @base', function () {
+    const {
+      USDC,
+      Synth: {msUSD, msETH},
+    } = Addresses.base
+
+    before(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/base']
+
+      // eslint-disable-next-line no-shadow
+      const {MasterOracle, PriceProvidersAggregator} = await deployments.fixture()
+      const addressProvider = await ethers.getContractAt('AddressProviderMock', Addresses.ADDRESS_PROVIDER)
+      const governor = await impersonateAccount(await addressProvider.governor())
+      await addressProvider.connect(governor).updateProvidersAggregator(PriceProvidersAggregator.address)
+
+      masterOracle = await ethers.getContractAt('MasterOracle', MasterOracle.address, governor)
+    })
+
+    describe('getPriceInUsd', function () {
+      it('should revert if token oracle returns 0', async function () {
+        // given
+        const usdcFakeOracle = await smock.fake('ITokenOracle')
+        usdcFakeOracle.getPriceInUsd.returns(0)
+        await masterOracle.updateTokenOracle(USDC, usdcFakeOracle.address)
+
+        // when-then
+        expect(masterOracle.getPriceInUsd(USDC)).to.revertedWith('invalid-token-price')
+      })
+    })
+
+    describe('Synth', function () {
+      it('should get price for msUSD', async function () {
+        const price = await masterOracle.getPriceInUsd(msUSD)
+        expect(price).eq(toUSD('1'))
+      })
+
+      it('should get price for msETH', async function () {
+        const price = await masterOracle.getPriceInUsd(msETH)
+        expect(price).closeTo(Quote.base.ETH_USD, toUSD('5'))
+      })
+    })
+  })
 })

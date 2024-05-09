@@ -86,6 +86,47 @@ describe('Deployments ', function () {
     })
   })
 
+  describe('@base', function () {
+    let chainlinkPriceProvider: ChainlinkAvalanchePriceProvider
+    let priceProvidersAggregator: PriceProvidersAggregator
+    let chainlinkOracle: ChainlinkOracle
+
+    const {WETH} = Addresses.base
+
+    beforeEach(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/base']
+      // eslint-disable-next-line no-shadow
+      const {ChainlinkPriceProvider, PriceProvidersAggregator, ChainlinkOracle} = await deployments.fixture()
+      chainlinkPriceProvider = await ethers.getContractAt(
+        'ChainlinkAvalanchePriceProvider',
+        ChainlinkPriceProvider.address,
+        deployer
+      )
+      priceProvidersAggregator = await ethers.getContractAt(
+        'PriceProvidersAggregator',
+        PriceProvidersAggregator.address,
+        deployer
+      )
+      chainlinkOracle = await ethers.getContractAt('ChainlinkOracle', ChainlinkOracle.address, deployer)
+    })
+
+    it('ChainlinkPriceProvider', async function () {
+      const {_priceInUsd: price} = await chainlinkPriceProvider.getPriceInUsd(WETH)
+      expect(price).closeTo(Quote.base.ETH_USD, toUSD('1'))
+    })
+
+    it('PriceProvidersAggregator', async function () {
+      const {_priceInUsd: priceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, WETH)
+      expect(priceInUsd).closeTo(Quote.base.ETH_USD, toUSD('1'))
+    })
+
+    it('ChainlinkOracle', async function () {
+      const priceInUsd = await chainlinkOracle.getPriceInUsd(WETH)
+      expect(priceInUsd).closeTo(Quote.base.ETH_USD, toUSD('1'))
+    })
+  })
+
   describe('@mainnet', function () {
     let vspOracle: VspMainnetOracle
 

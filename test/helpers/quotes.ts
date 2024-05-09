@@ -16,6 +16,9 @@ const Quote = {
     CURVE_REN_LP_USD: parseEther('20,185'),
     CURVE_AAVE_LP_USD: parseEther('1.02'),
   },
+  base: {
+    ETH_USD: parseEther('3,063'),
+  },
   mainnet: {
     BTC_USD: parseEther('37,003'),
     ETH_USD: parseEther('2,010'),
