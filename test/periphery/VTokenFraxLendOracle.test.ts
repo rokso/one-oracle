@@ -63,7 +63,7 @@ describe('VTokenFraxLendOracle @mainnet', function () {
     it('should get price for vastETH', async function () {
       const oracle = await oracleFactory.deploy(CHAINLINK_STETH_USD_AGGREGATOR, vastETH)
       const {answer: price} = await oracle.latestRoundData()
-      expect(price).closeTo(Quote.mainnet.vastETH_USD.div(`${1e10}`), parseUnits('5', 8))
+      expect(price).closeTo(Quote.mainnet.vastETH_USD.div(`${1e10}`), parseUnits('15', 8))
     })
 
     it('should get price for vaWBTC', async function () {

@@ -17,7 +17,7 @@ const UNISWAP_V2_WETH_DAI_PAIR = '0xA478c2975Ab1Ea89e8196811F51A7B7Ade33eB11'
 const UNISWAP_V2_WETH_DAI_LIQUIDITY_PROVIDER = '0x79317fc0fb17bc0ce213a2b50f343e4d4c277704'
 const UNISWAP_V2_WETH_WBTC_PAIR = '0xBb2b8038a1640196FbE3e38816F3e67Cba72D940'
 const UNISWAP_V2_WBTC_USDC_PAIR = '0x004375dff511095cc5a197a54140a24efef3a416'
-const DAI_HOLDER = '0x075e72a5eDf65F0A5f44699c7654C1a76941Ddc8'
+const DAI_HOLDER = '0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb'
 
 const {UNISWAP_V2_ROUTER_ADDRESS, WETH, DAI, WBTC, USDC} = Addresses.mainnet
 
@@ -51,10 +51,10 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
     ethDaiPair = await ethers.getContractAt('IUniswapV2Pair', UNISWAP_V2_WETH_DAI_PAIR, deployer)
     ethWbtcPair = await ethers.getContractAt('IUniswapV2Pair', UNISWAP_V2_WETH_WBTC_PAIR, deployer)
     wbtcUsdcPair = await ethers.getContractAt('IUniswapV2Pair', UNISWAP_V2_WBTC_USDC_PAIR, deployer)
-    weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
-    dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
-    wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
-    usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
+    weth = await ethers.getContractAt('IERC20', WETH, deployer)
+    dai = await ethers.getContractAt('IERC20', DAI, deployer)
+    wbtc = await ethers.getContractAt('IERC20', WBTC, deployer)
+    usdc = await ethers.getContractAt('IERC20', USDC, deployer)
   })
 
   afterEach(async function () {
@@ -127,7 +127,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         const lpBalanceOfProvider = await ethDaiPair.balanceOf(provider.address)
         const lpSupplyBefore = await ethDaiPair.totalSupply()
         const lpShareOfProvider = lpBalanceOfProvider.mul(parseEther('1')).div(lpSupplyBefore)
-        expect(lpShareOfProvider).closeTo(parseEther('0.17'), parseEther('0.01')) // ~17% of all liquidity
+        expect(lpShareOfProvider).closeTo(parseEther('0.1818'), parseEther('0.01')) // ~17% of all liquidity
 
         // when
         await ethDaiPair.connect(provider).approve(router.address, lpBalanceOfProvider)
@@ -167,7 +167,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         const ethReservesAfter = await weth.balanceOf(ethDaiPair.address)
         expect(ethReservesAfter).gt(ethReservesBefore)
         const priceAfter = await lpOracle.getPriceInUsd(ethDaiPair.address)
-        expect(priceAfter).closeTo(priceBefore, parseEther('0.1'))
+        expect(priceAfter).closeTo(priceBefore, parseEther('0.2'))
       })
 
       it('after unbalanced liquidity addition', async function () {

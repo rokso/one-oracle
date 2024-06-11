@@ -26,7 +26,6 @@ contract ChainlinkMainnetPriceProvider is ChainlinkPriceProvider {
         _setAggregator(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, AggregatorV3Interface(0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419)); // WETH
         _setAggregator(0x853d955aCEf822Db058eb8505911ED77F175b99e, AggregatorV3Interface(0xB9E1E3A9feFf48998E45Fa90847ed4D467E8BcfD)); // FRAX
         _setAggregator(0xc944E90C64B2c07662A292be6244BDf05Cda44a7, AggregatorV3Interface(0x86cF33a451dE9dc61a2862FD94FF4ad4Bd65A5d2)); // GRT
-        _setAggregator(0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd, AggregatorV3Interface(0xa89f5d2365ce98B3cD68012b6f503ab1416245Fc)); // GUSD
         _setAggregator(0x514910771AF9Ca656af840dff83E8264EcF986CA, AggregatorV3Interface(0x2c1d072e956AFFC0D435Cb7AC38EF18d24d9127c)); // LINK
         _setAggregator(0x7c9f4C87d911613Fe9ca58b579f737911AAD2D43, AggregatorV3Interface(0x7bAC85A8a13A4BcD8abb3eB7d6b4d632c5a57676)); // WMATIC
         _setAggregator(0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3, AggregatorV3Interface(0x7A364e8770418566e3eb2001A96116E6138Eb32F)); // MIM

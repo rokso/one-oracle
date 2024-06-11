@@ -27,9 +27,9 @@ describe('ChainlinkFeedPriceProvider @mainnet', function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer] = await ethers.getSigners()
 
-    dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
-    weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
-    wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+    dai = await ethers.getContractAt('IERC20', DAI, deployer)
+    weth = await ethers.getContractAt('IERC20', WETH, deployer)
+    wbtc = await ethers.getContractAt('IERC20', WBTC, deployer)
 
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)

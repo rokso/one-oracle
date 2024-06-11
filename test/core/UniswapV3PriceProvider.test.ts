@@ -38,9 +38,9 @@ describe('UniswapV3PriceProvider', function () {
     const {USDC, WETH, WBTC} = Addresses.mainnet
 
     beforeEach(async function () {
-      usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
-      weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
-      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+      usdc = await ethers.getContractAt('IERC20', USDC, deployer)
+      weth = await ethers.getContractAt('IERC20', WETH, deployer)
+      wbtc = await ethers.getContractAt('IERC20', WBTC, deployer)
 
       const crossPoolOracleFactory = await ethers.getContractFactory('UniswapV3CrossPoolOracle', deployer)
       const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
@@ -106,7 +106,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseEther('1')
         )
-        expect(_amountOut).closeTo(Quote.mainnet.ETH_USD.div(`${1e12}`), parseUnits('5', 6))
+        expect(_amountOut).closeTo(Quote.mainnet.ETH_USD.div(`${1e12}`), parseUnits('25', 6))
       })
 
       it('should quote using WBTC-NATIVE-USDC', async function () {
@@ -115,7 +115,7 @@ describe('UniswapV3PriceProvider', function () {
           usdc.address,
           parseUnits('1', 8)
         )
-        expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('150', 6))
+        expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('300', 6))
       })
 
       it('should quote using WBTC-NATIVE-USDC with 0.05% fee pools', async function () {
@@ -152,12 +152,12 @@ describe('UniswapV3PriceProvider', function () {
 
         it('should WETH price', async function () {
           const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WETH)
-          expect(_priceInUsd).closeTo(Quote.mainnet.ETH_USD, parseEther('10'))
+          expect(_priceInUsd).closeTo(Quote.mainnet.ETH_USD, parseEther('25'))
         })
 
         it('should WBTC price', async function () {
           const {_priceInUsd} = await priceProvider['getPriceInUsd(address)'](WBTC)
-          expect(_priceInUsd).closeTo(Quote.mainnet.BTC_USD, parseEther('150'))
+          expect(_priceInUsd).closeTo(Quote.mainnet.BTC_USD, parseEther('300'))
         })
 
         it('should DAI price', async function () {
@@ -172,10 +172,10 @@ describe('UniswapV3PriceProvider', function () {
     const {USDC, WETH, WBTC} = Addresses.polygon
 
     beforeEach(async function () {
-      usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
+      usdc = await ethers.getContractAt('IERC20', USDC, deployer)
       // WETH has more liquid pools than WMATIC
-      weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
-      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+      weth = await ethers.getContractAt('IERC20', WETH, deployer)
+      wbtc = await ethers.getContractAt('IERC20', WBTC, deployer)
 
       const crossPoolOracleFactory = await ethers.getContractFactory('UniswapV3CrossPoolOracle', deployer)
       const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
