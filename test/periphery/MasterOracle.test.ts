@@ -53,6 +53,7 @@ describe('MasterOracle', function () {
         REN_LP,
         FRAX_USDC_LP,
         DOLA_FRAXBP_LP,
+        DOLA_FRAXPYUSD_LP,
       },
       Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK, varETH, vacbETH},
       Synth: {msETH, msUSD, msBTC},
@@ -253,6 +254,14 @@ describe('MasterOracle', function () {
 
         // then
         expect(price).closeTo(Quote.mainnet.CURVE_FRAX_USDC_LP_USD, toUSD('0.01'))
+      })
+
+      it('should get price for dola frax pyusd Pool', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(DOLA_FRAXPYUSD_LP)
+
+        // then
+        expect(price).closeTo(Quote.mainnet.CURVE_DOLA_FRAX_PYUSD_LP_USD, toUSD('0.01'))
       })
     })
 

@@ -34,6 +34,8 @@ const curveLpTokens = [
   {token: Address.Curve.FRAX_USDC_LP, isLending: false},
 ]
 
+const curveLpTokensV2 = [Address.Curve.DOLA_FRAXPYUSD_LP]
+
 const curveFactoryLps = [
   Address.Curve.IBBTC_SBTC_LP,
   Address.Curve.D3_LP,
@@ -103,6 +105,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
     customOracles,
     chainlinkAggregators,
     curveLpTokens,
+    curveLpTokensV2,
     curveFactoryLps,
     customStalePeriods,
     chainlinkEthOnly,

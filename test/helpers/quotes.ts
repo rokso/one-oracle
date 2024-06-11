@@ -46,6 +46,7 @@ const Quote = {
     CURVE_GUSD_LP_USD: parseEther('1.04'),
     CURVE_REN_LP_USD: parseEther('68,698.70'),
     CURVE_FRAX_USDC_LP_USD: parseEther('1.00'),
+    CURVE_DOLA_FRAX_PYUSD_LP_USD: parseEther('1.00'),
     UNIV2_ETH_DAI_LP_USD: parseEther('226'),
     UNIV2_WBTC_USDC_LP_USD: parseEther('92,099,310,887,088'),
     UNIV2_ETH_WBTC_LP_USD: parseEther('3,879,098,987'),
