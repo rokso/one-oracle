@@ -1,0 +1,267 @@
+{
+  "address": "0x87AAc880c998662BAfF07c61D2584B7543eb2Ff3",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "weth_",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "lpToken",
+          "type": "address"
+        }
+      ],
+      "name": "LpRegistered",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "addressProvider",
+      "outputs": [
+        {
+          "internalType": "contract IAddressProvider",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "curveAddressProvider",
+      "outputs": [
+        {
+          "internalType": "contract ICurveAddressProvider",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "lpToken_",
+          "type": "address"
+        }
+      ],
+      "name": "getPriceInUsd",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_priceInUsd",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "lpToken_",
+          "type": "address"
+        }
+      ],
+      "name": "isLpRegistered",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "poolOf",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "lpToken_",
+          "type": "address"
+        }
+      ],
+      "name": "registerLp",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "underlyingTokens",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xf9d2130b9115e20ee4360c56f28895973ac7256051eaffed4ad2c3bfc16d246f",
+  "receipt": {
+    "to": null,
+    "from": "0x169e2FfC1c6b229b04E65A431434bF0e8eD9563d",
+    "contractAddress": "0x87AAc880c998662BAfF07c61D2584B7543eb2Ff3",
+    "transactionIndex": 158,
+    "gasUsed": "765539",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x8292fc9f4c51ab5b2bc546e5d63fc92dc50d67b29ababc1e742928b8c60797a4",
+    "transactionHash": "0xf9d2130b9115e20ee4360c56f28895973ac7256051eaffed4ad2c3bfc16d246f",
+    "logs": [],
+    "blockNumber": 20077518,
+    "cumulativeGasUsed": "16853377",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "43a5b14b25be57aac4dc77aeb35756c6",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.9+commit.e5eed63a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"weth_\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"lpToken\",\"type\":\"address\"}],\"name\":\"LpRegistered\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"addressProvider\",\"outputs\":[{\"internalType\":\"contract IAddressProvider\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"curveAddressProvider\",\"outputs\":[{\"internalType\":\"contract ICurveAddressProvider\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"lpToken_\",\"type\":\"address\"}],\"name\":\"getPriceInUsd\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_priceInUsd\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"lpToken_\",\"type\":\"address\"}],\"name\":\"isLpRegistered\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"poolOf\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"lpToken_\",\"type\":\"address\"}],\"name\":\"registerLp\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"underlyingTokens\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"getPriceInUsd(address)\":{\"details\":\"This function is supposed to be called from `MasterOracle` only\",\"params\":{\"token_\":\"The address of asset\"},\"returns\":{\"_priceInUsd\":\"The USD price\"}}},\"stateVariables\":{\"curveAddressProvider\":{\"details\":\"Same address for all chains\"}},\"title\":\"Oracle for Curve LP tokens\",\"version\":1},\"userdoc\":{\"events\":{\"LpRegistered(address)\":{\"notice\":\"Emitted when a LP token is registered\"}},\"kind\":\"user\",\"methods\":{\"getPriceInUsd(address)\":{\"notice\":\"Get USD (or equivalent) price of an asset\"},\"isLpRegistered(address)\":{\"notice\":\"Check if a token is already registered\"},\"poolOf(address)\":{\"notice\":\"LP token => pool\"},\"registerLp(address)\":{\"notice\":\"Register LP token data\"},\"underlyingTokens(address,uint256)\":{\"notice\":\"LP token => coins mapping\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/periphery/tokens/CurveLpTokenOracleV2.sol\":\"CurveLpTokenOracleV2\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":5000},\"remappings\":[]},\"sources\":{\"contracts/access/Governable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"../interfaces/core/IAddressProvider.sol\\\";\\n\\n/**\\n * @notice Contract module which provides access control mechanism, where\\n * the governor account is granted with exclusive access to specific functions.\\n * @dev Uses the AddressProvider to get the governor\\n */\\nabstract contract Governable {\\n    IAddressProvider public constant addressProvider = IAddressProvider(0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A);\\n\\n    /// @dev Throws if called by any account other than the governor.\\n    modifier onlyGovernor() {\\n        require(msg.sender == addressProvider.governor(), \\\"not-governor\\\");\\n        _;\\n    }\\n}\\n\",\"keccak256\":\"0x9fcc955db07cc6517e7456517eae374a3910d557b7d16f9372154188290d3da0\",\"license\":\"MIT\"},\"contracts/interfaces/core/IAddressProvider.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"./IStableCoinProvider.sol\\\";\\nimport \\\"./IPriceProvidersAggregator.sol\\\";\\n\\ninterface IAddressProvider {\\n    function governor() external view returns (address);\\n\\n    function providersAggregator() external view returns (IPriceProvidersAggregator);\\n\\n    function stableCoinProvider() external view returns (IStableCoinProvider);\\n\\n    function updateProvidersAggregator(IPriceProvidersAggregator providersAggregator_) external;\\n}\\n\",\"keccak256\":\"0x133c36faf973cdef1639bdbc837c21368240146875b5aa28e533bb1769b84329\",\"license\":\"MIT\"},\"contracts/interfaces/core/IPriceProvider.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface IPriceProvider {\\n    /**\\n     * @notice Get USD (or equivalent) price of an asset\\n     * @param token_ The address of asset\\n     * @return _priceInUsd The USD price\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function getPriceInUsd(address token_) external view returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);\\n\\n    /**\\n     * @notice Get quote\\n     * @param tokenIn_ The address of assetIn\\n     * @param tokenOut_ The address of assetOut\\n     * @param amountIn_ Amount of input token\\n     * @return _amountOut Amount out\\n     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`\\n     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`\\n     */\\n    function quote(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    )\\n        external\\n        view\\n        returns (\\n            uint256 _amountOut,\\n            uint256 _tokenInLastUpdatedAt,\\n            uint256 _tokenOutLastUpdatedAt\\n        );\\n\\n    /**\\n     * @notice Get quote in USD (or equivalent) amount\\n     * @param token_ The address of assetIn\\n     * @param amountIn_ Amount of input token.\\n     * @return amountOut_ Amount in USD\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function quoteTokenToUsd(address token_, uint256 amountIn_)\\n        external\\n        view\\n        returns (uint256 amountOut_, uint256 _lastUpdatedAt);\\n\\n    /**\\n     * @notice Get quote from USD (or equivalent) amount to amount of token\\n     * @param token_ The address of assetOut\\n     * @param amountIn_ Input amount in USD\\n     * @return _amountOut Output amount of token\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function quoteUsdToToken(address token_, uint256 amountIn_)\\n        external\\n        view\\n        returns (uint256 _amountOut, uint256 _lastUpdatedAt);\\n}\\n\",\"keccak256\":\"0x188c27728bd50b187944ef217b58751efd7b8ec3f1ef0d923be82298b2b0af0e\",\"license\":\"MIT\"},\"contracts/interfaces/core/IPriceProvidersAggregator.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"../../libraries/DataTypes.sol\\\";\\nimport \\\"./IPriceProvider.sol\\\";\\n\\n/**\\n * @notice PriceProvidersAggregator interface\\n * @dev Worth noting that the `_lastUpdatedAt` logic depends on the underlying price provider. In summary:\\n * ChainLink: returns the last updated date from the aggregator\\n * UniswapV2: returns the date of the latest pair oracle update\\n * UniswapV3: assumes that the price is always updated (returns block.timestamp)\\n * Umbrella (FCD): returns the last updated date returned from their oracle contract\\n * Umbrella (Passport): returns the date of the latest pallet submission\\n * Anytime that a quote performs more than one query, it uses the oldest date as the `_lastUpdatedAt`.\\n * See more: https://github.com/bloqpriv/one-oracle/issues/64\\n */\\ninterface IPriceProvidersAggregator {\\n    /**\\n     * @notice Get USD (or equivalent) price of an asset\\n     * @param provider_ The price provider to get quote from\\n     * @param token_ The address of asset\\n     * @return _priceInUsd The USD price\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function getPriceInUsd(\\n        DataTypes.Provider provider_,\\n        address token_\\n    ) external view returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);\\n\\n    /**\\n     * @notice Provider Providers' mapping\\n     */\\n    function priceProviders(DataTypes.Provider provider_) external view returns (IPriceProvider _priceProvider);\\n\\n    /**\\n     * @notice Get quote\\n     * @param provider_ The price provider to get quote from\\n     * @param tokenIn_ The address of assetIn\\n     * @param tokenOut_ The address of assetOut\\n     * @param amountIn_ Amount of input token\\n     * @return _amountOut Amount out\\n     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`\\n     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`\\n     */\\n    function quote(\\n        DataTypes.Provider provider_,\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    ) external view returns (uint256 _amountOut, uint256 _tokenInLastUpdatedAt, uint256 _tokenOutLastUpdatedAt);\\n\\n    /**\\n     * @notice Get quote\\n     * @dev If providers aren't the same, uses native token as \\\"bridge\\\"\\n     * @param providerIn_ The price provider to get quote for the tokenIn\\n     * @param tokenIn_ The address of assetIn\\n     * @param providerOut_ The price provider to get quote for the tokenOut\\n     * @param tokenOut_ The address of assetOut\\n     * @param amountIn_ Amount of input token\\n     * @return _amountOut Amount out\\n     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`\\n     * @return _nativeTokenLastUpdatedAt Last updated timestamp of native token (i.e. WETH) used when providers aren't the same\\n     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`\\n     */\\n    function quote(\\n        DataTypes.Provider providerIn_,\\n        address tokenIn_,\\n        DataTypes.Provider providerOut_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    )\\n        external\\n        view\\n        returns (\\n            uint256 _amountOut,\\n            uint256 _tokenInLastUpdatedAt,\\n            uint256 _nativeTokenLastUpdatedAt,\\n            uint256 _tokenOutLastUpdatedAt\\n        );\\n\\n    /**\\n     * @notice Get quote in USD (or equivalent) amount\\n     * @param provider_ The price provider to get quote from\\n     * @param token_ The address of assetIn\\n     * @param amountIn_ Amount of input token.\\n     * @return amountOut_ Amount in USD\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function quoteTokenToUsd(\\n        DataTypes.Provider provider_,\\n        address token_,\\n        uint256 amountIn_\\n    ) external view returns (uint256 amountOut_, uint256 _lastUpdatedAt);\\n\\n    /**\\n     * @notice Get quote from USD (or equivalent) amount to amount of token\\n     * @param provider_ The price provider to get quote from\\n     * @param token_ The address of assetOut\\n     * @param amountIn_ Input amount in USD\\n     * @return _amountOut Output amount of token\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function quoteUsdToToken(\\n        DataTypes.Provider provider_,\\n        address token_,\\n        uint256 amountIn_\\n    ) external view returns (uint256 _amountOut, uint256 _lastUpdatedAt);\\n\\n    /**\\n     * @notice Set a price provider\\n     * @dev Administrative function\\n     * @param provider_ The provider (from enum)\\n     * @param priceProvider_ The price provider contract\\n     */\\n    function setPriceProvider(DataTypes.Provider provider_, IPriceProvider priceProvider_) external;\\n}\\n\",\"keccak256\":\"0x2cc214fb40cc9d9f912e8570bdeaee983ab3bc966872c3d69c5cb8d100a614ed\",\"license\":\"MIT\"},\"contracts/interfaces/core/IStableCoinProvider.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface IStableCoinProvider {\\n    /**\\n     * @notice Return the stable coin if pegged\\n     * @dev Check price relation between both stable coins and revert if peg is too loose\\n     * @return _stableCoin The primary stable coin if pass all checks\\n     */\\n    function getStableCoinIfPegged() external view returns (address _stableCoin);\\n\\n    /**\\n     * @notice Convert given amount of stable coin to USD representation (18 decimals)\\n     */\\n    function toUsdRepresentation(uint256 stableCoinAmount_) external view returns (uint256 _usdAmount);\\n}\\n\",\"keccak256\":\"0x57121c0faef63ea2d06b05048054ffa78d4d3c5734c2dabc1aaa4c5032e194c5\",\"license\":\"MIT\"},\"contracts/interfaces/external/curve/ICurveAddressProvider.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface ICurveAddressProvider {\\n    function get_registry() external view returns (address);\\n\\n    function get_address(uint256 i) external view returns (address);\\n}\\n\",\"keccak256\":\"0x461681ed41c74b517147ff27f29139bff11d5e5de6f258e58b18d540fb779b58\",\"license\":\"MIT\"},\"contracts/interfaces/external/curve/ICurveMetaRegistry.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface ICurveMetaRegistry {\\n    function get_lp_token(address _pool) external view returns (address);\\n\\n    function get_n_underlying_coins(address _pool) external view returns (uint256);\\n\\n    function get_pool_from_lp_token(address _token) external view returns (address);\\n\\n    function get_underlying_coins(address _pool) external view returns (address[8] memory);\\n}\\n\",\"keccak256\":\"0x1ec3b5d273275ed5af61c876cf5cdf491bda52c6c1f5d5b33fbb9c2051af8f75\",\"license\":\"MIT\"},\"contracts/interfaces/external/curve/ICurvePool.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface ICurvePool {\\n    function get_virtual_price() external view returns (uint256);\\n\\n    function exchange(\\n        int128 i,\\n        int128 j,\\n        uint256 _dx,\\n        uint256 _min_dy\\n    ) external payable;\\n}\\n\",\"keccak256\":\"0x030f3b115d45dfb8cb7c00e42b803f862093d93093dc23f6b479c0e89caac459\",\"license\":\"MIT\"},\"contracts/interfaces/periphery/IOracle.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface IOracle {\\n    /**\\n     * @notice Get USD (or equivalent) price of an asset\\n     * @param token_ The address of asset\\n     * @return _priceInUsd The USD price\\n     */\\n    function getPriceInUsd(address token_) external view returns (uint256 _priceInUsd);\\n\\n    /**\\n     * @notice Get quote\\n     * @param tokenIn_ The address of assetIn\\n     * @param tokenOut_ The address of assetOut\\n     * @param amountIn_ Amount of input token\\n     * @return _amountOut Amount out\\n     */\\n    function quote(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    ) external view returns (uint256 _amountOut);\\n\\n    /**\\n     * @notice Get quote in USD (or equivalent) amount\\n     * @param token_ The address of assetIn\\n     * @param amountIn_ Amount of input token.\\n     * @return amountOut_ Amount in USD\\n     */\\n    function quoteTokenToUsd(address token_, uint256 amountIn_) external view returns (uint256 amountOut_);\\n\\n    /**\\n     * @notice Get quote from USD (or equivalent) amount to amount of token\\n     * @param token_ The address of assetOut\\n     * @param amountIn_ Input amount in USD\\n     * @return _amountOut Output amount of token\\n     */\\n    function quoteUsdToToken(address token_, uint256 amountIn_) external view returns (uint256 _amountOut);\\n}\\n\",\"keccak256\":\"0xb48d57d83e75abecacbd065d3df55ee50eef4998fad94560cb1dbb0644049caa\",\"license\":\"MIT\"},\"contracts/interfaces/periphery/ITokenOracle.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface ITokenOracle {\\n    /**\\n     * @notice Get USD (or equivalent) price of an asset\\n     * @param token_ The address of asset\\n     * @return _priceInUsd The USD price\\n     */\\n    function getPriceInUsd(address token_) external view returns (uint256 _priceInUsd);\\n}\\n\",\"keccak256\":\"0x0a458745d97e56d125d348a597133af8572f34a7830c17d91b82cf8229c1492f\",\"license\":\"MIT\"},\"contracts/libraries/DataTypes.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nlibrary DataTypes {\\n    /**\\n     * @notice Price providers enumeration\\n     */\\n    enum Provider {\\n        NONE,\\n        CHAINLINK,\\n        UNISWAP_V3,\\n        UNISWAP_V2,\\n        SUSHISWAP,\\n        TRADERJOE,\\n        PANGOLIN,\\n        QUICKSWAP,\\n        UMBRELLA_FIRST_CLASS,\\n        UMBRELLA_PASSPORT\\n    }\\n}\\n\",\"keccak256\":\"0x6f43074d75ecc057e2ea789fa896096ade570d64c76b86eb3be563d5ae9175da\",\"license\":\"MIT\"},\"contracts/periphery/tokens/CurveLpTokenOracleV2.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport \\\"../../interfaces/periphery/ITokenOracle.sol\\\";\\nimport \\\"../../interfaces/external/curve/ICurveAddressProvider.sol\\\";\\nimport \\\"../../interfaces/external/curve/ICurveMetaRegistry.sol\\\";\\nimport \\\"../../interfaces/external/curve/ICurvePool.sol\\\";\\nimport \\\"../../interfaces/periphery/IOracle.sol\\\";\\nimport \\\"../../access/Governable.sol\\\";\\n\\n/**\\n * @title Oracle for Curve LP tokens\\n */\\ncontract CurveLpTokenOracleV2 is ITokenOracle, Governable {\\n    /// @dev Same address for all chains\\n    ICurveAddressProvider public constant curveAddressProvider =\\n        ICurveAddressProvider(0x0000000022D53366457F9d5E68Ec105046FC4383);\\n\\n    address internal constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;\\n\\n    address internal immutable weth;\\n\\n    uint256 private constant META_REGISTRY_ADDRESS_ID = 7;\\n\\n    /// @notice LP token => coins mapping\\n    mapping(address => address[]) public underlyingTokens;\\n\\n    /// @notice LP token => pool\\n    mapping(address => address) public poolOf;\\n\\n    /// @notice Emitted when a LP token is registered\\n    event LpRegistered(address indexed lpToken);\\n\\n    constructor(address weth_) {\\n        require(weth_ != address(0), \\\"null-weth\\\");\\n        weth = weth_;\\n    }\\n\\n    /// @inheritdoc ITokenOracle\\n    /// @dev This function is supposed to be called from `MasterOracle` only\\n    function getPriceInUsd(address lpToken_) external view override returns (uint256 _priceInUsd) {\\n        address _pool = poolOf[lpToken_];\\n        require(_pool != address(0), \\\"lp-is-not-registered\\\");\\n        address[] memory _tokens = underlyingTokens[lpToken_];\\n        uint256 _min = type(uint256).max;\\n        uint256 _n = _tokens.length;\\n\\n        for (uint256 i; i < _n; i++) {\\n            // Note: `msg.sender` is the `MasterOracle` contract\\n            uint256 _price = IOracle(msg.sender).getPriceInUsd(_tokens[i]);\\n            if (_price < _min) _min = _price;\\n        }\\n\\n        require(_min < type(uint256).max, \\\"no-min-underlying-price-found\\\");\\n        require(_min > 0, \\\"invalid-min-price\\\");\\n\\n        return (_min * ICurvePool(_pool).get_virtual_price()) / 1e18;\\n    }\\n\\n    /// @notice Check if a token is already registered\\n    function isLpRegistered(address lpToken_) public view returns (bool) {\\n        return underlyingTokens[lpToken_].length > 0;\\n    }\\n\\n    /// @notice Register LP token data\\n    function registerLp(address lpToken_) external onlyGovernor {\\n        require(!isLpRegistered(lpToken_), \\\"lp-already-registered\\\");\\n\\n        ICurveMetaRegistry _registry = ICurveMetaRegistry(curveAddressProvider.get_address(META_REGISTRY_ADDRESS_ID));\\n\\n        address _pool = _registry.get_pool_from_lp_token(lpToken_);\\n        require(_pool != address(0), \\\"invalid-lp-token\\\");\\n\\n        if (poolOf[lpToken_] != address(0)) {\\n            // Clean current tokens if LP exists\\n            delete underlyingTokens[lpToken_];\\n        }\\n        poolOf[lpToken_] = _pool;\\n\\n        address[8] memory _tokens = _registry.get_underlying_coins(_pool);\\n\\n        // Due to issue here https://github.com/curvefi/metaregistry/issues/25\\n        // we are using address(0) check to break out and not using below line to get exact coin count.\\n        // uint256 _noOfCoins = _registry.get_n_underlying_coins(_pool);\\n        for (uint256 i; i < 8; i++) {\\n            if (_tokens[i] == address(0)) {\\n                break;\\n            }\\n            if (_tokens[i] == ETH) {\\n                underlyingTokens[lpToken_].push(weth);\\n            } else {\\n                underlyingTokens[lpToken_].push(_tokens[i]);\\n            }\\n        }\\n\\n        emit LpRegistered(lpToken_);\\n    }\\n}\\n\",\"keccak256\":\"0xb7d99de2258f29c0378db7bd0c6efb0252a2178dabcf1441b0cc402e4b6d2520\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x60a060405234801561001057600080fd5b50604051610db8380380610db883398101604081905261002f91610086565b6001600160a01b0381166100755760405162461bcd60e51b81526020600482015260096024820152680dcead8d85aeecae8d60bb1b604482015260640160405180910390fd5b6001600160a01b03166080526100b6565b60006020828403121561009857600080fd5b81516001600160a01b03811681146100af57600080fd5b9392505050565b608051610ce76100d160003960006109560152610ce76000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c80633d6e73881161005b5780633d6e7388146100ee5780637e3d431914610105578063988b1fa71461011a578063e27dbd5e1461014357600080fd5b806301eadec41461008257806307ee40bf146100b25780632954018c146100d3575b600080fd5b610095610090366004610a9b565b61017e565b6040516001600160a01b0390911681526020015b60405180910390f35b6100c56100c0366004610ac7565b6101b6565b6040519081526020016100a9565b61009573fba0816a81bcabbf3829bed28618177a2bf0e82a81565b6100956f22d53366457f9d5e68ec105046fc438381565b610118610113366004610ac7565b6104a9565b005b610095610128366004610ac7565b6001602052600090815260409020546001600160a01b031681565b61016e610151366004610ac7565b6001600160a01b0316600090815260208190526040902054151590565b60405190151581526020016100a9565b6000602052816000526040600020818154811061019a57600080fd5b6000918252602090912001546001600160a01b03169150829050565b6001600160a01b03808216600090815260016020526040812054909116806102255760405162461bcd60e51b815260206004820152601460248201527f6c702d69732d6e6f742d7265676973746572656400000000000000000000000060448201526064015b60405180910390fd5b6001600160a01b0383166000908152602081815260408083208054825181850281018501909352808352919290919083018282801561028d57602002820191906000526020600020905b81546001600160a01b0316815260019091019060200180831161026f575b5050835193945060001993925060009150505b8181101561036f576000336001600160a01b03166307ee40bf8684815181106102cb576102cb610aeb565b60200260200101516040518263ffffffff1660e01b81526004016102fe91906001600160a01b0391909116815260200190565b60206040518083038186803b15801561031657600080fd5b505afa15801561032a573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061034e9190610b1a565b90508381101561035c578093505b508061036781610b62565b9150506102a0565b5060001982106103c15760405162461bcd60e51b815260206004820152601d60248201527f6e6f2d6d696e2d756e6465726c79696e672d70726963652d666f756e64000000604482015260640161021c565b600082116104115760405162461bcd60e51b815260206004820152601160248201527f696e76616c69642d6d696e2d7072696365000000000000000000000000000000604482015260640161021c565b670de0b6b3a7640000846001600160a01b031663bb7b8b806040518163ffffffff1660e01b815260040160206040518083038186803b15801561045357600080fd5b505afa158015610467573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061048b9190610b1a565b6104959084610b7d565b61049f9190610b9c565b9695505050505050565b73fba0816a81bcabbf3829bed28618177a2bf0e82a6001600160a01b0316630c340a246040518163ffffffff1660e01b815260040160206040518083038186803b1580156104f657600080fd5b505afa15801561050a573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061052e9190610be7565b6001600160a01b0316336001600160a01b03161461058e5760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f720000000000000000000000000000000000000000604482015260640161021c565b6001600160a01b038116600090815260208190526040902054156105f45760405162461bcd60e51b815260206004820152601560248201527f6c702d616c72656164792d726567697374657265640000000000000000000000604482015260640161021c565b6040517f493f4f74000000000000000000000000000000000000000000000000000000008152600760048201526000906f22d53366457f9d5e68ec105046fc43839063493f4f749060240160206040518083038186803b15801561065757600080fd5b505afa15801561066b573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061068f9190610be7565b6040517fbdf475c30000000000000000000000000000000000000000000000000000000081526001600160a01b03848116600483015291925060009183169063bdf475c39060240160206040518083038186803b1580156106ef57600080fd5b505afa158015610703573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906107279190610be7565b90506001600160a01b03811661077f5760405162461bcd60e51b815260206004820152601060248201527f696e76616c69642d6c702d746f6b656e00000000000000000000000000000000604482015260640161021c565b6001600160a01b0383811660009081526001602052604090205416156107c0576001600160a01b03831660009081526020819052604081206107c091610a4c565b6001600160a01b0383811660009081526001602052604080822080547fffffffffffffffffffffffff00000000000000000000000000000000000000001685851690811790915590517fa77576ef0000000000000000000000000000000000000000000000000000000081526004810191909152909184169063a77576ef906024016101006040518083038186803b15801561085b57600080fd5b505afa15801561086f573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906108939190610c04565b905060005b6008811015610a115760008282600881106108b5576108b5610aeb565b60200201516001600160a01b031614156108ce57610a11565b73eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee8282600881106108f5576108f5610aeb565b60200201516001600160a01b03161415610983576001600160a01b038581166000908152602081815260408220805460018101825590835291200180547fffffffffffffffffffffffff0000000000000000000000000000000000000000167f00000000000000000000000000000000000000000000000000000000000000009092169190911790556109ff565b6001600160a01b03851660009081526020819052604090208282600881106109ad576109ad610aeb565b6020908102919091015182546001810184556000938452919092200180547fffffffffffffffffffffffff0000000000000000000000000000000000000000166001600160a01b039092169190911790555b80610a0981610b62565b915050610898565b506040516001600160a01b038516907f21ebaedd59f317b5de83c2b833f2f8f6e38e5e826f527a827412bce37c93a14890600090a250505050565b5080546000825590600052602060002090810190610a6a9190610a6d565b50565b5b80821115610a825760008155600101610a6e565b5090565b6001600160a01b0381168114610a6a57600080fd5b60008060408385031215610aae57600080fd5b8235610ab981610a86565b946020939093013593505050565b600060208284031215610ad957600080fd5b8135610ae481610a86565b9392505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b600060208284031215610b2c57600080fd5b5051919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b6000600019821415610b7657610b76610b33565b5060010190565b6000816000190483118215151615610b9757610b97610b33565b500290565b600082610bd2577f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b500490565b8051610be281610a86565b919050565b600060208284031215610bf957600080fd5b8151610ae481610a86565b6000610100808385031215610c1857600080fd5b83601f840112610c2757600080fd5b60405181810181811067ffffffffffffffff82111715610c70577f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b604052908301908085831115610c8557600080fd5b845b83811015610ca657610c9881610bd7565b825260209182019101610c87565b50909594505050505056fea26469706673582212209c227cde2548f93354dd559b3b5874f3785eae2fc6d6755a3b4341e01c27970464736f6c63430008090033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061007d5760003560e01c80633d6e73881161005b5780633d6e7388146100ee5780637e3d431914610105578063988b1fa71461011a578063e27dbd5e1461014357600080fd5b806301eadec41461008257806307ee40bf146100b25780632954018c146100d3575b600080fd5b610095610090366004610a9b565b61017e565b6040516001600160a01b0390911681526020015b60405180910390f35b6100c56100c0366004610ac7565b6101b6565b6040519081526020016100a9565b61009573fba0816a81bcabbf3829bed28618177a2bf0e82a81565b6100956f22d53366457f9d5e68ec105046fc438381565b610118610113366004610ac7565b6104a9565b005b610095610128366004610ac7565b6001602052600090815260409020546001600160a01b031681565b61016e610151366004610ac7565b6001600160a01b0316600090815260208190526040902054151590565b60405190151581526020016100a9565b6000602052816000526040600020818154811061019a57600080fd5b6000918252602090912001546001600160a01b03169150829050565b6001600160a01b03808216600090815260016020526040812054909116806102255760405162461bcd60e51b815260206004820152601460248201527f6c702d69732d6e6f742d7265676973746572656400000000000000000000000060448201526064015b60405180910390fd5b6001600160a01b0383166000908152602081815260408083208054825181850281018501909352808352919290919083018282801561028d57602002820191906000526020600020905b81546001600160a01b0316815260019091019060200180831161026f575b5050835193945060001993925060009150505b8181101561036f576000336001600160a01b03166307ee40bf8684815181106102cb576102cb610aeb565b60200260200101516040518263ffffffff1660e01b81526004016102fe91906001600160a01b0391909116815260200190565b60206040518083038186803b15801561031657600080fd5b505afa15801561032a573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061034e9190610b1a565b90508381101561035c578093505b508061036781610b62565b9150506102a0565b5060001982106103c15760405162461bcd60e51b815260206004820152601d60248201527f6e6f2d6d696e2d756e6465726c79696e672d70726963652d666f756e64000000604482015260640161021c565b600082116104115760405162461bcd60e51b815260206004820152601160248201527f696e76616c69642d6d696e2d7072696365000000000000000000000000000000604482015260640161021c565b670de0b6b3a7640000846001600160a01b031663bb7b8b806040518163ffffffff1660e01b815260040160206040518083038186803b15801561045357600080fd5b505afa158015610467573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061048b9190610b1a565b6104959084610b7d565b61049f9190610b9c565b9695505050505050565b73fba0816a81bcabbf3829bed28618177a2bf0e82a6001600160a01b0316630c340a246040518163ffffffff1660e01b815260040160206040518083038186803b1580156104f657600080fd5b505afa15801561050a573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061052e9190610be7565b6001600160a01b0316336001600160a01b03161461058e5760405162461bcd60e51b815260206004820152600c60248201527f6e6f742d676f7665726e6f720000000000000000000000000000000000000000604482015260640161021c565b6001600160a01b038116600090815260208190526040902054156105f45760405162461bcd60e51b815260206004820152601560248201527f6c702d616c72656164792d726567697374657265640000000000000000000000604482015260640161021c565b6040517f493f4f74000000000000000000000000000000000000000000000000000000008152600760048201526000906f22d53366457f9d5e68ec105046fc43839063493f4f749060240160206040518083038186803b15801561065757600080fd5b505afa15801561066b573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061068f9190610be7565b6040517fbdf475c30000000000000000000000000000000000000000000000000000000081526001600160a01b03848116600483015291925060009183169063bdf475c39060240160206040518083038186803b1580156106ef57600080fd5b505afa158015610703573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906107279190610be7565b90506001600160a01b03811661077f5760405162461bcd60e51b815260206004820152601060248201527f696e76616c69642d6c702d746f6b656e00000000000000000000000000000000604482015260640161021c565b6001600160a01b0383811660009081526001602052604090205416156107c0576001600160a01b03831660009081526020819052604081206107c091610a4c565b6001600160a01b0383811660009081526001602052604080822080547fffffffffffffffffffffffff00000000000000000000000000000000000000001685851690811790915590517fa77576ef0000000000000000000000000000000000000000000000000000000081526004810191909152909184169063a77576ef906024016101006040518083038186803b15801561085b57600080fd5b505afa15801561086f573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906108939190610c04565b905060005b6008811015610a115760008282600881106108b5576108b5610aeb565b60200201516001600160a01b031614156108ce57610a11565b73eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee8282600881106108f5576108f5610aeb565b60200201516001600160a01b03161415610983576001600160a01b038581166000908152602081815260408220805460018101825590835291200180547fffffffffffffffffffffffff0000000000000000000000000000000000000000167f00000000000000000000000000000000000000000000000000000000000000009092169190911790556109ff565b6001600160a01b03851660009081526020819052604090208282600881106109ad576109ad610aeb565b6020908102919091015182546001810184556000938452919092200180547fffffffffffffffffffffffff0000000000000000000000000000000000000000166001600160a01b039092169190911790555b80610a0981610b62565b915050610898565b506040516001600160a01b038516907f21ebaedd59f317b5de83c2b833f2f8f6e38e5e826f527a827412bce37c93a14890600090a250505050565b5080546000825590600052602060002090810190610a6a9190610a6d565b50565b5b80821115610a825760008155600101610a6e565b5090565b6001600160a01b0381168114610a6a57600080fd5b60008060408385031215610aae57600080fd5b8235610ab981610a86565b946020939093013593505050565b600060208284031215610ad957600080fd5b8135610ae481610a86565b9392505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b600060208284031215610b2c57600080fd5b5051919050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b6000600019821415610b7657610b76610b33565b5060010190565b6000816000190483118215151615610b9757610b97610b33565b500290565b600082610bd2577f4e487b7100000000000000000000000000000000000000000000000000000000600052601260045260246000fd5b500490565b8051610be281610a86565b919050565b600060208284031215610bf957600080fd5b8151610ae481610a86565b6000610100808385031215610c1857600080fd5b83601f840112610c2757600080fd5b60405181810181811067ffffffffffffffff82111715610c70577f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b604052908301908085831115610c8557600080fd5b845b83811015610ca657610c9881610bd7565b825260209182019101610c87565b50909594505050505056fea26469706673582212209c227cde2548f93354dd559b3b5874f3785eae2fc6d6755a3b4341e01c27970464736f6c63430008090033",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "getPriceInUsd(address)": {
+        "details": "This function is supposed to be called from `MasterOracle` only",
+        "params": {
+          "token_": "The address of asset"
+        },
+        "returns": {
+          "_priceInUsd": "The USD price"
+        }
+      }
+    },
+    "stateVariables": {
+      "curveAddressProvider": {
+        "details": "Same address for all chains"
+      }
+    },
+    "title": "Oracle for Curve LP tokens",
+    "version": 1
+  },
+  "userdoc": {
+    "events": {
+      "LpRegistered(address)": {
+        "notice": "Emitted when a LP token is registered"
+      }
+    },
+    "kind": "user",
+    "methods": {
+      "getPriceInUsd(address)": {
+        "notice": "Get USD (or equivalent) price of an asset"
+      },
+      "isLpRegistered(address)": {
+        "notice": "Check if a token is already registered"
+      },
+      "poolOf(address)": {
+        "notice": "LP token => pool"
+      },
+      "registerLp(address)": {
+        "notice": "Register LP token data"
+      },
+      "underlyingTokens(address,uint256)": {
+        "notice": "LP token => coins mapping"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 404,
+        "contract": "contracts/periphery/tokens/CurveLpTokenOracleV2.sol:CurveLpTokenOracleV2",
+        "label": "underlyingTokens",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_mapping(t_address,t_array(t_address)dyn_storage)"
+      },
+      {
+        "astId": 409,
+        "contract": "contracts/periphery/tokens/CurveLpTokenOracleV2.sol:CurveLpTokenOracleV2",
+        "label": "poolOf",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_mapping(t_address,t_address)"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_address)dyn_storage": {
+        "base": "t_address",
+        "encoding": "dynamic_array",
+        "label": "address[]",
+        "numberOfBytes": "32"
+      },
+      "t_mapping(t_address,t_address)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => address)",
+        "numberOfBytes": "32",
+        "value": "t_address"
+      },
+      "t_mapping(t_address,t_array(t_address)dyn_storage)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => address[])",
+        "numberOfBytes": "32",
+        "value": "t_array(t_address)dyn_storage"
+      }
+    }
+  }
+}
