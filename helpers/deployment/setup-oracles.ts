@@ -7,6 +7,7 @@ import {BigNumber} from 'ethers'
 const ChainlinkPriceProvider = 'ChainlinkPriceProvider'
 const MasterOracle = 'MasterOracle'
 const CurveLpTokenOracle = 'CurveLpTokenOracle'
+const CurveLpTokenOracleV2 = 'CurveLpTokenOracleV2'
 const CurveFactoryLpTokenOracle = 'CurveFactoryLpTokenOracle'
 const EllipsisLpTokenOracle = 'EllipsisLpTokenOracle'
 const ChainlinkOracle = 'ChainlinkOracle'
@@ -18,6 +19,7 @@ export const setupTokenOracles = async (
     customOracles,
     chainlinkAggregators,
     curveLpTokens,
+    curveLpTokensV2 = [],
     curveFactoryLps = [],
     customStalePeriods = [],
     chainlinkEthOnly = [],
@@ -25,6 +27,7 @@ export const setupTokenOracles = async (
     customOracles?: {token: string; oracle: string}[]
     chainlinkAggregators?: {token: string; aggregator: string}[]
     curveLpTokens?: {token: string; isLending: boolean}[]
+    curveLpTokensV2?: string[]
     curveFactoryLps?: string[]
     customStalePeriods?: {token: string; stalePeriod: number}[]
     chainlinkEthOnly?: {token: string; ethFeed: string}[]
@@ -108,6 +111,23 @@ export const setupTokenOracles = async (
         if (!alreadyRegistered) {
           // Note: No governor required for the `CurveFactoryLpTokenOracle` contract
           await execute(CurveFactoryLpTokenOracle, {from, log: true}, 'registerLp', token)
+        }
+      }
+    }
+  }
+
+  // Curve LPs V2
+  const curveLpTokenOracleV2 = await getOrNull(CurveLpTokenOracleV2)
+  if (curveLpTokenOracleV2) {
+    const {address: oracleAddress} = curveLpTokenOracleV2
+    for (const token of curveLpTokensV2) {
+      const current = await read(MasterOracle, 'oracles', token)
+      if (current !== oracleAddress) {
+        await saveGovernorExecutionForMultiSigBatch(hre, MasterOracle, 'updateTokenOracle', token, oracleAddress)
+
+        const isLpRegistered = await read(CurveLpTokenOracleV2, 'isLpRegistered', token)
+        if (!isLpRegistered) {
+          await saveGovernorExecutionForMultiSigBatch(hre, CurveLpTokenOracleV2, 'registerLp', token)
         }
       }
     }
