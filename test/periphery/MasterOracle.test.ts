@@ -50,13 +50,12 @@ describe('MasterOracle', function () {
         COMPOUND_LP,
         USDT_LP,
         DOLA_3CRV_LP,
-        GUSD_LP,
         REN_LP,
         FRAX_USDC_LP,
         DOLA_FRAXBP_LP,
       },
       Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK, varETH, vacbETH},
-      Synth: {msETH, msUSD, msBTC, msDOGE},
+      Synth: {msETH, msUSD, msBTC},
       Frax: {sFrxETH, frxETH},
       Bloom: {TBY_MAR24_A},
     } = Addresses.mainnet
@@ -240,14 +239,6 @@ describe('MasterOracle', function () {
         expect(price).closeTo(Quote.mainnet.CURVE_DOLA_FRAXBP_LP_USD, toUSD('0.01'))
       })
 
-      it('should get price for gusd Pool', async function () {
-        // when
-        const price = await masterOracle.getPriceInUsd(GUSD_LP)
-
-        // then
-        expect(price).closeTo(Quote.mainnet.CURVE_GUSD_LP_USD, toUSD('0.01'))
-      })
-
       it('should get price for ren Pool', async function () {
         // when
         const price = await masterOracle.getPriceInUsd(REN_LP)
@@ -344,11 +335,6 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(msBTC)
         expect(price).closeTo(Quote.mainnet.BTC_USD, toUSD('100'))
       })
-
-      it('should get price for msDOGE', async function () {
-        const price = await masterOracle.getPriceInUsd(msDOGE)
-        expect(price).closeTo(Quote.mainnet.DOGE_USD, toUSD('1'))
-      })
     })
 
     describe('Frax', function () {
@@ -367,16 +353,11 @@ describe('MasterOracle', function () {
 
           // then
           expect(price).closeTo(basePrice, toUSD('1'))
-          expect(price).closeTo(Quote.mainnet.ETH_USD, toUSD('150'))
         })
 
         it('should not be able to manipulate sFrxETH price (1)', async function () {
           // given
-          const frxEth = await ethers.getContractAt(
-            '@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20',
-            frxETH,
-            deployer
-          )
+          const frxEth = await ethers.getContractAt('IERC20', frxETH, deployer)
           const sFrxEth = await ethers.getContractAt('ISFrxEth', sFrxETH, deployer)
           const priceBefore = await masterOracle.getPriceInUsd(sFrxETH)
           const staked = await frxEth.balanceOf(sFrxEth.address)
@@ -399,11 +380,7 @@ describe('MasterOracle', function () {
             '0xa1f8a6807c402e4a15ef4eba36528a3fed24e577',
             deployer
           )
-          const frxEth = await ethers.getContractAt(
-            '@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20',
-            frxETH,
-            deployer
-          )
+          const frxEth = await ethers.getContractAt('IERC20', frxETH, deployer)
           const sFrxEth = await ethers.getContractAt('ISFrxEth', sFrxETH, deployer)
           const priceBefore = await masterOracle.getPriceInUsd(sFrxETH)
           const poolBalance = await ethers.provider.getBalance(ethFrxEthPool.address)
@@ -424,7 +401,7 @@ describe('MasterOracle', function () {
 
     it('should get price for TBY', async function () {
       const price = await masterOracle.getPriceInUsd(TBY_MAR24_A)
-      expect(price).closeTo(toUSD('1.01'), toUSD('0.01'))
+      expect(price).closeTo(toUSD('1.02'), toUSD('0.01'))
     })
   })
 

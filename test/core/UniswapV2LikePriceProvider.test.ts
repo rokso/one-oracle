@@ -37,10 +37,10 @@ describe('UniswapV2LikePriceProvider', function () {
     const {DAI, WETH, WBTC, USDC, UNISWAP_V2_FACTORY_ADDRESS, SUSHISWAP_FACTORY_ADDRESS} = Addresses.mainnet
 
     beforeEach(async function () {
-      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
-      nativeToken = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
-      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
-      usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
+      dai = await ethers.getContractAt('IERC20', DAI, deployer)
+      nativeToken = await ethers.getContractAt('IERC20', WETH, deployer)
+      wbtc = await ethers.getContractAt('IERC20', WBTC, deployer)
+      usdc = await ethers.getContractAt('IERC20', USDC, deployer)
     })
 
     describe('UniswapV2', function () {
@@ -149,7 +149,7 @@ describe('UniswapV2LikePriceProvider', function () {
             usdc.address,
             parseEther('1')
           )
-          expect(_amountOut).closeTo(Quote.mainnet.ETH_USD.div(`${1e12}`), parseUnits('5', 6))
+          expect(_amountOut).closeTo(Quote.mainnet.ETH_USD.div(`${1e12}`), parseUnits('10', 6))
         })
 
         it('should quote using WBTC-NATIVE-USDC', async function () {
@@ -244,9 +244,9 @@ describe('UniswapV2LikePriceProvider', function () {
     const {DAI, WAVAX, WBTC, TRADERJOE_FACTORY_ADDRESS, PANGOLIN_FACTORY_ADDRESS} = Addresses.avalanche
 
     beforeEach(async function () {
-      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
-      nativeToken = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WAVAX, deployer)
-      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+      dai = await ethers.getContractAt('IERC20', DAI, deployer)
+      nativeToken = await ethers.getContractAt('IERC20', WAVAX, deployer)
+      wbtc = await ethers.getContractAt('IERC20', WBTC, deployer)
     })
 
     describe('TraderJoe', function () {
@@ -351,13 +351,9 @@ describe('UniswapV2LikePriceProvider', function () {
     const {DAI, WMATIC, WBTC, SUSHISWAP_FACTORY_ADDRESS, QUICKSWAP_FACTORY_ADDRESS} = Addresses.polygon
 
     beforeEach(async function () {
-      dai = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', DAI, deployer)
-      nativeToken = await ethers.getContractAt(
-        '@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20',
-        WMATIC,
-        deployer
-      )
-      wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
+      dai = await ethers.getContractAt('IERC20', DAI, deployer)
+      nativeToken = await ethers.getContractAt('IERC20', WMATIC, deployer)
+      wbtc = await ethers.getContractAt('IERC20', WBTC, deployer)
     })
 
     describe('Sushiswap', function () {

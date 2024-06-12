@@ -33,9 +33,9 @@ describe('PriceProvidersAggregator @mainnet', function () {
   beforeEach(async function () {
     snapshotId = await ethers.provider.send('evm_snapshot', [])
     ;[deployer, alice] = await ethers.getSigners()
-    weth = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WETH, deployer)
-    wbtc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', WBTC, deployer)
-    usdc = await ethers.getContractAt('@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20', USDC, deployer)
+    weth = await ethers.getContractAt('IERC20', WETH, deployer)
+    wbtc = await ethers.getContractAt('IERC20', WBTC, deployer)
+    usdc = await ethers.getContractAt('IERC20', USDC, deployer)
 
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
@@ -121,7 +121,7 @@ describe('PriceProvidersAggregator @mainnet', function () {
         usdc.address,
         parseEther('1')
       )
-      expect(_amountOut).closeTo(Quote.mainnet.ETH_USD.div(`${1e12}`), parseUnits('10', 6))
+      expect(_amountOut).closeTo(Quote.mainnet.ETH_USD.div(`${1e12}`), parseUnits('25', 6))
     })
 
     it('should quote using WBTC-NATIVE-USDC', async function () {

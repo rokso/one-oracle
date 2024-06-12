@@ -15,7 +15,6 @@ const chainlinkAggregators = [
   {token: Address.SBTC, aggregator: Address.Chainlink.CHAINLINK_BTC_USD_AGGREGATOR},
   {token: Address.Synth.msETH, aggregator: Address.Chainlink.CHAINLINK_ETH_USD_AGGREGATOR},
   {token: Address.Synth.msBTC, aggregator: Address.Chainlink.CHAINLINK_BTC_USD_AGGREGATOR},
-  {token: Address.Synth.msDOGE, aggregator: Address.Chainlink.CHAINLINK_DOGE_USD_AGGREGATOR},
 ]
 
 const curveLpTokens = [
@@ -31,7 +30,6 @@ const curveLpTokens = [
   {token: Address.Curve.BUSD_LP, isLending: true},
   {token: Address.Curve.PAX_LP, isLending: true},
   {token: Address.Curve.Y_LP, isLending: true},
-  {token: Address.Curve.GUSD_LP, isLending: false},
   {token: Address.Curve.REN_LP, isLending: false},
   {token: Address.Curve.FRAX_USDC_LP, isLending: false},
 ]
