@@ -31,6 +31,7 @@
     "CurveExchange": "0x024cE630ff4A267FEab8Bb2AdEcC5c02e311DB0e",
     "CurveFactoryLpTokenOracle": "0x38636d2B2340Cb0a240EEAB15fe846B65B9C4E61",
     "CurveLpTokenOracle": "0xC7df215D1E819023f6b6c8d0177e5E395f36F682",
+    "CurveLpTokenOracleV2": "0x87AAc880c998662BAfF07c61D2584B7543eb2Ff3",
     "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf",
     "IbBtcTokenOracle": "0xf1010D8994C45429ea635BB8F8db10B89362f54d",
     "MStableTokenOracle": "0xfFD74eCF5B4eec6EAC2624764933fb5f2E2DfD09",
