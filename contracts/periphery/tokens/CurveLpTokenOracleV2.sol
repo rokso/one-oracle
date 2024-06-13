@@ -79,8 +79,14 @@ contract CurveLpTokenOracleV2 is ITokenOracle, Governable {
         poolOf[lpToken_] = _pool;
 
         address[8] memory _tokens = _registry.get_underlying_coins(_pool);
-        uint256 _noOfCoins = _registry.get_n_underlying_coins(_pool);
-        for (uint256 i; i < _noOfCoins; i++) {
+
+        // Due to issue here https://github.com/curvefi/metaregistry/issues/25
+        // we are using address(0) check to break out and not using below line to get exact coin count.
+        // uint256 _noOfCoins = _registry.get_n_underlying_coins(_pool);
+        for (uint256 i; i < 8; i++) {
+            if (_tokens[i] == address(0)) {
+                break;
+            }
             if (_tokens[i] == ETH) {
                 underlyingTokens[lpToken_].push(weth);
             } else {
@@ -90,7 +96,4 @@ contract CurveLpTokenOracleV2 is ITokenOracle, Governable {
 
         emit LpRegistered(lpToken_);
     }
-
-    /// @notice Register LP token data
-    function _registerLp(address lpToken_) internal virtual {}
 }
