@@ -16,21 +16,6 @@
     "TraderJoeExchange": "0xeC2d8A84384549Ff3F0234974A50234EeADe425c",
     "USDPeggedTokenOracle": "0xeFA808ba5496EAFAdbE3EC573ab4f002FE68CDec"
   },
-  "bsc": {
-    "AddressProvider": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
-    "AddressProvider_Implementation": "0xC5cc7ce1f5C14635f5A6882df13872F3E64995Fa",
-    "AddressProvider_Proxy": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
-    "ChainlinkOracle": "0x4D7c0f0EcC6FC634131c5020845ab5817c45316f",
-    "ChainlinkPriceProvider": "0xa4B4291E88CB61838406DcA8cD8ac6eA657193fC",
-    "DefaultProxyAdmin": "0xfc027E287A88bAD7259C5017a88E7B0e5ee4c5Bf",
-    "EllipsisLpTokenOracle": "0x9632f99456a632aF27FCdC57c12b309b2C286789",
-    "MasterOracle": "0x5323F445A8665239222b117aE095423a238F5706",
-    "PancakeSwapExchange": "0x59cC44B3D8558b0f8c3Be77453cE51Cf676728Fa",
-    "PriceProvidersAggregator": "0x730c8c2E58e3860268313dEE0Ec787311c3562dA",
-    "RoutedSwapper": "0x64E26Aeb32003aa17CdC20D07b27EC141a3f863d",
-    "SushiSwapExchange": "0xdB073EE93b90FD47a71E3babfA0599291b886B1C",
-    "USDPeggedTokenOracle": "0xDa64Ea66D4fBC785fa348c7A9A6b7121E6883bA9"
-  },
   "mainnet": {
     "ATokenOracle": "0x3078742bACdFECBE6F8D9E77f1aAa1000C074FCF",
     "AddressProvider": "0xfbA0816A81bcAbBf3829bED28618177a2bf0e82A",
@@ -54,11 +39,12 @@
     "RoutedSwapper": "0xEA454C961287222150780f656e3f7e27dFb50038",
     "RoutedSwapper_Implementation": "0x341C2ABe8901353e12b955B1F3462AFE7ba1e27d",
     "RoutedSwapper_Proxy": "0xEA454C961287222150780f656e3f7e27dFb50038",
-    "SFraxEthTokenOracle": "0x9cfdADaEfCA0052A04AF5695E40829A62f4B0559",
+    "SFraxEthTokenOracle": "0x7F4FD34dc9081144263Abee136d4280d4a086Ac2",
     "StableCoinProvider": "0xfd5216426B516008137E9b7Ec33D2B0931690773",
     "SushiswapExchange": "0xA78879853B15C9208bd5791046f694a659c53FcA",
     "SushiswapPriceProvider": "0x6eDb5a3c164358CdaE4661D2c8dA79E70D355Fb0",
     "SynthUsdTokenOracle": "0x00518D6e7a7589E4de60899966e4EA6D5b311cD5",
+    "TBYOracle": "0x21ce811b3EE51344BF9C2D3595dae56960F9b4A3",
     "USDPeggedTokenOracle": "0x278957E88bDbA45442acc49E07Ac143d893bAfB1",
     "UniswapV2Exchange": "0x335955030ABF4d7C62FCB70E1930f25d28C87b35",
     "UniswapV2PriceProvider": "0x01c3Ffac6ED33B2D4596307B1c5F7b6BF7D0b9cD",
@@ -83,8 +69,8 @@
   "optimism": {
     "ChainlinkOracle": "0x42c9De8bf891F0bE9dA7dA8078c1f301553CE064",
     "ChainlinkPriceProvider": "0x873E7b4b49922d0e412fDd50A4b7889EfC73ecAA",
-    "CurveFactoryLpTokenOracle": "0x522040e6738Ac009da4FC11b2aE25aD4C4079ca9",
-    "CurveLpTokenOracle": "0xFdcb4cc4a75235f53Db7a3dF3e0e839f421c072f",
+    "CurveFactoryLpTokenOracle": "0xc7eBF549c1454165E385a4C984B499C6e46C3eC7",
+    "CurveLpTokenOracle": "0xACAd4d26A2E61112aB1bcD86e5e361554437fe3D",
     "DefaultProxyAdmin": "0x8b08adEac560f764D2828361C5DD4Fe5BEF53dc6",
     "MasterOracle": "0x0aac835162D368F246dc71628AfcD6d2930c47d3",
     "PriceProvidersAggregator": "0x99866a6074ADb027f09c9AF31929dB5941D36DA7",
@@ -92,7 +78,8 @@
     "RoutedSwapper_Implementation": "0x2E99f1b571d1A3D7987f8CaDd9F4C5f2240354e2",
     "RoutedSwapper_Proxy": "0xDAf982c67712780D54C298A91D86788165B701A4",
     "USDPeggedTokenOracle": "0x28b3214684Dc4044e4Eaf7248FbB384192256BB5",
-    "UniswapV3Exchange": "0x7d0DC1ec332512E16Ca5b63A61Db9Ad9Ac9839Dc"
+    "UniswapV3Exchange": "0x7d0DC1ec332512E16Ca5b63A61Db9Ad9Ac9839Dc",
+    "VPoolTokenOracle": "0x4c2BA62e549df0c34a0e93948AF417f76D0E92Ad"
   },
   "base": {
     "ChainlinkOracle": "0x82611C86d98Bd0730b0460ea7D5Dc5Da327F00eE",

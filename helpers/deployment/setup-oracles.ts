@@ -9,7 +9,6 @@ const MasterOracle = 'MasterOracle'
 const CurveLpTokenOracle = 'CurveLpTokenOracle'
 const CurveLpTokenOracleV2 = 'CurveLpTokenOracleV2'
 const CurveFactoryLpTokenOracle = 'CurveFactoryLpTokenOracle'
-const EllipsisLpTokenOracle = 'EllipsisLpTokenOracle'
 const ChainlinkOracle = 'ChainlinkOracle'
 const ChainlinkEthOnlyTokenOracle = 'ChainlinkEthOnlyTokenOracle'
 
@@ -60,33 +59,36 @@ export const setupTokenOracles = async (
 
   // Curve LPs
   if (curveLpTokens) {
-    let CurveLikeLpTokenOracle = CurveLpTokenOracle
-    let curveLpTokenOracle = await getOrNull(CurveLikeLpTokenOracle)
-    if (!curveLpTokenOracle) {
-      CurveLikeLpTokenOracle = EllipsisLpTokenOracle
-      curveLpTokenOracle = await get(CurveLikeLpTokenOracle)
-    }
-    const {address: curveLpOracleAddress} = curveLpTokenOracle
-    for (const {token, isLending} of curveLpTokens) {
-      const current = await read(MasterOracle, 'oracles', token)
-      if (current !== curveLpOracleAddress) {
-        await saveGovernorExecutionForMultiSigBatch(hre, MasterOracle, 'updateTokenOracle', token, curveLpOracleAddress)
-      }
+    let curveLpTokenOracle = await getOrNull(CurveLpTokenOracle)
+    if (curveLpTokenOracle) {
+      const {address: curveLpOracleAddress} = curveLpTokenOracle
+      for (const {token, isLending} of curveLpTokens) {
+        const current = await read(MasterOracle, 'oracles', token)
+        if (current !== curveLpOracleAddress) {
+          await saveGovernorExecutionForMultiSigBatch(
+            hre,
+            MasterOracle,
+            'updateTokenOracle',
+            token,
+            curveLpOracleAddress
+          )
+        }
 
-      // The deployed contract hasn't the `isLpRegistered()` yet (https://github.com/bloqpriv/one-oracle/issues/404)
-      // const isLpRegistered = await read(CurveLpTokenOracle, 'isLpRegistered', token)
-      let isLpRegistered = false
-      try {
-        await read(CurveLpTokenOracle, 'underlyingTokens', token, 0)
-        isLpRegistered = true
-        // eslint-disable-next-line no-empty
-      } catch {}
+        // The deployed contract hasn't the `isLpRegistered()` yet (https://github.com/bloqpriv/one-oracle/issues/404)
+        // const isLpRegistered = await read(CurveLpTokenOracle, 'isLpRegistered', token)
+        let isLpRegistered = false
+        try {
+          await read(CurveLpTokenOracle, 'underlyingTokens', token, 0)
+          isLpRegistered = true
+          // eslint-disable-next-line no-empty
+        } catch {}
 
-      if (!isLpRegistered) {
-        if (isLending) {
-          await saveGovernorExecutionForMultiSigBatch(hre, CurveLikeLpTokenOracle, 'registerLendingLp', token)
-        } else {
-          await saveGovernorExecutionForMultiSigBatch(hre, CurveLikeLpTokenOracle, 'registerLp', token)
+        if (!isLpRegistered) {
+          if (isLending) {
+            await saveGovernorExecutionForMultiSigBatch(hre, CurveLpTokenOracle, 'registerLendingLp', token)
+          } else {
+            await saveGovernorExecutionForMultiSigBatch(hre, CurveLpTokenOracle, 'registerLp', token)
+          }
         }
       }
     }
