@@ -6,14 +6,26 @@ import {Addresses} from '../../helpers/address'
 const {base: Address} = Addresses
 const setupOracles = 'setupOracles'
 
-const chainlinkAggregators = [{token: Address.Synth.msETH, aggregator: Address.Chainlink.CHAINLINK_ETH_USD_AGGREGATOR}]
+const chainlinkAggregators = [
+  {token: Address.Synth.msETH, aggregator: Address.Chainlink.CHAINLINK_ETH_USD_AGGREGATOR},
+  {token: Address.CBETH, aggregator: Address.Chainlink.CHAINLINK_CBETH_USD_AGGREGATOR},
+]
 
-const customOracles = [{token: Address.Synth.msUSD, oracle: 'USDPeggedTokenOracle'}]
+const customOracles = [
+  {token: Address.Vesper.vaUSDC, oracle: 'VPoolTokenOracle'},
+  {token: Address.Vesper.vaETH, oracle: 'VPoolTokenOracle'},
+  {token: Address.Vesper.vacbETH, oracle: 'VPoolTokenOracle'},
+  {token: Address.Vesper.vawstETH, oracle: 'VPoolTokenOracle'},
+  {token: Address.Synth.msUSD, oracle: 'USDPeggedTokenOracle'},
+]
+
+const chainlinkEthOnly = [{token: Address.WSTETH, ethFeed: Address.Chainlink.CHAINLINK_WSTETH_ETH_AGGREGATOR}]
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await setupTokenOracles(hre, {
     chainlinkAggregators,
     customOracles,
+    chainlinkEthOnly,
   })
 }
 
