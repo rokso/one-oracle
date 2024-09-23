@@ -14,13 +14,15 @@ import "../../features/UsingStalePeriod.sol";
 contract ChainlinkEthOnlyTokenOracle is ITokenOracle, UsingStalePeriod {
     using SafeCast for int256;
 
-    address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    address public immutable WETH;
 
     mapping(address => AggregatorV3Interface) public ethFeedOf;
 
     event EthFeedUpdated(address indexed token, AggregatorV3Interface ethFeed);
 
-    constructor() UsingStalePeriod(24 hours) {}
+    constructor(address weth_) UsingStalePeriod(24 hours) {
+        WETH = weth_;
+    }
 
     /// @inheritdoc ITokenOracle
     function getPriceInUsd(address token_) external view override returns (uint256 _priceInUsd) {

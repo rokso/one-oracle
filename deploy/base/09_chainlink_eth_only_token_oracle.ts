@@ -1,5 +1,6 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
+import {Addresses} from '../../helpers'
 
 const ChainlinkEthOnlyTokenOracle = 'ChainlinkEthOnlyTokenOracle'
 
@@ -11,7 +12,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await deploy(ChainlinkEthOnlyTokenOracle, {
     from: deployer,
     log: true,
-    args: [],
+    args: [Addresses.base.WETH],
   })
 }
 
