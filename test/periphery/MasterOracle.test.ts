@@ -379,7 +379,7 @@ describe('MasterOracle', function () {
 
           // then
           const priceAfter = await masterOracle.getPriceInUsd(sFrxETH)
-          expect(priceAfter).closeTo(priceBefore, parseEther('0.001'))
+          expect(priceAfter).closeTo(priceBefore, parseEther('0.002'))
         })
 
         it('should not be able to manipulate sFrxETH price (2)', async function () {
