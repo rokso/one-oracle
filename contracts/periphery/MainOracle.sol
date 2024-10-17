@@ -2,23 +2,25 @@
 
 pragma solidity 0.8.9;
 
-import "@openzeppelin/contracts/utils/math/Math.sol";
-import "../interfaces/periphery/IOracle.sol";
-import "../features/UsingStalePeriod.sol";
+import {IOracle} from "../interfaces/periphery/IOracle.sol";
+import {IPriceProvider} from "../interfaces/core/IPriceProvider.sol";
+import {UsingStalePeriod} from "../features/UsingStalePeriod.sol";
 
 /**
- * @title Chainlink oracle
+ * @title Main oracle
+ * @dev In most cases this will wrap the Chainlink price provider
  */
-contract ChainlinkOracle is IOracle, UsingStalePeriod {
-    constructor(uint256 stalePeriod_) UsingStalePeriod(stalePeriod_) {}
+contract MainOracle is IOracle, UsingStalePeriod {
+    IPriceProvider public immutable provider;
+
+    constructor(IPriceProvider provider_, uint256 stalePeriod_) UsingStalePeriod(stalePeriod_) {
+        provider = provider_;
+    }
 
     /// @inheritdoc IOracle
     function getPriceInUsd(address token_) public view virtual returns (uint256 _priceInUsd) {
         uint256 _lastUpdatedAt;
-        (_priceInUsd, _lastUpdatedAt) = addressProvider.providersAggregator().getPriceInUsd(
-            DataTypes.Provider.CHAINLINK,
-            token_
-        );
+        (_priceInUsd, _lastUpdatedAt) = provider.getPriceInUsd(token_);
         require(_priceInUsd > 0 && !_priceIsStale(token_, _lastUpdatedAt), "price-invalid");
     }
 
@@ -30,12 +32,7 @@ contract ChainlinkOracle is IOracle, UsingStalePeriod {
     ) public view virtual returns (uint256 _amountOut) {
         uint256 _tokenInLastUpdatedAt;
         uint256 _tokenOutLastUpdatedAt;
-        (_amountOut, _tokenInLastUpdatedAt, _tokenOutLastUpdatedAt) = addressProvider.providersAggregator().quote(
-            DataTypes.Provider.CHAINLINK,
-            tokenIn_,
-            tokenOut_,
-            amountIn_
-        );
+        (_amountOut, _tokenInLastUpdatedAt, _tokenOutLastUpdatedAt) = provider.quote(tokenIn_, tokenOut_, amountIn_);
 
         require(
             _amountOut > 0 &&
@@ -48,22 +45,14 @@ contract ChainlinkOracle is IOracle, UsingStalePeriod {
     /// @inheritdoc IOracle
     function quoteTokenToUsd(address token_, uint256 amountIn_) public view virtual returns (uint256 _amountOut) {
         uint256 _lastUpdatedAt;
-        (_amountOut, _lastUpdatedAt) = addressProvider.providersAggregator().quoteTokenToUsd(
-            DataTypes.Provider.CHAINLINK,
-            token_,
-            amountIn_
-        );
+        (_amountOut, _lastUpdatedAt) = provider.quoteTokenToUsd(token_, amountIn_);
         require(_amountOut > 0 && !_priceIsStale(token_, _lastUpdatedAt), "price-invalid");
     }
 
     /// @inheritdoc IOracle
     function quoteUsdToToken(address token_, uint256 amountIn_) public view virtual returns (uint256 _amountOut) {
         uint256 _lastUpdatedAt;
-        (_amountOut, _lastUpdatedAt) = addressProvider.providersAggregator().quoteUsdToToken(
-            DataTypes.Provider.CHAINLINK,
-            token_,
-            amountIn_
-        );
+        (_amountOut, _lastUpdatedAt) = provider.quoteUsdToToken(token_, amountIn_);
         require(_amountOut > 0 && !_priceIsStale(token_, _lastUpdatedAt), "price-invalid");
     }
 }
