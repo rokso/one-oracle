@@ -151,6 +151,7 @@ export const Addresses: {[key: string]: any} = {
       TBY_MAR24_A: '0x8dc5BE35672D650bc8A176A4bafBfC33555D80AC',
       EXCHANGE_REGISTRY: '0xBbBe37FE58e9859b6943AC53bDf4d0827f7F0034',
     },
+    PYTH_ORACLE: '0x4305fb66699c3b2702d4d05cf36551390a4c69c6',
   },
   avalanche: {
     WAVAX: '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7',
@@ -250,6 +251,7 @@ export const Addresses: {[key: string]: any} = {
       msETH: '0x1610e3c85dd44Af31eD7f33a63642012Dca0C5A5',
       msOP: '0x33bCa143d9b41322479E8d26072a00a352404721',
     },
+    PYTH_ORACLE: '0xff1a0f4744e8582DF1aE09D5611b887B6a12925C',
   },
   base: {
     USDC: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
@@ -277,6 +279,7 @@ export const Addresses: {[key: string]: any} = {
       vacbETH: '0x3899a6090c5C178dB8A1800DA39daD0D06EeEFBE',
       vawstETH: '0x46fb68Eb2b1Fc43654AbaE5691D39D18D933E4b4',
     },
+    PYTH_ORACLE: '0x8250f4aF4B972684F7b336503E2D6dFeDeB1487a',
   },
 }
 
