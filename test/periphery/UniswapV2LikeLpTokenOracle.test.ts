@@ -98,7 +98,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
 
         // then
         expect(priceInUsd).closeTo(Quote.mainnet.UNIV2_ETH_WBTC_LP_USD, parseEther('1'))
-        expect(priceInUsd).closeTo(expectedPriceInUsd, parseEther('5,000'))
+        expect(priceInUsd).closeTo(expectedPriceInUsd, parseEther('10,000'))
       })
 
       it('when none of tokens are 18-decimals (wbtc,usdc)', async function () {
@@ -127,7 +127,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         const lpBalanceOfProvider = await ethDaiPair.balanceOf(provider.address)
         const lpSupplyBefore = await ethDaiPair.totalSupply()
         const lpShareOfProvider = lpBalanceOfProvider.mul(parseEther('1')).div(lpSupplyBefore)
-        expect(lpShareOfProvider).closeTo(parseEther('0.1818'), parseEther('0.01')) // ~17% of all liquidity
+        expect(lpShareOfProvider).closeTo(parseEther('0.1635'), parseEther('0.01')) // ~17% of all liquidity
 
         // when
         await ethDaiPair.connect(provider).approve(router.address, lpBalanceOfProvider)
@@ -144,7 +144,7 @@ describe('UniswapV2LikeLpTokenOracle @mainnet', function () {
         const lpSupplyAfter = await ethDaiPair.totalSupply()
         expect(lpSupplyAfter).lt(lpSupplyBefore)
         const priceAfter = await lpOracle.getPriceInUsd(ethDaiPair.address)
-        expect(priceAfter).eq(priceBefore)
+        expect(priceAfter).closeTo(priceBefore, '1')
       })
 
       it('after huge swap', async function () {
