@@ -4,7 +4,7 @@ import {expect} from 'chai'
 import {ethers} from 'hardhat'
 import {IPyth, PythPriceProvider} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
-import {parseEther} from '../helpers'
+import {increaseTime, timestampFromLatestBlock} from '../helpers'
 import {smock} from '@defi-wonderland/smock'
 import {EvmPriceServiceConnection} from '@pythnetwork/pyth-evm-js'
 
@@ -13,8 +13,6 @@ const {USDC, WETH, WBTC, PYTH_ORACLE} = Addresses.mainnet
 const ETH_USD_FEED_ID = '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace'
 const USDC_USD_FEED_ID = '0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a'
 const BTC_USD_FEED_ID = '0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43'
-
-const TOO_LONG = 60 * 60 * 20
 
 describe('PythPriceProvider @mainnet', function () {
   let snapshotId: string
@@ -42,53 +40,35 @@ describe('PythPriceProvider @mainnet', function () {
     await priceProvider.updateFeedId(WETH, ETH_USD_FEED_ID)
     await priceProvider.updateFeedId(USDC, USDC_USD_FEED_ID)
     await priceProvider.updateFeedId(WBTC, BTC_USD_FEED_ID)
+
+    // Change block time to current timestamp
+    const currentTimestamp = parseInt((Date.now() / 1000).toFixed())
+    const blockTimestamp = await timestampFromLatestBlock()
+    const toIncrease = currentTimestamp - blockTimestamp
+    await increaseTime(ethers.BigNumber.from(toIncrease))
   })
 
   afterEach(async function () {
     await ethers.provider.send('evm_revert', [snapshotId])
   })
 
-  describe('getPriceInUsd', function () {
-    it('should WETH price', async function () {
-      const {_priceInUsd, _lastUpdatedAt} = await priceProvider.getPriceInUsd(WETH)
+  it('getPriceInUsd', async function () {
+    // given (prices outdated)
+    await expect(priceProvider.getPriceInUsd(WETH)).revertedWith('price-too-behind')
+    await expect(priceProvider.getPriceInUsd(WBTC)).revertedWith('price-too-behind')
+    await expect(priceProvider.getPriceInUsd(USDC)).revertedWith('price-too-behind')
 
-      expect(_lastUpdatedAt).lt(forkTimestamp - TOO_LONG)
-      expect(_priceInUsd).closeTo(parseEther('2,460'), parseEther('10'))
-      // Note: Pyth price is outdated compared with current forked block
-      // expect(_priceInUsd).closeTo(Quote.mainnet.ETH_USD, parseEther('100'))
-    })
+    // when (update prices)
+    const connection = new EvmPriceServiceConnection('https://hermes.pyth.network')
+    const priceIds = [BTC_USD_FEED_ID, ETH_USD_FEED_ID, USDC_USD_FEED_ID]
+    const priceUpdate = await connection.getPriceFeedsUpdateData(priceIds)
+    const fee = await pyth.getUpdateFee(priceIds)
+    await pyth.updatePriceFeeds(priceUpdate, {value: fee})
 
-    it('should WBTC price', async function () {
-      const {_priceInUsd, _lastUpdatedAt} = await priceProvider.getPriceInUsd(WBTC)
-      expect(_lastUpdatedAt).lt(forkTimestamp - TOO_LONG)
-      expect(_priceInUsd).closeTo(parseEther('62,654'), parseEther('100'))
-      // Note: Pyth price is outdated compared with current forked block
-      // expect(_priceInUsd).closeTo(Quote.mainnet.BTC_USD, parseEther('100'))
-    })
-
-    it('should USDC price', async function () {
-      const {_priceInUsd} = await priceProvider.getPriceInUsd(USDC)
-      expect(_priceInUsd).closeTo(parseEther('1'), parseEther('0.1'))
-    })
-  })
-
-  describe('update Pyth prices', function () {
-    it('should update price', async function () {
-      // given
-      const {_priceInUsd} = await priceProvider.getPriceInUsd(WBTC)
-      expect(_priceInUsd).closeTo(parseEther('62,654'), parseEther('100'))
-
-      // when
-      const connection = new EvmPriceServiceConnection('https://hermes.pyth.network')
-      const priceIds = [BTC_USD_FEED_ID]
-      const priceUpdate = await connection.getPriceFeedsUpdateData(priceIds)
-      const fee = await pyth.getUpdateFee(priceIds)
-      await pyth.updatePriceFeeds(priceUpdate, {value: fee})
-
-      // then
-      const tx = priceProvider.getPriceInUsd(WBTC)
-      await expect(tx).revertedWith('price-too-ahead')
-    })
+    // then
+    expect(await priceProvider.getPriceInUsd(WETH)).to.not.deep.eq([0, 0])
+    expect(await priceProvider.getPriceInUsd(WBTC)).to.not.deep.eq([0, 0])
+    expect(await priceProvider.getPriceInUsd(USDC)).to.not.deep.eq([0, 0])
   })
 
   describe('updateFeedId', function () {

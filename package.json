@@ -41,6 +41,7 @@
     "@prb/math": "^2.5.0",
     "@pythnetwork/pyth-evm-js": "1.73.0",
     "@pythnetwork/pyth-sdk-solidity": "4.0.0",
+    "@redstone-finance/evm-connector": "0.6.2",
     "@safe-global/safe-core-sdk": "3.3.2",
     "@safe-global/safe-ethers-adapters": "0.1.0-alpha.16",
     "@safe-global/safe-ethers-lib": "1.9.2",
