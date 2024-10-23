@@ -18,7 +18,7 @@ contract PythPriceProvider is IPythPriceProvider, PriceProvider, Governable {
 
     int256 internal constant MIN_EXPONENT = -18;
     int256 internal constant MAX_EXPONENT = 0;
-    uint256 internal constant MAX_IN_FUTURE = 1 minutes;
+    uint256 internal constant MAX_TIME_TOLERANCE = 1 minutes;
 
     /// @notice Pyth main contract
     IPyth public immutable pyth;
@@ -48,9 +48,12 @@ contract PythPriceProvider is IPythPriceProvider, PriceProvider, Governable {
 
         PythStructs.Price memory _p = pyth.getPriceUnsafe(_feedId);
 
+        if (_p.publishTime < block.timestamp) {
+            require(block.timestamp - _p.publishTime <= MAX_TIME_TOLERANCE, "price-too-behind");
+        }
+
         if (_p.publishTime > block.timestamp) {
-            uint256 inFuture = _p.publishTime - block.timestamp;
-            require(inFuture <= MAX_IN_FUTURE, "price-too-ahead");
+            require(_p.publishTime - block.timestamp <= MAX_TIME_TOLERANCE, "price-too-ahead");
         }
 
         require(_p.price > 0, "price-negative-or-zero");
