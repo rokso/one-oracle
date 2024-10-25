@@ -2,7 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {IPyth, PythPriceProvider} from '../../typechain-types'
+import {IPyth, PythMainnetPriceProvider} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {increaseTime, timestampFromLatestBlock} from '../helpers'
 import {smock} from '@defi-wonderland/smock'
@@ -19,7 +19,7 @@ describe('PythPriceProvider @mainnet', function () {
   let deployer: SignerWithAddress
   let alice: SignerWithAddress
   let pyth: IPyth
-  let priceProvider: PythPriceProvider
+  let priceProvider: PythMainnetPriceProvider
   let forkTimestamp: number
 
   beforeEach(async function () {
@@ -33,13 +33,9 @@ describe('PythPriceProvider @mainnet', function () {
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    const priceProviderFactory = await ethers.getContractFactory('PythPriceProvider', deployer)
+    const priceProviderFactory = await ethers.getContractFactory('PythMainnetPriceProvider', deployer)
     priceProvider = await priceProviderFactory.deploy(pyth.address)
     await priceProvider.deployed()
-
-    await priceProvider.updateFeedId(WETH, ETH_USD_FEED_ID)
-    await priceProvider.updateFeedId(USDC, USDC_USD_FEED_ID)
-    await priceProvider.updateFeedId(WBTC, BTC_USD_FEED_ID)
 
     // Change block time to current timestamp
     const currentTimestamp = parseInt((Date.now() / 1000).toFixed())

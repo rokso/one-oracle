@@ -12,7 +12,8 @@
       "files": [
         "contracts/core/ChainlinkMainnetPriceProvider.sol",
         "contracts/core/ChainlinkAvalanchePriceProvider.sol",
-        "contracts/core/ChainlinkPolygonPriceProvider.sol"
+        "contracts/core/ChainlinkPolygonPriceProvider.sol",
+        "contracts/core/PythMainnetPriceProvider.sol"
       ],
       "options": {
         "printWidth": 140
