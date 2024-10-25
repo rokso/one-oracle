@@ -26,35 +26,44 @@ contract RedstonePriceProvider is
     }
 
     /// @notice Feed ids (feedId => token)
-    mapping(bytes32 => address) public feedIds;
+    mapping(bytes32 => address[]) internal feeds;
 
     /// @notice Price cache
     mapping(address => Cache) internal cache;
 
     /// @notice Emitted when an feed id is updated
-    event FeedIdUpdated(bytes32 feedId, address token);
+    event FeedIdUpdated(bytes32 feedId, address[] tokens);
 
     /// @notice The cache timestamp was updated.
     /// @param price The Redstone price.
     /// @param priceTimestamp The timestamp contained within the price data packages.
     event CacheUpdated(uint256 price, uint256 priceTimestamp);
 
+    /// @notice Get tokens of a feed
+    function tokensOf(bytes32 feedId_) external view returns (address[] memory tokens_) {
+        return feeds[feedId_];
+    }
+
+    /// @notice Update price for the tokens related to the `dataFeedIds_`
     function updatePrice(bytes32[] memory dataFeedIds_) external {
         (uint256[] memory _values, uint256 _timestamp) = _securelyExtractOracleValuesAndTimestampFromTxMsg(
             dataFeedIds_
         );
 
-        uint256 _len = _values.length;
-        require(_len == dataFeedIds_.length, "invalid-data");
+        uint256 _valuesLength = _values.length;
+        require(_valuesLength == dataFeedIds_.length, "invalid-data");
 
         _timestamp /= 1000; // Redstone uses milliseconds
 
-        for (uint256 i; i < _len; ++i) {
-            bytes32 _id = dataFeedIds_[i];
-            address _token = feedIds[_id];
-            require(_token != address(0), "feed-unknown");
-            if (_timestamp != cache[_token].priceTimestamp) {
-                cache[_token] = Cache({price: _values[i] * TO_SCALE, priceTimestamp: _timestamp});
+        for (uint256 i; i < _valuesLength; ++i) {
+            address[] memory _tokens = feeds[dataFeedIds_[i]];
+            uint256 _tokensLength = _tokens.length;
+            for (uint j; j < _tokensLength; ++j) {
+                address _token = _tokens[j];
+                require(_token != address(0), "feed-unknown");
+                if (_timestamp != cache[_token].priceTimestamp) {
+                    cache[_token] = Cache({price: _values[i] * TO_SCALE, priceTimestamp: _timestamp});
+                }
             }
         }
     }
@@ -85,11 +94,11 @@ contract RedstonePriceProvider is
 
     /// @inheritdoc IRedstonePriceProvider
     /// @dev The feed should be denominated in USD
-    function updateFeedId(bytes32 feedId_, address token_) external override onlyGovernor {
+    function updateFeed(bytes32 feedId_, address[] memory tokens_) external override onlyGovernor {
         require(feedId_ != bytes32(0), "id-is-null");
 
-        feedIds[feedId_] = token_;
+        feeds[feedId_] = tokens_;
 
-        emit FeedIdUpdated(feedId_, token_);
+        emit FeedIdUpdated(feedId_, tokens_);
     }
 }

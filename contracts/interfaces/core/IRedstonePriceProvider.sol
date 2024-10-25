@@ -8,5 +8,5 @@ interface IRedstonePriceProvider is IPriceProvider {
     /**
      * @notice Update feed id
      */
-    function updateFeedId(bytes32 feedId_, address token_) external;
+    function updateFeed(bytes32 feedId_, address[] memory tokens_) external;
 }

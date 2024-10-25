@@ -2,7 +2,7 @@
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import {ethers} from 'hardhat'
-import {RedstonePriceProvider} from '../../typechain-types'
+import {RedstoneMainnetPriceProvider} from '../../typechain-types'
 import {Addresses} from '../../helpers/address'
 import {increaseTime, timestampFromLatestBlock} from '../helpers'
 import {smock} from '@defi-wonderland/smock'
@@ -10,15 +10,15 @@ import {WrapperBuilder} from '@redstone-finance/evm-connector'
 
 const {USDC, WETH, WBTC} = Addresses.mainnet
 
-const ETH_USD_FEED_ID = '0x4554480000000000000000000000000000000000000000000000000000000000'
-const USDC_USD_FEED_ID = '0x5553444300000000000000000000000000000000000000000000000000000000'
-const BTC_USD_FEED_ID = '0x4254430000000000000000000000000000000000000000000000000000000000'
+const ETH_USD_FEED_ID = ethers.utils.formatBytes32String('ETH') // i.e., bytes32("ETH")
+const USDC_USD_FEED_ID = ethers.utils.formatBytes32String('USDC') // i.e., bytes32("USDC")
+const BTC_USD_FEED_ID = ethers.utils.formatBytes32String('BTC') // i.e., bytes32("BTC")
 
 describe('RedstonePriceProvider @mainnet', function () {
   let snapshotId: string
   let deployer: SignerWithAddress
   let alice: SignerWithAddress
-  let priceProvider: RedstonePriceProvider
+  let priceProvider: RedstoneMainnetPriceProvider
   let forkTimestamp: number
 
   beforeEach(async function () {
@@ -30,13 +30,9 @@ describe('RedstonePriceProvider @mainnet', function () {
     const addressProvider = await smock.fake('AddressProviderMock', {address: Addresses.ADDRESS_PROVIDER})
     addressProvider.governor.returns(deployer.address)
 
-    const priceProviderFactory = await ethers.getContractFactory('RedstonePriceProvider', deployer)
+    const priceProviderFactory = await ethers.getContractFactory('RedstoneMainnetPriceProvider', deployer)
     priceProvider = await priceProviderFactory.deploy()
     await priceProvider.deployed()
-
-    await priceProvider.updateFeedId(ETH_USD_FEED_ID, WETH)
-    await priceProvider.updateFeedId(USDC_USD_FEED_ID, USDC)
-    await priceProvider.updateFeedId(BTC_USD_FEED_ID, WBTC)
 
     // Change block time to current timestamp
     const currentTimestamp = parseInt((Date.now() / 1000).toFixed())
@@ -67,31 +63,31 @@ describe('RedstonePriceProvider @mainnet', function () {
     expect(await priceProvider.getPriceInUsd(USDC)).to.not.deep.eq([0, 0])
   })
 
-  describe('updateFeedId', function () {
+  describe('updateFeed', function () {
     it('should revert if not governor', async function () {
-      const tx = priceProvider.connect(alice).updateFeedId(ETH_USD_FEED_ID, WETH)
+      const tx = priceProvider.connect(alice).updateFeed(ETH_USD_FEED_ID, [WETH])
       await expect(tx).revertedWith('not-governor')
     })
 
     it('should revert if id is null', async function () {
       const zeroId = ethers.utils.hexZeroPad('0x', 32)
-      const tx = priceProvider.updateFeedId(zeroId, WETH)
+      const tx = priceProvider.updateFeed(zeroId, [WETH])
       await expect(tx).revertedWith('id-is-null')
     })
 
     it('should update feed id', async function () {
-      const before = await priceProvider.feedIds(BTC_USD_FEED_ID)
+      const [before] = await priceProvider.tokensOf(BTC_USD_FEED_ID)
       expect(before).not.eq(ethers.constants.AddressZero)
-      await priceProvider.updateFeedId(BTC_USD_FEED_ID, WETH)
-      const after = await priceProvider.feedIds(BTC_USD_FEED_ID)
+      await priceProvider.updateFeed(BTC_USD_FEED_ID, [WETH])
+      const [after] = await priceProvider.tokensOf(BTC_USD_FEED_ID)
       expect(after).eq(WETH).not.eq(before)
     })
 
     it('should set feed id to null', async function () {
-      const before = await priceProvider.feedIds(BTC_USD_FEED_ID)
+      const [before] = await priceProvider.tokensOf(BTC_USD_FEED_ID)
       expect(before).not.eq(ethers.constants.AddressZero)
-      await priceProvider.updateFeedId(BTC_USD_FEED_ID, ethers.constants.AddressZero)
-      const after = await priceProvider.feedIds(BTC_USD_FEED_ID)
+      await priceProvider.updateFeed(BTC_USD_FEED_ID, [ethers.constants.AddressZero])
+      const [after] = await priceProvider.tokensOf(BTC_USD_FEED_ID)
       expect(after).eq(ethers.constants.AddressZero)
     })
   })
