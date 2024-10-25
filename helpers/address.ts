@@ -134,10 +134,6 @@ export const Addresses: {[key: string]: any} = {
       vacbETH: '0x650CD45DEdb19c33160Acc522aD1a82D9701036a',
     },
     Synth: {
-      // Alpha
-      // msUSD: '0x9F71F7e34567c25672Ed6b6E51B5DA602757B8d0',
-      // msETH: '0x9105A793A24De69b1ac6f2051036D69670843Ee9',
-      // Beta
       msUSD: '0xab5eB14c09D416F0aC63661E57EDB7AEcDb9BEfA',
       msETH: '0x64351fC9810aDAd17A690E4e1717Df5e7e085160',
       msBTC: '0x8b4F8aD3801B4015Dea6DA1D36f063Cbf4e231c7',
