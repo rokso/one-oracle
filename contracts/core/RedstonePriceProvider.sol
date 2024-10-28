@@ -81,6 +81,8 @@ contract RedstonePriceProvider is
         Cache memory _cache = cache[token_];
         uint256 _timestamp = _cache.priceTimestamp;
 
+        require(_timestamp > 0, "no-price");
+
         if (_timestamp < block.timestamp) {
             require(block.timestamp - _timestamp <= MAX_TIME_TOLERANCE, "price-too-behind");
         }
