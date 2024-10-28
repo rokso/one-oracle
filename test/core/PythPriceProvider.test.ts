@@ -50,9 +50,9 @@ describe('PythPriceProvider @mainnet', function () {
 
   it('getPriceInUsd', async function () {
     // given (prices outdated)
-    await expect(priceProvider.getPriceInUsd(WETH)).revertedWith('price-too-behind')
-    await expect(priceProvider.getPriceInUsd(WBTC)).revertedWith('price-too-behind')
-    await expect(priceProvider.getPriceInUsd(USDC)).revertedWith('price-too-behind')
+    expect(await priceProvider.getPriceInUsd(WETH)).to.deep.eq([0, 0])
+    expect(await priceProvider.getPriceInUsd(WBTC)).to.deep.eq([0, 0])
+    expect(await priceProvider.getPriceInUsd(USDC)).to.deep.eq([0, 0])
 
     // when (update prices)
     const connection = new EvmPriceServiceConnection('https://hermes.pyth.network')

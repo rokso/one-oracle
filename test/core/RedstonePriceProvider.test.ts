@@ -47,9 +47,9 @@ describe('RedstonePriceProvider @mainnet', function () {
 
   it('getPriceInUsd', async function () {
     // given (cache is empty)
-    await expect(priceProvider.getPriceInUsd(WETH)).revertedWith('no-price')
-    await expect(priceProvider.getPriceInUsd(WBTC)).revertedWith('no-price')
-    await expect(priceProvider.getPriceInUsd(USDC)).revertedWith('no-price')
+    expect(await priceProvider.getPriceInUsd(WETH)).to.deep.eq([0, 0])
+    expect(await priceProvider.getPriceInUsd(WBTC)).to.deep.eq([0, 0])
+    expect(await priceProvider.getPriceInUsd(USDC)).to.deep.eq([0, 0])
 
     // when (update cache)
     const wrappedPriceProvider = WrapperBuilder.wrap(priceProvider).usingDataService({

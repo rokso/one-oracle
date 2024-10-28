@@ -44,25 +44,32 @@ contract PythPriceProvider is IPythPriceProvider, PriceProvider, Governable {
         returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
     {
         bytes32 _feedId = feedIds[token_];
-        require(_feedId != bytes32(0), "token-without-feed-ids");
+
+        if (_feedId == bytes32(0)) {
+            return (0, 0);
+        }
 
         PythStructs.Price memory _p = pyth.getPriceUnsafe(_feedId);
+        _lastUpdatedAt = _p.publishTime;
 
-        if (_p.publishTime < block.timestamp) {
-            require(block.timestamp - _p.publishTime <= MAX_TIME_TOLERANCE, "price-too-behind");
+        if (_lastUpdatedAt < block.timestamp && block.timestamp - _lastUpdatedAt > MAX_TIME_TOLERANCE) {
+            return (0, 0);
         }
 
-        if (_p.publishTime > block.timestamp) {
-            require(_p.publishTime - block.timestamp <= MAX_TIME_TOLERANCE, "price-too-ahead");
+        if (_lastUpdatedAt > block.timestamp && _lastUpdatedAt - block.timestamp > MAX_TIME_TOLERANCE) {
+            return (0, 0);
         }
 
-        require(_p.price > 0, "price-negative-or-zero");
-        require(_p.expo >= MIN_EXPONENT && _p.expo <= MAX_EXPONENT, "invalid-expo");
+        if (_p.price == 0) {
+            return (0, 0);
+        }
+
+        if (_p.expo < MIN_EXPONENT || _p.expo > MAX_EXPONENT) {
+            return (0, 0);
+        }
 
         uint256 _toScale = (10 ** int256(18 + _p.expo).toUint256());
-        uint256 _price = int256(_p.price).toUint256() * _toScale;
-
-        return (_price, _p.publishTime);
+        _priceInUsd = int256(_p.price).toUint256() * _toScale;
     }
 
     /// @inheritdoc IPythPriceProvider

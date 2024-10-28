@@ -79,19 +79,20 @@ contract RedstonePriceProvider is
         returns (uint256 _priceInUsd, uint256 _lastUpdatedAt)
     {
         Cache memory _cache = cache[token_];
-        uint256 _timestamp = _cache.priceTimestamp;
+        _lastUpdatedAt = _cache.priceTimestamp;
+        _priceInUsd = _cache.price;
 
-        require(_timestamp > 0, "no-price");
-
-        if (_timestamp < block.timestamp) {
-            require(block.timestamp - _timestamp <= MAX_TIME_TOLERANCE, "price-too-behind");
+        if (_lastUpdatedAt == 0) {
+            return (0, 0);
         }
 
-        if (_timestamp > block.timestamp) {
-            require(_timestamp - block.timestamp <= MAX_TIME_TOLERANCE, "price-too-ahead");
+        if (_lastUpdatedAt < block.timestamp && block.timestamp - _lastUpdatedAt > MAX_TIME_TOLERANCE) {
+            return (0, 0);
         }
 
-        return (_cache.price, _timestamp);
+        if (_lastUpdatedAt > block.timestamp && _lastUpdatedAt - block.timestamp > MAX_TIME_TOLERANCE) {
+            return (0, 0);
+        }
     }
 
     /// @inheritdoc IRedstonePriceProvider
