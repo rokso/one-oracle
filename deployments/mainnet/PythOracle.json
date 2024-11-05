@@ -1,0 +1,215 @@
+{
+  "address": "0x1f278B7EFf04ADd48Ff81ae1a01cBC178b3dD351",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract IPriceProvider",
+          "name": "provider_",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token_",
+          "type": "address"
+        }
+      ],
+      "name": "getPriceInUsd",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_priceInUsd",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "provider",
+      "outputs": [
+        {
+          "internalType": "contract IPriceProvider",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "tokenIn_",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenOut_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn_",
+          "type": "uint256"
+        }
+      ],
+      "name": "quote",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountOut",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn_",
+          "type": "uint256"
+        }
+      ],
+      "name": "quoteTokenToUsd",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountOut",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "token_",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amountIn_",
+          "type": "uint256"
+        }
+      ],
+      "name": "quoteUsdToToken",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amountOut",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x4a87a4095d1f925ba2eb0366fbbd83e52624bc3de22d4b244b308bf74e60700a",
+  "receipt": {
+    "to": null,
+    "from": "0xF5F5195cF6998c57C651f9f0bBFA7cFC72a6FaC1",
+    "contractAddress": "0x1f278B7EFf04ADd48Ff81ae1a01cBC178b3dD351",
+    "transactionIndex": 105,
+    "gasUsed": "345340",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xec524efd7c5fb3e8987f3bc6581503e4341d697aceae1473db272b2365a69e45",
+    "transactionHash": "0x4a87a4095d1f925ba2eb0366fbbd83e52624bc3de22d4b244b308bf74e60700a",
+    "logs": [],
+    "blockNumber": 21044058,
+    "cumulativeGasUsed": "8042342",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [
+    "0x7c2d5b1E7d7BE588389BDb94138cC37dC014e85c"
+  ],
+  "numDeployments": 1,
+  "solcInputHash": "7cfc7c43f7a8c30044114d86312d782c",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.9+commit.e5eed63a\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract IPriceProvider\",\"name\":\"provider_\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"token_\",\"type\":\"address\"}],\"name\":\"getPriceInUsd\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_priceInUsd\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"provider\",\"outputs\":[{\"internalType\":\"contract IPriceProvider\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"tokenIn_\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"tokenOut_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountIn_\",\"type\":\"uint256\"}],\"name\":\"quote\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountOut\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"token_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountIn_\",\"type\":\"uint256\"}],\"name\":\"quoteTokenToUsd\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountOut\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"token_\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amountIn_\",\"type\":\"uint256\"}],\"name\":\"quoteUsdToToken\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"_amountOut\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"details\":\"This is the same as `MainOracle` but without stale period check because pull-oracle providers already do that\",\"kind\":\"dev\",\"methods\":{\"getPriceInUsd(address)\":{\"params\":{\"token_\":\"The address of asset\"},\"returns\":{\"_priceInUsd\":\"The USD price\"}},\"quote(address,address,uint256)\":{\"params\":{\"amountIn_\":\"Amount of input token\",\"tokenIn_\":\"The address of assetIn\",\"tokenOut_\":\"The address of assetOut\"},\"returns\":{\"_amountOut\":\"Amount out\"}},\"quoteTokenToUsd(address,uint256)\":{\"params\":{\"amountIn_\":\"Amount of input token.\",\"token_\":\"The address of assetIn\"},\"returns\":{\"_amountOut\":\"Amount in USD\"}},\"quoteUsdToToken(address,uint256)\":{\"params\":{\"amountIn_\":\"Input amount in USD\",\"token_\":\"The address of assetOut\"},\"returns\":{\"_amountOut\":\"Output amount of token\"}}},\"title\":\"Pull oracle\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"getPriceInUsd(address)\":{\"notice\":\"Get USD (or equivalent) price of an asset\"},\"quote(address,address,uint256)\":{\"notice\":\"Get quote\"},\"quoteTokenToUsd(address,uint256)\":{\"notice\":\"Get quote in USD (or equivalent) amount\"},\"quoteUsdToToken(address,uint256)\":{\"notice\":\"Get quote from USD (or equivalent) amount to amount of token\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/periphery/PullOracle.sol\":\"PullOracle\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":5000},\"remappings\":[]},\"sources\":{\"contracts/interfaces/core/IPriceProvider.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface IPriceProvider {\\n    /**\\n     * @notice Get USD (or equivalent) price of an asset\\n     * @param token_ The address of asset\\n     * @return _priceInUsd The USD price\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function getPriceInUsd(address token_) external view returns (uint256 _priceInUsd, uint256 _lastUpdatedAt);\\n\\n    /**\\n     * @notice Get quote\\n     * @param tokenIn_ The address of assetIn\\n     * @param tokenOut_ The address of assetOut\\n     * @param amountIn_ Amount of input token\\n     * @return _amountOut Amount out\\n     * @return _tokenInLastUpdatedAt Last updated timestamp of `tokenIn_`\\n     * @return _tokenOutLastUpdatedAt Last updated timestamp of `tokenOut_`\\n     */\\n    function quote(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    )\\n        external\\n        view\\n        returns (\\n            uint256 _amountOut,\\n            uint256 _tokenInLastUpdatedAt,\\n            uint256 _tokenOutLastUpdatedAt\\n        );\\n\\n    /**\\n     * @notice Get quote in USD (or equivalent) amount\\n     * @param token_ The address of assetIn\\n     * @param amountIn_ Amount of input token.\\n     * @return amountOut_ Amount in USD\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function quoteTokenToUsd(address token_, uint256 amountIn_)\\n        external\\n        view\\n        returns (uint256 amountOut_, uint256 _lastUpdatedAt);\\n\\n    /**\\n     * @notice Get quote from USD (or equivalent) amount to amount of token\\n     * @param token_ The address of assetOut\\n     * @param amountIn_ Input amount in USD\\n     * @return _amountOut Output amount of token\\n     * @return _lastUpdatedAt Last updated timestamp\\n     */\\n    function quoteUsdToToken(address token_, uint256 amountIn_)\\n        external\\n        view\\n        returns (uint256 _amountOut, uint256 _lastUpdatedAt);\\n}\\n\",\"keccak256\":\"0x188c27728bd50b187944ef217b58751efd7b8ec3f1ef0d923be82298b2b0af0e\",\"license\":\"MIT\"},\"contracts/interfaces/periphery/IOracle.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\ninterface IOracle {\\n    /**\\n     * @notice Get USD (or equivalent) price of an asset\\n     * @param token_ The address of asset\\n     * @return _priceInUsd The USD price\\n     */\\n    function getPriceInUsd(address token_) external view returns (uint256 _priceInUsd);\\n\\n    /**\\n     * @notice Get quote\\n     * @param tokenIn_ The address of assetIn\\n     * @param tokenOut_ The address of assetOut\\n     * @param amountIn_ Amount of input token\\n     * @return _amountOut Amount out\\n     */\\n    function quote(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    ) external view returns (uint256 _amountOut);\\n\\n    /**\\n     * @notice Get quote in USD (or equivalent) amount\\n     * @param token_ The address of assetIn\\n     * @param amountIn_ Amount of input token.\\n     * @return amountOut_ Amount in USD\\n     */\\n    function quoteTokenToUsd(address token_, uint256 amountIn_) external view returns (uint256 amountOut_);\\n\\n    /**\\n     * @notice Get quote from USD (or equivalent) amount to amount of token\\n     * @param token_ The address of assetOut\\n     * @param amountIn_ Input amount in USD\\n     * @return _amountOut Output amount of token\\n     */\\n    function quoteUsdToToken(address token_, uint256 amountIn_) external view returns (uint256 _amountOut);\\n}\\n\",\"keccak256\":\"0xb48d57d83e75abecacbd065d3df55ee50eef4998fad94560cb1dbb0644049caa\",\"license\":\"MIT\"},\"contracts/periphery/PullOracle.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity 0.8.9;\\n\\nimport {IOracle} from \\\"../interfaces/periphery/IOracle.sol\\\";\\nimport {IPriceProvider} from \\\"../interfaces/core/IPriceProvider.sol\\\";\\n\\n/**\\n * @title Pull oracle\\n * @dev This is the same as `MainOracle` but without stale period check because pull-oracle providers already do that\\n */\\ncontract PullOracle is IOracle {\\n    IPriceProvider public immutable provider;\\n\\n    constructor(IPriceProvider provider_) {\\n        provider = provider_;\\n    }\\n\\n    /// @inheritdoc IOracle\\n    function getPriceInUsd(address token_) public view virtual returns (uint256 _priceInUsd) {\\n        (_priceInUsd, ) = provider.getPriceInUsd(token_);\\n    }\\n\\n    /// @inheritdoc IOracle\\n    function quote(\\n        address tokenIn_,\\n        address tokenOut_,\\n        uint256 amountIn_\\n    ) public view virtual returns (uint256 _amountOut) {\\n        (_amountOut, , ) = provider.quote(tokenIn_, tokenOut_, amountIn_);\\n    }\\n\\n    /// @inheritdoc IOracle\\n    function quoteTokenToUsd(address token_, uint256 amountIn_) public view virtual returns (uint256 _amountOut) {\\n        (_amountOut, ) = provider.quoteTokenToUsd(token_, amountIn_);\\n    }\\n\\n    /// @inheritdoc IOracle\\n    function quoteUsdToToken(address token_, uint256 amountIn_) public view virtual returns (uint256 _amountOut) {\\n        (_amountOut, ) = provider.quoteUsdToToken(token_, amountIn_);\\n    }\\n}\\n\",\"keccak256\":\"0xdc48bc732f2b38758001a586805290f279446a068c89b2fd5001edce1a2bd97f\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x60a060405234801561001057600080fd5b506040516105f13803806105f183398101604081905261002f91610040565b6001600160a01b0316608052610070565b60006020828403121561005257600080fd5b81516001600160a01b038116811461006957600080fd5b9392505050565b60805161054b6100a66000396000818160970152818161015f0152818161023001528181610303015261038b015261054b6000f3fe608060405234801561001057600080fd5b50600436106100675760003560e01c80638d0dba00116100505780638d0dba00146100de578063b5e9bef5146100f1578063b64663841461010457600080fd5b806307ee40bf1461006c578063085d488314610092575b600080fd5b61007f61007a36600461043b565b610117565b6040519081526020015b60405180910390f35b6100b97f000000000000000000000000000000000000000000000000000000000000000081565b60405173ffffffffffffffffffffffffffffffffffffffff9091168152602001610089565b61007f6100ec36600461045d565b6101e1565b61007f6100ff36600461045d565b6102b4565b61007f610112366004610487565b610334565b6040517f07ee40bf00000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff82811660048301526000917f0000000000000000000000000000000000000000000000000000000000000000909116906307ee40bf90602401604080518083038186803b1580156101a257600080fd5b505afa1580156101b6573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906101da91906104c3565b5092915050565b6040517f8d0dba0000000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff8381166004830152602482018390526000917f000000000000000000000000000000000000000000000000000000000000000090911690638d0dba00906044015b604080518083038186803b15801561027457600080fd5b505afa158015610288573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906102ac91906104c3565b509392505050565b6040517fb5e9bef500000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff8381166004830152602482018390526000917f00000000000000000000000000000000000000000000000000000000000000009091169063b5e9bef59060440161025d565b6040517fb646638400000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff84811660048301528381166024830152604482018390526000917f00000000000000000000000000000000000000000000000000000000000000009091169063b64663849060640160606040518083038186803b1580156103cf57600080fd5b505afa1580156103e3573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061040791906104e7565b509095945050505050565b803573ffffffffffffffffffffffffffffffffffffffff8116811461043657600080fd5b919050565b60006020828403121561044d57600080fd5b61045682610412565b9392505050565b6000806040838503121561047057600080fd5b61047983610412565b946020939093013593505050565b60008060006060848603121561049c57600080fd5b6104a584610412565b92506104b360208501610412565b9150604084013590509250925092565b600080604083850312156104d657600080fd5b505080516020909101519092909150565b6000806000606084860312156104fc57600080fd5b835192506020840151915060408401519050925092509256fea26469706673582212209d3c4733677a258d4652f1168a010972d80486ddf134a8284dc41d577f34b1e464736f6c63430008090033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100675760003560e01c80638d0dba00116100505780638d0dba00146100de578063b5e9bef5146100f1578063b64663841461010457600080fd5b806307ee40bf1461006c578063085d488314610092575b600080fd5b61007f61007a36600461043b565b610117565b6040519081526020015b60405180910390f35b6100b97f000000000000000000000000000000000000000000000000000000000000000081565b60405173ffffffffffffffffffffffffffffffffffffffff9091168152602001610089565b61007f6100ec36600461045d565b6101e1565b61007f6100ff36600461045d565b6102b4565b61007f610112366004610487565b610334565b6040517f07ee40bf00000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff82811660048301526000917f0000000000000000000000000000000000000000000000000000000000000000909116906307ee40bf90602401604080518083038186803b1580156101a257600080fd5b505afa1580156101b6573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906101da91906104c3565b5092915050565b6040517f8d0dba0000000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff8381166004830152602482018390526000917f000000000000000000000000000000000000000000000000000000000000000090911690638d0dba00906044015b604080518083038186803b15801561027457600080fd5b505afa158015610288573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906102ac91906104c3565b509392505050565b6040517fb5e9bef500000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff8381166004830152602482018390526000917f00000000000000000000000000000000000000000000000000000000000000009091169063b5e9bef59060440161025d565b6040517fb646638400000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff84811660048301528381166024830152604482018390526000917f00000000000000000000000000000000000000000000000000000000000000009091169063b64663849060640160606040518083038186803b1580156103cf57600080fd5b505afa1580156103e3573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061040791906104e7565b509095945050505050565b803573ffffffffffffffffffffffffffffffffffffffff8116811461043657600080fd5b919050565b60006020828403121561044d57600080fd5b61045682610412565b9392505050565b6000806040838503121561047057600080fd5b61047983610412565b946020939093013593505050565b60008060006060848603121561049c57600080fd5b6104a584610412565b92506104b360208501610412565b9150604084013590509250925092565b600080604083850312156104d657600080fd5b505080516020909101519092909150565b6000806000606084860312156104fc57600080fd5b835192506020840151915060408401519050925092509256fea26469706673582212209d3c4733677a258d4652f1168a010972d80486ddf134a8284dc41d577f34b1e464736f6c63430008090033",
+  "devdoc": {
+    "details": "This is the same as `MainOracle` but without stale period check because pull-oracle providers already do that",
+    "kind": "dev",
+    "methods": {
+      "getPriceInUsd(address)": {
+        "params": {
+          "token_": "The address of asset"
+        },
+        "returns": {
+          "_priceInUsd": "The USD price"
+        }
+      },
+      "quote(address,address,uint256)": {
+        "params": {
+          "amountIn_": "Amount of input token",
+          "tokenIn_": "The address of assetIn",
+          "tokenOut_": "The address of assetOut"
+        },
+        "returns": {
+          "_amountOut": "Amount out"
+        }
+      },
+      "quoteTokenToUsd(address,uint256)": {
+        "params": {
+          "amountIn_": "Amount of input token.",
+          "token_": "The address of assetIn"
+        },
+        "returns": {
+          "_amountOut": "Amount in USD"
+        }
+      },
+      "quoteUsdToToken(address,uint256)": {
+        "params": {
+          "amountIn_": "Input amount in USD",
+          "token_": "The address of assetOut"
+        },
+        "returns": {
+          "_amountOut": "Output amount of token"
+        }
+      }
+    },
+    "title": "Pull oracle",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "getPriceInUsd(address)": {
+        "notice": "Get USD (or equivalent) price of an asset"
+      },
+      "quote(address,address,uint256)": {
+        "notice": "Get quote"
+      },
+      "quoteTokenToUsd(address,uint256)": {
+        "notice": "Get quote in USD (or equivalent) amount"
+      },
+      "quoteUsdToToken(address,uint256)": {
+        "notice": "Get quote from USD (or equivalent) amount to amount of token"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [],
+    "types": null
+  }
+}
