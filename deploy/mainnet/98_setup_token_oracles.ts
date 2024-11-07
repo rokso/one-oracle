@@ -15,6 +15,7 @@ const chainlinkAggregators = [
   {token: Address.SBTC, aggregator: Address.Chainlink.CHAINLINK_BTC_USD_AGGREGATOR},
   {token: Address.Synth.msETH, aggregator: Address.Chainlink.CHAINLINK_ETH_USD_AGGREGATOR},
   {token: Address.Synth.msBTC, aggregator: Address.Chainlink.CHAINLINK_BTC_USD_AGGREGATOR},
+  {token: Address.stETH, aggregator: Address.Chainlink.CHAINLINK_STETH_USD_AGGREGATOR},
 ]
 
 const curveLpTokens = [
@@ -95,7 +96,6 @@ const customStalePeriods = [
 ]
 
 const chainlinkEthOnly = [
-  {token: Address.stETH, ethFeed: Address.Chainlink.CHAINLINK_STETH_ETH_AGGREGATOR},
   {token: Address.rETH, ethFeed: Address.Chainlink.CHAINLINK_RETH_ETH_AGGREGATOR},
   {token: Address.CBETH, ethFeed: Address.Chainlink.CHAINLINK_CBETH_ETH_AGGREGATOR},
 ]
