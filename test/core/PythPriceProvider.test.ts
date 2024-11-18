@@ -58,8 +58,8 @@ describe('PythPriceProvider @mainnet', function () {
     const connection = new EvmPriceServiceConnection('https://hermes.pyth.network')
     const priceIds = [BTC_USD_FEED_ID, ETH_USD_FEED_ID, USDC_USD_FEED_ID]
     const priceUpdate = await connection.getPriceFeedsUpdateData(priceIds)
-    const fee = await pyth.getUpdateFee(priceIds)
-    await pyth.updatePriceFeeds(priceUpdate, {value: fee})
+    const fee = await priceProvider.getUpdateFee(priceIds)
+    await priceProvider.updatePrice(priceUpdate, {value: fee})
 
     // then
     expect(await priceProvider.getPriceInUsd(WETH)).to.not.deep.eq([0, 0])

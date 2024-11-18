@@ -4,6 +4,7 @@ pragma solidity 0.8.9;
 
 import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 import {PythStructs} from "@pythnetwork/pyth-sdk-solidity/PythStructs.sol";
+import {Address} from "@openzeppelin/contracts/utils/Address.sol";
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import {IPythPriceProvider} from "../interfaces/core/IPythPriceProvider.sol";
 import {IPriceProvider, PriceProvider} from "./PriceProvider.sol";
@@ -15,6 +16,7 @@ import {Governable} from "../access/Governable.sol";
  */
 contract PythPriceProvider is IPythPriceProvider, PriceProvider, Governable {
     using SafeCast for int256;
+    using Address for address payable;
 
     int256 internal constant MIN_EXPONENT = -18;
     int256 internal constant MAX_EXPONENT = 0;
@@ -31,6 +33,23 @@ contract PythPriceProvider is IPythPriceProvider, PriceProvider, Governable {
 
     constructor(IPyth pyth_) {
         pyth = pyth_;
+    }
+
+    /// @notice Get update fee (native coin)
+    function getUpdateFee(bytes[] calldata updateData_) external view returns (uint _feeAmount) {
+        return pyth.getUpdateFee(updateData_);
+    }
+
+    /// @notice Update Pyth's prices
+    function updatePrice(bytes[] calldata updateData_) external payable {
+        uint256 _fee = pyth.getUpdateFee(updateData_);
+        require(msg.value >= _fee, "value-too-low");
+
+        pyth.updatePriceFeeds{value: _fee}(updateData_);
+
+        if (msg.value > _fee) {
+            payable(msg.sender).sendValue(msg.value - _fee);
+        }
     }
 
     /// @inheritdoc IPriceProvider
