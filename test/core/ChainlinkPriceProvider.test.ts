@@ -12,7 +12,9 @@ const {
   DAI,
   WETH,
   WBTC,
+  WEETH,
   Chainlink: {CHAINLINK_DAI_USD_AGGREGATOR, CHAINLINK_ETH_USD_AGGREGATOR, CHAINLINK_BTC_USD_AGGREGATOR},
+  Redstone: {REDSTONE_WEETH_USD_AGGREGATOR},
 } = Addresses.mainnet
 
 describe('ChainlinkPriceProvider @mainnet', function () {
@@ -55,6 +57,13 @@ describe('ChainlinkPriceProvider @mainnet', function () {
     it('should DAI price', async function () {
       const {_priceInUsd} = await priceProvider.getPriceInUsd(DAI)
       expect(_priceInUsd).closeTo(parseEther('1'), parseEther('0.1'))
+    })
+
+    // Redstone push model
+    it('should weETH price', async function () {
+      await priceProvider.updateAggregator(WEETH, REDSTONE_WEETH_USD_AGGREGATOR)
+      const {_priceInUsd} = await priceProvider.getPriceInUsd(WEETH)
+      expect(_priceInUsd).closeTo(Quote.mainnet.ETH_USD, parseEther('150'))
     })
   })
 
