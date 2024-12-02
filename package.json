@@ -68,7 +68,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-require-path-exists": "^1.1.9",
-    "hardhat": "2.22.5",
+    "hardhat": "2.22.14",
     "hardhat-contract-sizer": "^2.6.1",
     "hardhat-deploy": "^0.11.18",
     "hardhat-gas-reporter": "^1.0.9",
