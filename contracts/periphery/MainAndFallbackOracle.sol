@@ -47,37 +47,12 @@ contract MainAndFallbackOracle is IOracle, UsingStalePeriod {
     }
 
     /// @inheritdoc IOracle
-    function quote(address tokenIn_, address tokenOut_, uint256 amountIn_) public view virtual returns (uint256) {
-        uint256 _inStalePeriod = stalePeriodOf(tokenIn_);
-        uint256 _outStalePeriod = stalePeriodOf(tokenOut_);
-
-        // 1. Check main provider
-        (uint256 _amountOut, uint256 _inUpdatedAt, uint256 _outUpdatedAt) = mainProvider.quote(
-            tokenIn_,
-            tokenOut_,
-            amountIn_
-        );
-
-        if (
-            _amountOut > 0 &&
-            !_priceIsStale(_inUpdatedAt, _inStalePeriod) &&
-            !_priceIsStale(_outUpdatedAt, _outStalePeriod)
-        ) {
-            return _amountOut;
-        }
-
-        // 2. Check fallback provider
-        (_amountOut, _inUpdatedAt, _outUpdatedAt) = fallbackProvider.quote(tokenIn_, tokenOut_, amountIn_);
-
-        if (
-            _amountOut > 0 &&
-            !_priceIsStale(_inUpdatedAt, _inStalePeriod) &&
-            !_priceIsStale(_outUpdatedAt, _outStalePeriod)
-        ) {
-            return _amountOut;
-        }
-
-        revert("both-providers-failed");
+    function quote(
+        address tokenIn_,
+        address tokenOut_,
+        uint256 amountIn_
+    ) public view virtual returns (uint256 _amountOut) {
+        _amountOut = quoteUsdToToken({token_: tokenOut_, amountIn_: quoteTokenToUsd(tokenIn_, amountIn_)});
     }
 
     /// @inheritdoc IOracle

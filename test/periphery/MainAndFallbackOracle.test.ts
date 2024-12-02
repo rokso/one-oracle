@@ -91,7 +91,8 @@ describe('MainAndFallbacksOracle @mainnet', function () {
       it('should get price from main', async function () {
         // given
         const amountOut = parseEther('3,000')
-        mainProvider.quote.returns(() => [amountOut, lastUpdatedAt, lastUpdatedAt])
+        mainProvider.quoteTokenToUsd.returns(() => [amountOut, lastUpdatedAt])
+        mainProvider.quoteUsdToToken.returns(() => [amountOut, lastUpdatedAt])
 
         // when-then
         expect(await oracle.quote(WETH, DAI, parseEther('1'))).eq(amountOut)
@@ -102,8 +103,10 @@ describe('MainAndFallbacksOracle @mainnet', function () {
       it('should get price from fallback ', async function () {
         // given
         const amountOut = parseEther('3,000')
-        mainProvider.quote.returns(() => [0, 0, 0])
-        fallbackProvider.quote.returns(() => [amountOut, lastUpdatedAt, lastUpdatedAt])
+        mainProvider.quoteTokenToUsd.returns(() => [0, 0])
+        mainProvider.quoteUsdToToken.returns(() => [0, 0])
+        fallbackProvider.quoteTokenToUsd.returns(() => [amountOut, lastUpdatedAt])
+        fallbackProvider.quoteUsdToToken.returns(() => [amountOut, lastUpdatedAt])
 
         // when-then
         expect(await oracle.quote(WETH, DAI, parseEther('1'))).eq(amountOut)
@@ -112,8 +115,10 @@ describe('MainAndFallbacksOracle @mainnet', function () {
       describe('when price from fallback is NOT OK', function () {
         it('should revert', async function () {
           // given
-          mainProvider.quote.returns(() => [0, 0, 0])
-          fallbackProvider.quote.returns(() => [0, 0, 0])
+          mainProvider.quoteTokenToUsd.returns(() => [0, 0])
+          mainProvider.quoteUsdToToken.returns(() => [0, 0])
+          fallbackProvider.quoteTokenToUsd.returns(() => [0, 0])
+          fallbackProvider.quoteUsdToToken.returns(() => [0, 0])
 
           // when
           const call = oracle.quote(WETH, DAI, parseEther('1'))

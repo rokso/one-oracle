@@ -25,11 +25,7 @@ abstract contract PriceProvider is IPriceProvider {
         view
         virtual
         override
-        returns (
-            uint256 _amountOut,
-            uint256 _tokenInLastUpdatedAt,
-            uint256 _tokenOutLastUpdatedAt
-        )
+        returns (uint256 _amountOut, uint256 _tokenInLastUpdatedAt, uint256 _tokenOutLastUpdatedAt)
     {
         uint256 _amountInUsd;
         (_amountInUsd, _tokenInLastUpdatedAt) = quoteTokenToUsd(tokenIn_, amountIn_);
@@ -37,26 +33,25 @@ abstract contract PriceProvider is IPriceProvider {
     }
 
     /// @inheritdoc IPriceProvider
-    function quoteTokenToUsd(address token_, uint256 amountIn_)
-        public
-        view
-        override
-        returns (uint256 _amountOut, uint256 _lastUpdatedAt)
-    {
+    function quoteTokenToUsd(
+        address token_,
+        uint256 amountIn_
+    ) public view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
         uint256 _price;
         (_price, _lastUpdatedAt) = getPriceInUsd(token_);
-        _amountOut = (amountIn_ * _price) / 10**IERC20Metadata(token_).decimals();
+        _amountOut = (amountIn_ * _price) / 10 ** IERC20Metadata(token_).decimals();
     }
 
     /// @inheritdoc IPriceProvider
-    function quoteUsdToToken(address token_, uint256 amountIn_)
-        public
-        view
-        override
-        returns (uint256 _amountOut, uint256 _lastUpdatedAt)
-    {
+    function quoteUsdToToken(
+        address token_,
+        uint256 amountIn_
+    ) public view override returns (uint256 _amountOut, uint256 _lastUpdatedAt) {
         uint256 _price;
         (_price, _lastUpdatedAt) = getPriceInUsd(token_);
-        _amountOut = (amountIn_ * 10**IERC20Metadata(token_).decimals()) / _price;
+        if (_price == 0) {
+            return (0, 0);
+        }
+        _amountOut = (amountIn_ * 10 ** IERC20Metadata(token_).decimals()) / _price;
     }
 }
