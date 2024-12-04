@@ -280,6 +280,17 @@ export const Addresses: {[key: string]: any} = {
     },
     PYTH_ORACLE: '0x8250f4aF4B972684F7b336503E2D6dFeDeB1487a',
   },
+  swell: {
+    WETH: '0x4200000000000000000000000000000000000006',
+    GOVERNOR: '0x76d266DFD3754f090488ae12F6Bd115cD7E77eBD',
+    GNOSIS_SAFE: 'TODO',
+    Redstone: {
+      REDSTONE_ETH_USD_AGGREGATOR: 'TODO',
+    },
+    Synth: {
+      msETH: 'TODO',
+    },
+  },
 }
 
 const getChain = (): string => {
@@ -307,6 +318,10 @@ const getChain = (): string => {
 
   if (chainId === 8453) {
     return 'base'
+  }
+
+  if (chainId === 1923) {
+    return 'swell'
   }
 
   throw Error(`No address setup for chainId ${chainId}`)

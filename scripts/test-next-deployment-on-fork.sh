@@ -8,15 +8,15 @@ then
     exit
 fi
 
-if [[ "$network" != "mainnet" && "$network" != "optimism" ]];
+if [[ "$network" != "mainnet" && "$network" != "optimism" && "$network" != "swell" ]];
 then
     echo "'$network' is invalid"
     exit
 fi
 
 # Prepare deployment data
-cp -r deployments/$network deployments/localhost
+#cp -r deployments/$network deployments/localhost
 
 # Deployment
-npx hardhat deploy --network localhost --tags TBYOracle,setupOracles,MultiSigTxs #> DEPLOYMENT_TEST_OUTPUT.log
+npx hardhat deploy --network localhost #> DEPLOYMENT_TEST_OUTPUT.log
 
