@@ -13,6 +13,9 @@
         "contracts/core/ChainlinkMainnetPriceProvider.sol",
         "contracts/core/ChainlinkAvalanchePriceProvider.sol",
         "contracts/core/ChainlinkPolygonPriceProvider.sol",
+        "contracts/core/ChainlinkBasePriceProvider.sol",
+        "contracts/core/ChainlinkOptimismPriceProvider.sol",
+        "contracts/core/RedstoneHemiPushPriceProvider.sol",
         "contracts/core/PythMainnetPriceProvider.sol"
       ],
       "options": {
