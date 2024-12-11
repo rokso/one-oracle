@@ -92,5 +92,11 @@
     "PriceProvidersAggregator": "0x873E7b4b49922d0e412fDd50A4b7889EfC73ecAA",
     "USDPeggedTokenOracle": "0x42c9De8bf891F0bE9dA7dA8078c1f301553CE064",
     "VPoolTokenOracle": "0x8b08adEac560f764D2828361C5DD4Fe5BEF53dc6"
+  },
+  "hemi": {
+    "MainAndFallbackOracle": "0xd2a4Ba582dC9fAbF3293C2C46e0aFD6C4B5719b1",
+    "MasterOracle": "0x19382707d5a47E74f60053b652Ab34b6e30Febad",
+    "RedstoneHemiPushPriceProvider": "0x1C8f469e3c1D87B108eC69b165037d5d7365F8C3",
+    "RedstonePriceProvider": "0x7b8A1D28Ef8d09b442c6070316D92401fBAD36BF"
   }
 }
