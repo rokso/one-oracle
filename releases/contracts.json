@@ -37,6 +37,8 @@
     "MStableTokenOracle": "0xfFD74eCF5B4eec6EAC2624764933fb5f2E2DfD09",
     "MasterOracle": "0x80704Acdf97723963263c78F861F091ad04F46E2",
     "PriceProvidersAggregator": "0x37FF84F9eBE44530074142dE42469Ae40051b92B",
+    "PythOracle": "0x1f278B7EFf04ADd48Ff81ae1a01cBC178b3dD351",
+    "PythPriceProvider": "0x7c2d5b1E7d7BE588389BDb94138cC37dC014e85c",
     "RoutedSwapper": "0xEA454C961287222150780f656e3f7e27dFb50038",
     "RoutedSwapper_Implementation": "0x341C2ABe8901353e12b955B1F3462AFE7ba1e27d",
     "RoutedSwapper_Proxy": "0xEA454C961287222150780f656e3f7e27dFb50038",
@@ -83,10 +85,12 @@
     "VPoolTokenOracle": "0x4c2BA62e549df0c34a0e93948AF417f76D0E92Ad"
   },
   "base": {
+    "ChainlinkEthOnlyTokenOracle": "0xdAa2a8AF96f8Df51ED989E9D1fd3F86DF1EE882e",
     "ChainlinkOracle": "0x82611C86d98Bd0730b0460ea7D5Dc5Da327F00eE",
     "ChainlinkPriceProvider": "0xAcE2e5Fd6096FE0b35dCBc53182839cc9234a4e6",
     "MasterOracle": "0x99866a6074ADb027f09c9AF31929dB5941D36DA7",
     "PriceProvidersAggregator": "0x873E7b4b49922d0e412fDd50A4b7889EfC73ecAA",
-    "USDPeggedTokenOracle": "0x42c9De8bf891F0bE9dA7dA8078c1f301553CE064"
+    "USDPeggedTokenOracle": "0x42c9De8bf891F0bE9dA7dA8078c1f301553CE064",
+    "VPoolTokenOracle": "0x8b08adEac560f764D2828361C5DD4Fe5BEF53dc6"
   }
 }
