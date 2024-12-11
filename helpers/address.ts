@@ -324,6 +324,10 @@ const getChain = (): string => {
     return 'swell'
   }
 
+  if (chainId === 43111) {
+    return 'hemi'
+  }
+
   throw Error(`No address setup for chainId ${chainId}`)
 }
 

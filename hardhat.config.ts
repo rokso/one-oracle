@@ -34,6 +34,9 @@ function getChainConfig() {
   if (FORK_NODE_URL!.includes('swell')) {
     return {chainId: 1923, deploy: ['deploy/swell']}
   }
+  if (FORK_NODE_URL!.includes('hemi')) {
+    return {chainId: 43111, deploy: ['deploy/hemi']}
+  }
 
   return {chainId: 31337, deploy: ['deploy/mainnet']}
 }
@@ -102,7 +105,15 @@ const config: HardhatUserConfig = {
       chainId: 1923,
       gas: 8000000,
       verify: {etherscan: {apiKey: process.env.SWELL_ETHERSCAN_API_KEY}},
-      deploy: ['deploy/base'],
+      deploy: ['deploy/swell'],
+      accounts,
+    },
+    hemi: {
+      url: process.env.HEMI_NODE_URL || '',
+      chainId: 43111,
+      gas: 8000000,
+      verify: {etherscan: {apiKey: 'noApiKeyNeeded'}},
+      deploy: ['deploy/hemi'],
       accounts,
     },
   },
@@ -110,6 +121,7 @@ const config: HardhatUserConfig = {
     apiKey: {
       mainnet: process.env.ETHERSCAN_API_KEY || '',
       base: process.env.BASE_ETHERSCAN_API_KEY || '',
+      hemi: 'noApiKeyNeeded',
     },
     customChains: [
       {
@@ -126,6 +138,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: 'https://explorer.swellnetwork.io/api',
           browserURL: 'https://explorer.swellnetwork.io/',
+        },
+      },
+      {
+        network: 'hemi',
+        chainId: 43111,
+        urls: {
+          apiURL: 'https://explorer-b81c3bd8.hemi.xyz/api',
+          browserURL: 'https://explorer-b81c3bd8.hemi.xyz/',
         },
       },
     ],
