@@ -75,5 +75,8 @@ const Quote = {
     vastETH_USD: parseEther('2,011'),
     vaOP_USD: parseEther('1.61'),
   },
+  swell: {
+    ETH_USD: parseEther('3,937'),
+  },
 }
 export default Quote

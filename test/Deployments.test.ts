@@ -8,6 +8,7 @@ import {
   VspMainnetOracle,
   ChainlinkOracle,
   USDPeggedTokenOracle,
+  MasterOracle,
 } from '../typechain-types'
 import {Addresses, Provider} from '../helpers'
 import {impersonateAccount, increaseTime, parseEther, resetFork, toUSD} from './helpers'
@@ -223,6 +224,30 @@ describe('Deployments ', function () {
       // Should always return 1 USD no matter the address given
       const priceInUsd = await msUsdOracle.getPriceInUsd(ethers.constants.AddressZero)
       expect(priceInUsd).eq(toUSD('1'))
+    })
+  })
+
+  describe('@swell', function () {
+    let masterOracle: MasterOracle
+
+    const {WETH, USDC} = Addresses.swell
+
+    beforeEach(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/swell']
+
+      // eslint-disable-next-line no-shadow
+      const {MasterOracle} = await deployments.fixture()
+
+      masterOracle = await ethers.getContractAt('MasterOracle', MasterOracle.address, deployer)
+    })
+
+    it('MasterOracle', async function () {
+      // when
+      const price = await masterOracle.getPriceInUsd(WETH)
+
+      // then
+      expect(price).closeTo(Quote.swell.ETH_USD, parseEther('1'))
     })
   })
 })

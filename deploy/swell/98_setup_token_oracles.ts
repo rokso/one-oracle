@@ -6,20 +6,17 @@ import {Addresses} from '../../helpers/address'
 const {swell: Address} = Addresses
 const setupOracles = 'setupOracles'
 
-const chainlinkAggregators: never[] = [
-  // {token: Address.Synth.msETH, aggregator: Address.Redstone.REDSTONE_ETH_USD_AGGREGATOR},
-  // {token: Address.WETH, aggregator: Address.Redstone.REDSTONE_ETH_USD_AGGREGATOR},
+const chainlinkAggregators = [{token: Address.USDC, aggregator: Address.Redstone.REDSTONE_USDC_USD_AGGREGATOR}]
+
+const redstoneUsdcOnly = [
+  {token: Address.WETH, usdcFeed: Address.Redstone.REDSTONE_ETH_USDC_AGGREGATOR},
+  // {token: Address.Synth.msETH, usdcFeed: Address.Redstone.REDSTONE_ETH_USDC_AGGREGATOR},
 ]
-
-const curveLpTokens: never[] = []
-
-const customOracles: never[] = []
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await setupTokenOracles(hre, {
     chainlinkAggregators,
-    curveLpTokens,
-    customOracles,
+    redstoneUsdcOnly: redstoneUsdcOnly,
   })
 }
 

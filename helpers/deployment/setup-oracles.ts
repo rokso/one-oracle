@@ -11,6 +11,7 @@ const CurveLpTokenOracleV2 = 'CurveLpTokenOracleV2'
 const CurveFactoryLpTokenOracle = 'CurveFactoryLpTokenOracle'
 const ChainlinkOracle = 'ChainlinkOracle'
 const ChainlinkEthOnlyTokenOracle = 'ChainlinkEthOnlyTokenOracle'
+const RedstoneUsdcOnlyTokenOracle = 'RedstoneUsdcOnlyTokenOracle'
 
 export const setupTokenOracles = async (
   hre: HardhatRuntimeEnvironment,
@@ -22,6 +23,7 @@ export const setupTokenOracles = async (
     curveFactoryLps = [],
     customStalePeriods = [],
     chainlinkEthOnly = [],
+    redstoneUsdcOnly = [],
   }: {
     customOracles?: {token: string; oracle: string}[]
     chainlinkAggregators?: {token: string; aggregator: string}[]
@@ -30,6 +32,7 @@ export const setupTokenOracles = async (
     curveFactoryLps?: string[]
     customStalePeriods?: {token: string; stalePeriod: number}[]
     chainlinkEthOnly?: {token: string; ethFeed: string}[]
+    redstoneUsdcOnly?: {token: string; usdcFeed: string}[]
   }
 ) => {
   const {getNamedAccounts, deployments} = hre
@@ -168,6 +171,34 @@ export const setupTokenOracles = async (
         const currentFeed: string = await read(ChainlinkEthOnlyTokenOracle, 'ethFeedOf', token)
         if (currentFeed !== ethFeed) {
           await saveGovernorExecutionForMultiSigBatch(hre, ChainlinkEthOnlyTokenOracle, 'updateEthFeed', token, ethFeed)
+        }
+      }
+    }
+  }
+
+  // Redstone USDC-Only
+  if (redstoneUsdcOnly.length > 0) {
+    const {address: redstoneUsdcOnlyOracleAddress} = await get(RedstoneUsdcOnlyTokenOracle)
+    for (const {token, usdcFeed} of redstoneUsdcOnly) {
+      const current = await read(MasterOracle, 'oracles', token)
+      if (current !== redstoneUsdcOnlyOracleAddress) {
+        await saveGovernorExecutionForMultiSigBatch(
+          hre,
+          MasterOracle,
+          'updateTokenOracle',
+          token,
+          redstoneUsdcOnlyOracleAddress
+        )
+
+        const currentFeed: string = await read(RedstoneUsdcOnlyTokenOracle, 'usdcFeedOf', token)
+        if (currentFeed !== usdcFeed) {
+          await saveGovernorExecutionForMultiSigBatch(
+            hre,
+            RedstoneUsdcOnlyTokenOracle,
+            'updateUsdcFeed',
+            token,
+            usdcFeed
+          )
         }
       }
     }
