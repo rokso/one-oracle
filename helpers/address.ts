@@ -290,7 +290,7 @@ export const Addresses: {[key: string]: any} = {
       REDSTONE_ETH_USDC_AGGREGATOR: '0x84AD474c33c9cCefB1a2D8b77Bdd88bDc592f96b',
     },
     Synth: {
-      msETH: 'TODO',
+      msETH: '0x4661407fC224E5432D7f528a20EF8906E453A8f3',
     },
   },
 }

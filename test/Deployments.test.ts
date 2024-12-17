@@ -230,7 +230,10 @@ describe('Deployments ', function () {
   describe('@swell', function () {
     let masterOracle: MasterOracle
 
-    const {WETH, USDC} = Addresses.swell
+    const {
+      WETH,
+      Synth: {msETH},
+    } = Addresses.swell
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -242,12 +245,22 @@ describe('Deployments ', function () {
       masterOracle = await ethers.getContractAt('MasterOracle', MasterOracle.address, deployer)
     })
 
-    it('MasterOracle', async function () {
-      // when
-      const price = await masterOracle.getPriceInUsd(WETH)
+    describe('MasterOracle', function () {
+      it('WETH', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(WETH)
 
-      // then
-      expect(price).closeTo(Quote.swell.ETH_USD, parseEther('1'))
+        // then
+        expect(price).closeTo(Quote.swell.ETH_USD, parseEther('1'))
+      })
+
+      it('msETH', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(msETH)
+
+        // then
+        expect(price).closeTo(Quote.swell.ETH_USD, parseEther('1'))
+      })
     })
   })
 })

@@ -10,7 +10,7 @@ const chainlinkAggregators = [{token: Address.USDC, aggregator: Address.Redstone
 
 const redstoneUsdcOnly = [
   {token: Address.WETH, usdcFeed: Address.Redstone.REDSTONE_ETH_USDC_AGGREGATOR},
-  // {token: Address.Synth.msETH, usdcFeed: Address.Redstone.REDSTONE_ETH_USDC_AGGREGATOR},
+  {token: Address.Synth.msETH, usdcFeed: Address.Redstone.REDSTONE_ETH_USDC_AGGREGATOR},
 ]
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
