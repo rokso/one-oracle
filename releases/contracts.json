@@ -98,5 +98,12 @@
     "MasterOracle": "0x19382707d5a47E74f60053b652Ab34b6e30Febad",
     "RedstoneHemiPushPriceProvider": "0x1C8f469e3c1D87B108eC69b165037d5d7365F8C3",
     "RedstonePriceProvider": "0x7b8A1D28Ef8d09b442c6070316D92401fBAD36BF"
+  },
+  "swell": {
+    "ChainlinkPriceProvider": "0xe2aDB496684eb9C43b5025f05b50EE492C77f938",
+    "MainAndFallbackOracle": "0xd86a00dE186222A6720E0838b28CcF46c6DF086b",
+    "MasterOracle": "0x9bfc2143b2729ede4a53B96379b36D6018722406",
+    "RedstonePriceProvider": "0xDBd9Cfb0b54C08E75085f8c8844E8054d13Bd39a",
+    "RedstoneUsdcOnlyTokenOracle": "0x51BC603a29BeF7181E9866ed27beaAE215865761"
   }
 }
