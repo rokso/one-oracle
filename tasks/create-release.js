@@ -30,7 +30,7 @@ task("create-release", "Create release file from deploy data").setAction(async f
     fs.mkdirSync(releaseDir, {recursive: true});
   }
 
-  ["avalanche", "mainnet", "polygon", "optimism", "base", "hemi"].forEach((network) => {
+  ["avalanche", "mainnet", "polygon", "optimism", "base", "hemi", "swell"].forEach((network) => {
     // Read deployment name and address
     const deployData = getDeploymentData(network);
 
