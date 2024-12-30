@@ -6,9 +6,10 @@ import {Addresses} from '../../helpers/address'
 const {hemi: Address} = Addresses
 const setupOracles = 'setupOracles'
 
-const chainlinkAggregators: never[] = [
-  // {token: Address.Synth.msETH, aggregator: Address.Redstone.REDSTONE_ETH_USD_AGGREGATOR},
-  // {token: Address.WETH, aggregator: Address.Redstone.REDSTONE_ETH_USD_AGGREGATOR},
+const chainlinkAggregators = [
+  {token: Address.WETH, aggregator: Address.Redstone.REDSTONE_ETH_USD_AGGREGATOR},
+  {token: Address.USDC, aggregator: Address.Redstone.REDSTONE_USDC_USD_AGGREGATOR},
+  {token: Address.USDT, aggregator: Address.Redstone.REDSTONE_USDT_USD_AGGREGATOR},
 ]
 
 const curveLpTokens: never[] = []
