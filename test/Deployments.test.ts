@@ -263,4 +263,46 @@ describe('Deployments ', function () {
       })
     })
   })
+
+  describe('@hemi', function () {
+    let masterOracle: MasterOracle
+
+    const {WETH, USDC, USDT} = Addresses.hemi
+
+    beforeEach(async function () {
+      // Setting the folder to execute deployment scripts from
+      hre.network.deploy = ['deploy/hemi']
+
+      // eslint-disable-next-line no-shadow
+      const {MasterOracle} = await deployments.fixture()
+
+      masterOracle = await ethers.getContractAt('MasterOracle', MasterOracle.address, deployer)
+    })
+
+    describe('MasterOracle', function () {
+      it('WETH', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(WETH)
+
+        // then
+        expect(price).closeTo(Quote.hemi.ETH_USD, parseEther('1'))
+      })
+
+      it('USDC', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(USDC)
+
+        // then
+        expect(price).closeTo(Quote.hemi.USDC_USD, parseEther('0.01'))
+      })
+
+      it('USDT', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(USDT)
+
+        // then
+        expect(price).closeTo(Quote.hemi.USDT_USD, parseEther('0.01'))
+      })
+    })
+  })
 })

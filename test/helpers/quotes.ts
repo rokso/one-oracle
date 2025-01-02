@@ -78,5 +78,10 @@ const Quote = {
   swell: {
     ETH_USD: parseEther('3,937'),
   },
+  hemi: {
+    ETH_USD: parseEther('3,307'),
+    USDC_USD: parseEther('1'),
+    USDT_USD: parseEther('0.99'),
+  },
 }
 export default Quote

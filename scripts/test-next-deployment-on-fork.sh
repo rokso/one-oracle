@@ -8,7 +8,7 @@ then
     exit
 fi
 
-if [[ "$network" != "mainnet" && "$network" != "optimism" && "$network" != "swell" ]];
+if [[ "$network" != "mainnet" && "$network" != "optimism" && "$network" != "swell" && "$network" != "hemi" ]];
 then
     echo "'$network' is invalid"
     exit
