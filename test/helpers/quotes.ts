@@ -6,16 +6,6 @@ import {parseEther} from '.'
  * Unlike other use cases, it's important to fix block when forking to having precise prices assertions
  */
 const Quote = {
-  avalanche: {
-    BTC_USD: parseEther('20,058'),
-    ETH_USD: parseEther('1,359'),
-    AVAX_USD: parseEther('17'),
-    UNI_USD: parseEther('6.91'),
-    CRV_USD: parseEther('0.91'),
-    AAVE_USD: parseEther('78'),
-    CURVE_REN_LP_USD: parseEther('20,185'),
-    CURVE_AAVE_LP_USD: parseEther('1.02'),
-  },
   base: {
     ETH_USD: parseEther('3,063'),
   },
@@ -59,11 +49,6 @@ const Quote = {
     vaWBTC_USD: parseEther('67,030'),
     vaLINK_USD: parseEther('11.39'),
     vacbETH_USD: parseEther('2,850'),
-  },
-  polygon: {
-    MATIC_USD: parseEther('0.84'),
-    BTC_USD: parseEther('20,060'),
-    ETH_USD: parseEther('1,359'),
   },
   optimism: {
     ETH_USD: parseEther('1,786'),

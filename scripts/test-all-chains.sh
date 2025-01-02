@@ -6,7 +6,7 @@
 
 THIS=`dirname $0`
 
-for chain in mainnet avalanche polygon optimism swell hemi;
+for chain in mainnet optimism base swell hemi;
 do
     cp $THIS/../.github/$chain.env.properties $THIS/../.env
     npx hardhat test --grep @$chain

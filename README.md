@@ -52,7 +52,7 @@ Set env vars in `.env` file (use `.env.template` as reference)
 
 ## Test
 
-This repo has tests against many EVM networks (e.g. mainnet, polygon, etc), to run all of them, use:
+This repo has tests against many EVM networks (e.g. mainnet, optimism, etc), to run all of them, use:
 
 ```sh
 npm run test:all
