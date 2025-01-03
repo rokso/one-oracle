@@ -267,7 +267,12 @@ describe('Deployments ', function () {
   describe('@hemi', function () {
     let masterOracle: MasterOracle
 
-    const {WETH, USDC, USDT} = Addresses.hemi
+    const {
+      WETH,
+      USDC,
+      USDT,
+      Synth: {msETH, msUSD},
+    } = Addresses.hemi
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -302,6 +307,22 @@ describe('Deployments ', function () {
 
         // then
         expect(price).closeTo(Quote.hemi.USDT_USD, parseEther('0.01'))
+      })
+
+      it('msETH', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(msETH)
+
+        // then
+        expect(price).closeTo(Quote.hemi.ETH_USD, parseEther('1'))
+      })
+
+      it('msUSD', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(msUSD)
+
+        // then
+        expect(price).eq(parseEther('1'))
       })
     })
   })

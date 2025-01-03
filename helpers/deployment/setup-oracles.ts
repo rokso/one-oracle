@@ -12,6 +12,7 @@ const CurveFactoryLpTokenOracle = 'CurveFactoryLpTokenOracle'
 const ChainlinkOracle = 'ChainlinkOracle'
 const ChainlinkEthOnlyTokenOracle = 'ChainlinkEthOnlyTokenOracle'
 const RedstoneUsdcOnlyTokenOracle = 'RedstoneUsdcOnlyTokenOracle'
+const RedstonePushPriceProvider = 'RedstonePushPriceProvider'
 
 export const setupTokenOracles = async (
   hre: HardhatRuntimeEnvironment,
@@ -24,6 +25,7 @@ export const setupTokenOracles = async (
     customStalePeriods = [],
     chainlinkEthOnly = [],
     redstoneUsdcOnly = [],
+    redstonePushAggregators = [],
   }: {
     customOracles?: {token: string; oracle: string}[]
     chainlinkAggregators?: {token: string; aggregator: string}[]
@@ -33,6 +35,7 @@ export const setupTokenOracles = async (
     customStalePeriods?: {token: string; stalePeriod: number}[]
     chainlinkEthOnly?: {token: string; ethFeed: string}[]
     redstoneUsdcOnly?: {token: string; usdcFeed: string}[]
+    redstonePushAggregators?: {token: string; aggregator: string}[]
   }
 ) => {
   const {getNamedAccounts, deployments} = hre
@@ -56,6 +59,22 @@ export const setupTokenOracles = async (
       const current = await read(ChainlinkPriceProvider, 'aggregators', token)
       if (current !== aggregator) {
         await saveGovernorExecutionForMultiSigBatch(hre, ChainlinkPriceProvider, 'updateAggregator', token, aggregator)
+      }
+    }
+  }
+
+  // RedstonePushPriceProvider
+  if (redstonePushAggregators) {
+    for (const {token, aggregator} of redstonePushAggregators) {
+      const current = await read(RedstonePushPriceProvider, 'aggregators', token)
+      if (current !== aggregator) {
+        await saveGovernorExecutionForMultiSigBatch(
+          hre,
+          RedstonePushPriceProvider,
+          'updateAggregator',
+          token,
+          aggregator
+        )
       }
     }
   }

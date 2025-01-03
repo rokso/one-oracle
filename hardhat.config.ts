@@ -59,6 +59,11 @@ const config: HardhatUserConfig = {
         url: process.env.FORK_NODE_URL || 'http://localhost',
         blockNumber: process.env.FORK_BLOCK_NUMBER ? parseInt(process.env.FORK_BLOCK_NUMBER) : undefined,
       },
+      hardfork: 'cancun',
+      chains: {
+        // See: https://hardhat.org/hardhat-network/docs/guides/forking-other-networks#using-a-custom-hardfork-history
+        43111: {hardforkHistory: {cancun: 1}},
+      },
     },
     mainnet: {
       url: process.env.MAINNET_NODE_URL || '',

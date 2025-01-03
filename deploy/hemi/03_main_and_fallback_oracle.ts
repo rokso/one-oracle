@@ -3,7 +3,7 @@ import {DeployFunction} from 'hardhat-deploy/types'
 
 const MainAndFallbackOracle = 'MainAndFallbackOracle'
 const RedstonePriceProvider = 'RedstonePriceProvider'
-const RedstoneHemiPushPriceProvider = 'RedstoneHemiPushPriceProvider'
+const RedstonePushPriceProvider = 'RedstonePushPriceProvider'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
@@ -11,7 +11,7 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {deployer: from} = await getNamedAccounts()
 
   const {address: mainAddress} = await get(RedstonePriceProvider)
-  const {address: fallbackAddress} = await get(RedstoneHemiPushPriceProvider)
+  const {address: fallbackAddress} = await get(RedstonePushPriceProvider)
   const stalePeriod = 24 * 60 * 60 // 24h
 
   await deploy(MainAndFallbackOracle, {
@@ -21,6 +21,6 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   })
 }
 
-func.dependencies = [RedstoneHemiPushPriceProvider, RedstonePriceProvider]
+func.dependencies = [RedstonePushPriceProvider, RedstonePriceProvider]
 func.tags = [MainAndFallbackOracle]
 export default func
