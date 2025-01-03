@@ -7,7 +7,7 @@
 THIS=`dirname $0`
 SOLCOVER="$THIS/../.solcover.js"
 
-for chain in mainnet avalanche polygon optimism;
+for chain in mainnet optimism base swell hemi;
 do
     rm $THIS/../coverage.json
     cp $THIS/../.github/$chain.env.properties $THIS/../.env

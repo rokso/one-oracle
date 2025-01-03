@@ -3,7 +3,7 @@ import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers'
 import {expect} from 'chai'
 import hre, {deployments, ethers} from 'hardhat'
 import {
-  ChainlinkAvalanchePriceProvider,
+  ChainlinkBasePriceProvider,
   PriceProvidersAggregator,
   VspMainnetOracle,
   ChainlinkOracle,
@@ -35,60 +35,8 @@ describe('Deployments ', function () {
     await ethers.provider.send('evm_revert', [snapshotId])
   })
 
-  describe('@avalanche', function () {
-    let chainlinkPriceProvider: ChainlinkAvalanchePriceProvider
-    let priceProvidersAggregator: PriceProvidersAggregator
-    let chainlinkOracle: ChainlinkOracle
-    let msUsdOracle: USDPeggedTokenOracle
-
-    const {WETH} = Addresses.avalanche
-
-    beforeEach(async function () {
-      // Setting the folder to execute deployment scripts from
-      hre.network.deploy = ['deploy/avalanche']
-
-      // eslint-disable-next-line no-shadow
-      const {ChainlinkPriceProvider, PriceProvidersAggregator, ChainlinkOracle, USDPeggedTokenOracle} =
-        await deployments.fixture()
-
-      chainlinkPriceProvider = await ethers.getContractAt(
-        'ChainlinkAvalanchePriceProvider',
-        ChainlinkPriceProvider.address,
-        deployer
-      )
-      priceProvidersAggregator = await ethers.getContractAt(
-        'PriceProvidersAggregator',
-        PriceProvidersAggregator.address,
-        deployer
-      )
-      chainlinkOracle = await ethers.getContractAt('ChainlinkOracle', ChainlinkOracle.address, deployer)
-      msUsdOracle = await ethers.getContractAt('USDPeggedTokenOracle', USDPeggedTokenOracle.address, deployer)
-    })
-
-    it('ChainlinkPriceProvider', async function () {
-      const {_priceInUsd: price} = await chainlinkPriceProvider.getPriceInUsd(WETH)
-      expect(price).closeTo(Quote.avalanche.ETH_USD, toUSD('1'))
-    })
-
-    it('PriceProvidersAggregator', async function () {
-      const {_priceInUsd: priceInUsd} = await priceProvidersAggregator.getPriceInUsd(Provider.CHAINLINK, WETH)
-      expect(priceInUsd).closeTo(Quote.avalanche.ETH_USD, toUSD('1'))
-    })
-
-    it('ChainlinkOracle', async function () {
-      const priceInUsd = await chainlinkOracle.getPriceInUsd(WETH)
-      expect(priceInUsd).closeTo(Quote.avalanche.ETH_USD, toUSD('1'))
-    })
-
-    it('USDPeggedTokenOracle', async function () {
-      // Should always return 1 USD no matter the address given
-      const priceInUsd = await msUsdOracle.getPriceInUsd(ethers.constants.AddressZero)
-      expect(priceInUsd).eq(toUSD('1'))
-    })
-  })
-
   describe('@base', function () {
-    let chainlinkPriceProvider: ChainlinkAvalanchePriceProvider
+    let chainlinkPriceProvider: ChainlinkBasePriceProvider
     let priceProvidersAggregator: PriceProvidersAggregator
     let chainlinkOracle: ChainlinkOracle
 
@@ -100,7 +48,7 @@ describe('Deployments ', function () {
       // eslint-disable-next-line no-shadow
       const {ChainlinkPriceProvider, PriceProvidersAggregator, ChainlinkOracle} = await deployments.fixture()
       chainlinkPriceProvider = await ethers.getContractAt(
-        'ChainlinkAvalanchePriceProvider',
+        'ChainlinkBasePriceProvider',
         ChainlinkPriceProvider.address,
         deployer
       )

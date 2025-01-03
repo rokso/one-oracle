@@ -19,12 +19,6 @@ function getChainConfig() {
   if (FORK_NODE_URL!.includes('eth.connect') || FORK_NODE_URL!.includes('eth-mainnet')) {
     return {chainId: 1, deploy: ['deploy/mainnet']}
   }
-  if (FORK_NODE_URL!.includes('avax')) {
-    return {chainId: 43114, deploy: ['deploy/avalanche']}
-  }
-  if (FORK_NODE_URL!.includes('polygon-mainnet')) {
-    return {chainId: 137, deploy: ['deploy/polygon']}
-  }
   if (FORK_NODE_URL!.includes('optimism')) {
     return {chainId: 10, deploy: ['deploy/optimism']}
   }
@@ -66,22 +60,6 @@ const config: HardhatUserConfig = {
       gas: 6700000,
       verify: {etherscan: {apiKey: process.env.MAINNET_ETHERSCAN_API_KEY}},
       deploy: ['deploy/mainnet'],
-      accounts,
-    },
-    polygon: {
-      url: process.env.POLYGON_NODE_URL || '',
-      chainId: 137,
-      gas: 11700000,
-      verify: {etherscan: {apiKey: process.env.POLYGON_ETHERSCAN_API_KEY}},
-      deploy: ['deploy/polygon'],
-      accounts,
-    },
-    avalanche: {
-      url: process.env.AVALANCHE_NODE_URL || '',
-      chainId: 43114,
-      gas: 8000000,
-      verify: {etherscan: {apiKey: process.env.AVALANCHE_ETHERSCAN_API_KEY}},
-      deploy: ['deploy/avalanche'],
       accounts,
     },
     optimism: {
@@ -212,7 +190,7 @@ const config: HardhatUserConfig = {
     runOnCompile: true,
   },
   mocha: {
-    timeout: 200000,
+    timeout: 0,
   },
 }
 

@@ -15,12 +15,6 @@ const slots = {
   [Addresses.mainnet.FRAX]: 0,
   [Addresses.mainnet.Frax.frxETH]: 0,
   [Addresses.mainnet.CVX]: 0,
-  [Addresses.avalanche.WAVAX]: 3,
-  [Addresses.avalanche.DAI]: 0,
-  [Addresses.avalanche.WETH]: 0,
-  [Addresses.avalanche.USDC]: 0,
-  [Addresses.avalanche.WBTC]: 0,
-  [Addresses.polygon.WMATIC]: 3,
   [Addresses.optimism.WETH]: 3,
 }
 

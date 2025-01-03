@@ -167,49 +167,4 @@ describe('UniswapV3PriceProvider', function () {
       })
     })
   })
-
-  describe('UniswapV3PriceProvider @polygon', function () {
-    const {USDC, WETH, WBTC} = Addresses.polygon
-
-    beforeEach(async function () {
-      usdc = await ethers.getContractAt('IERC20', USDC, deployer)
-      // WETH has more liquid pools than WMATIC
-      weth = await ethers.getContractAt('IERC20', WETH, deployer)
-      wbtc = await ethers.getContractAt('IERC20', WBTC, deployer)
-
-      const crossPoolOracleFactory = await ethers.getContractFactory('UniswapV3CrossPoolOracle', deployer)
-      const crossPoolOracle = await crossPoolOracleFactory.deploy(weth.address)
-      await crossPoolOracle.deployed()
-
-      const priceProviderFactory = await ethers.getContractFactory('UniswapV3PriceProvider', deployer)
-      priceProvider = await priceProviderFactory.deploy(crossPoolOracle.address, DEFAULT_TWAP_PERIOD, DEFAULT_POOLS_FEE)
-      await priceProvider.deployed()
-    })
-
-    describe('quote', function () {
-      it('should quote same token to same token', async function () {
-        const amountIn = parseEther('100')
-        const {_amountOut} = await priceProvider['quote(address,address,uint256)'](weth.address, weth.address, amountIn)
-        expect(_amountOut).eq(amountIn)
-      })
-
-      it('should quote using WETH-USDC path', async function () {
-        const {_amountOut} = await priceProvider['quote(address,address,uint256)'](
-          weth.address,
-          usdc.address,
-          parseEther('1')
-        )
-        expect(_amountOut).closeTo(Quote.polygon.ETH_USD.div(`${1e12}`), parseUnits('10', 6))
-      })
-
-      it('should quote using WBTC-WETH-USDC', async function () {
-        const {_amountOut} = await priceProvider['quote(address,address,uint256)'](
-          wbtc.address,
-          usdc.address,
-          parseUnits('1', 8)
-        )
-        expect(_amountOut).closeTo(Quote.polygon.BTC_USD.div(`${1e12}`), parseUnits('10', 6))
-      })
-    })
-  })
 })
