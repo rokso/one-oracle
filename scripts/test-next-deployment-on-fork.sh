@@ -15,8 +15,8 @@ then
 fi
 
 # Prepare deployment data
-#cp -r deployments/$network deployments/localhost
+cp -r deployments/$network deployments/localhost
 
 # Deployment
-npx hardhat deploy --network localhost #> DEPLOYMENT_TEST_OUTPUT.log
+npx hardhat deploy --network localhost
 

@@ -1,14 +1,14 @@
 import {HardhatRuntimeEnvironment} from 'hardhat/types'
 import {DeployFunction} from 'hardhat-deploy/types'
 
-const ChainlinkPriceProvider = 'ChainlinkPriceProvider'
+const USDPeggedTokenOracle = 'USDPeggedTokenOracle'
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   const {getNamedAccounts, deployments} = hre
   const {deploy} = deployments
   const {deployer} = await getNamedAccounts()
 
-  await deploy(ChainlinkPriceProvider, {
+  await deploy(USDPeggedTokenOracle, {
     from: deployer,
     log: true,
     args: [],
@@ -16,4 +16,4 @@ const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
 }
 
 export default func
-func.tags = [ChainlinkPriceProvider]
+func.tags = [USDPeggedTokenOracle]
