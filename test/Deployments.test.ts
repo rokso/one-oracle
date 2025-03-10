@@ -219,7 +219,7 @@ describe('Deployments ', function () {
       WETH,
       USDC,
       USDT,
-      Synth: {msETH, msUSD},
+      Synth: {msETH, msUSD, msBTC},
     } = Addresses.hemi
 
     beforeEach(async function () {
@@ -271,6 +271,14 @@ describe('Deployments ', function () {
 
         // then
         expect(price).eq(parseEther('1'))
+      })
+
+      it('msBTC', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(msBTC)
+
+        // then
+        expect(price).closeTo(Quote.hemi.BTC_USD, parseEther('1'))
       })
     })
   })
