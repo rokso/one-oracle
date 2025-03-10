@@ -64,9 +64,10 @@ const Quote = {
     ETH_USD: parseEther('3,937'),
   },
   hemi: {
-    ETH_USD: parseEther('3,452'),
+    ETH_USD: parseEther('2,012'),
     USDC_USD: parseEther('1'),
     USDT_USD: parseEther('0.99'),
+    BTC_USD: parseEther('79,909'),
   },
 }
 export default Quote
