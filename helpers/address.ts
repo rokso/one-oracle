@@ -243,7 +243,7 @@ export const Addresses: {[key: string]: any} = {
     Synth: {
       msETH: '0xBF7d0F62B64B23053949B3a88a03da5Bfd35b2E2',
       msUSD: '0x3EA24E3727a85A479E29E02Cc70e792936FbBcaD',
-      msBTC: '0x85a21d08eba56962E33F556091d1ab9385b14871',
+      msBTC: '0x1855911ab07ed5Cd056008F409b709DfA9D01183',
     },
   },
 }
