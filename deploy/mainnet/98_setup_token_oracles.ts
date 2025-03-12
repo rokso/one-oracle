@@ -16,6 +16,9 @@ const chainlinkAggregators = [
   {token: Address.Synth.msETH, aggregator: Address.Chainlink.CHAINLINK_ETH_USD_AGGREGATOR},
   {token: Address.Synth.msBTC, aggregator: Address.Chainlink.CHAINLINK_BTC_USD_AGGREGATOR},
   {token: Address.stETH, aggregator: Address.Chainlink.CHAINLINK_STETH_USD_AGGREGATOR},
+  {token: Address.USDS, aggregator: Address.Chainlink.CHAINLINK_USDS_USD_AGGREGATOR},
+  {token: Address.WSTETH, aggregator: Address.Chainlink.CHAINLINK_WSTETH_USD_AGGREGATOR},
+  {token: Address.SUSDE, aggregator: Address.Chainlink.CHAINLINK_SUSDE_USD_AGGREGATOR},
 ]
 
 const curveLpTokens = [
@@ -83,8 +86,8 @@ const customOracles = [
   {token: Address.eUSD, oracle: 'USDPeggedTokenOracle'},
   // Frax sFraxETH
   {token: Address.Frax.sFrxETH, oracle: 'SFraxEthTokenOracle'},
-  // TBY
-  {token: Address.Bloom.TBY_MAR24_A, oracle: 'TBYOracle'},
+  // ERC4626
+  {token: Address.SUSDS, oracle: 'ERC4626TokenOracle'},
 ]
 
 const customStalePeriods = [
@@ -98,6 +101,7 @@ const customStalePeriods = [
 const chainlinkEthOnly = [
   {token: Address.rETH, ethFeed: Address.Chainlink.CHAINLINK_RETH_ETH_AGGREGATOR},
   {token: Address.CBETH, ethFeed: Address.Chainlink.CHAINLINK_CBETH_ETH_AGGREGATOR},
+  {token: Address.RSWETH, ethFeed: Address.Chainlink.CHAINLINK_RSWETH_ETH_AGGREGATOR},
 ]
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {

@@ -19,7 +19,7 @@ function getChainConfig() {
   if (FORK_NODE_URL!.includes('eth.connect') || FORK_NODE_URL!.includes('eth-mainnet')) {
     return {chainId: 1, deploy: ['deploy/mainnet']}
   }
-  if (FORK_NODE_URL!.includes('optimism')) {
+  if (FORK_NODE_URL!.includes('optimism') || FORK_NODE_URL!.includes('opt-mainnet')) {
     return {chainId: 10, deploy: ['deploy/optimism']}
   }
   if (FORK_NODE_URL!.includes('base')) {
@@ -57,6 +57,7 @@ const config: HardhatUserConfig = {
       chains: {
         // See: https://hardhat.org/hardhat-network/docs/guides/forking-other-networks#using-a-custom-hardfork-history
         43111: {hardforkHistory: {cancun: 1}},
+        8453: {hardforkHistory: {cancun: 1}},
       },
     },
     mainnet: {

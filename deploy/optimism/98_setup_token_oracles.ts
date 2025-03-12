@@ -27,11 +27,14 @@ const customOracles = [
   {token: Address.Synth.msUSD, oracle: 'USDPeggedTokenOracle'},
 ]
 
+const chainlinkEthOnly = [{token: Address.EZETH, ethFeed: Address.Chainlink.CHAINLINK_EZETH_ETH_AGGREGATOR}]
+
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
   await setupTokenOracles(hre, {
     chainlinkAggregators,
     curveLpTokens,
     customOracles,
+    chainlinkEthOnly,
   })
 }
 
