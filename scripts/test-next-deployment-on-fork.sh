@@ -17,6 +17,17 @@ fi
 # Prepare deployment data
 cp -r deployments/$network deployments/localhost
 
+# Impersonate deployer
+npx hardhat impersonate-deployer --network localhost
+
 # Deployment
-npx hardhat deploy --network localhost
+
+#mainnet
+#npx hardhat deploy --network localhost --tags ERC4626TokenOracle,setupOracles,MultiSigTxs
+
+#base
+#npx hardhat deploy --network localhost --tags setupOracles,MultiSigTxs
+
+#op
+npx hardhat deploy --network localhost --tags setupOracles,MultiSigTxs,ChainlinkEthOnlyTokenOracle
 

@@ -35,6 +35,11 @@ describe('MasterOracle', function () {
       DAI,
       USDC,
       USDT,
+      USDS,
+      WSTETH,
+      RSWETH,
+      SUSDE,
+      SUSDS,
       Compound: {CDAI, CUSDC, CETH},
       Curve: {
         TRIPOOL_LP,
@@ -58,7 +63,6 @@ describe('MasterOracle', function () {
       Vesper: {vaUSDC, vaDAI, vaFRAX, vaETH, vastETH, vaWBTC, vaLINK, varETH, vacbETH},
       Synth: {msETH, msUSD, msBTC},
       Frax: {sFrxETH, frxETH},
-      Bloom: {TBY_MAR24_A},
     } = Addresses.mainnet
 
     before(async function () {
@@ -408,9 +412,29 @@ describe('MasterOracle', function () {
       })
     })
 
-    it('should get price for TBY', async function () {
-      const price = await masterOracle.getPriceInUsd(TBY_MAR24_A)
-      expect(price).closeTo(toUSD('1.02'), toUSD('0.01'))
+    it('should get price for USDS', async function () {
+      const price = await masterOracle.getPriceInUsd(USDS)
+      expect(price).closeTo(toUSD('1.00'), toUSD('0.01'))
+    })
+
+    it('should get price for WSTETH', async function () {
+      const price = await masterOracle.getPriceInUsd(WSTETH)
+      expect(price).closeTo(toUSD('3,021'), toUSD('10'))
+    })
+
+    it('should get price for RSWETH', async function () {
+      const price = await masterOracle.getPriceInUsd(RSWETH)
+      expect(price).closeTo(toUSD('2,602'), toUSD('10'))
+    })
+
+    it('should get price for SUSDE', async function () {
+      const price = await masterOracle.getPriceInUsd(SUSDE)
+      expect(price).closeTo(toUSD('1.10'), toUSD('0.01'))
+    })
+
+    it('should get price for SUSDS', async function () {
+      const price = await masterOracle.getPriceInUsd(SUSDS)
+      expect(price).closeTo(toUSD('1.00'), toUSD('0.01'))
     })
   })
 
@@ -419,6 +443,7 @@ describe('MasterOracle', function () {
       GOVERNOR,
       DAI,
       Curve,
+      EZETH,
       Vesper: {vaUSDC, vaOP, vaETH, vawstETH},
       Synth: {msUSD, msETH, msOP},
     } = Addresses.optimism
@@ -505,11 +530,17 @@ describe('MasterOracle', function () {
         expect(price).closeTo(Quote.optimism.vaOP_USD, toUSD('0.01'))
       })
     })
+
+    it('should get price for EZETH', async function () {
+      const price = await masterOracle.getPriceInUsd(EZETH)
+      expect(price).closeTo(toUSD('1,918'), toUSD('5'))
+    })
   })
 
   describe('MasterOracle @base', function () {
     const {
       USDC,
+      EZETH,
       Synth: {msUSD, msETH},
     } = Addresses.base
 
@@ -548,6 +579,11 @@ describe('MasterOracle', function () {
         const price = await masterOracle.getPriceInUsd(msETH)
         expect(price).closeTo(Quote.base.ETH_USD, toUSD('5'))
       })
+    })
+
+    it('should get price for EZETH', async function () {
+      const price = await masterOracle.getPriceInUsd(EZETH)
+      expect(price).closeTo(toUSD('3,020'), toUSD('5'))
     })
   })
 })
