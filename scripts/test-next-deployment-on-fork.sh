@@ -22,12 +22,6 @@ npx hardhat impersonate-deployer --network localhost
 
 # Deployment
 
-#mainnet
-#npx hardhat deploy --network localhost --tags ERC4626TokenOracle,setupOracles,MultiSigTxs
 
-#base
-#npx hardhat deploy --network localhost --tags setupOracles,MultiSigTxs
-
-#op
-npx hardhat deploy --network localhost --tags setupOracles,MultiSigTxs,ChainlinkEthOnlyTokenOracle
+npx hardhat deploy --network localhost
 
