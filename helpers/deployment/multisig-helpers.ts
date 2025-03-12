@@ -66,7 +66,7 @@ const prepareTx = async (
   const actualDeployment = !['hardhat', 'localhost'].includes(hre.network.name)
 
   if (actualDeployment && from !== Address.GNOSIS_SAFE) {
-    throw Error(`Trying to propose a multi-sig transaction but sender ('${from}') isn't the safe address.`)
+    throw Error(`Trying to prepare a multi-sig transaction but sender ('${from}') isn't the safe address.`)
   }
 
   return {to, data, value: value || '0'}
