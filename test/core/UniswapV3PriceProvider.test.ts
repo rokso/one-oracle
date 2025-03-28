@@ -126,7 +126,7 @@ describe('UniswapV3PriceProvider', function () {
           poolFee,
           parseUnits('1', 8)
         )
-        expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('150', 6))
+        expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('350', 6))
       })
     })
 

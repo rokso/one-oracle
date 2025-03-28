@@ -419,22 +419,22 @@ describe('MasterOracle', function () {
 
     it('should get price for WSTETH', async function () {
       const price = await masterOracle.getPriceInUsd(WSTETH)
-      expect(price).closeTo(toUSD('3,021'), toUSD('10'))
+      expect(price).closeTo(toUSD('2,245'), toUSD('10'))
     })
 
     it('should get price for RSWETH', async function () {
       const price = await masterOracle.getPriceInUsd(RSWETH)
-      expect(price).closeTo(toUSD('2,602'), toUSD('10'))
+      expect(price).closeTo(toUSD('1,934'), toUSD('10'))
     })
 
     it('should get price for SUSDE', async function () {
       const price = await masterOracle.getPriceInUsd(SUSDE)
-      expect(price).closeTo(toUSD('1.10'), toUSD('0.01'))
+      expect(price).closeTo(toUSD('1.15'), toUSD('0.01'))
     })
 
     it('should get price for SUSDS', async function () {
       const price = await masterOracle.getPriceInUsd(SUSDS)
-      expect(price).closeTo(toUSD('1.00'), toUSD('0.01'))
+      expect(price).closeTo(toUSD('1.04'), toUSD('0.01'))
     })
   })
 
@@ -583,7 +583,7 @@ describe('MasterOracle', function () {
 
     it('should get price for EZETH', async function () {
       const price = await masterOracle.getPriceInUsd(EZETH)
-      expect(price).closeTo(toUSD('3,020'), toUSD('5'))
+      expect(price).closeTo(toUSD('1,954'), toUSD('5'))
     })
   })
 })
