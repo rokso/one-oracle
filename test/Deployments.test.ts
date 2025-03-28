@@ -36,27 +36,34 @@ describe('Deployments ', function () {
   })
 
   describe('@base', function () {
+    let masterOracle: MasterOracle
     let chainlinkPriceProvider: ChainlinkBasePriceProvider
     let priceProvidersAggregator: PriceProvidersAggregator
     let chainlinkOracle: ChainlinkOracle
 
-    const {WETH} = Addresses.base
+    const {WETH, superOETHb, wsuperOETHb} = Addresses.base
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
       hre.network.deploy = ['deploy/base']
       // eslint-disable-next-line no-shadow
-      const {ChainlinkPriceProvider, PriceProvidersAggregator, ChainlinkOracle} = await deployments.fixture()
+      const {MasterOracle, ChainlinkPriceProvider, PriceProvidersAggregator, ChainlinkOracle} =
+        await deployments.fixture()
+
+      masterOracle = await ethers.getContractAt('MasterOracle', MasterOracle.address, deployer)
+
       chainlinkPriceProvider = await ethers.getContractAt(
         'ChainlinkBasePriceProvider',
         ChainlinkPriceProvider.address,
         deployer
       )
+
       priceProvidersAggregator = await ethers.getContractAt(
         'PriceProvidersAggregator',
         PriceProvidersAggregator.address,
         deployer
       )
+
       chainlinkOracle = await ethers.getContractAt('ChainlinkOracle', ChainlinkOracle.address, deployer)
     })
 
@@ -74,19 +81,40 @@ describe('Deployments ', function () {
       const priceInUsd = await chainlinkOracle.getPriceInUsd(WETH)
       expect(priceInUsd).closeTo(Quote.base.ETH_USD, toUSD('1'))
     })
+
+    describe('MasterOracle', function () {
+      it('superOETHb', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(superOETHb)
+
+        // then
+        expect(price).closeTo(parseEther('1,878'), parseEther('1'))
+      })
+
+      it('wsuperOETHb', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(wsuperOETHb)
+
+        // then
+        expect(price).closeTo(parseEther('1,977'), parseEther('1'))
+      })
+    })
   })
 
   describe('@mainnet', function () {
+    let masterOracle: MasterOracle
     let vspOracle: VspMainnetOracle
 
-    const {WETH, VSP} = Addresses.mainnet
+    const {WETH, VSP, ynETHx} = Addresses.mainnet
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
       hre.network.deploy = ['deploy/mainnet']
 
       // eslint-disable-next-line no-shadow
-      const {VspOracle} = await deployments.fixture()
+      const {MasterOracle, VspOracle} = await deployments.fixture()
+
+      masterOracle = await ethers.getContractAt('MasterOracle', MasterOracle.address, deployer)
 
       vspOracle = await ethers.getContractAt('VspMainnetOracle', VspOracle.address, deployer)
 
@@ -103,6 +131,16 @@ describe('Deployments ', function () {
 
       // then
       expect(price).closeTo(Quote.mainnet.VSP_USD, parseEther('0.01'))
+    })
+
+    describe('MasterOracle', function () {
+      it('ynETHx', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(ynETHx)
+
+        // then
+        expect(price).closeTo(parseEther('1,941'), parseEther('1'))
+      })
     })
   })
 

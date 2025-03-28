@@ -88,6 +88,7 @@ const customOracles = [
   {token: Address.Frax.sFrxETH, oracle: 'SFraxEthTokenOracle'},
   // ERC4626
   {token: Address.SUSDS, oracle: 'ERC4626TokenOracle'},
+  {token: Address.ynETHx, oracle: 'ERC4626TokenOracle'},
 ]
 
 const customStalePeriods = [

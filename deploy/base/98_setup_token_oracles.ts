@@ -17,11 +17,13 @@ const customOracles = [
   {token: Address.Vesper.vacbETH, oracle: 'VPoolTokenOracle'},
   {token: Address.Vesper.vawstETH, oracle: 'VPoolTokenOracle'},
   {token: Address.Synth.msUSD, oracle: 'USDPeggedTokenOracle'},
+  {token: Address.wsuperOETHb, oracle: 'ERC4626TokenOracle'},
 ]
 
 const chainlinkEthOnly = [
   {token: Address.WSTETH, ethFeed: Address.Chainlink.CHAINLINK_WSTETH_ETH_AGGREGATOR},
   {token: Address.EZETH, ethFeed: Address.Chainlink.CHAINLINK_EZETH_ETH_AGGREGATOR},
+  {token: Address.superOETHb, ethFeed: Address.Chainlink.CHAINLINK_SUPER_OETH_B_AGGREGATOR},
 ]
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {
