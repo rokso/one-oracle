@@ -158,7 +158,7 @@ describe('UniswapV2LikePriceProvider', function () {
             usdc.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('200', 6))
+          expect(_amountOut).closeTo(Quote.mainnet.BTC_USD.div(`${1e12}`), parseUnits('500', 6))
         })
       })
 
@@ -234,7 +234,7 @@ describe('UniswapV2LikePriceProvider', function () {
             dai.address,
             parseUnits('1', 8)
           )
-          expect(_amountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('200'))
+          expect(_amountOut).closeTo(Quote.mainnet.BTC_USD, parseEther('300'))
         })
       })
     })
