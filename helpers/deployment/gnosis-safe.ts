@@ -22,7 +22,7 @@ export class GnosisSafe {
 
     const safeAddress = safeSDK.getAddress()
     const nonce = await safeClient.getNextNonce(safeAddress)
-    const safeTransaction = await safeSDK.createTransaction({safeTransactionData, options: {nonce}})
+    const safeTransaction = await safeSDK.createTransaction({safeTransactionData, onlyCalls: true, options: {nonce}})
     const safeTxHash = await safeSDK.getTransactionHash(safeTransaction)
     const {data: senderSignature} = await safeSDK.signTransactionHash(safeTxHash)
 

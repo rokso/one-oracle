@@ -57,7 +57,7 @@ export const setupTokenOracles = async (
   if (chainlinkAggregators) {
     for (const {token, aggregator} of chainlinkAggregators) {
       const current = await read(ChainlinkPriceProvider, 'aggregators', token)
-      if (current !== aggregator) {
+      if (current !== hre.ethers.utils.getAddress(aggregator)) {
         await saveGovernorExecutionForMultiSigBatch(hre, ChainlinkPriceProvider, 'updateAggregator', token, aggregator)
       }
     }
