@@ -51,14 +51,14 @@ const Quote = {
     vacbETH_USD: parseEther('2,122'),
   },
   optimism: {
-    ETH_USD: parseEther('1,844'),
+    ETH_USD: parseEther('2,566'),
     USDC_USD: parseEther('1'),
     DAI_USD: parseEther('1'),
     OP_USD: parseEther('0.82'),
     vaUSDC_USD: parseEther('1.1'),
-    vaETH_USD: parseEther('1,976'),
-    vastETH_USD: parseEther('2,202'),
-    vaOP_USD: parseEther('0.86'),
+    vaETH_USD: parseEther('2,754'),
+    vastETH_USD: parseEther('3,078'),
+    vaOP_USD: parseEther('0.83'),
   },
   swell: {
     ETH_USD: parseEther('3,937'),
