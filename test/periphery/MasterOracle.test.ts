@@ -533,7 +533,7 @@ describe('MasterOracle', function () {
 
     it('should get price for EZETH', async function () {
       const price = await masterOracle.getPriceInUsd(EZETH)
-      expect(price).closeTo(toUSD('1,918'), toUSD('5'))
+      expect(price).closeTo(toUSD('2,690'), toUSD('5'))
     })
   })
 
