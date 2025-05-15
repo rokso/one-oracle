@@ -105,7 +105,7 @@ describe('Deployments ', function () {
     let masterOracle: MasterOracle
     let vspOracle: VspMainnetOracle
 
-    const {WETH, VSP, ynETHx} = Addresses.mainnet
+    const {WETH, VSP, ynETHx, Curve} = Addresses.mainnet
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -140,6 +140,24 @@ describe('Deployments ', function () {
 
         // then
         expect(price).closeTo(parseEther('1,941'), parseEther('1'))
+      })
+    })
+
+    describe('CurveLpTokenOracleV2', function () {
+      it('eUSD_USDC', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(Curve.eUSD_USDC_POOL)
+
+        // then
+        expect(price).closeTo(parseEther('1.00'), parseEther('0.01'))
+      })
+
+      it('ynETHx_WETH', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(Curve.ynETHx_WETH_POOL)
+
+        // then
+        expect(price).closeTo(parseEther('1905'), parseEther('1'))
       })
     })
   })

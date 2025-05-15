@@ -38,7 +38,7 @@ const curveLpTokens = [
   {token: Address.Curve.FRAX_USDC_LP, isLending: false},
 ]
 
-const curveLpTokensV2 = [Address.Curve.DOLA_FRAXPYUSD_LP]
+const curveLpTokensV2 = [Address.Curve.DOLA_FRAXPYUSD_LP, Address.Curve.eUSD_USDC_POOL, Address.Curve.ynETHx_WETH_POOL]
 
 const curveFactoryLps = [
   Address.Curve.IBBTC_SBTC_LP,
