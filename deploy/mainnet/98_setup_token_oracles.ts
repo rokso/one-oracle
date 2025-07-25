@@ -103,6 +103,7 @@ const chainlinkEthOnly = [
   {token: Address.rETH, ethFeed: Address.Chainlink.CHAINLINK_RETH_ETH_AGGREGATOR},
   {token: Address.CBETH, ethFeed: Address.Chainlink.CHAINLINK_CBETH_ETH_AGGREGATOR},
   {token: Address.RSWETH, ethFeed: Address.Chainlink.CHAINLINK_RSWETH_ETH_AGGREGATOR},
+  {token: Address.WEETH, ethFeed: Address.Chainlink.CHAINLINK_WEETH_ETH_USD_AGGREGATOR},
 ]
 
 const func: DeployFunction = async (hre: HardhatRuntimeEnvironment) => {

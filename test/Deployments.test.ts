@@ -105,7 +105,7 @@ describe('Deployments ', function () {
     let masterOracle: MasterOracle
     let vspOracle: VspMainnetOracle
 
-    const {WETH, VSP, ynETHx, Curve} = Addresses.mainnet
+    const {WETH, VSP, ynETHx, WEETH, Curve} = Addresses.mainnet
 
     beforeEach(async function () {
       // Setting the folder to execute deployment scripts from
@@ -140,6 +140,14 @@ describe('Deployments ', function () {
 
         // then
         expect(price).closeTo(parseEther('1,941'), parseEther('1'))
+      })
+
+      it('WEETH', async function () {
+        // when
+        const price = await masterOracle.getPriceInUsd(WEETH)
+
+        // then
+        expect(price).closeTo(parseEther('1,991'), parseEther('1'))
       })
     })
 
