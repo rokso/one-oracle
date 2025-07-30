@@ -7,6 +7,10 @@ const {hemi: Address} = Addresses
 const setupOracles = 'setupOracles'
 
 const redstonePushAggregators = [
+  {token: Address.WETH, aggregator: Address.Redstone.REDSTONE_ETH_USD_AGGREGATOR},
+  {token: Address.USDC, aggregator: Address.Redstone.REDSTONE_USDC_USD_AGGREGATOR},
+  {token: Address.USDCe, aggregator: Address.Redstone.REDSTONE_USDC_USD_AGGREGATOR},
+  {token: Address.USDT, aggregator: Address.Redstone.REDSTONE_USDT_USD_AGGREGATOR},
   {token: Address.Synth.msETH, aggregator: Address.Redstone.REDSTONE_ETH_USD_AGGREGATOR},
   {token: Address.Synth.msBTC, aggregator: Address.Redstone.REDSTONE_BTC_USD_AGGREGATOR},
 ]
